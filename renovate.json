@@ -1,0 +1,22 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "github-actions": {
+    "enabled": true,
+    "pinDigests": true
+  },
+  "includePaths": [
+    "Gemfile",
+    "yard-lint.gemspec"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "minimumReleaseAge": "7 days"
+    }
+  ]
+}
