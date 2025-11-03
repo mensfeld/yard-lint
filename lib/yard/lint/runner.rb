@@ -98,13 +98,9 @@ module Yard
       # @param raw [Hash] raw stdout output result from yard commands
       # @return [Array<Hash>] Array with undocumented objects details
       def build_undocumented(raw)
-        all = Parsers::UndocumentedObject
-              .new
-              .call(raw.dig(:stats, :stdout))
+        all = Parsers::UndocumentedObject.new.call(raw.dig(:stats, :stdout))
 
-        boolean = Parsers::UndocumentedBooleanMethods
-                  .new
-                  .call(raw.dig(:undocumented_boolean_methods, :stdout))
+        boolean = Parsers::UndocumentedBooleanMethods.new.call(raw.dig(:undocumented_boolean_methods, :stdout))
 
         all + boolean
       end
@@ -112,25 +108,19 @@ module Yard
       # @param raw [Hash] raw stdout output result from yard commands
       # @return [Array<Hash>] array with all warnings informations from yard list on missing docs
       def build_undocumented_method_arguments(raw)
-        Parsers::UndocumentedMethodArguments
-          .new
-          .call(raw.dig(:undocumented_method_arguments, :stdout))
+        Parsers::UndocumentedMethodArguments.new.call(raw.dig(:undocumented_method_arguments, :stdout))
       end
 
       # @param raw [Hash] raw stdout output result from yard commands
       # @return [Array<Hash>] array with location info of elements with invalid tag types
       def build_invalid_tags_types(raw)
-        Parsers::UndocumentedMethodArguments
-          .new
-          .call(raw.dig(:invalid_tags_types, :stdout))
+        Parsers::UndocumentedMethodArguments.new.call(raw.dig(:invalid_tags_types, :stdout))
       end
 
       # @param raw [Hash] raw stdout output result from yard commands
       # @return [Array<Hash>] array with location info of elements with invalid tags order
       def build_invalid_tags_order(raw)
-        Parsers::InvalidTagsOrder
-          .new
-          .call(raw.dig(:invalid_tags_order, :stdout))
+        Parsers::InvalidTagsOrder.new.call(raw.dig(:invalid_tags_order, :stdout))
       end
 
       # @param raw [Hash] raw stdout output result from yard commands
@@ -138,9 +128,7 @@ module Yard
       def build_api_tags(raw)
         return [] unless raw[:api_tags]
 
-        Parsers::ApiTags
-          .new
-          .call(raw.dig(:api_tags, :stdout))
+        Parsers::ApiTags.new.call(raw.dig(:api_tags, :stdout))
       end
 
       # @param raw [Hash] raw stdout output result from yard commands
@@ -148,9 +136,7 @@ module Yard
       def build_abstract_methods(raw)
         return [] unless raw[:abstract_methods]
 
-        Parsers::AbstractMethods
-          .new
-          .call(raw.dig(:abstract_methods, :stdout))
+        Parsers::AbstractMethods.new.call(raw.dig(:abstract_methods, :stdout))
       end
 
       # @param raw [Hash] raw stdout output result from yard commands
@@ -158,9 +144,7 @@ module Yard
       def build_option_tags(raw)
         return [] unless raw[:option_tags]
 
-        Parsers::OptionTags
-          .new
-          .call(raw.dig(:option_tags, :stdout))
+        Parsers::OptionTags.new.call(raw.dig(:option_tags, :stdout))
       end
 
       # Build final result object

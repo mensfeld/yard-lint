@@ -10,7 +10,7 @@ RSpec.describe 'Yard::Lint Validators' do
         end
       end
 
-      it "detects API tag issues" do
+      it 'detects API tag issues' do
         # Run against a simple Ruby string to avoid loading full project
         result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config)
 
@@ -28,7 +28,7 @@ RSpec.describe 'Yard::Lint Validators' do
         end
       end
 
-      it "does not run API tag validation" do
+      it 'does not run API tag validation' do
         result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config)
 
         expect(result.api_tags).to be_empty
@@ -43,7 +43,7 @@ RSpec.describe 'Yard::Lint Validators' do
         end
       end
 
-      it "uses custom allowed_apis configuration" do
+      it 'uses custom allowed_apis configuration' do
         result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config)
 
         # Feature should work with custom config
@@ -60,7 +60,7 @@ RSpec.describe 'Yard::Lint Validators' do
         end
       end
 
-      it "runs abstract method validation" do
+      it 'runs abstract method validation' do
         result = Yard::Lint.run(path: 'lib', config: config)
 
         expect(result.abstract_methods).to be_an(Array)
@@ -75,7 +75,7 @@ RSpec.describe 'Yard::Lint Validators' do
         end
       end
 
-      it "does not run abstract method validation" do
+      it 'does not run abstract method validation' do
         result = Yard::Lint.run(path: 'lib', config: config)
 
         expect(result.abstract_methods).to be_empty
@@ -91,7 +91,7 @@ RSpec.describe 'Yard::Lint Validators' do
         end
       end
 
-      it "runs option tags validation" do
+      it 'runs option tags validation' do
         result = Yard::Lint.run(path: 'lib', config: config)
 
         expect(result.option_tags).to be_an(Array)
@@ -106,7 +106,7 @@ RSpec.describe 'Yard::Lint Validators' do
         end
       end
 
-      it "does not run option tags validation" do
+      it 'does not run option tags validation' do
         result = Yard::Lint.run(path: 'lib', config: config)
 
         expect(result.option_tags).to be_empty
@@ -123,7 +123,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
     end
 
-    it "runs all validators when enabled" do
+    it 'runs all validators when enabled' do
       result = Yard::Lint.run(path: 'lib', config: config)
 
       expect(result.api_tags).to be_an(Array)
@@ -131,7 +131,7 @@ RSpec.describe 'Yard::Lint Validators' do
       expect(result.option_tags).to be_an(Array)
     end
 
-    it "includes all offense types in the offenses array" do
+    it 'includes all offense types in the offenses array' do
       result = Yard::Lint.run(path: 'lib', config: config)
 
       expect(result.offenses).to be_an(Array)

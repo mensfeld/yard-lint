@@ -4,7 +4,7 @@ require 'tmpdir'
 
 RSpec.describe Yard::Lint::Config do
   describe '#initialize' do
-    it "sets default values" do
+    it 'sets default values' do
       config = described_class.new
 
       expect(config.options).to eq([])
@@ -19,7 +19,7 @@ RSpec.describe Yard::Lint::Config do
       expect(config.validate_option_tags).to eq(true)
     end
 
-    it "accepts a block for configuration" do
+    it 'accepts a block for configuration' do
       config = described_class.new do |c|
         c.options = ['--private']
         c.tags_order = %w[param return]
@@ -51,13 +51,13 @@ RSpec.describe Yard::Lint::Config do
       File.delete(config_file) if File.exist?(config_file)
     end
 
-    it "raises an error if file does not exist" do
+    it 'raises an error if file does not exist' do
       expect do
         described_class.from_file('/nonexistent/file.yml')
       end.to raise_error(ArgumentError, /Config file not found/)
     end
 
-    it "loads configuration from YAML file" do
+    it 'loads configuration from YAML file' do
       File.write(config_file, <<~YAML)
         options:
           - --private
@@ -98,7 +98,7 @@ RSpec.describe Yard::Lint::Config do
       expect(config.validate_option_tags).to eq(true)
     end
 
-    it "uses defaults for missing keys" do
+    it 'uses defaults for missing keys' do
       File.write(config_file, <<~YAML)
         options:
           - --private
@@ -113,13 +113,13 @@ RSpec.describe Yard::Lint::Config do
   end
 
   describe '.load' do
-    it "returns nil if no config file is found" do
+    it 'returns nil if no config file is found' do
       allow(described_class).to receive(:find_config_file).and_return(nil)
 
       expect(described_class.load).to be_nil
     end
 
-    it "loads config file if found" do
+    it 'loads config file if found' do
       config_path = '/tmp/.yard-lint.yml'
       allow(described_class).to receive(:find_config_file).and_return(config_path)
       allow(File).to receive(:exist?).with(config_path).and_return(true)
@@ -132,7 +132,7 @@ RSpec.describe Yard::Lint::Config do
   end
 
   describe '.find_config_file' do
-    it "finds config file in current directory" do
+    it 'finds config file in current directory' do
       Dir.mktmpdir do |dir|
         config_file = File.join(dir, described_class::DEFAULT_CONFIG_FILE)
         File.write(config_file, '')
@@ -141,7 +141,7 @@ RSpec.describe Yard::Lint::Config do
       end
     end
 
-    it "finds config file in parent directory" do
+    it 'finds config file in parent directory' do
       Dir.mktmpdir do |parent_dir|
         config_file = File.join(parent_dir, described_class::DEFAULT_CONFIG_FILE)
         File.write(config_file, '')
@@ -153,7 +153,7 @@ RSpec.describe Yard::Lint::Config do
       end
     end
 
-    it "returns nil if no config file is found" do
+    it 'returns nil if no config file is found' do
       Dir.mktmpdir do |dir|
         expect(described_class.find_config_file(dir)).to be_nil
       end
@@ -161,14 +161,14 @@ RSpec.describe Yard::Lint::Config do
   end
 
   describe '#[]' do
-    it "allows hash-like access to attributes" do
+    it 'allows hash-like access to attributes' do
       config = described_class.new
 
       expect(config[:options]).to eq([])
       expect(config[:tags_order]).to eq(described_class::DEFAULT_TAGS_ORDER)
     end
 
-    it "returns nil for non-existent attributes" do
+    it 'returns nil for non-existent attributes' do
       config = described_class.new
 
       expect(config[:nonexistent]).to be_nil

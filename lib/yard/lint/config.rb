@@ -7,8 +7,8 @@ module Yard
     # Configuration object for YARD Lint
     class Config
       attr_accessor :options, :tags_order, :invalid_tags_names, :extra_types,
-                    :exclude, :fail_on_severity, :require_api_tags, :allowed_apis,
-                    :validate_abstract_methods, :validate_option_tags
+        :exclude, :fail_on_severity, :require_api_tags, :allowed_apis,
+        :validate_abstract_methods, :validate_option_tags
 
       # Default YAML config file name
       DEFAULT_CONFIG_FILE = '.yard-lint.yml'
@@ -125,9 +125,7 @@ module Yard
       # @param key [Symbol, String] attribute name to access
       # @return [Object, nil] attribute value or nil if not found
       def [](key)
-        send(key)
-      rescue NoMethodError
-        nil
+        respond_to?(key) ? send(key) : nil
       end
     end
   end

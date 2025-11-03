@@ -45,6 +45,7 @@ module Yard
       # @param name [String, Symbol] name of the rake task
       # @yield [self] configuration block
       def initialize(name = :yard_lint)
+        super()
         @name = name
         @paths = ['lib']
         @config_file = nil

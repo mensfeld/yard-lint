@@ -11,34 +11,34 @@ config_file = nil
 config_overrides = {}
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: yard-lint [options] PATH"
+  opts.banner = 'Usage: yard-lint [options] PATH'
 
   opts.on('-c', '--config FILE', 'Path to config file (default: .yard-lint.yml)') do |file|
     config_file = file
   end
 
   opts.on('-t', '--tags-order ORDER', Array,
-          'Comma-separated list of tag names in expected order') do |order|
+    'Comma-separated list of tag names in expected order') do |order|
     config_overrides[:tags_order] = order
   end
 
   opts.on('-e', '--extra-types TYPES', Array,
-          'Comma-separated list of extra allowed type names') do |types|
+    'Comma-separated list of extra allowed type names') do |types|
     config_overrides[:extra_types] = types
   end
 
   opts.on('-o', '--options OPTIONS', Array,
-          'Comma-separated list of extra YARD options') do |yard_options|
+    'Comma-separated list of extra YARD options') do |yard_options|
     config_overrides[:options] = yard_options
   end
 
   opts.on('-x', '--exclude PATTERNS', Array,
-          'Comma-separated list of exclusion patterns') do |patterns|
+    'Comma-separated list of exclusion patterns') do |patterns|
     config_overrides[:exclude] = patterns
   end
 
   opts.on('-s', '--fail-on-severity LEVEL',
-          'Fail on severity level (error, warning, convention, never)') do |level|
+    'Fail on severity level (error, warning, convention, never)') do |level|
     config_overrides[:fail_on_severity] = level
   end
 
@@ -88,9 +88,9 @@ case options[:format]
 when 'json'
   require 'json'
   puts JSON.pretty_generate({
-                              offense_count: result.count,
-                              offenses: result.offenses
-                            })
+    offense_count: result.count,
+    offenses: result.offenses
+  })
   exit result.exit_code(config)
 when 'text', nil
   if result.clean?

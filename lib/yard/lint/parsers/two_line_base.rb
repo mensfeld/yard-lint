@@ -31,7 +31,7 @@ module Yard
         def classify(rows)
           buffor = []
 
-          rows.each_with_index do |row, index|
+          rows.each.with_index do |row, index|
             next unless row.match? self.class.regexps[:general]
 
             buffor << [rows[index].to_s, rows[index + 1].to_s]

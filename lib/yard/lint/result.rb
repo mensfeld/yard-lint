@@ -5,12 +5,15 @@ module Yard
     # Result object containing all offenses found during validation
     class Result
       attr_reader :warnings, :undocumented, :undocumented_method_arguments,
-                  :invalid_tags_types, :invalid_tags_order, :api_tags,
-                  :abstract_methods, :option_tags
+        :invalid_tags_types, :invalid_tags_order, :api_tags,
+        :abstract_methods, :option_tags
 
       # Severity levels for different offense types
+      # @return [String] severity level for errors
       SEVERITY_ERROR = 'error'
+      # @return [String] severity level for warnings
       SEVERITY_WARNING = 'warning'
+      # @return [String] severity level for conventions
       SEVERITY_CONVENTION = 'convention'
 
       # @param data [Hash] parsed data from validators
@@ -137,7 +140,7 @@ module Yard
             type: 'method',
             name: 'UndocumentedMethodArgument',
             message: "The `#{offense[:method_name]}` method is missing documentation " \
-                     "for some of the arguments.",
+                     'for some of the arguments.',
             location: offense[:location],
             location_line: offense[:line]
           }
@@ -153,7 +156,7 @@ module Yard
             type: 'method',
             name: 'InvalidTagType',
             message: "The `#{offense[:method_name]}` has at least one tag " \
-                     "with an invalid type definition.",
+                     'with an invalid type definition.',
             location: offense[:location],
             location_line: offense[:line]
           }

@@ -9,19 +9,19 @@ RSpec.describe Yard::Lint::RakeTask do
   end
 
   describe "#initialize" do
-    it "creates a rake task with default name" do
+    it 'creates a rake task with default name' do
       described_class.new
 
       expect(Rake::Task.task_defined?(:yard_lint)).to be true
     end
 
-    it "creates a rake task with custom name" do
+    it 'creates a rake task with custom name' do
       described_class.new(:custom_lint)
 
       expect(Rake::Task.task_defined?(:custom_lint)).to be true
     end
 
-    it "sets default values" do
+    it 'sets default values' do
       task = described_class.new
 
       expect(task.name).to eq(:yard_lint)
@@ -32,7 +32,7 @@ RSpec.describe Yard::Lint::RakeTask do
       expect(task.description).to eq('Run YARD documentation linter')
     end
 
-    it "accepts configuration block" do
+    it 'accepts configuration block' do
       task = described_class.new do |t|
         t.paths = %w[lib app]
         t.config_file = '.custom-config.yml'
@@ -46,7 +46,7 @@ RSpec.describe Yard::Lint::RakeTask do
   end
 
   describe "task execution" do
-    it "runs without error when no offenses found" do
+    it 'runs without error when no offenses found' do
       allow(Yard::Lint).to receive(:run).and_return(
         instance_double(Yard::Lint::Result, clean?: true)
       )
@@ -55,7 +55,7 @@ RSpec.describe Yard::Lint::RakeTask do
       expect { Rake::Task[:yard_lint].invoke }.to output(/No offenses found/).to_stdout
     end
 
-    it "displays statistics when offenses are found" do
+    it 'displays statistics when offenses are found' do
       result = instance_double(
         Yard::Lint::Result,
         clean?: false,

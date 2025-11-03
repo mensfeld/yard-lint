@@ -5,7 +5,9 @@ require_relative 'lint/version'
 
 # Define modules first
 module Yard
+  # YARD Lint module providing linting functionality for YARD documentation
   module Lint
+    # Custom error class for YARD Lint exceptions
     class Error < StandardError; end
   end
 end

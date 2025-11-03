@@ -40,10 +40,9 @@ module Yard
           base_hash.delete_if { |_key, value| value == 'valid' }
           order = base_hash.values.map(&:last)
 
-          UndocumentedMethodArguments
-            .new
+          UndocumentedMethodArguments.new
             .call(base_hash.values.map(&:first).join("\n"))
-            .each_with_index { |element, index| element[:order] = order[index] }
+            .each.with_index { |element, index| element[:order] = order[index] }
         end
 
         private
