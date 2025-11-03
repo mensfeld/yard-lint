@@ -40,7 +40,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@7bae1d00b5db9166c60df4rdf3e2845e3a0948cc # v1.202.0
+        uses: ruby/setup-ruby@2a7b30092b0caf9c046252510f9273b4875f3db9 # v1.254.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
@@ -66,7 +66,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@7bae1d00b5db9166c60df4rdf3e2845e3a0948cc # v1.202.0
+        uses: ruby/setup-ruby@2a7b30092b0caf9c046252510f9273b4875f3db9 # v1.254.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
@@ -75,18 +75,20 @@ jobs:
         run: bundle exec rspec
 
   ci-success:
+    name: CI Success
     runs-on: ubuntu-latest
+    if: always()
     needs:
       - coditsu
       - yard-lint
       - specs
-    if: always()
 
     steps:
-      - name: Verify CI success
-        run: |
-          if [ "${{ needs.coditsu.result }}" != "success" ] || [ "${{ needs.yard-lint.result }}" != "success" ] || [ "${{ needs.specs.result }}" != "success" ]; then
-            echo "CI failed"
-            exit 1
-          fi
-          echo "All CI checks passed"
+      - name: Check all jobs passed
+        if: |
+          contains(needs.*.result, 'failure') ||
+          contains(needs.*.result, 'cancelled') ||
+          contains(needs.*.result, 'skipped')
+        run: exit 1
+
+      - run: echo "All CI checks passed!"
