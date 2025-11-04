@@ -27,13 +27,13 @@ gem 'yard-lint'
 And then execute:
 
 ```bash
-$ bundle install
+bundle install
 ```
 
 Or install it yourself as:
 
 ```bash
-$ gem install yard-lint
+gem install yard-lint
 ```
 
 ## Usage
@@ -43,58 +43,28 @@ $ gem install yard-lint
 Basic usage:
 
 ```bash
-yard-lint lib/**/*.rb
+yard-lint lib/
 ```
 
-With custom options:
+With options:
 
 ```bash
-# Specify tag ordering
-yard-lint --tags-order param,return,raise lib/
-
-# Add extra allowed types
-yard-lint --extra-types CustomType,AnotherType lib/
+# Use a specific config file
+yard-lint --config config/yard-lint.yml lib/
 
 # Output as JSON
 yard-lint --format json lib/ > report.json
-```
 
-### Ruby API
+# Quiet mode (only show summary)
+yard-lint --quiet lib/
 
-```ruby
-require 'yard/lint'
-
-# Simple usage
-result = Yard::Lint.run(path: 'lib/**/*.rb')
-
-if result.clean?
-  puts "No offenses found!"
-else
-  puts "Found #{result.count} offenses:"
-  result.offenses.each do |offense|
-    puts "#{offense[:location]}:#{offense[:location_line]}"
-    puts "  #{offense[:severity]}: #{offense[:message]}"
-  end
-end
-
-# With custom configuration
-config = Yard::Lint::Config.new do |c|
-  c.tags_order = ['param', 'option', 'return', 'raise']
-  c.extra_types = ['CustomType']
-  c.invalid_tags_names = ['param', 'return']
-  c.options = ['--private', '--protected']
-end
-
-result = Yard::Lint.run(path: 'lib/', config: config)
+# Show statistics
+yard-lint --stats lib/
 ```
 
 ## Configuration
 
-YARD-Lint can be configured in three ways (in order of precedence):
-
-1. **Command-line options** (highest priority)
-2. **Configuration file** (`.yard-lint.yml`)
-3. **Defaults** (lowest priority)
+YARD-Lint is configured via a `.yard-lint.yml` configuration file (similar to `.rubocop.yml`).
 
 ### Configuration File
 
@@ -228,160 +198,47 @@ Documentation/UndocumentedObjects:
     - 'lib/legacy/**/*'
 ```
 
-### Ruby API Configuration
+### Available Validators
 
-You can also configure YARD-Lint programmatically:
+#### Documentation Validators
 
-```ruby
-# Load from file
-config = Yard::Lint::Config.from_file('.yard-lint.yml')
+- **Documentation/UndocumentedObjects**: Checks for classes, modules, and methods without documentation
+- **Documentation/UndocumentedMethodArguments**: Checks for method parameters without `@param` tags
+- **Documentation/UndocumentedBooleanMethods**: Checks that question mark methods document their boolean return
 
-# Or configure in Ruby
-config = Yard::Lint::Config.new do |c|
-  c.tags_order = ['param', 'return', 'raise', 'example']
-  c.extra_types = ['CustomType', 'MyEnum']
-  c.options = ['--private', '--protected']
-end
+#### Tags Validators
 
-result = Yard::Lint.run(path: 'lib/', config: config)
-```
+- **Tags/Order**: Enforces consistent ordering of YARD tags (configure with `EnforcedOrder`)
+- **Tags/InvalidTypes**: Validates type definitions in `@param`, `@return`, `@option` tags (configure with `ValidatedTags` and `ExtraTypes`)
+- **Tags/ApiTags**: Enforces `@api` tags on public objects (opt-in, configure with `AllowedApis`)
+- **Tags/OptionTags**: Requires `@option` tags for methods with options parameters
 
-### Configuration Options
+#### Warnings Validators
 
-#### tags_order
+- **Warnings/UnknownTag**: Detects unknown YARD tags
+- **Warnings/UnknownDirective**: Detects unknown YARD directives
+- **Warnings/InvalidTagFormat**: Detects malformed tag syntax
+- **Warnings/InvalidDirectiveFormat**: Detects malformed directive syntax
+- **Warnings/DuplicatedParameterName**: Detects duplicate `@param` tags
+- **Warnings/UnknownParameterName**: Detects `@param` tags for non-existent parameters
 
-Specifies the expected order of YARD tags. Defaults to:
+#### Semantic Validators
 
-```ruby
-['param', 'option', 'yield', 'yieldparam', 'yieldreturn', 'return', 'raise', 'see', 'example', 'note', 'todo']
-```
+- **Semantic/AbstractMethods**: Ensures `@abstract` methods don't have real implementations
 
-#### invalid_tags_names
+### Global Configuration Options
 
-Tags to check for invalid type definitions. Defaults to:
+- **AllValidators/YardOptions**: Array of YARD command-line options (e.g., `--private`, `--protected`)
+- **AllValidators/Exclude**: Array of glob patterns to exclude from linting
+- **AllValidators/FailOnSeverity**: Exit with error code for this severity level and above (`error`, `warning`, `convention`, `never`)
 
-```ruby
-['param', 'option', 'return', 'yieldreturn']
-```
+## Severity Levels
 
-#### extra_types
+YARD-Lint categorizes offenses into three severity levels:
 
-Additional type names to allow (beyond Ruby built-in types and defined constants). Defaults to:
-
-```ruby
-[]
-```
-
-#### options
-
-Extra options to pass to YARD commands. Defaults to:
-
-```ruby
-[]
-```
-
-#### exclude
-
-File patterns to exclude from linting. Defaults to:
-
-```ruby
-['\.git', 'vendor/**/*', 'node_modules/**/*']
-```
-
-Supports glob patterns compatible with `File.fnmatch`.
-
-#### fail_on_severity
-
-Severity level at which to exit with error code. Valid values:
-
-- `"error"` - Only fail on errors
-- `"warning"` - Fail on errors and warnings (default)
-- `"convention"` - Fail on any offense
-- `"never"` - Never fail (always exit 0)
-
-Defaults to:
-
-```ruby
-'warning'
-```
-
-#### require_api_tags
-
-When enabled, validates that all public objects have an `@api` tag. Defaults to `false`.
-
-```ruby
-false
-```
-
-#### allowed_apis
-
-List of allowed values for `@api` tags. Only checked when `require_api_tags` is true. Defaults to:
-
-```ruby
-['public', 'private', 'internal']
-```
-
-#### validate_abstract_methods
-
-When enabled, validates that methods marked with `@abstract` don't have real implementations (they should only raise `NotImplementedError` or be empty). **Enabled by default** for better documentation quality. Set to `false` to disable.
-
-```ruby
-true  # Default
-```
-
-#### validate_option_tags
-
-When enabled, validates that methods with `options`, `opts`, or `kwargs` parameters have corresponding `@option` tags documenting the available options. **Enabled by default** for better documentation quality. Set to `false` to disable.
-
-```ruby
-true  # Default
-```
-
-## Result Object
-
-The `Yard::Lint::Result` object provides several methods:
-
-```ruby
-result = Yard::Lint.run(path: 'lib/')
-
-result.offenses         # Array of all offenses
-result.count            # Total offense count
-result.offenses?        # True if there are offenses
-result.clean?           # True if no offenses
-result.statistics       # Hash with counts by severity
-result.exit_code(config) # Exit code based on config
-
-# Access specific offense categories
-result.warnings                         # YARD parser warnings
-result.undocumented                     # Undocumented objects
-result.undocumented_method_arguments    # Methods with missing param docs
-result.invalid_tags_types               # Invalid type definitions
-result.invalid_tags_order               # Tags in wrong order
-result.api_tags                         # Missing or invalid @api tags
-result.abstract_methods                 # @abstract methods with implementation
-result.option_tags                      # Missing @option tags for options parameters
-```
-
-## Offense Structure
-
-Each offense is a hash with the following structure:
-
-```ruby
-{
-  severity: 'error' | 'warning' | 'convention',
-  type: 'line' | 'method',
-  name: 'UnknownTag',  # Offense name
-  message: 'Unknown tag @example1...',
-  location: 'lib/my_class.rb',
-  location_line: 32
-}
-```
-
-### Severity Levels
-
-- **error**: Critical issues (unknown tags, invalid formats, etc.)
-- **warning**: Missing documentation, invalid type definitions
-- **convention**: Style issues (tag ordering)
+- **error**: Critical issues (unknown tags, invalid formats, malformed syntax)
+- **warning**: Missing documentation, invalid type definitions, semantic issues
+- **convention**: Style issues (tag ordering, formatting)
 
 ## Integration with CI
 
@@ -412,31 +269,28 @@ YARD-Lint supports the following command-line options:
 yard-lint [options] PATH
 
 Options:
-  -c, --config FILE                Path to config file (default: .yard-lint.yml)
-  -t, --tags-order ORDER           Comma-separated list of tag names in expected order
-  -e, --extra-types TYPES          Comma-separated list of extra allowed type names
-  -o, --options OPTIONS            Comma-separated list of extra YARD options
-  -x, --exclude PATTERNS           Comma-separated list of exclusion patterns
-  -s, --fail-on-severity LEVEL     Fail on severity level (error, warning, convention, never)
-  -f, --format FORMAT              Output format (text, json)
-  -q, --quiet                      Quiet mode (only show summary)
-      --stats                      Show statistics summary
-  -v, --version                    Show version
-  -h, --help                       Show this help
+  -c, --config FILE     Path to config file (default: .yard-lint.yml)
+  -f, --format FORMAT   Output format (text, json)
+  -q, --quiet           Quiet mode (only show summary)
+      --stats           Show statistics summary
+  -v, --version         Show version
+  -h, --help            Show this help
 ```
 
+All configuration (tag order, exclude patterns, severity levels, validator settings) should be defined in `.yard-lint.yml`.
+
 ## Examples
+
+### Check a directory
+
+```bash
+yard-lint lib/
+```
 
 ### Check a single file
 
 ```bash
 yard-lint lib/my_class.rb
-```
-
-### Check multiple paths
-
-```bash
-yard-lint lib/ app/
 ```
 
 ### Quiet mode with statistics
@@ -445,30 +299,35 @@ yard-lint lib/ app/
 yard-lint --quiet --stats lib/
 ```
 
-### Only fail on errors
+### JSON output
 
 ```bash
-yard-lint --fail-on-severity error lib/
+yard-lint --format json lib/ > report.json
 ```
 
-### Exclude specific patterns
+### Use custom config file
 
 ```bash
-yard-lint --exclude 'lib/generated/**/*,spec/**/*' lib/
+yard-lint --config config/yard-lint.yml lib/
+```
+
+### Configure fail-on-severity
+
+Add to `.yard-lint.yml`:
+```yaml
+AllValidators:
+  FailOnSeverity: error  # Only fail on errors, not warnings
 ```
 
 ### Enable @api tag validation
 
-```bash
-yard-lint --config .yard-lint.yml lib/
-```
-
-With `.yard-lint.yml`:
+Add to `.yard-lint.yml`:
 ```yaml
-require_api_tags: true
-allowed_apis:
-  - public
-  - private
+Tags/ApiTags:
+  Enabled: true
+  AllowedApis:
+    - public
+    - private
 ```
 
 This will enforce that all public classes, modules, and methods have an `@api` tag:
@@ -495,10 +354,11 @@ end
 
 ### @abstract method validation (enabled by default)
 
-This validator ensures abstract methods don't have real implementations. It's **enabled by default**. To disable it, set:
+This validator ensures abstract methods don't have real implementations. It's **enabled by default**. To disable it, add to `.yard-lint.yml`:
 
 ```yaml
-validate_abstract_methods: false
+Semantic/AbstractMethods:
+  Enabled: false
 ```
 
 Examples:
@@ -520,10 +380,11 @@ end
 
 ### @option tag validation (enabled by default)
 
-This validator ensures that methods with options parameters document them. It's **enabled by default**. To disable it, set:
+This validator ensures that methods with options parameters document them. It's **enabled by default**. To disable it, add to `.yard-lint.yml`:
 
 ```yaml
-validate_option_tags: false
+Tags/OptionTags:
+  Enabled: false
 ```
 
 Examples:
@@ -544,36 +405,6 @@ def configure(name, options = {})
 end
 ```
 
-### Use in a Rake task
-
-```ruby
-# Rakefile
-require 'yard/lint/rake_task'
-
-Yard::Lint::RakeTask.new do |task|
-  task.paths = ['lib']
-  task.config_file = '.yard-lint.yml'
-  task.fail_on_error = true
-end
-```
-
-Or manually:
-
-```ruby
-# Rakefile
-require 'yard/lint'
-
-desc 'Run YARD lint'
-task :yard_lint do
-  result = Yard::Lint.run(path: 'lib/**/*.rb')
-
-  unless result.clean?
-    puts "YARD lint failed with #{result.count} offenses"
-    exit 1
-  end
-end
-```
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -591,7 +422,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/mensfe
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Credits
-
-This gem was extracted from the [OffendingEngine](https://github.com/coditsu/offending-engine) project by Maciej Mensfeld.
