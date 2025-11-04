@@ -5,8 +5,8 @@ module Yard
     # Result object containing all offenses found during validation
     class Result
       attr_reader :warnings, :undocumented, :undocumented_method_arguments,
-        :invalid_tags_types, :invalid_tags_order, :api_tags,
-        :abstract_methods, :option_tags, :config
+                  :invalid_tags_types, :invalid_tags_order, :api_tags,
+                  :abstract_methods, :option_tags, :config
 
       # Severity levels for different offense types
       # @return [String] severity level for errors

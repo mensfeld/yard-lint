@@ -3,33 +3,33 @@
 module Yard
   module Lint
     module Validators
-        module Semantic
+      module Semantic
         module AbstractMethods
           # Validator to check @abstract methods have proper implementation
           class Validator < Base
-          private
+            private
 
           # Runs yard list query to find abstract methods with implementation
           # @param dir [String] dir where the yard db is (or where it should be generated)
           # @param escaped_file_names [String] files for which we want to get the stats
           # @return [Hash] shell command execution hash results
-          def yard_cmd(dir, escaped_file_names)
-          cmd = <<~CMD
+            def yard_cmd(dir, escaped_file_names)
+              cmd = <<~CMD
             yard list \
             --private \
             --protected \
             -b #{Shellwords.escape(dir)} \
               #{escaped_file_names}
           CMD
-          cmd = cmd.tr("\n", ' ')
-          cmd = cmd.gsub('yard list', "yard list --query #{query}")
+              cmd = cmd.tr("\n", ' ')
+              cmd = cmd.gsub('yard list', "yard list --query #{query}")
 
-          shell(cmd)
-          end
+              shell(cmd)
+            end
 
           # @return [String] yard query to find abstract methods with implementation
-          def query
-          <<~QUERY
+            def query
+              <<~QUERY
             '
               if object.has_tag?(:abstract) && object.is_a?(YARD::CodeObjects::MethodObject)
                   # Check if method has actual implementation (not just NotImplementedError)
@@ -56,10 +56,10 @@ module Yard
               false
             '
             QUERY
-          end
+            end
         end
         end
-        end
+      end
     end
   end
 end

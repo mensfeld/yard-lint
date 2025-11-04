@@ -41,7 +41,6 @@ module Yard
         'Exclude' => []
       }.freeze
 
-
       class << self
         # Load configuration from file with inheritance support
         # @param path [String] path to configuration file
@@ -124,11 +123,9 @@ module Yard
         end
 
         # Load inherit_gem (gem-based configs)
-        if yaml['inherit_gem']
-          yaml['inherit_gem'].each do |gem_name, gem_file|
-            inherited = load_gem_config(gem_name, gem_file)
-            config = merge_configs(config, inherited) if inherited
-          end
+        yaml['inherit_gem']&.each do |gem_name, gem_file|
+          inherited = load_gem_config(gem_name, gem_file)
+          config = merge_configs(config, inherited) if inherited
         end
 
         config
@@ -161,14 +158,14 @@ module Yard
           # Skip inheritance keys in merged result
           next if %w[inherit_from inherit_gem].include?(key)
 
-          if value.is_a?(Hash) && result[key].is_a?(Hash)
-            result[key] = merge_configs(result[key], value)
-          elsif value.is_a?(Array) && result[key].is_a?(Array)
-            # For arrays, override completely (RuboCop behavior)
-            result[key] = value
-          else
-            result[key] = value
-          end
+          result[key] = if value.is_a?(Hash) && result[key].is_a?(Hash)
+                          merge_configs(result[key], value)
+                        elsif value.is_a?(Array) && result[key].is_a?(Array)
+                          # For arrays, override completely (RuboCop behavior)
+                          value
+                        else
+                          value
+                        end
         end
 
         result

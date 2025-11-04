@@ -27,17 +27,17 @@ module Yard
             # @param escaped_file_names [String] files for which we want to get the stats
             # @return [Hash] shell command execution hash results
             def yard_cmd(dir, escaped_file_names)
-              cmd = <<~CMD
-                yard list \
-                --private \
-                --protected \
-                -b #{Shellwords.escape(dir)} \
-                  #{escaped_file_names}
-              CMD
-              cmd = cmd.tr("\n", ' ')
-              cmd = cmd.gsub('yard list', "yard list --query #{query}")
+              # Write query to a temporary file to avoid shell escaping issues
+              require 'tempfile'
 
-              shell(cmd)
+              Tempfile.create(['yard_query', '.sh']) do |f|
+                f.write("#!/bin/bash\n")
+                f.write("yard list --query #{Shellwords.escape(query)} --private --protected -b #{Shellwords.escape(dir)} #{escaped_file_names}\n")
+                f.flush
+                f.chmod(0755)
+
+                shell("bash #{Shellwords.escape(f.path)}")
+              end
             end
 
             # @return [String] multiline yard query that we use to find methods with
@@ -68,7 +68,7 @@ module Yard
                     .reject { |type| !(Kernel.const_defined?(type) rescue nil).nil? }
                     .reject { |type| type.include?('#') }
                     .then { |types| !types.empty? }
-                ' \\
+                '
               QUERY
             end
 

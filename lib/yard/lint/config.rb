@@ -264,12 +264,12 @@ module Yard
 
           department_config = @raw_config[department]
           validator_names.each do |validator_name|
-            if department_config.is_a?(Hash)
-              config[validator_name] = merge_validator_config(
-                config[validator_name],
-                department_config
-              )
-            end
+            next unless department_config.is_a?(Hash)
+
+            config[validator_name] = merge_validator_config(
+              config[validator_name],
+              department_config
+            )
           end
         end
 
@@ -324,13 +324,13 @@ module Yard
           # Skip metadata keys
           next if %w[Description StyleGuide VersionAdded VersionChanged].include?(key)
 
-          if value.is_a?(Array) && result[key].is_a?(Array)
-            result[key] = value # Array replacement
-          elsif value.is_a?(Hash) && result[key].is_a?(Hash)
-            result[key] = result[key].merge(value)
-          else
-            result[key] = value
-          end
+          result[key] = if value.is_a?(Array) && result[key].is_a?(Array)
+                          value # Array replacement
+                        elsif value.is_a?(Hash) && result[key].is_a?(Hash)
+                          result[key].merge(value)
+                        else
+                          value
+                        end
         end
 
         result

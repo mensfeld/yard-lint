@@ -3,35 +3,35 @@
 module Yard
   module Lint
     module Validators
-        module Tags
+      module Tags
         module ApiTags
           # Validator to check for @api tag presence and validity
           class Validator < Base
-          private
+            private
 
           # Runs yard list query to find objects missing or with invalid @api tags
           # @param dir [String] dir where the yard db is (or where it should be generated)
           # @param escaped_file_names [String] files for which we want to get the stats
           # @return [Hash] shell command execution hash results
-          def yard_cmd(dir, escaped_file_names)
-          cmd = <<~CMD
+            def yard_cmd(dir, escaped_file_names)
+              cmd = <<~CMD
             yard list \
             --private \
             --protected \
             -b #{Shellwords.escape(dir)} \
               #{escaped_file_names}
           CMD
-          cmd = cmd.tr("\n", ' ')
-          cmd = cmd.gsub('yard list', "yard list --query #{query}")
+              cmd = cmd.tr("\n", ' ')
+              cmd = cmd.gsub('yard list', "yard list --query #{query}")
 
-          shell(cmd)
-          end
+              shell(cmd)
+            end
 
           # @return [String] yard query to find objects with missing or invalid @api tags
-          def query
-          allowed_list = allowed_apis.map { |api| "'#{api}'" }.join(", ")
+            def query
+              allowed_list = allowed_apis.map { |api| "'#{api}'" }.join(", ")
 
-          <<~QUERY
+              <<~QUERY
             '
               if object.has_tag?(:api)
                 api_value = object.tag(:api).text
@@ -50,20 +50,20 @@ module Yard
               false
             '
             QUERY
-          end
+            end
 
           # @return [Array<String>] list of allowed API values
-          def allowed_apis
-          config.allowed_apis || %w[public private internal]
-          end
+            def allowed_apis
+              config.allowed_apis || %w[public private internal]
+            end
 
           # @return [Boolean] whether @api tags are required on public objects
-          def require_api_tags?
-          config.require_api_tags || false
-          end
+            def require_api_tags?
+              config.require_api_tags || false
+            end
         end
         end
-        end
+      end
     end
   end
 end

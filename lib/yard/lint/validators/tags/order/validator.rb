@@ -3,19 +3,19 @@
 module Yard
   module Lint
     module Validators
-        module Tags
+      module Tags
         module Order
           # Runs a query that will pick all the objects that have docs with tags in an invalid
         #   order. By invalid we mean, that they are not as defined in the settings.
           class Validator < Base
-          private
+            private
 
           # Runs yard list query with proper settings on a given dir and files
           # @param dir [String] dir where the yard db is (or where it should be generated)
           # @param escaped_file_names [String] files for which we want to get the stats
           # @return [Hash] shell command execution hash results
-          def yard_cmd(dir, escaped_file_names)
-          cmd = <<~CMD
+            def yard_cmd(dir, escaped_file_names)
+              cmd = <<~CMD
             yard list \
             --private \
             --protected \
@@ -24,10 +24,10 @@ module Yard
               #{escaped_file_names}
           CMD
 
-          result = shell(cmd)
-          result[:stdout] = { result: result[:stdout], tags_order: tags_order }
-          result
-          end
+              result = shell(cmd)
+              result[:stdout] = { result: result[:stdout], tags_order: tags_order }
+              result
+            end
 
           # @return [String] multiline yard query that we use to find methods with
           #   tags that are not in the valid order
@@ -37,8 +37,8 @@ module Yard
           #   figure out whether the order is ok or now. That's why we print all and those
           #   that are ok, we mark with 'valid' and if it is reported later as invalid again,
           #   we know, that it is valid
-          def query
-          <<-QUERY
+            def query
+              <<-QUERY
             '
               tags_order = #{query_array(tags_order)}
               accu = []
@@ -68,22 +68,22 @@ module Yard
               false
             ' \\
           QUERY
-          end
+            end
 
           # @return [Array<String>] tags order
-          def tags_order
-          config.tags_order
-          end
+            def tags_order
+              config.tags_order
+            end
 
           # @param elements [Array<String>] array of elements that we want to convert into
           #   a string ruby yard query array form
           # @return [String] array of elements for yard query converted into a string
-          def query_array(elements)
-            "[#{elements.map { |type| "\"#{type}\"" }.join(",")}]"
-          end
+            def query_array(elements)
+              "[#{elements.map { |type| "\"#{type}\"" }.join(",")}]"
+            end
         end
         end
-        end
+      end
     end
   end
 end

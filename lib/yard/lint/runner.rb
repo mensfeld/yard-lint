@@ -39,9 +39,7 @@ module Yard
 
           # Run the validator if it has a module (validators with modules have Validator classes)
           # Validators without modules (like Documentation/UndocumentedObjects) are handled by Stats
-          if validator_module
-            run_and_store_validator(validator_module, results)
-          end
+          run_and_store_validator(validator_module, results) if validator_module
         end
 
         results
@@ -75,25 +73,17 @@ module Yard
           results[:undocumented_method_arguments] = build_undocumented_method_arguments(raw)
         end
 
-        if config.validator_enabled?('Tags/InvalidTypes')
-          results[:invalid_tags_types] = build_invalid_tags_types(raw)
-        end
+        results[:invalid_tags_types] = build_invalid_tags_types(raw) if config.validator_enabled?('Tags/InvalidTypes')
 
-        if config.validator_enabled?('Tags/Order')
-          results[:invalid_tags_order] = build_invalid_tags_order(raw)
-        end
+        results[:invalid_tags_order] = build_invalid_tags_order(raw) if config.validator_enabled?('Tags/Order')
 
-        if config.validator_enabled?('Tags/ApiTags')
-          results[:api_tags] = build_api_tags(raw)
-        end
+        results[:api_tags] = build_api_tags(raw) if config.validator_enabled?('Tags/ApiTags')
 
         if config.validator_enabled?('Semantic/AbstractMethods')
           results[:abstract_methods] = build_abstract_methods(raw)
         end
 
-        if config.validator_enabled?('Tags/OptionTags')
-          results[:option_tags] = build_option_tags(raw)
-        end
+        results[:option_tags] = build_option_tags(raw) if config.validator_enabled?('Tags/OptionTags')
 
         results
       end
@@ -121,9 +111,13 @@ module Yard
       # @param raw [Hash] raw stdout output result from yard commands
       # @return [Array<Hash>] Array with undocumented objects details
       def build_undocumented(raw)
-        all = Validators::Documentation::UndocumentedObjects::Parser.new.call(raw.dig(Validators::Documentation::UndocumentedObjects.id, :stdout))
+        all = Validators::Documentation::UndocumentedObjects::Parser.new.call(raw.dig(
+                                                                                Validators::Documentation::UndocumentedObjects.id, :stdout
+                                                                              ))
 
-        boolean = Validators::Documentation::UndocumentedBooleanMethods::Parser.new.call(raw.dig(Validators::Documentation::UndocumentedBooleanMethods.id, :stdout))
+        boolean = Validators::Documentation::UndocumentedBooleanMethods::Parser.new.call(raw.dig(
+                                                                                           Validators::Documentation::UndocumentedBooleanMethods.id, :stdout
+                                                                                         ))
 
         all + boolean
       end
@@ -131,7 +125,9 @@ module Yard
       # @param raw [Hash] raw stdout output result from yard commands
       # @return [Array<Hash>] array with all warnings informations from yard list on missing docs
       def build_undocumented_method_arguments(raw)
-        Validators::Documentation::UndocumentedMethodArguments::Parser.new.call(raw.dig(Validators::Documentation::UndocumentedMethodArguments.id, :stdout))
+        Validators::Documentation::UndocumentedMethodArguments::Parser.new.call(raw.dig(
+                                                                                  Validators::Documentation::UndocumentedMethodArguments.id, :stdout
+                                                                                ))
       end
 
       # @param raw [Hash] raw stdout output result from yard commands
@@ -159,7 +155,8 @@ module Yard
       def build_abstract_methods(raw)
         return [] unless raw[Validators::Semantic::AbstractMethods.id]
 
-        Validators::Semantic::AbstractMethods::Parser.new.call(raw.dig(Validators::Semantic::AbstractMethods.id, :stdout))
+        Validators::Semantic::AbstractMethods::Parser.new.call(raw.dig(Validators::Semantic::AbstractMethods.id,
+                                                                       :stdout))
       end
 
       # @param raw [Hash] raw stdout output result from yard commands
