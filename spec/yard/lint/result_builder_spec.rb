@@ -86,8 +86,7 @@ RSpec.describe Yard::Lint::ResultBuilder do
       let(:raw_results) do
         {
           stats: {
-            stdout: '[warn]: Unknown tag @example1 in file `file.rb` near line 5
-' \
+            stdout: '[warn]: Unknown tag @example1 in file `file.rb` near line 5\n' \
                     '[warn]: @param tag has unknown parameter name: wrong_name for method ' \
                     "'Foo#bar' in file `file.rb` near line 10\n",
             stderr: '',
@@ -130,13 +129,17 @@ RSpec.describe Yard::Lint::ResultBuilder do
 
   describe 'parser discovery' do
     it 'discovers multiple parsers for Stats validator' do
-      result = builder.build('Warnings/Stats', {
-                               stats: {
-                                 stdout: "[warn]: Unknown tag @test in file `file.rb` near line 5\n" \
-                                         "[warn]: Unknown directive @!test in file `file.rb` near line 10\n",
-                                 stderr: '', exit_code: 0
-                               }
-                             })
+      result = builder.build(
+        'Warnings/Stats',
+        {
+          stats: {
+            stdout: "[warn]: Unknown tag @test in file `file.rb` near line 5\n" \
+                    "[warn]: Unknown directive @!test in file `file.rb` near line 10\n",
+            stderr: '',
+            exit_code: 0
+          }
+        }
+      )
 
       # Multiple parsers discovered and used
       expect(result).to be_a(Yard::Lint::Results::Base)
@@ -146,24 +149,32 @@ RSpec.describe Yard::Lint::ResultBuilder do
   describe 'composite detection' do
     it 'skips composite children automatically' do
       # UndocumentedBooleanMethods is a child of UndocumentedObjects composite
-      result = builder.build('Documentation/UndocumentedBooleanMethods', {
-                               undocumented_boolean_methods: {
-                                 stdout: 'file.rb:30: MyClass#valid?',
-                                 stderr: '', exit_code: 0
-                               }
-                             })
+      result = builder.build(
+        'Documentation/UndocumentedBooleanMethods',
+        {
+          undocumented_boolean_methods: {
+            stdout: 'file.rb:30: MyClass#valid?',
+            stderr: '',
+            exit_code: 0
+          }
+        }
+      )
 
       expect(result).to be_nil
     end
 
     it 'processes parent composites' do
       # UndocumentedObjects is the parent composite
-      result = builder.build('Documentation/UndocumentedObjects', {
-                               undocumented_objects: {
-                                 stdout: 'file.rb:10: MyClass',
-                                 stderr: '', exit_code: 0
-                               }
-                             })
+      result = builder.build(
+        'Documentation/UndocumentedObjects',
+        {
+          undocumented_objects: {
+            stdout: 'file.rb:10: MyClass',
+            stderr: '',
+            exit_code: 0
+          }
+        }
+      )
 
       expect(result).not_to be_nil
     end

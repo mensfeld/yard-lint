@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../../results/base'
-require_relative 'messages_builder'
-
 module Yard
   module Lint
     module Validators

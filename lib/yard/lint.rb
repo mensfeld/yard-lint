@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'shellwords'
+require 'open3'
+require 'tmpdir'
+require 'digest'
+require 'net/http'
+require 'uri'
 
 module Yard
   # YARD Lint module providing linting functionality for YARD documentation

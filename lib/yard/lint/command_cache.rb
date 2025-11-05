@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'digest'
-
 module Yard
   module Lint
     # Cache for YARD command executions to avoid running identical commands multiple times

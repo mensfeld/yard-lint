@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../../results/base'
-
 module Yard
   module Lint
     module Validators

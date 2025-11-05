@@ -17,50 +17,50 @@ module Yard
             # @return [Array<Hash>] hashes with details about objects with docs with invalid tags
             #   order.
             def call(yard_list)
-            # Return empty array if yard_list is nil or empty
-            return [] if yard_list.nil? || yard_list.empty?
-            return [] if yard_list[:result].nil? || yard_list[:result].empty?
+              # Return empty array if yard_list is nil or empty
+              return [] if yard_list.nil? || yard_list.empty?
+              return [] if yard_list[:result].nil? || yard_list[:result].empty?
 
-            # Each raw offense result is combined out of two lines:
-            #   - first line contains the issue location
-            #   - second the order in which the tags should be
-            # That's why we split it and then for building the locations hashes we can use the
-            #   UndocumentedMethodArguments parser as the location format is the same for both
-            #   raw inputs
-            base_hash = {}
+              # Each raw offense result is combined out of two lines:
+              #   - first line contains the issue location
+              #   - second the order in which the tags should be
+              # That's why we split it and then for building the locations hashes we can use the
+              #   UndocumentedMethodArguments parser as the location format is the same for both
+              #   raw inputs
+              base_hash = {}
 
-            yard_list[:result].split("\n").each_slice(2).each do |location, ordering|
-              key = normalize(location)
+              yard_list[:result].split("\n").each_slice(2).each do |location, ordering|
+                key = normalize(location)
 
-              if ordering == 'valid'
-                base_hash[key] = 'valid'
-              else
-                base_hash[key] ||= [location, ordering]
+                if ordering == 'valid'
+                  base_hash[key] = 'valid'
+                else
+                  base_hash[key] ||= [location, ordering]
+                end
               end
+
+              base_hash.delete_if { |_key, value| value == 'valid' }
+              order = base_hash.values.map(&:last)
+
+              Validators::Documentation::UndocumentedMethodArguments::Parser
+                .new
+                .call(base_hash.values.map(&:first).join("\n"))
+                .each.with_index { |element, index| element[:order] = order[index] }
             end
 
-            base_hash.delete_if { |_key, value| value == 'valid' }
-            order = base_hash.values.map(&:last)
+            private
 
-            Validators::Documentation::UndocumentedMethodArguments::Parser
-              .new
-              .call(base_hash.values.map(&:first).join("\n"))
-              .each.with_index { |element, index| element[:order] = order[index] }
+            # @param location_line [String] full line with the location. It can be used, when we
+            #   use module_function or other aliases that alter the yard tags order
+            # @return [String] line without special characters
+            def normalize(location_line)
+              location_line
+                .scan(NORMALIZATION_REGEXP)
+                .join
             end
-
-          private
-
-          # @param location_line [String] full line with the location. It can be used, when we
-          #   use module_function or other aliases that alter the yard tags order
-          # @return [String] line without special characters
-          def normalize(location_line)
-            location_line
-              .scan(NORMALIZATION_REGEXP)
-              .join
           end
         end
       end
-    end
     end
   end
 end

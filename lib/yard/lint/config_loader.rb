@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'yaml'
-require 'net/http'
-require 'uri'
-
 module Yard
   module Lint
     # Handles loading and merging of configuration files with inheritance support
@@ -20,10 +16,10 @@ module Yard
           module_path = "Validators::#{department}::#{name}"
 
           module_path.split('::').reduce(Yard::Lint) do |mod, const_name|
+            return nil unless mod.const_defined?(const_name)
+
             mod.const_get(const_name)
           end
-        rescue NameError
-          nil
         end
 
         # Get the validator config for a given validator name

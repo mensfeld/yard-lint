@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'shellwords'
-require 'open3'
-require 'tmpdir'
-
 module Yard
   module Lint
     # Validators for checking different aspects of YARD documentation
@@ -47,9 +43,7 @@ module Yard
 
           # Set validators to combine with
           attr_writer :combines_with
-        end
 
-        class << self
           # Lazy-initialized command cache shared across all validator instances
           # This allows different validators to reuse results from identical YARD commands
           # @return [CommandCache] the command cache instance
