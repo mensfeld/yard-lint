@@ -46,7 +46,7 @@ jobs:
           bundler-cache: true
 
       - name: Run YARD Lint (dogfooding)
-        run: bundle exec exe/yard-lint lib/
+        run: bundle exec bin/yard-lint lib/
 
   specs:
     runs-on: ubuntu-latest
