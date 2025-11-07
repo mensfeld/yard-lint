@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.1 (2025-11-07)
+- Release to validate Trusted Publishing flow. 
+
 ## 0.2.0 (2025-11-07)
 
 - Initial release of YARD-Lint gem
