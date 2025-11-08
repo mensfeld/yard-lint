@@ -52,6 +52,11 @@ unless path
   exit 1
 end
 
+# Clear YARD database and command cache to ensure fresh run
+# This prevents contamination from previous runs
+Yard::Lint::Validators::Base.reset_command_cache!
+Yard::Lint::Validators::Base.clear_yard_database!
+
 # Run the linter with config_file (it will be loaded internally)
 result = Yard::Lint.run(
   path: path,

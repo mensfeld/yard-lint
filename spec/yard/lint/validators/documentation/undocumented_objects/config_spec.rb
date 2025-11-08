@@ -11,7 +11,8 @@ RSpec.describe Yard::Lint::Validators::Documentation::UndocumentedObjects::Confi
     it 'returns default configuration' do
       expect(described_class.defaults).to eq(
         'Enabled' => true,
-        'Severity' => 'warning'
+        'Severity' => 'warning',
+        'AllowEmptyInitialize' => true
       )
     end
 

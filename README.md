@@ -96,6 +96,8 @@ Documentation/UndocumentedObjects:
   Description: 'Checks for classes, modules, and methods without documentation.'
   Enabled: true
   Severity: warning
+  # Allow initialize methods with no parameters to remain undocumented (default: true)
+  AllowEmptyInitialize: true
 
 Documentation/UndocumentedMethodArguments:
   Description: 'Checks for method parameters without @param tags.'
@@ -297,7 +299,7 @@ Supported glob patterns:
 | Validator | Description | Default | Configuration Options |
 |-----------|-------------|---------|----------------------|
 | **Documentation Validators** |
-| `Documentation/UndocumentedObjects` | Checks for classes, modules, and methods without documentation | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
+| `Documentation/UndocumentedObjects` | Checks for classes, modules, and methods without documentation | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `AllowEmptyInitialize` |
 | `Documentation/UndocumentedMethodArguments` | Checks for method parameters without `@param` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Documentation/UndocumentedBooleanMethods` | Checks that question mark methods document their boolean return | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | **Tags Validators** |

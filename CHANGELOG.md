@@ -1,4 +1,12 @@
-# Changelog
+# YARD-Lint Changelog
+
+## 0.2.2 (2025-11-07)
+- **[Feature]** Add `AllowEmptyInitialize` configuration option (enabled by default) to skip documentation requirement for `#initialize` methods with no parameters.
+- [Fix] Fix `UndocumentedObjects` validator incorrectly flagging methods with `@return [Boolean]` tags as undocumented by using `docstring.all.empty?` instead of `docstring.blank?`.
+- [Fix] Fix `UndocumentedBooleanMethods` validator incorrectly flagging methods with `@return [Boolean]` (type without description text) by checking for return types instead of description text.
+- [Enhancement] Implement per-arguments YARD database isolation using SHA256 hash of arguments to prevent contamination between validators with different file selections.
+- [Refactoring] Remove file filtering workaround as database isolation eliminates the need for it.
+- [Change] YARD database directories are now created under a base temp directory with unique subdirectories per argument set.
 
 ## 0.2.1 (2025-11-07)
 - Release to validate Trusted Publishing flow. 

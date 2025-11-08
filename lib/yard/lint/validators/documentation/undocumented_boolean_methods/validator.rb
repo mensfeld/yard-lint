@@ -9,13 +9,15 @@ module Yard
           # do not have a return type or return description documented
           class Validator < Base
             # Query to find all the boolean methods without proper return documentation
+            # Requires either: no @return tag, OR @return tag with no types specified
+            # Accepts @return [Boolean] without description text as valid documentation
             QUERY = <<~QUERY.tr("\n", ' ')
               '
                 type == :method &&
                 !is_alias? &&
                 is_explicit? &&
                 name.to_s.end_with?("?") &&
-                (tag("return").nil? || tag("return").text.to_s.strip.empty?)
+                (tag("return").nil? || tag("return").types.to_a.empty?)
               '
             QUERY
 

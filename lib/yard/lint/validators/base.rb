@@ -17,12 +17,11 @@ module Yard
           '--no-progress'
         ].freeze
 
-        # String with a temp dir to store the YARD database
-        # @note We run YARD multiple times and in order not to rebuild db over and over
-        #   again but reuse the same one, we have a single tmp dir for it
-        YARDOC_TEMP_DIR = Dir.mktmpdir.freeze
+        # Base temp directory for YARD databases
+        # Each unique set of arguments gets its own subdirectory to prevent contamination
+        YARDOC_BASE_TEMP_DIR = Dir.mktmpdir.freeze
 
-        private_constant :YARDOC_TEMP_DIR
+        private_constant :YARDOC_BASE_TEMP_DIR
 
         attr_reader :config, :selection
 
@@ -42,12 +41,12 @@ module Yard
             Base.instance_variable_set(:@shared_command_cache, nil)
           end
 
-          # Clear the YARD database (primarily for testing)
+          # Clear all YARD databases (primarily for testing)
           # @return [void]
           def clear_yard_database!
-            return unless defined?(YARDOC_TEMP_DIR)
+            return unless defined?(YARDOC_BASE_TEMP_DIR)
 
-            FileUtils.rm_rf(Dir.glob(File.join(YARDOC_TEMP_DIR, '*')))
+            FileUtils.rm_rf(Dir.glob(File.join(YARDOC_BASE_TEMP_DIR, '*')))
           end
         end
 
@@ -68,19 +67,43 @@ module Yard
           # Anything that goes to shell needs to be escaped
           escaped_file_names = escape(selection).join(' ')
 
-          yard_cmd(YARDOC_TEMP_DIR, escaped_file_names)
+          # Use a unique YARD database per set of arguments to prevent contamination
+          # between validators with different file selections or options
+          yardoc_dir = yardoc_temp_dir_for_arguments(escaped_file_names)
+
+          yard_cmd(yardoc_dir, escaped_file_names)
         end
 
         private
 
+        # Returns a unique YARD database directory for the given arguments
+        # Uses SHA256 hash of the normalized arguments to ensure different file sets
+        # get separate databases, preventing contamination
+        # @param escaped_file_names [String] escaped file names to process
+        # @return [String] path to the YARD database directory
+        def yardoc_temp_dir_for_arguments(escaped_file_names)
+          # Combine all arguments that affect YARD output
+          all_args = "#{shell_arguments} #{escaped_file_names}"
+
+          # Create a hash of the arguments for a unique directory name
+          require 'digest'
+          args_hash = Digest::SHA256.hexdigest(all_args)
+
+          # Create subdirectory under base temp dir
+          dir = File.join(YARDOC_BASE_TEMP_DIR, args_hash)
+          FileUtils.mkdir_p(dir) unless File.directory?(dir)
+
+          dir
+        end
+
         # @return [String] all arguments with which YARD command should be executed
         def shell_arguments
-          validator_name = self.class.name.split('::').then do |parts|
+          validator_name = self.class.name&.split('::')&.then do |parts|
             idx = parts.index('Validators')
             next config.options unless idx && parts[idx + 1] && parts[idx + 2]
 
             "#{parts[idx + 1]}/#{parts[idx + 2]}"
-          end
+          end || config.options
 
           yard_options = config.validator_yard_options(validator_name)
           args = escape(yard_options).join(' ')

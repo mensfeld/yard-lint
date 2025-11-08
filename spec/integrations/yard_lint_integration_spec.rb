@@ -91,14 +91,18 @@ RSpec.describe 'Yard::Lint Integration Tests' do
 
       result = Yard::Lint.run(path: file, config: config)
 
-      # Should find active? and ready? but not valid? (which has docs)
+      # Boolean methods with comments but without explicit @return tags
+      # are NOT flagged because:
+      # 1. YARD auto-infers @return [Boolean] for methods ending with '?'
+      # 2. Having ANY docstring content (even just a comment) satisfies UndocumentedObjects
+      # This is the correct behavior - boolean methods don't need explicit @return tags
       undocumented_booleans = result.offenses
                                     .select { |o| o[:name] == 'UndocumentedObject' }
                                     .select do |o|
         o[:element].to_s.include?('active?') || o[:element].to_s.include?('ready?')
       end
 
-      expect(undocumented_booleans).not_to be_empty
+      expect(undocumented_booleans).to be_empty
     end
   end
 

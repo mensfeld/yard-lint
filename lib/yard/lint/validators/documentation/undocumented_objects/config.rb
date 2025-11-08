@@ -10,7 +10,8 @@ module Yard
             self.id = :undocumented_objects
             self.defaults = {
               'Enabled' => true,
-              'Severity' => 'warning'
+              'Severity' => 'warning',
+              'AllowEmptyInitialize' => true
             }.freeze
             self.combines_with = ['Documentation/UndocumentedBooleanMethods'].freeze
           end
