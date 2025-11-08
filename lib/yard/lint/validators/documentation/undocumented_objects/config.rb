@@ -11,7 +11,7 @@ module Yard
             self.defaults = {
               'Enabled' => true,
               'Severity' => 'warning',
-              'AllowEmptyInitialize' => true
+              'ExcludedMethods' => ['initialize/0']
             }.freeze
             self.combines_with = ['Documentation/UndocumentedBooleanMethods'].freeze
           end

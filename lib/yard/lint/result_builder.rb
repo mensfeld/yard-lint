@@ -109,7 +109,16 @@ module Yard
         return [] unless stdout
 
         parsers = discover_parsers(validator_module)
-        parsers.flat_map { |parser| parser.new.call(stdout) }
+        parsers.flat_map do |parser|
+          parser_instance = parser.new
+          # Try passing config to parser if it accepts it (for filtering)
+          # Otherwise, call without config for backwards compatibility
+          begin
+            parser_instance.call(stdout, config: config)
+          rescue ArgumentError
+            parser_instance.call(stdout)
+          end
+        end
       end
 
       # Auto-discover parser classes in a validator module

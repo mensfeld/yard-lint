@@ -2,7 +2,7 @@
 
 require 'tempfile'
 
-RSpec.describe 'Empty initialize methods handling' do
+RSpec.describe 'Method exclusion via ExcludeQuery' do
   subject(:result) { Yard::Lint.run(path: temp_file.path, progress: false, config: config) }
 
   let(:temp_file) { Tempfile.new(['test', '.rb']) }
@@ -10,7 +10,7 @@ RSpec.describe 'Empty initialize methods handling' do
 
   after { temp_file.unlink }
 
-  context 'when AllowEmptyInitialize is true (default)' do
+  context 'when ExcludedMethods includes initialize/0 (default)' do
     it 'does not flag initialize with no parameters' do
       temp_file.write(<<~RUBY)
         class Example
@@ -105,11 +105,11 @@ RSpec.describe 'Empty initialize methods handling' do
     end
   end
 
-  context 'when AllowEmptyInitialize is false' do
+  context 'when ExcludedMethods is empty' do
     let(:config) do
       Yard::Lint::Config.new do |c|
         c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
-          'AllowEmptyInitialize', false)
+          'ExcludedMethods', [])
       end
     end
 

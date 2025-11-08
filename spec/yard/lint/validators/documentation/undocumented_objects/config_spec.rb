@@ -12,7 +12,7 @@ RSpec.describe Yard::Lint::Validators::Documentation::UndocumentedObjects::Confi
       expect(described_class.defaults).to eq(
         'Enabled' => true,
         'Severity' => 'warning',
-        'AllowEmptyInitialize' => true
+        'ExcludedMethods' => ['initialize/0']
       )
     end
 

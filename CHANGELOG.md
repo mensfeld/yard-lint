@@ -1,7 +1,7 @@
 # YARD-Lint Changelog
 
 ## 0.2.2 (2025-11-07)
-- **[Feature]** Add `AllowEmptyInitialize` configuration option (enabled by default) to skip documentation requirement for `#initialize` methods with no parameters.
+- **[Feature]** Add `ExcludedMethods` configuration option to exclude methods from validation using simple names, regex patterns, or arity notation (default excludes parameter-less `initialize/0` methods).
 - [Fix] Fix `UndocumentedObjects` validator incorrectly flagging methods with `@return [Boolean]` tags as undocumented by using `docstring.all.empty?` instead of `docstring.blank?`.
 - [Fix] Fix `UndocumentedBooleanMethods` validator incorrectly flagging methods with `@return [Boolean]` (type without description text) by checking for return types instead of description text.
 - [Enhancement] Implement per-arguments YARD database isolation using SHA256 hash of arguments to prevent contamination between validators with different file selections.
