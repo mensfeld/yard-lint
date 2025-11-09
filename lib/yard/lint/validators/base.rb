@@ -65,13 +65,21 @@ module Yard
           return raw if selection.nil? || selection.empty?
 
           # Anything that goes to shell needs to be escaped
-          escaped_file_names = escape(selection).join(' ')
+          escaped_file_names = escape(selection)
 
           # Use a unique YARD database per set of arguments to prevent contamination
           # between validators with different file selections or options
-          yardoc_dir = yardoc_temp_dir_for_arguments(escaped_file_names)
+          yardoc_dir = yardoc_temp_dir_for_arguments(escaped_file_names.join(' '))
 
-          yard_cmd(yardoc_dir, escaped_file_names)
+          # For large file lists, use a temporary file to avoid ARG_MAX limits
+          # Write file paths to temp file, one per line
+          require 'tempfile'
+          Tempfile.create(['yard_files', '.txt']) do |f|
+            escaped_file_names.each { |file| f.puts(file) }
+            f.flush
+
+            yard_cmd(yardoc_dir, f.path)
+          end
         end
 
         private

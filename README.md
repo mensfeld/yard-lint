@@ -17,7 +17,11 @@ YARD-Lint validates your YARD documentation for:
 - **Undocumented code**: Classes, modules, methods, and constants without documentation
 - **Missing parameter documentation**: Methods with undocumented parameters
 - **Invalid tag types**: Type definitions that aren't valid Ruby classes or allowed defaults
+- **Invalid type syntax**: Malformed YARD type syntax (unclosed brackets, empty generics, etc.)
 - **Invalid tag ordering**: Tags that don't follow your specified order
+- **Meaningless tags**: `@param` or `@option` tags on classes, modules, or constants (only valid on methods)
+- **Collection type syntax**: Enforces `Hash{K => V}` over `Hash<K, V>` (YARD standard)
+- **Type annotation position**: Validates whether types appear before or after parameter names (configurable)
 - **Boolean method documentation**: Question mark methods missing return type documentation
 - **API tag validation**: Enforce @api tags on public objects and validate API values
 - **Abstract method validation**: Ensure @abstract methods don't have real implementations
@@ -137,6 +141,49 @@ Tags/InvalidTypes:
   ExtraTypes:
     - CustomType
     - MyType
+
+Tags/TypeSyntax:
+  Description: 'Validates YARD type syntax using YARD parser.'
+  Enabled: true
+  Severity: warning
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+
+Tags/MeaninglessTag:
+  Description: 'Detects @param/@option tags on classes, modules, or constants.'
+  Enabled: true
+  Severity: warning
+  CheckedTags:
+    - param
+    - option
+  InvalidObjectTypes:
+    - class
+    - module
+    - constant
+
+Tags/CollectionType:
+  Description: 'Validates Hash collection syntax (enforces Hash{K => V} over Hash<K, V>).'
+  Enabled: true
+  Severity: convention
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+
+Tags/TagTypePosition:
+  Description: 'Validates type annotation position in tags.'
+  Enabled: true
+  Severity: convention
+  CheckedTags:
+    - param
+    - option
+  # EnforcedStyle: 'type_after_name' (YARD standard: @param name [Type])
+  #                or 'type_first' (@param [Type] name)
+  EnforcedStyle: type_after_name
 
 Tags/ApiTags:
   Description: 'Enforces @api tags on public objects.'
@@ -311,6 +358,10 @@ Supported glob patterns:
 | **Tags Validators** |
 | `Tags/Order` | Enforces consistent ordering of YARD tags | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnforcedOrder` |
 | `Tags/InvalidTypes` | Validates type definitions in `@param`, `@return`, `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags`, `ExtraTypes` |
+| `Tags/TypeSyntax` | Validates YARD type syntax (detects unclosed brackets, empty generics, etc.) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
+| `Tags/MeaninglessTag` | Detects `@param`/`@option` tags on classes, modules, or constants (only valid on methods) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `InvalidObjectTypes` |
+| `Tags/CollectionType` | Enforces `Hash{K => V}` over `Hash<K, V>` (YARD standard collection syntax) | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
+| `Tags/TagTypePosition` | Validates type annotation position (`@param name [Type]` vs `@param [Type] name`) | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `EnforcedStyle` |
 | `Tags/ApiTags` | Enforces `@api` tags on public objects | Disabled (opt-in) | `Enabled`, `Severity`, `Exclude`, `AllowedApis` |
 | `Tags/OptionTags` | Requires `@option` tags for methods with options parameters | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | **Warnings Validators** |
@@ -568,6 +619,110 @@ end
 def configure(name, options = {})
 end
 ```
+
+### Meaningless tag validation (enabled by default)
+
+This validator prevents `@param` and `@option` tags from being used on classes, modules, or constants, where they make no sense (these tags are only valid on methods).
+
+```ruby
+# Bad - @param on a class
+# @param name [String] this makes no sense on a class
+class User
+end
+
+# Bad - @option on a module
+# @option config [Boolean] :enabled modules don't have parameters
+module Authentication
+end
+
+# Good - @param on a method
+class User
+  # @param name [String] the user's name
+  def initialize(name)
+    @name = name
+  end
+end
+```
+
+To disable this validator:
+
+```yaml
+Tags/MeaninglessTag:
+  Enabled: false
+```
+
+### Collection type syntax validation (enabled by default)
+
+YARD uses `Hash{K => V}` syntax for hashes, not `Hash<K, V>` (which is generic syntax from other languages). This validator enforces the correct YARD syntax.
+
+```ruby
+# Bad - using generic syntax
+# @param options [Hash<Symbol, String>] configuration
+def configure(options)
+end
+
+# Good - using YARD syntax
+# @param options [Hash{Symbol => String}] configuration
+def configure(options)
+end
+
+# Also good - Array uses angle brackets
+# @param items [Array<String>] list of items
+def process(items)
+end
+```
+
+To disable this validator:
+
+```yaml
+Tags/CollectionType:
+  Enabled: false
+```
+
+### Type annotation position validation (enabled by default)
+
+This validator ensures consistent type annotation positioning. By default, it enforces YARD standard (`@param name [Type]`), but you can configure it to enforce `type_first` style if your team prefers it.
+
+**YARD Standard (default):**
+
+```ruby
+# Good - type after parameter name (YARD standard)
+# @param name [String] the user's name
+# @param age [Integer] the user's age
+def create_user(name, age)
+end
+
+# Bad - type before parameter name
+# @param [String] name the user's name
+# @param [Integer] age the user's age
+def create_user(name, age)
+end
+```
+
+**Alternative Style (`type_first`):**
+
+If your team prefers types before parameter names, configure it:
+
+```yaml
+Tags/TagTypePosition:
+  EnforcedStyle: type_first
+```
+
+```ruby
+# Good with type_first style
+# @param [String] name the user's name
+# @param [Integer] age the user's age
+def create_user(name, age)
+end
+
+# Bad with type_first style
+# @param name [String] the user's name
+# @param age [Integer] the user's age
+def create_user(name, age)
+end
+```
+
+**Note:** This validator only checks `@param` and `@option` tags. It doesn't check `@return` tags since they don't have parameter names.
 
 ## License
 

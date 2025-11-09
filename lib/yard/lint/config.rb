@@ -86,7 +86,41 @@ module Yard
       # Global file exclusion patterns
       # @return [Array<String>] exclusion patterns
       def exclude
-        all_validators['Exclude'] || ['\.git', 'vendor/**/*', 'node_modules/**/*']
+        all_validators['Exclude'] || default_exclusions
+      end
+
+      # Default exclusion patterns for typical Ruby/Rails projects
+      # @return [Array<String>] default exclusion patterns
+      def default_exclusions
+        [
+          # Version control
+          '\.git',
+          # Dependencies
+          'vendor/**/*',
+          'node_modules/**/*',
+          # Test directories
+          'spec/**/*',
+          'test/**/*',
+          'features/**/*',
+          # Temporary and cache directories
+          'tmp/**/*',
+          'log/**/*',
+          'coverage/**/*',
+          '.bundle/**/*',
+          # Rails-specific
+          'db/schema.rb',
+          'db/migrate/**/*',
+          'public/assets/**/*',
+          'public/packs/**/*',
+          'public/system/**/*',
+          # Build artifacts
+          'pkg/**/*',
+          'doc/**/*',
+          '.yardoc/**/*',
+          # Configuration that doesn't need docs
+          'config/initializers/**/*',
+          'config/environments/**/*'
+        ]
       end
 
       # Minimum severity level to fail on

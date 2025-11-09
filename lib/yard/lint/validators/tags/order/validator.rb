@@ -12,16 +12,15 @@ module Yard
 
             # Runs yard list query with proper settings on a given dir and files
             # @param dir [String] dir where the yard db is (or where it should be generated)
-            # @param escaped_file_names [String] files for which we want to get the stats
+            # @param file_list_path [String] path to temp file containing file paths (one per line)
             # @return [Hash] shell command execution hash results
-            def yard_cmd(dir, escaped_file_names)
+            def yard_cmd(dir, file_list_path)
               cmd = <<~CMD
-                yard list \
+                cat #{Shellwords.escape(file_list_path)} | xargs yard list \
                 --private \
                 --protected \
                 --query #{query} \
-                -b #{Shellwords.escape(dir)} \
-                  #{escaped_file_names}
+                -b #{Shellwords.escape(dir)}
               CMD
 
               result = shell(cmd)

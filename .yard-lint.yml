@@ -11,13 +11,35 @@ AllValidators:
     - --private
     - --protected
 
-  # Global file exclusion patterns
+  # Global file exclusion patterns (typical Ruby/Rails directories)
   Exclude:
+    # Version control
     - '\.git'
+    # Dependencies
     - 'vendor/**/*'
     - 'node_modules/**/*'
+    # Test directories
     - 'spec/**/*'
+    - 'test/**/*'
+    - 'features/**/*'
+    # Temporary and cache directories
     - 'tmp/**/*'
+    - 'log/**/*'
+    - 'coverage/**/*'
+    - '.bundle/**/*'
+    # Rails-specific
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'public/assets/**/*'
+    - 'public/packs/**/*'
+    - 'public/system/**/*'
+    # Build artifacts
+    - 'pkg/**/*'
+    - 'doc/**/*'
+    - '.yardoc/**/*'
+    # Configuration that doesn't need docs
+    - 'config/initializers/**/*'
+    - 'config/environments/**/*'
 
   # Exit code behavior (error, warning, convention, never)
   FailOnSeverity: warning
@@ -74,6 +96,16 @@ Tags/InvalidTypes:
   ExtraTypes:
     - []
 
+Tags/TypeSyntax:
+  Description: 'Validates YARD type syntax using YARD parser (detects unclosed brackets, empty generics, etc.).'
+  Enabled: true
+  Severity: warning
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+
 Tags/ApiTags:
   Description: 'Enforces @api tags on public objects.'
   Enabled: false  # Opt-in validator
@@ -87,6 +119,42 @@ Tags/OptionTags:
   Description: 'Requires @option tags for methods with options parameters.'
   Enabled: true
   Severity: warning
+
+Tags/MeaninglessTag:
+  Description: 'Detects @param/@option tags on classes, modules, or constants (only valid on methods).'
+  Enabled: true
+  Severity: warning
+  CheckedTags:
+    - param
+    - option
+  InvalidObjectTypes:
+    - class
+    - module
+    - constant
+
+Tags/CollectionType:
+  Description: 'Validates Hash collection syntax (enforces Hash{K => V} over Hash<K, V>).'
+  Enabled: true
+  Severity: convention
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+
+Tags/TagTypePosition:
+  Description: 'Validates type annotation position in tags (configurable: type before or after name).'
+  Enabled: true
+  Severity: convention
+  CheckedTags:
+    - param
+    - option
+    # Note: @return is not included because it doesn't have a parameter name
+    # @return syntax is always: @return [Type] description
+  # EnforcedStyle: 'type_after_name' or 'type_first'
+  # type_after_name: @param name [String] (YARD standard)
+  # type_first: @param [String] name (alternative style - type before name)
+  EnforcedStyle: type_after_name
 
 # Warnings validators - catches YARD parser errors
 Warnings/UnknownTag:
