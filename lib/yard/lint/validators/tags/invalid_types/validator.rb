@@ -28,11 +28,12 @@ module Yard
             # @return [Hash] shell command execution hash results
             def yard_cmd(dir, file_list_path)
               # Write query to a temporary file to avoid shell escaping issues
-              require 'tempfile'
+              squery = Shellwords.escape(query)
+              cmd = "cat #{Shellwords.escape(file_list_path)} | xargs yard list --query #{squery} "
 
               Tempfile.create(['yard_query', '.sh']) do |f|
                 f.write("#!/bin/bash\n")
-                f.write("cat #{Shellwords.escape(file_list_path)} | xargs yard list --query #{Shellwords.escape(query)} ")
+                f.write(cmd)
                 f.write("--private --protected -b #{Shellwords.escape(dir)}\n")
                 f.flush
                 f.chmod(0o755)

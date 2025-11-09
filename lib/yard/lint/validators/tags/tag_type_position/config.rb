@@ -12,7 +12,7 @@ module Yard
               'Enabled' => true,
               'Severity' => 'convention',
               'CheckedTags' => %w[param option],
-              'EnforcedStyle' => 'type_after_name' # 'type_after_name' (YARD standard) or 'type_first'
+              'EnforcedStyle' => 'type_after_name' # 'type_after_name' (standard) or 'type_first'
             }.freeze
           end
         end

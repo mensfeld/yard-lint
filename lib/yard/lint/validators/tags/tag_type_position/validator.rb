@@ -19,11 +19,11 @@ module Yard
             # @return [Hash] shell command execution results
             def yard_cmd(dir, file_list_path)
               # Write query to a temporary file to avoid shell escaping issues
-              require 'tempfile'
+              cmd = "cat #{Shellwords.escape(file_list_path)} | xargs yard list --query #{query} "
 
               Tempfile.create(['yard_query', '.sh']) do |f|
                 f.write("#!/bin/bash\n")
-                f.write("cat #{Shellwords.escape(file_list_path)} | xargs yard list --query #{query} ")
+                f.write(cmd)
                 f.write("#{shell_arguments} -b #{Shellwords.escape(dir)}\n")
                 f.flush
                 f.chmod(0o755)
@@ -92,7 +92,7 @@ module Yard
               QUERY
             end
 
-            # @return [String] the enforced style ('type_after_name' (YARD standard) or 'type_first')
+            # @return [String] the enforced style ('type_after_name' (standard) or 'type_first')
             def enforced_style
               config.validator_config('Tags/TagTypePosition', 'EnforcedStyle') || 'type_after_name'
             end
@@ -100,7 +100,9 @@ module Yard
             # Array of tag names to check, formatted for YARD query
             # @return [String] Ruby array literal string
             def checked_tags_array
-              tags = config.validator_config('Tags/TagTypePosition', 'CheckedTags') || %w[param option]
+              tags = config.validator_config(
+                'Tags/TagTypePosition', 'CheckedTags'
+              ) || %w[param option]
               "[#{tags.map { |t| "\"#{t}\"" }.join(',')}]"
             end
           end
