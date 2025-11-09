@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Tags/MeaninglessTag Validator' do
+RSpec.describe Yard::Lint::Validators::Tags::MeaninglessTag do
   it 'has all required components' do
     expect(defined?(Yard::Lint::Validators::Tags::MeaninglessTag)).to be_truthy
     expect(defined?(Yard::Lint::Validators::Tags::MeaninglessTag::Config)).to be_truthy

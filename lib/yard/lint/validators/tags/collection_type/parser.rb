@@ -9,6 +9,7 @@ module Yard
           class Parser < ::Yard::Lint::Parsers::Base
             # Parses YARD query output into structured violation data
             # @param yard_output [String] raw output from YARD query
+            # @param _kwargs [Hash] additional keyword arguments (unused)
             # @return [Array<Hash>] array of violation hashes
             def call(yard_output, **_kwargs)
               return [] if yard_output.nil? || yard_output.strip.empty?

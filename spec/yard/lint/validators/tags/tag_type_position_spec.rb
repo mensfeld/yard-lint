@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Tags/TagTypePosition Validator' do
+RSpec.describe Yard::Lint::Validators::Tags::TagTypePosition::Validator do
   it 'has all required components' do
     expect(defined?(Yard::Lint::Validators::Tags::TagTypePosition::Validator)).to be_truthy
     expect(defined?(Yard::Lint::Validators::Tags::TagTypePosition::Parser)).to be_truthy

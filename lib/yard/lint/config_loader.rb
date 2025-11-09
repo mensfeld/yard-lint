@@ -37,7 +37,7 @@ module Yard
         # Auto-discover validators from the codebase
         # Scans the validators directory and loads all validator modules that have
         # an .id method and .defaults method (indicating they're valid validators)
-        # @return [Hash<String, Array<String>>] hash of category names to validator names
+        # @return [Hash{String => Array<String>}] hash of category names to validator names
         def discover_validators
           categories = Hash.new { |h, k| h[k] = [] }
 

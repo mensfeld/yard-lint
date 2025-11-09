@@ -7,7 +7,7 @@ module Yard
         module TagTypePosition
           # Validates type annotation position in @param and @option tags
           # YARD standard (type_after_name): @param name [String] description
-          # Alternative (type_first): @param [String] name description
+          # Alternative (type_first): @param name [String] description
           #
           # Note: @return tags are not checked as they don't have parameter names
           class Validator < Base
