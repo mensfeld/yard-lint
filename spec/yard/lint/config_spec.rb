@@ -7,16 +7,26 @@ RSpec.describe Yard::Lint::Config do
     it 'sets default values' do
       config = described_class.new
 
-      expect(config.options).to eq([])
-      expect(config.validator_config('Tags/Order', 'EnforcedOrder')).to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
-      expect(config.validator_config('Tags/InvalidTypes', 'ValidatedTags')).to eq(Yard::Lint::Validators::Tags::InvalidTypes::Config.defaults['ValidatedTags'])
-      expect(config.validator_config('Tags/InvalidTypes', 'ExtraTypes')).to eq([])
-      expect(config.exclude).to include('\.git', 'vendor/**/*', 'node_modules/**/*', 'spec/**/*', 'test/**/*')
-      expect(config.fail_on_severity).to eq('warning')
-      expect(config.validator_enabled?('Tags/ApiTags')).to be false
-      expect(config.validator_config('Tags/ApiTags', 'AllowedApis')).to eq(Yard::Lint::Validators::Tags::ApiTags::Config.defaults['AllowedApis'])
-      expect(config.validator_enabled?('Semantic/AbstractMethods')).to be true
-      expect(config.validator_enabled?('Tags/OptionTags')).to be true
+      expect(config.options)
+        .to eq([])
+      expect(config.validator_config('Tags/Order', 'EnforcedOrder'))
+        .to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
+      expect(config.validator_config('Tags/InvalidTypes', 'ValidatedTags'))
+        .to eq(Yard::Lint::Validators::Tags::InvalidTypes::Config.defaults['ValidatedTags'])
+      expect(config.validator_config('Tags/InvalidTypes', 'ExtraTypes'))
+        .to eq([])
+      expect(config.exclude)
+        .to include('\.git', 'vendor/**/*', 'node_modules/**/*', 'spec/**/*', 'test/**/*')
+      expect(config.fail_on_severity)
+        .to eq('warning')
+      expect(config.validator_enabled?('Tags/ApiTags'))
+        .to be false
+      expect(config.validator_config('Tags/ApiTags', 'AllowedApis'))
+        .to eq(Yard::Lint::Validators::Tags::ApiTags::Config.defaults['AllowedApis'])
+      expect(config.validator_enabled?('Semantic/AbstractMethods'))
+        .to be true
+      expect(config.validator_enabled?('Tags/OptionTags'))
+        .to be true
     end
 
     it 'accepts a block for configuration' do
@@ -119,9 +129,12 @@ RSpec.describe Yard::Lint::Config do
 
       config = described_class.from_file(config_file)
 
-      expect(config.options).to eq(['--private'])
-      expect(config.validator_config('Tags/Order', 'EnforcedOrder')).to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
-      expect(config.exclude).to include('\.git', 'vendor/**/*', 'node_modules/**/*')
+      expect(config.options)
+        .to eq(['--private'])
+      expect(config.validator_config('Tags/Order', 'EnforcedOrder'))
+        .to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
+      expect(config.exclude)
+        .to include('\.git', 'vendor/**/*', 'node_modules/**/*')
     end
   end
 
@@ -179,7 +192,8 @@ RSpec.describe Yard::Lint::Config do
 
       expect(config[:options]).to eq([])
       # Hash-like access doesn't work for validator configs - use validator_config method
-      expect(config.validator_config('Tags/Order', 'EnforcedOrder')).to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
+      expect(config.validator_config('Tags/Order', 'EnforcedOrder'))
+        .to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
     end
 
     it 'returns nil for non-existent attributes' do

@@ -8,7 +8,7 @@ RSpec.describe Yard::Lint::Validators::Tags::MeaninglessTag::Config do
 
     it 'has defaults configured' do
       expect(described_class.defaults).to be_a(Hash)
-      expect(described_class.defaults['Enabled']).to eq(true)
+      expect(described_class.defaults['Enabled']).to be(true)
       expect(described_class.defaults['Severity']).to eq('warning')
       expect(described_class.defaults['CheckedTags']).to eq(%w[param option])
       expect(described_class.defaults['InvalidObjectTypes']).to eq(%w[class module constant])

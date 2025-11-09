@@ -8,7 +8,7 @@ RSpec.describe Yard::Lint::Validators::Tags::CollectionType::Config do
 
     it 'has defaults configured' do
       expect(described_class.defaults).to be_a(Hash)
-      expect(described_class.defaults['Enabled']).to eq(true)
+      expect(described_class.defaults['Enabled']).to be(true)
       expect(described_class.defaults['Severity']).to eq('convention')
       expect(described_class.defaults['ValidatedTags']).to eq(%w[param option return yieldreturn])
     end
