@@ -24,15 +24,18 @@ RSpec.describe Yard::Lint::Validators::Tags::TagTypePosition::Result do
         detected_style: 'type_after_name'
       }
 
-      allow(Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder).to receive(:call)
+      allow(Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder)
+        .to receive(:call)
         .with(offense)
         .and_return('formatted message')
 
       result = described_class.new([])
       message = result.build_message(offense)
 
-      expect(message).to eq('formatted message')
-      expect(Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder).to have_received(:call)
+      expect(message)
+        .to eq('formatted message')
+      expect(Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder)
+        .to have_received(:call)
         .with(offense)
     end
   end

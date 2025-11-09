@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe Yard::Lint::Validators::Tags::CollectionType::Validator do
+RSpec.describe Yard::Lint::Validators::Tags::CollectionType do
   it 'has all required components' do
-    expect(defined?(Yard::Lint::Validators::Tags::CollectionType::Validator)).to be_truthy
-    expect(defined?(Yard::Lint::Validators::Tags::CollectionType::Parser)).to be_truthy
-    expect(defined?(Yard::Lint::Validators::Tags::CollectionType::Result)).to be_truthy
-    expect(defined?(Yard::Lint::Validators::Tags::CollectionType::Config)).to be_truthy
-    expect(defined?(Yard::Lint::Validators::Tags::CollectionType::MessagesBuilder)).to be_truthy
+    expect(defined?(described_class::Validator)).to be_truthy
+    expect(defined?(described_class::Parser)).to be_truthy
+    expect(defined?(described_class::Result)).to be_truthy
+    expect(defined?(described_class::Config)).to be_truthy
+    expect(defined?(described_class::MessagesBuilder)).to be_truthy
   end
 end
