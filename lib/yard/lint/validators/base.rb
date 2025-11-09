@@ -73,7 +73,6 @@ module Yard
 
           # For large file lists, use a temporary file to avoid ARG_MAX limits
           # Write file paths to temp file, one per line
-          require 'tempfile'
           Tempfile.create(['yard_files', '.txt']) do |f|
             escaped_file_names.each { |file| f.puts(file) }
             f.flush
@@ -94,7 +93,6 @@ module Yard
           all_args = "#{shell_arguments} #{escaped_file_names}"
 
           # Create a hash of the arguments for a unique directory name
-          require 'digest'
           args_hash = Digest::SHA256.hexdigest(all_args)
 
           # Create subdirectory under base temp dir
