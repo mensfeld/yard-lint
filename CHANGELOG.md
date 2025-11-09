@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## Unreleased
+## 1.0.0 (2025-11-09)
 - [Fix] Fix "Argument list too long" error on large codebases by using xargs pattern with temporary file lists
 - [Enhancement] Expand default exclusion patterns to include typical Ruby/Rails directories (test/, log/, coverage/, db/migrate/, etc.)
 - **[Feature]** Add `Tags/TypeSyntax` validator to detect malformed YARD type syntax using YARD's built-in parser
