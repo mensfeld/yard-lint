@@ -11,7 +11,7 @@ RSpec.describe Yard::Lint::Config do
       expect(config.validator_config('Tags/Order', 'EnforcedOrder')).to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
       expect(config.validator_config('Tags/InvalidTypes', 'ValidatedTags')).to eq(Yard::Lint::Validators::Tags::InvalidTypes::Config.defaults['ValidatedTags'])
       expect(config.validator_config('Tags/InvalidTypes', 'ExtraTypes')).to eq([])
-      expect(config.exclude).to eq(['\.git', 'vendor/**/*', 'node_modules/**/*'])
+      expect(config.exclude).to include('\.git', 'vendor/**/*', 'node_modules/**/*', 'spec/**/*', 'test/**/*')
       expect(config.fail_on_severity).to eq('warning')
       expect(config.validator_enabled?('Tags/ApiTags')).to be false
       expect(config.validator_config('Tags/ApiTags', 'AllowedApis')).to eq(Yard::Lint::Validators::Tags::ApiTags::Config.defaults['AllowedApis'])
@@ -121,7 +121,7 @@ RSpec.describe Yard::Lint::Config do
 
       expect(config.options).to eq(['--private'])
       expect(config.validator_config('Tags/Order', 'EnforcedOrder')).to eq(Yard::Lint::Validators::Tags::Order::Config.defaults['EnforcedOrder'])
-      expect(config.exclude).to eq(['\.git', 'vendor/**/*', 'node_modules/**/*'])
+      expect(config.exclude).to include('\.git', 'vendor/**/*', 'node_modules/**/*')
     end
   end
 
@@ -209,7 +209,7 @@ RSpec.describe Yard::Lint::Config do
     it 'handles nil values in configuration' do
       config = described_class.new({ 'AllValidators' => { 'Exclude' => nil } })
 
-      expect(config.exclude).to eq(['\.git', 'vendor/**/*', 'node_modules/**/*'])
+      expect(config.exclude).to include('\.git', 'vendor/**/*', 'node_modules/**/*')
     end
 
     it 'returns correct validator severity' do
