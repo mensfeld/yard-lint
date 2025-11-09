@@ -171,7 +171,7 @@ RSpec.describe 'Yard::Lint Validators' do
       multi_issue_files = by_file.select { |_file, offenses| offenses.size > 1 }
 
       # Should have at least some files with multiple issues
-      expect(multi_issue_files).not_to be_empty if result.any?
+      expect(multi_issue_files).not_to be_empty if result.offenses.any?
     end
   end
 
