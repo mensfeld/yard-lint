@@ -2,14 +2,20 @@
 
 RSpec.describe Yard::Lint::ConfigGenerator do
   describe '.generate' do
-    let(:config_path) { File.join(Dir.pwd, '.yard-lint.yml') }
+    # Use a temporary directory to avoid deleting the project's .yard-lint.yml
+    let(:temp_dir) { Dir.mktmpdir }
+    let(:config_path) { File.join(temp_dir, '.yard-lint.yml') }
 
     before do
-      FileUtils.rm_f(config_path)
+      # Change to temp directory for these tests
+      @original_dir = Dir.pwd
+      Dir.chdir(temp_dir)
     end
 
     after do
-      FileUtils.rm_f(config_path)
+      # Clean up and return to original directory
+      Dir.chdir(@original_dir)
+      FileUtils.rm_rf(temp_dir)
     end
 
     context 'when config file does not exist' do
