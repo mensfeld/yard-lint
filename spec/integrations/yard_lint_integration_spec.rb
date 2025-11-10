@@ -292,7 +292,7 @@ RSpec.describe 'Yard::Lint Integration Tests' do
   end
 
   describe 'Glob Patterns' do
-    it 'processes files matching glob patterns' do
+    it 'processes files matching glob patterns', :cache_isolation do
       pattern = File.join(fixtures_dir, '*.rb')
 
       result = Yard::Lint.run(path: pattern, config: config)
@@ -304,7 +304,7 @@ RSpec.describe 'Yard::Lint Integration Tests' do
   end
 
   describe 'Directory Processing' do
-    it 'recursively processes Ruby files in directories' do
+    it 'recursively processes Ruby files in directories', :cache_isolation do
       result = Yard::Lint.run(path: fixtures_dir, config: config)
 
       # Should find offenses from multiple files
