@@ -156,8 +156,6 @@ Tags/RedundantParamDescription:
     - an
   # Maximum word count for redundant descriptions (longer descriptions are never flagged)
   MaxRedundantWords: 6
-  # Minimum character length to consider meaningful (secondary check)
-  MinMeaningfulLength: 15
   # Generic terms that trigger the type_generic pattern
   GenericTerms:
     - object

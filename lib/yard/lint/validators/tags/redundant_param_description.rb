@@ -109,8 +109,6 @@ module Yard
         #         - an
         #       # Maximum word count for redundant descriptions (longer descriptions are never flagged)
         #       MaxRedundantWords: 6
-        #       # Minimum character length to consider meaningful (secondary check)
-        #       MinMeaningfulLength: 15
         #       # Generic terms that trigger the type_generic pattern
         #       GenericTerms:
         #         - object
@@ -150,9 +148,7 @@ module Yard
         # 1. **Word count threshold**: Descriptions longer than `MaxRedundantWords` (default: 6)
         #    are never flagged, even if they start with a redundant pattern
         # 2. **EXACT pattern matching**: Only flags complete matches, not partial/prefix matches
-        # 3. **Character length check**: Very short descriptions below `MinMeaningfulLength`
-        #    may be flagged even if meaningful
-        # 4. **Configurable patterns**: Disable patterns that don't work for your codebase
+        # 3. **Configurable patterns**: Disable patterns that don't work for your codebase
         #
         # This means `"the date that can describe the event starting information"` (9 words)
         # will never be flagged, even though it starts with "the date".

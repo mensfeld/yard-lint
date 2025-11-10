@@ -13,7 +13,6 @@ module Yard
               articles = config_articles.join('|')
               generic_terms = config_generic_terms.join('|')
               max_words = config_max_redundant_words
-              min_length = config_min_meaningful_length
               checked_tags = config_checked_tags
               patterns = config_enabled_patterns
 
@@ -130,11 +129,6 @@ module Yard
             # @return [Integer] maximum word count for redundant descriptions
             def config_max_redundant_words
               config.validator_config('Tags/RedundantParamDescription', 'MaxRedundantWords') || Config.defaults['MaxRedundantWords']
-            end
-
-            # @return [Integer] minimum length for meaningful descriptions
-            def config_min_meaningful_length
-              config.validator_config('Tags/RedundantParamDescription', 'MinMeaningfulLength') || Config.defaults['MinMeaningfulLength']
             end
 
             # @return [Array<String>] tags to check for redundant descriptions

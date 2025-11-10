@@ -14,7 +14,6 @@ module Yard
               'CheckedTags' => %w[param option],
               'Articles' => %w[The the A a An an],
               'MaxRedundantWords' => 6,
-              'MinMeaningfulLength' => 15,
               'GenericTerms' => %w[object instance value data item element],
               'EnabledPatterns' => {
                 'ArticleParam' => true,

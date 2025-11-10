@@ -29,13 +29,14 @@ module Yard
             # @return [String] yard query to find methods with options parameter
             #   but no @option tags
             def query
+              parameter_names = config_parameter_names
               <<~QUERY
                 '
                   if object.is_a?(YARD::CodeObjects::MethodObject)
                       # Check if method has a parameter named "options" or "opts"
                     has_options_param = object.parameters.any? do |param|
                       param_name = param[0].to_s.gsub(/[*:]/, '')
-                      ['options', 'opts', 'kwargs'].include?(param_name)
+                      #{parameter_names.inspect}.include?(param_name)
                       end
 
                     if has_options_param
@@ -51,6 +52,11 @@ module Yard
                   false
                 '
               QUERY
+            end
+
+            # @return [Array<String>] parameter names that should have @option tags
+            def config_parameter_names
+              config.validator_config('Tags/OptionTags', 'ParameterNames') || Config.defaults['ParameterNames']
             end
           end
         end

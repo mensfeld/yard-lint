@@ -16,7 +16,6 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Config d
       expect(defaults['CheckedTags']).to eq(%w[param option])
       expect(defaults['Articles']).to eq(%w[The the A a An an])
       expect(defaults['MaxRedundantWords']).to eq(6)
-      expect(defaults['MinMeaningfulLength']).to eq(15)
       expect(defaults['GenericTerms']).to eq(%w[object instance value data item element])
     end
 

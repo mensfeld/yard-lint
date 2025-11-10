@@ -84,10 +84,6 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Validato
       expect(validator.send(:config_max_redundant_words)).to eq(6)
     end
 
-    it 'reads MinMeaningfulLength config' do
-      expect(validator.send(:config_min_meaningful_length)).to eq(15)
-    end
-
     it 'reads CheckedTags config' do
       expect(validator.send(:config_checked_tags)).to eq(%w[param option])
     end
