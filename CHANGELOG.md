@@ -8,6 +8,17 @@
   - Reports multi-line syntax errors with full context from Ruby's parser
   - Enabled by default with 'warning' severity
   - Helps prevent broken code examples in documentation
+- **[Feature]** Add `Tags/RedundantParamDescription` validator to detect meaningless parameter descriptions
+  - Detects 7 types of redundant patterns: article+param, possessive, type restatement, param-to-verb, ID pattern, directional date, type+generic
+  - Configurable pattern toggles to enable/disable individual pattern types
+  - Word count threshold (`MaxRedundantWords`: 6) prevents false positives on longer descriptions
+  - Character length threshold (`MinMeaningfulLength`: 15) for additional context
+  - Configurable articles list (`Articles`: The, the, A, a, An, an)
+  - Configurable generic terms list (`GenericTerms`: object, instance, value, data, item, element)
+  - Pattern-specific error messages with actionable suggestions
+  - EXACT pattern matching (not prefix) to avoid false positives
+  - Enabled by default with 'convention' severity
+  - Helps maintain high-quality, meaningful documentation
 
 ## 1.0.1 (2025-11-09)
 - **[Feature]** Add `--init` command to generate `.yard-lint.yml` configuration file with sensible defaults

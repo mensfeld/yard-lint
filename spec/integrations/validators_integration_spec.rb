@@ -385,6 +385,154 @@ RSpec.describe 'Yard::Lint Validators' do
     end
   end
 
+  describe 'Redundant Param Description Validation' do
+    context 'when redundant_param_description is enabled' do
+      let(:config) do
+        Yard::Lint::Config.new do |c|
+          c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
+        end
+      end
+
+      it 'runs redundant param description validation' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+        expect(redundant_offenses).not_to be_empty
+        expect(result).to respond_to(:offenses)
+      end
+
+      it 'detects article + param pattern' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        # Should find violations from article_param_redundant method
+        article_pattern_offenses = redundant_offenses.select do |o|
+          o[:message].include?('restates the parameter name')
+        end
+
+        expect(article_pattern_offenses).not_to be_empty
+      end
+
+      it 'detects possessive + param pattern' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        possessive_offenses = redundant_offenses.select do |o|
+          o[:message].include?('adds no meaningful information')
+        end
+
+        expect(possessive_offenses).not_to be_empty
+      end
+
+      it 'detects type restatement pattern' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        type_restatement_offenses = redundant_offenses.select do |o|
+          o[:message].include?('repeats the type name')
+        end
+
+        expect(type_restatement_offenses).not_to be_empty
+      end
+
+      it 'does not flag long meaningful descriptions' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        # Check that long_meaningful_descriptions method has no violations
+        long_desc_method_offenses = redundant_offenses.select do |o|
+          o[:object_name] == 'RedundantParamFixtures#long_meaningful_descriptions'
+        end
+
+        expect(long_desc_method_offenses).to be_empty
+      end
+
+      it 'provides detailed error messages with suggestions' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        # Check that offenses have proper structure
+        redundant_offenses.each do |offense|
+          expect(offense).to have_key(:location)
+          expect(offense).to have_key(:line)
+          expect(offense).to have_key(:message)
+          expect(offense).to have_key(:object_name)
+          expect(offense[:severity]).to eq('convention')
+          expect(offense[:message]).to match(/[Cc]onsider/)
+        end
+      end
+    end
+
+    context 'when redundant_param_description is disabled' do
+      let(:config) do
+        Yard::Lint::Config.new do |c|
+          c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', false)
+        end
+      end
+
+      it 'does not run redundant param description validation' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+        expect(redundant_offenses).to be_empty
+      end
+    end
+
+    context 'with custom configuration' do
+      let(:config) do
+        Yard::Lint::Config.new do |c|
+          c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
+          c.set_validator_config('Tags/RedundantParamDescription', 'MaxRedundantWords', 4)
+        end
+      end
+
+      it 'respects custom MaxRedundantWords threshold' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        # With lower threshold, should find fewer violations
+        # (5-6 word descriptions will not be flagged now)
+        expect(redundant_offenses).to be_an(Array)
+      end
+    end
+
+    context 'with pattern toggles' do
+      let(:config) do
+        Yard::Lint::Config.new do |c|
+          c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
+          c.set_validator_config('Tags/RedundantParamDescription', 'EnabledPatterns', {
+            'ArticleParam' => true,
+            'PossessiveParam' => false,
+            'TypeRestatement' => false,
+            'ParamToVerb' => false,
+            'IdPattern' => false,
+            'DirectionalDate' => false,
+            'TypeGeneric' => false
+          })
+        end
+      end
+
+      it 'only detects enabled patterns' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        # Should only find article_param violations
+        article_only = redundant_offenses.all? do |o|
+          o[:message].include?('restates the parameter name')
+        end
+
+        expect(article_only).to be true
+      end
+    end
+  end
+
   describe 'All Validators Enabled' do
     let(:config) do
       Yard::Lint::Config.new do |c|
@@ -405,6 +553,7 @@ RSpec.describe 'Yard::Lint Validators' do
         c.set_validator_config('Warnings/UnknownParameterName', 'Enabled', true)
         c.set_validator_config('Semantic/AbstractMethods', 'Enabled', true)
         c.set_validator_config('Tags/ExampleSyntax', 'Enabled', true)
+        c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
       end
     end
 

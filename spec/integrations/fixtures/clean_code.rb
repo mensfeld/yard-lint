@@ -3,8 +3,8 @@
 # Properly documented class
 class CleanCode
   # Initialize the clean code instance
-  # @param name [String] the name
-  # @param value [Integer] the value
+  # @param name [String] identifier for the instance
+  # @param value [Integer] initial numeric value to store
   def initialize(name, value)
     @name = name
     @value = value

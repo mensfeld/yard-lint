@@ -30,8 +30,8 @@ class AttributeMethodsExample
   attr_reader :country, :postal_code
   attr_accessor :verified, :active
 
-  # @param name [String] the name
-  # @param age [Integer] the age
+  # @param name [String] user's full name
+  # @param age [Integer] user's age in years
   def initialize(name, age)
     @name = name
     @age = age
