@@ -23,9 +23,12 @@ module Yard
         #   def process(data)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Tags/TypeSyntax:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Tags/TypeSyntax:
+        #       Enabled: false
         #
         module TypeSyntax
         end

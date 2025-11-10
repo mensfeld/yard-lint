@@ -24,9 +24,12 @@ module Yard
         #   def process(name)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Warnings/UnknownTag:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Warnings/UnknownTag:
+        #       Enabled: false
         #
         module UnknownTag
         end

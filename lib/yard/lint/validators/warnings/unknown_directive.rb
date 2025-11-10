@@ -24,9 +24,12 @@ module Yard
         #   class User
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Warnings/UnknownDirective:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Warnings/UnknownDirective:
+        #       Enabled: false
         #
         module UnknownDirective
         end

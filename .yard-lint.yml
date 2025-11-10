@@ -15,6 +15,13 @@ AllValidators:
     - 'node_modules/**/*'
     - 'spec/**/*'
     - 'test/**/*'
+    # Validator implementation files (main module, config, parser, etc.)
+    # These contain extensive documentation with examples of bad code (intentional)
+    # They also have internal implementation details that don't need full documentation
+    - '**/validators/documentation/**/*.rb'
+    - '**/validators/tags/**/*.rb'
+    - '**/validators/warnings/**/*.rb'
+    - '**/validators/semantic/**/*.rb'
 
   # Exit code behavior (error, warning, convention, never)
   FailOnSeverity: warning

@@ -23,9 +23,12 @@ module Yard
         #   def process(name)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Warnings/InvalidTagFormat:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Warnings/InvalidTagFormat:
+        #       Enabled: false
         #
         module InvalidTagFormat
         end

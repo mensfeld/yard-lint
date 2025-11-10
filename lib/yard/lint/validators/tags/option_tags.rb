@@ -9,9 +9,12 @@ module Yard
         # Ensures that methods with options parameters document them using `@option`
         # tags. This validator is enabled by default.
         #
-        # @example Configuration - Disable if needed
-        #   Tags/OptionTags:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Tags/OptionTags:
+        #       Enabled: false
         #
         # @example Good - Options hash is documented
         #   # @param name [String] the name

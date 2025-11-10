@@ -28,9 +28,12 @@ module Yard
         #   def process
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Semantic/AbstractMethods:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Semantic/AbstractMethods:
+        #       Enabled: false
         #
         module AbstractMethods
         end

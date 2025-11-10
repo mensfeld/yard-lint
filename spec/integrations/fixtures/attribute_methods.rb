@@ -4,7 +4,7 @@
 class AttributeMethodsExample
   # Documented attribute reader
   # @!attribute [r] name
-  #   @return [String] the name
+  #   @return [String] user's full name
   attr_reader :name
 
   # Undocumented attribute reader

@@ -10,9 +10,12 @@ module Yard
         # or constants, where they make no sense. These tags are only valid on methods.
         # This validator is enabled by default.
         #
-        # @example Configuration - Disable if needed
-        #   Tags/MeaninglessTag:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Tags/MeaninglessTag:
+        #       Enabled: false
         #
         # @example Bad - @param on a class
         #   # @param name [String] this makes no sense on a class

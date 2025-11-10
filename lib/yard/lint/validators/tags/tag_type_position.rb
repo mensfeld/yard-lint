@@ -25,9 +25,12 @@ module Yard
         #   def create_user(name, age)
         #   end
         #
-        # @example Configuration - Use type_first style instead
-        #   Tags/TagTypePosition:
-        #     EnforcedStyle: type_first
+        # ## Configuration
+        #
+        # To use type_first style instead:
+        #
+        #     Tags/TagTypePosition:
+        #       EnforcedStyle: type_first
         #
         # @example Good - When EnforcedStyle is type_first
         #   # @param [String] name the user's name
@@ -35,9 +38,10 @@ module Yard
         #   def create_user(name, age)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Tags/TagTypePosition:
-        #     Enabled: false
+        # To disable this validator:
+        #
+        #     Tags/TagTypePosition:
+        #       Enabled: false
         #
         module TagTypePosition
         end

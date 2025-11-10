@@ -21,9 +21,12 @@ module Yard
         #   def process(new_name)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Warnings/UnknownParameterName:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Warnings/UnknownParameterName:
+        #       Enabled: false
         #
         module UnknownParameterName
         end

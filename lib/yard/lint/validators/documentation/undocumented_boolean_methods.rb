@@ -23,9 +23,12 @@ module Yard
         #     @active
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Documentation/UndocumentedBooleanMethods:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Documentation/UndocumentedBooleanMethods:
+        #       Enabled: false
         #
         module UndocumentedBooleanMethods
         end

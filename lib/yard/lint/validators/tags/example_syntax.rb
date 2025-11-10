@@ -27,9 +27,12 @@ module Yard
         #   def my_method(name)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Tags/ExampleSyntax:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Tags/ExampleSyntax:
+        #       Enabled: false
         #
         module ExampleSyntax
         end

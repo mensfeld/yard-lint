@@ -22,9 +22,12 @@ module Yard
         #   def process
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Documentation/MarkdownSyntax:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Documentation/MarkdownSyntax:
+        #       Enabled: false
         #
         module MarkdownSyntax
         end

@@ -24,9 +24,12 @@ module Yard
         #   def process(name, age)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Warnings/DuplicatedParameterName:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Warnings/DuplicatedParameterName:
+        #       Enabled: false
         #
         module DuplicatedParameterName
         end

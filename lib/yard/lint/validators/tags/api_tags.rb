@@ -10,12 +10,15 @@ module Yard
         # to explicitly document their API visibility level. This validator is disabled
         # by default and must be explicitly enabled.
         #
-        # @example Configuration
-        #   Tags/ApiTags:
-        #     Enabled: true
-        #     AllowedApis:
-        #       - public
-        #       - private
+        # ## Configuration
+        #
+        # To enable this validator (it's disabled by default):
+        #
+        #     Tags/ApiTags:
+        #       Enabled: true
+        #       AllowedApis:
+        #         - public
+        #         - private
         #
         # @example Good - Methods and classes have @api tags
         #   # @api public

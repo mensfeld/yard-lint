@@ -22,9 +22,12 @@ module Yard
         #   def process(name)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Tags/Order:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Tags/Order:
+        #       Enabled: false
         #
         module Order
         end

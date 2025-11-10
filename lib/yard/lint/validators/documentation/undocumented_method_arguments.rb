@@ -23,9 +23,12 @@ module Yard
         #   def process(name, options)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Documentation/UndocumentedMethodArguments:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Documentation/UndocumentedMethodArguments:
+        #       Enabled: false
         #
         module UndocumentedMethodArguments
         end

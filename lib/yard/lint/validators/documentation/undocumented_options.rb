@@ -25,9 +25,12 @@ module Yard
         #   def configure(options)
         #   end
         #
-        # @example Configuration - Disable this validator
-        #   Documentation/UndocumentedOptions:
-        #     Enabled: false
+        # ## Configuration
+        #
+        # To disable this validator:
+        #
+        #     Documentation/UndocumentedOptions:
+        #       Enabled: false
         #
         module UndocumentedOptions
         end
