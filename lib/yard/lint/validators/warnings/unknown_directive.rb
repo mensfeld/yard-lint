@@ -13,8 +13,8 @@ module Yard
         # could indicate errors. This validator is enabled by default.
         #
         # @example Bad - Unknown or misspelled directive
-        #   # @!attribut [r] name
-        #   # @!metod foo
+        #   # @!attribute [r] name
+        #   # @!method foo
         #   class User
         #   end
         #

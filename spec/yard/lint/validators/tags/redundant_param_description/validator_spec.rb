@@ -57,7 +57,7 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Validato
 
     it 'includes max word count threshold' do
       query = validator.send(:query)
-      expect(query).to include('> 6')  # Default MaxRedundantWords
+      expect(query).to include('> 6') # Default MaxRedundantWords
     end
   end
 

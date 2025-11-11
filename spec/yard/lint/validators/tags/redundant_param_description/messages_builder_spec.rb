@@ -170,7 +170,7 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Messages
       end
     end
 
-    context 'message content validation' do
+    context 'when validating message content' do
       it 'article_param suggests removing description' do
         offense = {
           tag_name: 'param',
@@ -205,7 +205,7 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Messages
       end
     end
 
-    context 'all messages' do
+    context 'when checking all messages' do
       it 'include the original description' do
         patterns = %w[
           article_param possessive_param type_restatement

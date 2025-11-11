@@ -68,4 +68,80 @@ RSpec.describe Yard::Lint::Validators::Base do
       expect(result[:stdout]).to eq('')
     end
   end
+
+  describe '#config_or_default' do
+    let(:concrete_validator_class) do
+      Class.new(described_class) do
+        # Fake namespace for testing: Yard::Lint::Validators::Tags::TestValidator
+        def self.name
+          'Yard::Lint::Validators::Tags::TestValidator'
+        end
+
+        private
+
+        def yard_cmd(_dir, _escaped_file_names)
+          raw('test output', '', 0)
+        end
+      end
+    end
+
+    let(:validator) { concrete_validator_class.new(config, selection) }
+
+    context 'when config value exists' do
+      before do
+        allow(config).to receive(:validator_config)
+          .with('Tags/TestValidator', 'SomeKey')
+          .and_return('configured_value')
+      end
+
+      it 'returns the configured value' do
+        result = validator.send(:config_or_default, 'SomeKey')
+        expect(result).to eq('configured_value')
+      end
+    end
+
+    context 'when config value is nil' do
+      before do
+        allow(config).to receive(:validator_config)
+          .with('Tags/TestValidator', 'SomeKey')
+          .and_return(nil)
+        allow(Yard::Lint::Validators::Tags::TestValidator::Config).to receive(:defaults)
+          .and_return('SomeKey' => 'default_value')
+      end
+
+      it 'returns the default value' do
+        result = validator.send(:config_or_default, 'SomeKey')
+        expect(result).to eq('default_value')
+      end
+    end
+
+    context 'when validator name cannot be extracted' do
+      let(:invalid_validator_class) do
+        Class.new(described_class) do
+          def self.name
+            'InvalidClassName'
+          end
+
+          private
+
+          def yard_cmd(_dir, _escaped_file_names)
+            raw('test output', '', 0)
+          end
+        end
+      end
+
+      let(:invalid_validator) { invalid_validator_class.new(config, selection) }
+
+      it 'returns the default value from Config.defaults' do
+        stub_const('Yard::Lint::Config', Class.new do
+          def self.defaults
+            { 'SomeKey' => 'global_default' }
+          end
+        end)
+
+        result = invalid_validator.send(:config_or_default, 'SomeKey')
+        expect(result).to eq('global_default')
+      end
+    end
+  end
 end

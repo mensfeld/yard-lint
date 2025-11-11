@@ -94,15 +94,13 @@ module Yard
 
             # @return [String] the enforced style ('type_after_name' (standard) or 'type_first')
             def enforced_style
-              config.validator_config('Tags/TagTypePosition', 'EnforcedStyle') || 'type_after_name'
+              config_or_default('EnforcedStyle')
             end
 
             # Array of tag names to check, formatted for YARD query
             # @return [String] Ruby array literal string
             def checked_tags_array
-              tags = config.validator_config(
-                'Tags/TagTypePosition', 'CheckedTags'
-              ) || %w[param option]
+              tags = config_or_default('CheckedTags')
               "[#{tags.map { |t| "\"#{t}\"" }.join(',')}]"
             end
           end

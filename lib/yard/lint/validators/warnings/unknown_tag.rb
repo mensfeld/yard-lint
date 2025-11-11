@@ -13,7 +13,7 @@ module Yard
         # This validator is enabled by default.
         #
         # @example Bad - Misspelled or non-existent tags
-        #   # @paramm name [String] typo in param tag
+        #   # @param name [String] typo in param tag
         #   # @returns [String] should be @return not @returns
         #   def process(name)
         #   end

@@ -75,15 +75,13 @@ module Yard
             # Gets the enforced collection style from configuration
             # @return [String] 'long' or 'short'
             def enforced_style
-              config.validator_config('Tags/CollectionType', 'EnforcedStyle') || 'long'
+              config_or_default('EnforcedStyle')
             end
 
             # Array of tag names to validate, formatted for YARD query
             # @return [String] Ruby array literal string
             def validated_tags_array
-              tags = config.validator_config('Tags/CollectionType', 'ValidatedTags') || %w[
-                param option return yieldreturn
-              ]
+              tags = config_or_default('ValidatedTags')
               "[#{tags.map { |t| "\"#{t}\"" }.join(',')}]"
             end
           end
