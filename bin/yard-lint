@@ -8,6 +8,7 @@ require 'yard-lint'
 
 options = {}
 config_file = nil
+diff_mode = nil
 
 OptionParser.new do |opts|
   opts.banner = 'Usage: yard-lint [options] PATH'
@@ -32,6 +33,24 @@ OptionParser.new do |opts|
     options[:progress] = value
   end
 
+  opts.separator ''
+  opts.separator 'Diff mode options (mutually exclusive):'
+
+  opts.on('--diff [REF]', 'Lint only files changed since REF (default: main/master auto-detected)') do |ref|
+    diff_mode = { mode: :ref, base_ref: ref }
+  end
+
+  opts.on('--staged', 'Lint only staged files (git index)') do
+    diff_mode = { mode: :staged }
+  end
+
+  opts.on('--changed', 'Lint only uncommitted files') do
+    diff_mode = { mode: :changed }
+  end
+
+  opts.separator ''
+  opts.separator 'Other options:'
+
   opts.on('--init', 'Generate .yard-lint.yml config file with defaults') do
     options[:init] = true
   end
@@ -47,6 +66,13 @@ OptionParser.new do |opts|
 
   opts.on('-h', '--help', 'Show this help') do
     puts opts
+    puts
+    puts 'Examples:'
+    puts '  yard-lint lib/                          # Lint all files in lib/'
+    puts '  yard-lint --diff main lib/              # Lint only files changed since main branch'
+    puts '  yard-lint --staged lib/                 # Lint only staged files'
+    puts '  yard-lint --changed lib/                # Lint only uncommitted files'
+    puts '  yard-lint --format json lib/            # Output in JSON format'
     exit
   end
 end.parse!
@@ -97,11 +123,17 @@ Yard::Lint::Validators::Base.reset_command_cache!
 Yard::Lint::Validators::Base.clear_yard_database!
 
 # Run the linter with config_file (it will be loaded internally)
-result = Yard::Lint.run(
-  path: path,
-  config_file: config_file,
-  progress: options[:progress]
-)
+begin
+  result = Yard::Lint.run(
+    path: path,
+    config_file: config_file,
+    progress: options[:progress],
+    diff: diff_mode
+  )
+rescue Yard::Lint::Git::Error => e
+  puts "Git error: #{e.message}"
+  exit 1
+end
 
 # Format and display results
 case options[:format]

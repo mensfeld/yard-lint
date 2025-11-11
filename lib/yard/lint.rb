@@ -19,10 +19,20 @@ module Yard
       # @param config_file [String, nil] path to config file
       #   (auto-loads .yard-lint.yml if not specified)
       # @param progress [Boolean] show progress indicator (default: true for TTY)
+      # @param diff [Hash, nil] diff mode options
+      #   - :mode [Symbol] one of :ref, :staged, :changed
+      #   - :base_ref [String, nil] base ref for :ref mode (auto-detects main/master if nil)
       # @return [Yard::Lint::Result] result object with offenses
-      def run(path:, config: nil, config_file: nil, progress: nil)
+      def run(path:, config: nil, config_file: nil, progress: nil, diff: nil)
         config ||= load_config(config_file)
-        files = expand_path(path, config)
+
+        # Determine files to lint based on diff mode or normal path expansion
+        files = if diff
+                  get_diff_files(diff, path, config)
+                else
+                  expand_path(path, config)
+                end
+
         runner = Runner.new(files, config)
 
         # Enable progress by default if output is a TTY
@@ -42,6 +52,32 @@ module Yard
           Config.from_file(config_file)
         else
           Config.load || Config.new
+        end
+      end
+
+      # Get files from git diff based on diff mode
+      # @param diff [Hash] diff mode options
+      # @param path [String, Array<String>] path or array of paths to filter within
+      # @param config [Yard::Lint::Config] configuration object
+      # @return [Array<String>] array of absolute file paths
+      def get_diff_files(diff, path, config)
+        # Get changed files from git based on mode
+        git_files = case diff[:mode]
+                    when :ref
+                      Git.changed_files(diff[:base_ref], path)
+                    when :staged
+                      Git.staged_files(path)
+                    when :changed
+                      Git.uncommitted_files(path)
+                    else
+                      raise ArgumentError, "Unknown diff mode: #{diff[:mode]}"
+                    end
+
+        # Apply exclusion patterns
+        git_files.reject do |file|
+          config.exclude.any? do |pattern|
+            File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
+          end
         end
       end
 

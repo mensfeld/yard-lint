@@ -129,6 +129,13 @@ module Yard
         all_validators['FailOnSeverity'] || 'warning'
       end
 
+      # Diff mode default base ref (main or master)
+      # @return [String, nil] default base ref for diff mode
+      def diff_mode_default_base_ref
+        diff_config = all_validators['DiffMode'] || {}
+        diff_config['DefaultBaseRef']
+      end
+
       # Check if a validator is enabled
       # @param validator_name [String] full validator name (e.g., 'Tags/Order')
       # @return [Boolean] true if validator is enabled
