@@ -60,7 +60,6 @@ RSpec.describe Yard::Lint::Git do
           .with('git', 'diff', '--name-only', 'develop...HEAD')
           .and_return(["lib/foo.rb\n", '', instance_double(Process::Status, success?: true)])
 
-        allow(File).to receive(:expand_path).with('develop').and_return('develop')
         allow(File).to receive(:expand_path).with('/home/user/project/lib').and_return('/home/user/project/lib')
         allow(File).to receive(:expand_path).with('lib/foo.rb').and_return('/home/user/project/lib/foo.rb')
         allow(File).to receive(:exist?).and_return(true)

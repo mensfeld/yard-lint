@@ -31,8 +31,6 @@ module Yard
           DiffMode:
             # Default base ref for --diff (auto-detects main/master if not specified)
             DefaultBaseRef: ~
-            # Include untracked files in diff mode (not yet implemented)
-            IncludeUntracked: false
 
         # Documentation validators
         Documentation/UndocumentedObjects:

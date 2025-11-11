@@ -71,7 +71,6 @@ RSpec.describe 'Diff Mode Integration', :integration do
 
         # Should only check new.rb (undocumented)
         expect(result.count).to be > 0
-        new_rb_path = File.join(lib_dir, 'new.rb')
         expect(result.offenses.any? { |o| o[:location].include?('new.rb') }).to be true
       end
 
@@ -84,7 +83,7 @@ RSpec.describe 'Diff Mode Integration', :integration do
         allow(Yard::Lint::Git).to receive(:default_branch).and_return('main')
         allow(Yard::Lint::Git).to receive(:changed_files).with(nil, lib_dir).and_return([])
 
-        result = Yard::Lint.run(
+        Yard::Lint.run(
           path: lib_dir,
           config: config,
           progress: false,
@@ -253,7 +252,7 @@ RSpec.describe 'Diff Mode Integration', :integration do
         ]
       )
 
-      result = Yard::Lint.run(
+      Yard::Lint.run(
         path: lib_dir,
         config: config,
         progress: false,

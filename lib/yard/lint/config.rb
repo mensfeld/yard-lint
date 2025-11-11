@@ -136,13 +136,6 @@ module Yard
         diff_config['DefaultBaseRef']
       end
 
-      # Whether to include untracked files in diff mode
-      # @return [Boolean] true to include untracked files
-      def diff_mode_include_untracked
-        diff_config = all_validators['DiffMode'] || {}
-        diff_config['IncludeUntracked'] || false
-      end
-
       # Check if a validator is enabled
       # @param validator_name [String] full validator name (e.g., 'Tags/Order')
       # @return [Boolean] true if validator is enabled
