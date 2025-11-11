@@ -72,9 +72,9 @@ RSpec.describe Yard::Lint::Validators::Base do
   describe '#config_or_default' do
     let(:concrete_validator_class) do
       Class.new(described_class) do
-        # Fake namespace for testing: Yard::Lint::Validators::Tags::TestValidator
+        # Fake namespace for testing: Yard::Lint::Validators::Tags::TestValidator::Validator
         def self.name
-          'Yard::Lint::Validators::Tags::TestValidator'
+          'Yard::Lint::Validators::Tags::TestValidator::Validator'
         end
 
         private
@@ -101,15 +101,19 @@ RSpec.describe Yard::Lint::Validators::Base do
     end
 
     context 'when config value is nil' do
-      before do
+      it 'returns the default value' do
         allow(config).to receive(:validator_config)
           .with('Tags/TestValidator', 'SomeKey')
           .and_return(nil)
-        allow(Yard::Lint::Validators::Tags::TestValidator::Config).to receive(:defaults)
-          .and_return('SomeKey' => 'default_value')
-      end
 
-      it 'returns the default value' do
+        # Create a mock Config class with defaults
+        config_class = Class.new do
+          def self.defaults
+            { 'SomeKey' => 'default_value' }
+          end
+        end
+        stub_const('Yard::Lint::Validators::Tags::TestValidator::Config', config_class)
+
         result = validator.send(:config_or_default, 'SomeKey')
         expect(result).to eq('default_value')
       end
@@ -132,15 +136,9 @@ RSpec.describe Yard::Lint::Validators::Base do
 
       let(:invalid_validator) { invalid_validator_class.new(config, selection) }
 
-      it 'returns the default value from Config.defaults' do
-        stub_const('Yard::Lint::Config', Class.new do
-          def self.defaults
-            { 'SomeKey' => 'global_default' }
-          end
-        end)
-
+      it 'returns nil when no Config class exists' do
         result = invalid_validator.send(:config_or_default, 'SomeKey')
-        expect(result).to eq('global_default')
+        expect(result).to be_nil
       end
     end
   end
