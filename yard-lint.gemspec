@@ -38,4 +38,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'yard', '~> 0.9'
   spec.add_dependency 'zeitwerk', '~> 2.6'
+  spec.add_dependency 'irb' # Required by YARD in Ruby 3.5+
 end
