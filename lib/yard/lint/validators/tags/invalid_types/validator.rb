@@ -77,14 +77,14 @@ module Yard
             # @return [String] tags names for which we want to check the invalid tags
             #   types definitions
             def checked_tags_names
-              validated_tags = config.validator_config('Tags/InvalidTypes', 'ValidatedTags')
+              validated_tags = config_or_default('ValidatedTags')
               query_array(validated_tags)
             end
 
             # @return [String] extra names that we allow for types definitions in a yard
             #   query acceptable form
             def allowed_types_code
-              extra_types = config.validator_config('Tags/InvalidTypes', 'ExtraTypes') || []
+              extra_types = config_or_default('ExtraTypes')
               query_array(ALLOWED_DEFAULTS + extra_types)
             end
 

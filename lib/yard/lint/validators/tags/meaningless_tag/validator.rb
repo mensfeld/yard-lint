@@ -67,14 +67,12 @@ module Yard
 
             # @return [Array<String>] tags that should only appear on methods
             def checked_tags
-              config.validator_config('Tags/MeaninglessTag', 'CheckedTags') || %w[param option]
+              config_or_default('CheckedTags')
             end
 
             # @return [Array<String>] object types that shouldn't have method-only tags
             def invalid_object_types
-              config.validator_config('Tags/MeaninglessTag', 'InvalidObjectTypes') || %w[
-                class module constant
-              ]
+              config_or_default('InvalidObjectTypes')
             end
           end
         end

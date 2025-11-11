@@ -143,6 +143,42 @@ module Yard
         def shell(cmd)
           self.class.command_cache.execute(cmd)
         end
+
+        # Retrieves configuration value with fallback to default
+        # Automatically determines the validator name from the class namespace
+        #
+        # @param key [String] the configuration key to retrieve
+        # @return [Object] the configured value or default value from the validator's Config.defaults
+        # @note The validator name is automatically extracted from the class namespace.
+        #   For example, Yard::Lint::Validators::Tags::RedundantParamDescription::Validator
+        #   becomes 'Tags/RedundantParamDescription'
+        # @example Usage in a validator (e.g., Tags::RedundantParamDescription)
+        #   def config_articles
+        #     config_or_default('Articles')
+        #   end
+        def config_or_default(key)
+          validator_name = self.class.name&.split('::')&.then do |parts|
+            idx = parts.index('Validators')
+            next nil unless idx && parts[idx + 1] && parts[idx + 2]
+
+            "#{parts[idx + 1]}/#{parts[idx + 2]}"
+          end
+
+          # Get the validator module's Config class
+          validator_config_class = begin
+            # Get parent module (e.g., Yard::Lint::Validators::Tags::RedundantParamDescription)
+            parent_module = self.class.name.split('::')[0..-2].join('::')
+            Object.const_get("#{parent_module}::Config")
+          rescue NameError
+            nil
+          end
+
+          defaults = validator_config_class&.defaults || {}
+
+          return defaults[key] unless validator_name
+
+          config.validator_config(validator_name, key) || defaults[key]
+        end
       end
     end
   end
