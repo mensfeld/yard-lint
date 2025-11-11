@@ -89,6 +89,55 @@ yard-lint --init
 yard-lint --init --force
 ```
 
+### Diff Mode (Incremental Linting)
+
+Lint only files that changed - perfect for large projects, CI/CD, and pre-commit hooks:
+
+```bash
+# Lint only files changed since main branch (auto-detects main/master)
+yard-lint --diff lib/
+
+# Lint only files changed since specific branch/commit
+yard-lint --diff develop lib/
+yard-lint --diff HEAD~3 lib/
+
+# Lint only staged files (perfect for pre-commit hooks)
+yard-lint --staged lib/
+
+# Lint only uncommitted files
+yard-lint --changed lib/
+```
+
+**Use Cases:**
+
+**Pre-commit Hook:**
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+bundle exec yard-lint --staged --fail-on-severity error lib/
+```
+
+**GitHub Actions CI/CD:**
+```yaml
+name: YARD Lint
+on: [pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for --diff
+      - name: Run YARD-Lint on changed files
+        run: bundle exec yard-lint --diff origin/${{ github.base_ref }} lib/
+```
+
+**Legacy Codebase Incremental Adoption:**
+```bash
+# Only enforce rules on NEW code
+yard-lint --diff main lib/
+```
+
 ## Configuration
 
 YARD-Lint is configured via a `.yard-lint.yml` configuration file (similar to `.rubocop.yml`).
@@ -115,6 +164,13 @@ AllValidators:
 
   # Exit code behavior (error, warning, convention, never)
   FailOnSeverity: warning
+
+  # Diff mode settings
+  DiffMode:
+    # Default base ref for --diff (auto-detects main/master if not specified)
+    DefaultBaseRef: ~
+    # Include untracked files in diff mode (not yet implemented)
+    IncludeUntracked: false
 
 # Individual validator configuration
 Documentation/UndocumentedObjects:

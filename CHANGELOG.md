@@ -1,5 +1,21 @@
 # YARD-Lint Changelog
 
+## 1.2.0 (2025-11-11)
+- **[Feature]** Add Diff Mode for incremental linting - only analyze files that changed
+  - `--diff [REF]` - Lint only files changed since REF (auto-detects main/master if not specified)
+  - `--staged` - Lint only staged files (git index)
+  - `--changed` - Lint only uncommitted files
+  - Enables practical usage in large legacy codebases
+  - Perfect for CI/CD pipelines (only check what changed in PR)
+  - Ideal for pre-commit hooks (only check staged files)
+  - Auto-detects main/master branch with fallback to master
+  - Applies global exclusion patterns to git diff results
+  - Silently skips deleted files
+  - Returns clean result when no files are changed
+  - Uses shell-based git commands via Open3 (no new dependencies)
+  - Configuration support via `AllValidators.DiffMode` section
+  - Mutually exclusive diff flags (--diff, --staged, --changed)
+
 ## 1.1.0 (2025-11-11)
 - **[Feature]** Add `Tags/ExampleSyntax` validator to validate Ruby syntax in `@example` tags
   - Uses Ruby 3.2's `RubyVM::InstructionSequence.compile()` to parse example code

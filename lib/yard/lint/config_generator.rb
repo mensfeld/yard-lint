@@ -27,6 +27,13 @@ module Yard
           # Exit code behavior (error, warning, convention, never)
           FailOnSeverity: warning
 
+          # Diff mode settings
+          DiffMode:
+            # Default base ref for --diff (auto-detects main/master if not specified)
+            DefaultBaseRef: ~
+            # Include untracked files in diff mode (not yet implemented)
+            IncludeUntracked: false
+
         # Documentation validators
         Documentation/UndocumentedObjects:
           Description: 'Checks for classes, modules, and methods without documentation.'
