@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## Unreleased
+## 1.1.0 (2025-11-11)
 - **[Feature]** Add `Tags/ExampleSyntax` validator to validate Ruby syntax in `@example` tags
   - Uses Ruby 3.2's `RubyVM::InstructionSequence.compile()` to parse example code
   - Automatically strips output indicators (`#=>`) before validation
@@ -19,8 +19,6 @@
   - EXACT pattern matching (not prefix) to avoid false positives
   - Enabled by default with 'convention' severity
   - Helps maintain high-quality, meaningful documentation
-
-## 1.0.1 (2025-11-09)
 - **[Feature]** Add `--init` command to generate `.yard-lint.yml` configuration file with sensible defaults
 - **[Feature]** Add `--force` flag to overwrite existing config file when using `--init`
 - **[Feature]** Add `EnforcedStyle` configuration option to `Tags/CollectionType` validator for bidirectional style enforcement
