@@ -297,9 +297,21 @@ RSpec.describe 'Yard::Lint Integration Tests' do
 
       result = Yard::Lint.run(path: pattern, config: config)
 
-      # Should process all fixture files
-      expect(result.clean?).to be false
-      expect(result.count).to be > 0
+      # Should process multiple files
+      # The glob pattern should match at least our test fixtures
+      expect(Dir.glob(pattern).size).to be >= 21
+
+      # Should find the undocumented class in glob_test_file.rb
+      # This test file is specifically designed to always have offenses
+      expect(result.offenses).not_to be_empty,
+        "Expected to find offenses in fixtures. Files processed: #{Dir.glob(pattern).size}"
+
+      # Verify at least the known offense from glob_test_file.rb exists
+      has_undocumented = result.offenses.any? do |o|
+        o[:name] == 'UndocumentedObject' && o[:element]&.include?('GlobTestClass')
+      end
+      expect(has_undocumented).to be(true),
+        "Expected to find UndocumentedObject for GlobTestClass. Found: #{result.offenses.map { |o| [o[:name], o[:element]] }}"
     end
   end
 
@@ -307,12 +319,25 @@ RSpec.describe 'Yard::Lint Integration Tests' do
     it 'recursively processes Ruby files in directories', :cache_isolation do
       result = Yard::Lint.run(path: fixtures_dir, config: config)
 
-      # Should find offenses from multiple files
-      expect(result.clean?).to be false
+      # Should process files in the directory
+      # Verify files were actually processed
+      expect(Dir.glob(File.join(fixtures_dir, '*.rb')).size).to be >= 21
 
-      # Should have processed multiple types of offenses
+      # Should find the specific test offense we expect
+      expect(result.offenses).not_to be_empty,
+        "Expected to find offenses when processing directory #{fixtures_dir}"
+
+      # Verify at least the known offense from glob_test_file.rb exists
+      has_undocumented = result.offenses.any? do |o|
+        o[:name] == 'UndocumentedObject' && o[:element]&.include?('GlobTestClass')
+      end
+      expect(has_undocumented).to be(true),
+        "Expected to find UndocumentedObject for GlobTestClass. Found offenses: #{result.offenses.map { |o| o[:name] }.uniq.join(', ')}"
+
+      # Should have processed multiple types of offenses (not just from one validator)
       offense_types = result.offenses.map { |o| o[:name] }.uniq
-      expect(offense_types.size).to be > 1
+      expect(offense_types.size).to be > 1,
+        "Expected multiple offense types, found: #{offense_types.join(', ')}"
     end
   end
 
