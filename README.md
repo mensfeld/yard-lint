@@ -79,10 +79,10 @@ With options:
 
 ```bash
 # Use a specific config file
-yard-lint --config config/yard-lint.yml lib/
+yard-lint lib/ --config config/yard-lint.yml
 
 # Output as JSON
-yard-lint --format json lib/ > report.json
+yard-lint lib/ --format json > report.json
 
 # Generate config file (use --force to overwrite existing)
 yard-lint --init
@@ -144,7 +144,7 @@ Monitor and enforce minimum documentation coverage thresholds:
 
 ```bash
 # Show coverage statistics with --stats flag
-yard-lint --stats lib/
+yard-lint lib/ --stats
 
 # Output:
 # Documentation Coverage: 85.5%
@@ -153,13 +153,13 @@ yard-lint --stats lib/
 #   Undocumented:       18
 
 # Enforce minimum coverage threshold (fails if below)
-yard-lint --min-coverage 80 lib/
+yard-lint lib/ --min-coverage 80
 
 # Use with diff mode to check coverage only for changed files
-yard-lint --diff main --min-coverage 90 lib/
+yard-lint lib/ --diff main --min-coverage 90
 
 # Quiet mode shows only summary with coverage
-yard-lint --quiet --min-coverage 80 lib/
+yard-lint lib/ --quiet --min-coverage 80
 ```
 
 **Configuration File:**
@@ -388,7 +388,7 @@ YARD-Lint will automatically search for `.yard-lint.yml` in the current director
 You can specify a different config file:
 
 ```bash
-yard-lint --config path/to/config.yml lib/
+yard-lint lib/ --config path/to/config.yml
 ```
 
 #### Configuration Inheritance
