@@ -195,8 +195,7 @@ jobs:
 - CLI `--min-coverage` flag overrides config file setting
 - Exit code 1 if coverage is below threshold
 - Works with diff mode to enforce coverage only on changed files
-- Respects `ExcludedMethods` configuration from validators
-- Performance optimized for large codebases
+- Performance optimized with auto-cleanup temp directories for large codebases
 
 ## Configuration
 

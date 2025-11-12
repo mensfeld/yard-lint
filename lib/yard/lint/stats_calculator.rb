@@ -45,14 +45,18 @@ module Yard
           f.flush
 
           query = build_stats_query
-          cmd = build_yard_command(f.path, query)
 
-          stdout, stderr, status = Open3.capture3(cmd)
+          # Use temp directory for YARD database (auto-cleanup)
+          Dir.mktmpdir("yard_stats_#{Process.pid}_") do |temp_dir|
+            cmd = build_yard_command(f.path, query, temp_dir)
 
-          # Return empty string if YARD command fails
-          return '' unless status.exitstatus.zero?
+            stdout, _stderr, status = Open3.capture3(cmd)
 
-          stdout
+            # Return empty string if YARD command fails
+            return '' unless status.exitstatus.zero?
+
+            stdout
+          end
         end
       end
 
@@ -67,12 +71,9 @@ module Yard
       # Build complete YARD command
       # @param file_list_path [String] path to file with list of files
       # @param query [String] YARD query to execute
+      # @param temp_dir [String] temporary directory for YARD database
       # @return [String] complete command string
-      def build_yard_command(file_list_path, query)
-        # Use a unique temp directory for stats calculation
-        temp_dir = File.join(Dir.tmpdir, "yard_stats_#{Process.pid}_#{Time.now.to_i}")
-        FileUtils.mkdir_p(temp_dir)
-
+      def build_yard_command(file_list_path, query, temp_dir)
         <<~CMD.tr("\n", ' ').strip
           cat #{Shellwords.escape(file_list_path)} | xargs yard list
           --charset utf-8
