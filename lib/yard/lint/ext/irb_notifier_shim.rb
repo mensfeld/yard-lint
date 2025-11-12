@@ -17,6 +17,9 @@ unless defined?(IRB::Notifier)
   # Try to load the real IRB notifier first
   # If it fails (IRB not installed), we'll provide our shim
   begin
+    # Suppress warnings during require attempt (Ruby 3.5+ warns about missing default gems)
+    original_verbose = $VERBOSE
+    $VERBOSE = nil
     require 'irb/notifier'
   rescue LoadError
     # IRB not available, use our shim
@@ -85,5 +88,8 @@ unless defined?(IRB::Notifier)
         end
       end
     end
+  ensure
+    # Restore original verbosity setting
+    $VERBOSE = original_verbose
   end
 end

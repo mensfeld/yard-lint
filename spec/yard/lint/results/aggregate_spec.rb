@@ -139,7 +139,7 @@ RSpec.describe Yard::Lint::Results::Aggregate do
 
   describe '#exit_code' do
     context 'when fail_on_severity is "error"' do
-      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'error') }
+      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'error', min_coverage: nil) }
 
       it 'returns 1 if errors exist' do
         expect(aggregate.exit_code).to eq(1)
@@ -157,7 +157,7 @@ RSpec.describe Yard::Lint::Results::Aggregate do
     end
 
     context 'when fail_on_severity is "warning"' do
-      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'warning') }
+      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'warning', min_coverage: nil) }
 
       it 'returns 1 if errors exist' do
         expect(aggregate.exit_code).to eq(1)
@@ -199,7 +199,7 @@ RSpec.describe Yard::Lint::Results::Aggregate do
     end
 
     context 'when fail_on_severity is "convention"' do
-      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'convention') }
+      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'convention', min_coverage: nil) }
 
       it 'returns 1 if any offenses exist' do
         expect(aggregate.exit_code).to eq(1)
@@ -212,7 +212,7 @@ RSpec.describe Yard::Lint::Results::Aggregate do
     end
 
     context 'when fail_on_severity is unknown' do
-      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'unknown') }
+      let(:config) { instance_double(Yard::Lint::Config, fail_on_severity: 'unknown', min_coverage: nil) }
 
       it 'returns 0' do
         expect(aggregate.exit_code).to eq(0)

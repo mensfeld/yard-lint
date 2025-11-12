@@ -65,12 +65,12 @@ module Yard
         # Calculate documentation coverage statistics
         # @return [Hash] coverage statistics with :total, :documented, :coverage keys
         def documentation_coverage
-          return @coverage if defined?(@coverage)
+          return @documentation_coverage if defined?(@documentation_coverage)
 
           return nil unless @config && !@files.empty?
 
           calculator = StatsCalculator.new(@config, @files)
-          @coverage = calculator.calculate
+          @documentation_coverage = calculator.calculate
         end
 
         # Determine exit code based on configured fail_on_severity
@@ -78,8 +78,10 @@ module Yard
         # @return [Integer] 0 for success, 1 for failure
         def exit_code
           # Check minimum coverage requirement first
-          if @config&.min_coverage && documentation_coverage
-            return 1 if documentation_coverage[:coverage] < @config.min_coverage
+          if @config&.min_coverage &&
+             documentation_coverage &&
+             documentation_coverage[:coverage] < @config.min_coverage
+            return 1
           end
 
           return 0 if offenses.empty?
