@@ -73,10 +73,10 @@ OptionParser.new do |opts|
     puts
     puts 'Examples:'
     puts '  yard-lint lib/                          # Lint all files in lib/'
-    puts '  yard-lint --diff main lib/              # Lint only files changed since main branch'
-    puts '  yard-lint --staged lib/                 # Lint only staged files'
-    puts '  yard-lint --changed lib/                # Lint only uncommitted files'
-    puts '  yard-lint --format json lib/            # Output in JSON format'
+    puts '  yard-lint lib/ --diff main              # Lint only files changed since main branch'
+    puts '  yard-lint lib/ --staged                 # Lint only staged files'
+    puts '  yard-lint lib/ --changed                # Lint only uncommitted files'
+    puts '  yard-lint lib/ --format json            # Output in JSON format'
     exit
   end
 end.parse!
