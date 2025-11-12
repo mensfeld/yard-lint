@@ -21,7 +21,7 @@ module Yard
       def run
         raw_results = run_validators
         parsed_results = parse_results(raw_results)
-        build_result(parsed_results)
+        build_result(parsed_results, @selection)
       end
 
       private
@@ -116,9 +116,10 @@ module Yard
 
       # Build final result object
       # @param results [Array<Results::Base>] array of validator result objects
+      # @param files [Array<String>] array of files that were analyzed
       # @return [Results::Aggregate] aggregate result object
-      def build_result(results)
-        Results::Aggregate.new(results, config)
+      def build_result(results, files)
+        Results::Aggregate.new(results, config, files)
       end
     end
   end

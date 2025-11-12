@@ -29,6 +29,10 @@ OptionParser.new do |opts|
     options[:stats] = true
   end
 
+  opts.on('--min-coverage PERCENT', Float, 'Minimum documentation coverage required (0-100)') do |percent|
+    options[:min_coverage] = percent
+  end
+
   opts.on('--[no-]progress', 'Show progress indicator (default: auto)') do |value|
     options[:progress] = value
   end
@@ -122,11 +126,21 @@ end
 Yard::Lint::Validators::Base.reset_command_cache!
 Yard::Lint::Validators::Base.clear_yard_database!
 
-# Run the linter with config_file (it will be loaded internally)
+# Load config and apply CLI overrides
+config = if config_file
+           Yard::Lint::Config.from_file(config_file)
+         else
+           Yard::Lint::Config.load || Yard::Lint::Config.new
+         end
+
+# Apply CLI min_coverage override if provided
+config.min_coverage = options[:min_coverage] if options[:min_coverage]
+
+# Run the linter
 begin
   result = Yard::Lint.run(
     path: path,
-    config_file: config_file,
+    config: config,
     progress: options[:progress],
     diff: diff_mode
   )
@@ -145,14 +159,40 @@ when 'json'
   })
   exit result.exit_code
 when 'text', nil
+  # Calculate coverage stats if requested or configured
+  coverage = result.documentation_coverage if options[:stats] || options[:min_coverage] || config.min_coverage
+
+  # Show coverage stats if available
+  if coverage && (options[:stats] || options[:quiet])
+    puts "\nDocumentation Coverage: #{coverage[:coverage].round(2)}%"
+    puts "  Total objects:      #{coverage[:total]}"
+    puts "  Documented:         #{coverage[:documented]}"
+    puts "  Undocumented:       #{coverage[:total] - coverage[:documented]}"
+
+    if config.min_coverage
+      if coverage[:coverage] >= config.min_coverage
+        puts "  Status:             ✓ Meets minimum (#{config.min_coverage}%)"
+      else
+        puts "  Status:             ✗ Below minimum (#{config.min_coverage}%)"
+      end
+    end
+    puts
+  end
+
   if result.clean?
-    puts 'No offenses found'
+    # Still check coverage requirement even if no offenses
+    if coverage && config.min_coverage && coverage[:coverage] < config.min_coverage
+      puts "Error: Documentation coverage #{coverage[:coverage].round(2)}% is below minimum #{config.min_coverage}%"
+      exit result.exit_code
+    end
+
+    puts 'No offenses found' unless options[:quiet]
     exit 0
   else
     # Show statistics if requested or in quiet mode
     if options[:stats] || options[:quiet]
       stats = result.statistics
-      puts "\n#{result.count} offense(s) detected"
+      puts "#{result.count} offense(s) detected"
       puts "  Errors:      #{stats[:error]}"
       puts "  Warnings:    #{stats[:warning]}"
       puts "  Conventions: #{stats[:convention]}"

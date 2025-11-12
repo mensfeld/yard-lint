@@ -138,6 +138,66 @@ jobs:
 yard-lint --diff main lib/
 ```
 
+### Documentation Coverage Statistics
+
+Monitor and enforce minimum documentation coverage thresholds:
+
+```bash
+# Show coverage statistics with --stats flag
+yard-lint --stats lib/
+
+# Output:
+# Documentation Coverage: 85.5%
+#   Total objects:      120
+#   Documented:         102
+#   Undocumented:       18
+
+# Enforce minimum coverage threshold (fails if below)
+yard-lint --min-coverage 80 lib/
+
+# Use with diff mode to check coverage only for changed files
+yard-lint --diff main --min-coverage 90 lib/
+
+# Quiet mode shows only summary with coverage
+yard-lint --quiet --min-coverage 80 lib/
+```
+
+**Configuration File:**
+```yaml
+# .yard-lint.yml
+AllValidators:
+  # Fail if documentation coverage is below this percentage
+  MinCoverage: 80.0
+```
+
+**CI/CD Pipeline Example:**
+```yaml
+name: Documentation Quality
+on: [pull_request]
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check documentation coverage for new code
+        run: |
+          bundle exec yard-lint \
+            --diff origin/${{ github.base_ref }} \
+            --min-coverage 90 \
+            --quiet \
+            lib/
+```
+
+**Key Features:**
+- Calculates percentage of documented classes, modules, and methods
+- CLI `--min-coverage` flag overrides config file setting
+- Exit code 1 if coverage is below threshold
+- Works with diff mode to enforce coverage only on changed files
+- Respects `ExcludedMethods` configuration from validators
+- Performance optimized for large codebases
+
 ## Configuration
 
 YARD-Lint is configured via a `.yard-lint.yml` configuration file (similar to `.rubocop.yml`).

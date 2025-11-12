@@ -136,6 +136,12 @@ module Yard
         diff_config['DefaultBaseRef']
       end
 
+      # Minimum documentation coverage percentage required
+      # @return [Float, nil] minimum coverage percentage (0-100) or nil if not set
+      def min_coverage
+        all_validators['MinCoverage']
+      end
+
       # Check if a validator is enabled
       # @param validator_name [String] full validator name (e.g., 'Tags/Order')
       # @return [Boolean] true if validator is enabled
@@ -197,6 +203,13 @@ module Yard
       def fail_on_severity=(value)
         @raw_config['AllValidators'] ||= {}
         @raw_config['AllValidators']['FailOnSeverity'] = value
+      end
+
+      # Set minimum coverage percentage
+      # @param value [Float] minimum coverage percentage (0-100)
+      def min_coverage=(value)
+        @raw_config['AllValidators'] ||= {}
+        @raw_config['AllValidators']['MinCoverage'] = value
       end
 
       # Allow hash-like access for convenience

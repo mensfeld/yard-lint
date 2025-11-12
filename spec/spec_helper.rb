@@ -5,6 +5,8 @@ require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/'
   add_filter '/vendor/'
+
+  minimum_coverage 95
 end
 
 require 'yard-lint'

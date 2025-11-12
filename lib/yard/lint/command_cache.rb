@@ -77,7 +77,7 @@ module Yard
         rubyopt = "-r#{shim_path}"
 
         # Preserve existing RUBYOPT if present
-        rubyopt = "#{ENV['RUBYOPT']} #{rubyopt}" if ENV['RUBYOPT']
+        rubyopt = "#{ENV['RUBYOPT'].strip} #{rubyopt}" if ENV['RUBYOPT']
 
         { 'RUBYOPT' => rubyopt }
       end

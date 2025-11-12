@@ -20,8 +20,8 @@ unless defined?(IRB::Notifier)
     require 'irb/notifier'
   rescue LoadError
     # IRB not available, use our shim
-    # Mark as loaded to prevent further attempts
-    $LOADED_FEATURES << 'irb/notifier.rb' unless $LOADED_FEATURES.include?('irb/notifier.rb')
+    # Mark as loaded to prevent further require attempts
+    $LOADED_FEATURES << 'irb/notifier.rb'
 
     module IRB
       # Minimal Notifier implementation that does nothing
@@ -44,7 +44,7 @@ unless defined?(IRB::Notifier)
           attr_accessor :level
 
           def initialize
-            @level = D_NOMSG
+            @level = Notifier::D_NOMSG
           end
 
           # Returns a no-op notifier for any sub-level

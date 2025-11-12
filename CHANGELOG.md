@@ -11,6 +11,18 @@
   - Shim automatically loaded in subprocesses via RUBYOPT environment variable
   - Avoids adding IRB and its transitive dependencies to supply chain
   - All 977 tests pass on Ruby 3.5.0-preview1 without IRB gem
+- **[Feature]** Add Documentation Coverage Statistics with minimum threshold enforcement
+  - `--min-coverage PERCENT` - Fail if documentation coverage is below threshold (0-100)
+  - `--stats` flag now displays coverage metrics (total objects, documented, undocumented, percentage)
+  - `MinCoverage` configuration option in `.yard-lint.yml` under `AllValidators` section
+  - CLI flag overrides config file setting for flexibility in CI/CD pipelines
+  - Coverage calculation uses YARD queries to count documented vs undocumented objects
+  - Respects `ExcludedMethods` configuration from `Documentation/UndocumentedObjects` validator
+  - Works seamlessly with diff mode (--diff, --staged, --changed) to calculate coverage for changed files only
+  - Exit code 1 when coverage is below minimum threshold, even if no linting offenses found
+  - Summary-only output in --quiet mode shows coverage with pass/fail status
+  - Comprehensive unit and integration test coverage for all scenarios
+  - Performance optimized using temp file approach for large codebases
 - **[Feature]** Add Diff Mode for incremental linting - only analyze files that changed
   - `--diff [REF]` - Lint only files changed since REF (auto-detects main/master if not specified)
   - `--staged` - Lint only staged files (git index)

@@ -27,6 +27,10 @@ module Yard
           # Exit code behavior (error, warning, convention, never)
           FailOnSeverity: warning
 
+          # Minimum documentation coverage percentage (0-100)
+          # Fails if coverage is below this threshold
+          # MinCoverage: 80.0
+
           # Diff mode settings
           DiffMode:
             # Default base ref for --diff (auto-detects main/master if not specified)
