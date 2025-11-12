@@ -36,7 +36,6 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Abin/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'irb' # Required by YARD in Ruby 3.5+
   spec.add_dependency 'yard', '~> 0.9'
   spec.add_dependency 'zeitwerk', '~> 2.6'
 end

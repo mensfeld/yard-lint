@@ -58,12 +58,28 @@ module Yard
       # @param command_string [String] the command to execute
       # @return [Hash] hash with stdout, stderr, exit_code keys
       def execute_command(command_string)
-        stdout, stderr, status = Open3.capture3(command_string)
+        # Set up environment to load IRB shim before YARD (Ruby 3.5+ compatibility)
+        env = build_environment_with_shim
+
+        stdout, stderr, status = Open3.capture3(env, command_string)
         {
           stdout: stdout,
           stderr: stderr,
           exit_code: status.exitstatus
         }
+      end
+
+      # Build environment hash with RUBYOPT to load IRB shim
+      # This ensures the shim is loaded in subprocesses (like yard list commands)
+      # @return [Hash] environment variables for command execution
+      def build_environment_with_shim
+        shim_path = File.expand_path('ext/irb_notifier_shim.rb', __dir__)
+        rubyopt = "-r#{shim_path}"
+
+        # Preserve existing RUBYOPT if present
+        rubyopt = "#{ENV['RUBYOPT']} #{rubyopt}" if ENV['RUBYOPT']
+
+        { 'RUBYOPT' => rubyopt }
       end
 
       # Deep clone a hash to prevent modifications to cached data

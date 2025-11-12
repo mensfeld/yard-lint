@@ -1,5 +1,17 @@
 # YARD-Lint Changelog
 
+## 1.2.0 (2025-11-12)
+- **[Fix]** Add Ruby 3.5+ compatibility without requiring IRB gem dependency
+  - Ruby 3.5 moved IRB out of default gems, requiring explicit installation
+  - YARD's legacy parser depends on `IRB::Notifier` for debug output
+  - Created lightweight `IRB::Notifier` shim to satisfy YARD without full IRB gem
+  - Shim tries to load real IRB first, only provides fallback if LoadError occurs
+  - Does not override or interfere with real IRB gem when present
+  - Safe to use in applications that depend on yard-lint and also use IRB
+  - Shim automatically loaded in subprocesses via RUBYOPT environment variable
+  - Avoids adding IRB and its transitive dependencies to supply chain
+  - All 977 tests pass on Ruby 3.5.0-preview1 without IRB gem
+
 ## 1.2.0 (2025-11-11)
 - **[Feature]** Add Diff Mode for incremental linting - only analyze files that changed
   - `--diff [REF]` - Lint only files changed since REF (auto-detects main/master if not specified)
