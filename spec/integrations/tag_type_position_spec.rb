@@ -3,7 +3,7 @@
 RSpec.describe 'TagTypePosition Integration' do
   let(:fixture_path) { 'spec/fixtures/tag_type_position_examples.rb' }
   let(:config) do
-    Yard::Lint::Config.new do |c|
+    test_config do |c|
       c.send(:set_validator_config, 'Tags/TagTypePosition', 'Enabled', true)
     end
   end

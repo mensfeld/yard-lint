@@ -3,7 +3,7 @@
 RSpec.describe 'Type Syntax Validation Integration' do
   let(:fixture_path) { File.expand_path('spec/fixtures/type_syntax_examples.rb') }
   let(:config) do
-    Yard::Lint::Config.new do |c|
+    test_config do |c|
       c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
     end
   end
@@ -92,7 +92,7 @@ RSpec.describe 'Type Syntax Validation Integration' do
   describe 'validator configuration' do
     context 'when TypeSyntax validator is disabled' do
       let(:disabled_config) do
-        Yard::Lint::Config.new do |c|
+        test_config do |c|
           c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', false)
         end
       end
@@ -108,7 +108,7 @@ RSpec.describe 'Type Syntax Validation Integration' do
 
     context 'when ValidatedTags is customized' do
       let(:custom_config) do
-        Yard::Lint::Config.new do |c|
+        test_config do |c|
           c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
           c.send(:set_validator_config, 'Tags/TypeSyntax', 'ValidatedTags', ['return'])
         end
