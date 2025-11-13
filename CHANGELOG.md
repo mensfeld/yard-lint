@@ -6,6 +6,7 @@
   - Added version.rb to Zeitwerk ignore list and load it manually
   - Prevents Zeitwerk naming convention conflicts with constant names
   - Added CLI integration specs to test version flag behavior
+- [Change] Remove unused `net/http` and `uri` dependencies
 
 ## 1.2.1 (2025-11-12)
 - [Fix] Fix help text examples showing incorrect argument order (options before PATH instead of PATH before options)

@@ -6,8 +6,6 @@ require 'open3'
 require 'tempfile'
 require 'tmpdir'
 require 'digest'
-require 'net/http'
-require 'uri'
 
 module Yard
   # YARD Lint module providing linting functionality for YARD documentation
