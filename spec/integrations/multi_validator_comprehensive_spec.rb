@@ -6,8 +6,10 @@ RSpec.describe 'Multi-Validator Comprehensive Integration' do
   end
 
   describe 'With default configuration' do
+    let(:config) { test_config }
+
     it 'detects multiple types of offenses simultaneously' do
-      result = Yard::Lint.run(path: fixture_path, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
       offense_names = result.offenses.map { |o| o[:name] }.uniq
 
@@ -19,7 +21,7 @@ RSpec.describe 'Multi-Validator Comprehensive Integration' do
     end
 
     it 'finds offenses across multiple scenarios in the fixture' do
-      result = Yard::Lint.run(path: fixture_path, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
       # Group by line to see distribution
       lines_with_issues = result.offenses.map { |o| o[:location_line] }.uniq
@@ -29,7 +31,7 @@ RSpec.describe 'Multi-Validator Comprehensive Integration' do
     end
 
     it 'handles kitchen sink method with many issues' do
-      result = Yard::Lint.run(path: fixture_path, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
       # Kitchen sink method is at line 89
       kitchen_sink_offenses = result.offenses.select do |o|
@@ -44,7 +46,7 @@ RSpec.describe 'Multi-Validator Comprehensive Integration' do
 
   describe 'Multiple validators enabled together' do
     let(:config) do
-      Yard::Lint::Config.new do |c|
+      test_config do |c|
         c.send(:set_validator_config, 'Tags/Order', 'Enabled', true)
         c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
         c.send(:set_validator_config, 'Warnings/UnknownParameterName', 'Enabled', true)
@@ -81,7 +83,7 @@ RSpec.describe 'Multi-Validator Comprehensive Integration' do
 
   describe 'Type validation validators together' do
     let(:config) do
-      Yard::Lint::Config.new do |c|
+      test_config do |c|
         c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
         c.send(:set_validator_config, 'Tags/InvalidTypes', 'Enabled', true)
       end
@@ -113,7 +115,7 @@ RSpec.describe 'Multi-Validator Comprehensive Integration' do
 
   describe 'Documentation validators together' do
     let(:config) do
-      Yard::Lint::Config.new do |c|
+      test_config do |c|
         c.send(:set_validator_config, 'Documentation/UndocumentedMethodArguments', 'Enabled', true)
       end
     end
@@ -130,7 +132,7 @@ RSpec.describe 'Multi-Validator Comprehensive Integration' do
 
   describe 'Performance with many validators' do
     let(:config) do
-      Yard::Lint::Config.new do |c|
+      test_config do |c|
         # Enable many validators
         c.send(:set_validator_config, 'Tags/Order', 'Enabled', true)
         c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)

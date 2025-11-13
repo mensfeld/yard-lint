@@ -7,7 +7,7 @@ RSpec.describe 'Unknown Parameter Name Integration' do
 
   let(:temp_file) { Tempfile.new(['test', '.rb']) }
   let(:config) do
-    Yard::Lint::Config.new do |c|
+    test_config do |c|
       c.send(:set_validator_config, 'Warnings/UnknownParameterName', 'Enabled', true)
     end
   end

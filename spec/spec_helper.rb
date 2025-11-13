@@ -12,6 +12,17 @@ end
 
 require 'yard-lint'
 
+# Helper method for creating test configs without default exclusions
+# This is needed for integration tests that use fixture files in spec/fixtures/
+# @param block [Proc] optional block for additional configuration
+# @return [Yard::Lint::Config] config object with no exclusions
+def test_config(&block)
+  Yard::Lint::Config.new do |c|
+    c.exclude = [] # Clear default exclusions that would filter out spec/fixtures
+    block&.call(c)
+  end
+end
+
 RSpec.configure do |config|
   config.disable_monkey_patching!
 
