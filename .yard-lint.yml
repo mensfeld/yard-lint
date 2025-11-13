@@ -24,13 +24,13 @@ AllValidators:
     - '**/validators/semantic/**/*.rb'
 
   # Exit code behavior (error, warning, convention, never)
-  FailOnSeverity: warning
+  FailOnSeverity: error
 
 # Documentation validators
 Documentation/UndocumentedObjects:
   Description: 'Checks for classes, modules, and methods without documentation.'
   Enabled: true
-  Severity: warning
+  Severity: error
   ExcludedMethods:
     - 'initialize/0'  # Exclude parameter-less initialize
     - '/^_/'          # Exclude private methods (by convention)
@@ -38,28 +38,28 @@ Documentation/UndocumentedObjects:
 Documentation/UndocumentedMethodArguments:
   Description: 'Checks for method parameters without @param tags.'
   Enabled: true
-  Severity: warning
+  Severity: error
 
 Documentation/UndocumentedBooleanMethods:
   Description: 'Checks that question mark methods document their boolean return.'
   Enabled: true
-  Severity: warning
+  Severity: error
 
 Documentation/UndocumentedOptions:
   Description: 'Detects methods with options hash parameters but no @option tags.'
   Enabled: true
-  Severity: warning
+  Severity: error
 
 Documentation/MarkdownSyntax:
   Description: 'Detects common markdown syntax errors in documentation.'
   Enabled: true
-  Severity: warning
+  Severity: error
 
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'
   Enabled: true
-  Severity: convention
+  Severity: error
   EnforcedOrder:
     - param
     - option
@@ -70,7 +70,7 @@ Tags/Order:
 Tags/InvalidTypes:
   Description: 'Validates type definitions in @param, @return, @option tags.'
   Enabled: true
-  Severity: warning
+  Severity: error
   ValidatedTags:
     - param
     - option
@@ -79,7 +79,7 @@ Tags/InvalidTypes:
 Tags/TypeSyntax:
   Description: 'Validates YARD type syntax using YARD parser.'
   Enabled: true
-  Severity: warning
+  Severity: error
   ValidatedTags:
     - param
     - option
@@ -89,7 +89,7 @@ Tags/TypeSyntax:
 Tags/MeaninglessTag:
   Description: 'Detects @param/@option tags on classes, modules, or constants.'
   Enabled: true
-  Severity: warning
+  Severity: error
   CheckedTags:
     - param
     - option
@@ -101,7 +101,7 @@ Tags/MeaninglessTag:
 Tags/CollectionType:
   Description: 'Validates Hash collection syntax consistency.'
   Enabled: true
-  Severity: convention
+  Severity: error
   EnforcedStyle: long  # 'long' for Hash{K => V} (YARD standard), 'short' for {K => V}
   ValidatedTags:
     - param
@@ -112,7 +112,7 @@ Tags/CollectionType:
 Tags/TagTypePosition:
   Description: 'Validates type annotation position in tags.'
   Enabled: true
-  Severity: convention
+  Severity: error
   CheckedTags:
     - param
     - option
@@ -123,7 +123,7 @@ Tags/TagTypePosition:
 Tags/ApiTags:
   Description: 'Enforces @api tags on public objects.'
   Enabled: false  # Opt-in validator
-  Severity: warning
+  Severity: error
   AllowedApis:
     - public
     - private
@@ -132,17 +132,20 @@ Tags/ApiTags:
 Tags/OptionTags:
   Description: 'Requires @option tags for methods with options parameters.'
   Enabled: true
-  Severity: warning
+  Severity: error
 
 Tags/ExampleSyntax:
   Description: 'Validates Ruby syntax in @example tags.'
   Enabled: true
-  Severity: warning
+  Severity: error
+  Exclude:
+    - '**/validators/**/parser.rb'
+    - 'spec/fixtures/**/*'
 
 Tags/RedundantParamDescription:
   Description: 'Detects meaningless parameter descriptions that add no value.'
   Enabled: true
-  Severity: convention
+  Severity: error
   CheckedTags:
     - param
     - option
@@ -209,4 +212,4 @@ Warnings/UnknownParameterName:
 Semantic/AbstractMethods:
   Description: 'Ensures @abstract methods do not have real implementations.'
   Enabled: true
-  Severity: warning
+  Severity: error
