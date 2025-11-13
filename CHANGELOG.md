@@ -1,5 +1,28 @@
 # YARD-Lint Changelog
 
+## 1.2.3 (2025-11-13)
+- **[Feature]** Add per-validator exclusion support for fine-grained file filtering
+  - Individual validators can now specify `Exclude` patterns in `.yard-lint.yml`
+  - Exclusions work alongside global `AllValidators.Exclude` patterns
+  - Both global and per-validator exclusions are applied (union of both pattern sets)
+  - Enables excluding intentionally invalid documentation examples from specific validators
+  - Default config excludes validator implementation files and spec fixtures from `Tags/ExampleSyntax`
+  - Pattern matching works with glob patterns (`**/*.rb`, `**/validators/**/parser.rb`)
+  - Filters validator results based on file location, not just input file selection
+  - Handles both absolute and relative paths correctly in pattern matching
+  - Comprehensive integration test coverage for exclusion scenarios
+  - Example: Exclude parser.rb files with intentionally broken @example tags from syntax validation
+- **[Change]** Update `.yard-lint.yml` to set all validator severities to `error` level
+  - Changes `FailOnSeverity` from `warning` to `error` for stricter enforcement
+  - All validators now use `error` severity instead of `warning` or `convention`
+  - Ensures any documentation issue triggers exit code 1 for CI/CD pipelines
+  - Provides consistent behavior across all validation rules
+- **[Fix]** Fix integration tests failing due to fixture files being filtered by global exclusions
+  - Added `test_config` helper in spec_helper.rb that clears default exclusions for tests
+  - Updated all integration test files to use `test_config` instead of `Yard::Lint::Config.new`
+  - Prevents test fixtures in `spec/fixtures/` from being filtered out by `spec/**/*` exclusion pattern
+  - Ensures integration tests can properly validate linter behavior on fixture files
+
 ## 1.2.2 (2025-11-13)
 - **[Fix]** Fix `--version` flag failing with `uninitialized constant Yard::Lint::VERSION` error
   - Zeitwerk expected `Version` (camel case) but file defined `VERSION` (all caps)

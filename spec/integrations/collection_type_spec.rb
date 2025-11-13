@@ -4,7 +4,7 @@ RSpec.describe 'CollectionType Integration' do
   let(:fixture_path) { 'spec/fixtures/collection_type_examples.rb' }
 
   let(:config) do
-    Yard::Lint::Config.new do |c|
+    test_config do |c|
       c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', true)
     end
   end
@@ -80,7 +80,7 @@ RSpec.describe 'CollectionType Integration' do
 
   describe 'when enforcing short style' do
     let(:short_style_config) do
-      Yard::Lint::Config.new do |c|
+      test_config do |c|
         c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', true)
         c.send(:set_validator_config, 'Tags/CollectionType', 'EnforcedStyle', 'short')
       end
@@ -133,7 +133,7 @@ RSpec.describe 'CollectionType Integration' do
 
   describe 'when disabled' do
     it 'does not run validation' do
-      disabled_config = Yard::Lint::Config.new do |c|
+      disabled_config = test_config do |c|
         c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', false)
       end
 

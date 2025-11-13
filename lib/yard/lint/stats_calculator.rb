@@ -8,7 +8,7 @@ module Yard
       attr_reader :config, :files
 
       # @param config [Yard::Lint::Config] configuration object
-      # @param files [Array<String>] files to analyze
+      # @param files [Array<String>] Ruby source files whose YARD documentation will be checked for coverage statistics
       def initialize(config, files)
         @config = config
         @files = Array(files).compact

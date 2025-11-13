@@ -4,7 +4,7 @@ RSpec.describe 'MeaninglessTag Integration' do
   let(:fixture_path) { 'spec/fixtures/meaningless_tag_examples.rb' }
 
   let(:config) do
-    Yard::Lint::Config.new do |c|
+    test_config do |c|
       c.send(:set_validator_config, 'Tags/MeaninglessTag', 'Enabled', true)
     end
   end
@@ -70,7 +70,7 @@ RSpec.describe 'MeaninglessTag Integration' do
 
   describe 'when disabled' do
     let(:config) do
-      Yard::Lint::Config.new do |c|
+      test_config do |c|
         c.send(:set_validator_config, 'Tags/MeaninglessTag', 'Enabled', false)
       end
     end

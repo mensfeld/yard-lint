@@ -20,8 +20,8 @@ module Yard
         #   end
         #
         # @example Bad - Type before parameter name (when using default style)
-        #   # @param [String] name the user's name
-        #   # @param [Integer] age the user's age
+        #   # @param name [String] the user's name
+        #   # @param age [Integer] the user's age
         #   def create_user(name, age)
         #   end
         #
@@ -33,8 +33,8 @@ module Yard
         #       EnforcedStyle: type_first
         #
         # @example Good - When EnforcedStyle is type_first
-        #   # @param [String] name the user's name
-        #   # @param [Integer] age the user's age
+        #   # @param name [String] the user's name
+        #   # @param age [Integer] the user's age
         #   def create_user(name, age)
         #   end
         #
