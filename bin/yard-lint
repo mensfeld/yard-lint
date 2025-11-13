@@ -59,6 +59,10 @@ OptionParser.new do |opts|
     options[:init] = true
   end
 
+  opts.on('--strict', 'Generate strict config (all Error severity, 100% coverage). Use with --init') do
+    options[:strict] = true
+  end
+
   opts.on('--force', 'Force overwrite when using --init') do
     options[:force] = true
   end
@@ -77,14 +81,20 @@ OptionParser.new do |opts|
     puts '  yard-lint lib/ --staged                 # Lint only staged files'
     puts '  yard-lint lib/ --changed                # Lint only uncommitted files'
     puts '  yard-lint lib/ --format json            # Output in JSON format'
+    puts '  yard-lint --init                        # Generate default config'
+    puts '  yard-lint --init --strict               # Generate strict config (all errors, 100% coverage)'
     exit
   end
 end.parse!
 
 # Handle --init flag
 if options[:init]
-  if Yard::Lint::ConfigGenerator.generate(force: options[:force])
-    puts 'Created .yard-lint.yml with default configuration'
+  if Yard::Lint::ConfigGenerator.generate(force: options[:force], strict: options[:strict])
+    if options[:strict]
+      puts 'Created .yard-lint.yml with strict configuration (all Error severity, 100% coverage)'
+    else
+      puts 'Created .yard-lint.yml with default configuration'
+    end
     exit 0
   else
     puts 'Error: .yard-lint.yml already exists'

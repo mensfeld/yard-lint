@@ -67,6 +67,17 @@ yard-lint --init
 
 This creates `.yard-lint.yml` with sensible defaults in your current directory.
 
+For new projects with high documentation standards, use strict mode:
+
+```bash
+yard-lint --init --strict
+```
+
+This creates a strict configuration with:
+- All validators set to `error` severity (no warnings or conventions)
+- Minimum documentation coverage set to 100%
+- Perfect for bootstrapping new repositories with high quality standards
+
 ### Command Line
 
 Basic usage:
@@ -87,6 +98,9 @@ yard-lint lib/ --format json > report.json
 # Generate config file (use --force to overwrite existing)
 yard-lint --init
 yard-lint --init --force
+
+# Generate strict config (all errors, 100% coverage)
+yard-lint --init --strict
 ```
 
 ### Diff Mode (Incremental Linting)
@@ -589,7 +603,14 @@ Options:
   -f, --format FORMAT     Output format (text, json)
   -q, --quiet             Quiet mode (only show summary)
       --stats             Show statistics summary
+      --min-coverage N    Minimum documentation coverage required (0-100)
       --[no-]progress     Show progress indicator (default: auto-detect TTY)
+      --diff [REF]        Lint only files changed since REF
+      --staged            Lint only staged files
+      --changed           Lint only uncommitted files
+      --init              Generate .yard-lint.yml config file
+      --strict            Generate strict config (use with --init)
+      --force             Force overwrite when using --init
   -v, --version           Show version
   -h, --help              Show this help
 ```
