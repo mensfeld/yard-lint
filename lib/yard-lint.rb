@@ -10,7 +10,9 @@ require 'zeitwerk'
 loader = Zeitwerk::Loader.for_gem(warn_on_extra_files: false)
 loader.ignore(__FILE__)
 loader.ignore("#{__dir__}/yard/lint/ext")
+loader.ignore("#{__dir__}/yard/lint/version.rb")
 loader.setup
 
-# Manually load the main module since it contains class-level methods
+# Manually load files that don't follow Zeitwerk naming conventions
+require_relative 'yard/lint/version'
 require_relative 'yard/lint'

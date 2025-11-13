@@ -1,5 +1,12 @@
 # YARD-Lint Changelog
 
+## 1.2.2 (2025-11-13)
+- **[Fix]** Fix `--version` flag failing with `uninitialized constant Yard::Lint::VERSION` error
+  - Zeitwerk expected `Version` (camel case) but file defined `VERSION` (all caps)
+  - Added version.rb to Zeitwerk ignore list and load it manually
+  - Prevents Zeitwerk naming convention conflicts with constant names
+  - Added CLI integration specs to test version flag behavior
+
 ## 1.2.1 (2025-11-12)
 - [Fix] Fix help text examples showing incorrect argument order (options before PATH instead of PATH before options)
 

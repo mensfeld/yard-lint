@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    yard-lint (1.2.1)
+    yard-lint (1.2.2)
       yard (~> 0.9)
       zeitwerk (~> 2.6)
 
