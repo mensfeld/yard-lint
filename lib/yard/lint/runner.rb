@@ -96,6 +96,43 @@ module Yard
         end
       end
 
+      # Filter result offenses based on per-validator exclusions
+      # Removes offenses where the file path matches exclusion patterns
+      # @param validator_name [String] full validator name
+      # @param result [Results::Base] result object with offenses
+      # @return [Results::Base, nil] result with filtered offenses, or nil if no offenses remain
+      def filter_result_offenses(validator_name, result)
+        validator_excludes = config.validator_all_excludes(validator_name)
+        return result if validator_excludes.empty?
+
+        working_dir = Dir.pwd
+        filtered_keys = %i[severity type name message location_line]
+
+        filtered_offenses = result.offenses.reject do |offense|
+          file_path = offense[:location] || offense[:file]
+          next true unless file_path
+
+          # Convert to relative path for pattern matching
+          relative_path = if file_path.start_with?(working_dir)
+                            file_path.sub(%r{^#{Regexp.escape(working_dir)}/}, '')
+                          else
+                            file_path
+                          end
+
+          # Check if file matches any exclusion pattern
+          validator_excludes.any? do |pattern|
+            File.fnmatch(pattern, relative_path, File::FNM_PATHNAME | File::FNM_EXTGLOB)
+          end
+        end
+
+        # Return nil if no offenses remain after filtering
+        return nil if filtered_offenses.empty?
+
+        # Create a new result object with filtered offenses
+        # We need to preserve the result class and config
+        result.class.new(filtered_offenses.map { |o| o.except(*filtered_keys) }, result.config)
+      end
+
       # Parse raw results from validators and create Result objects
       # Delegates result building to ResultBuilder
       # @param raw [Hash] hash with raw results from all validators
@@ -108,7 +145,11 @@ module Yard
           next unless config.validator_enabled?(validator_name)
 
           result = @result_builder.build(validator_name, raw)
-          results << result if result
+          next unless result
+
+          # Filter offenses based on per-validator exclusions
+          filtered_result = filter_result_offenses(validator_name, result)
+          results << filtered_result if filtered_result
         end
 
         results

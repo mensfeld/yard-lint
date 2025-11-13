@@ -13,7 +13,7 @@ module Yard
             #   file.rb:LINE: ClassName#method_name
             #   tag_name|type_string|error_message
             # @param yard_output [String] raw YARD query results
-            # @param _kwargs [Hash] unused keyword arguments (for compatibility)
+            # @option _kwargs [Object] :unused this parameter accepts no options (reserved for future use)
             # @return [Array<Hash>] array with violation details
             def call(yard_output, **_kwargs)
               return [] if yard_output.nil? || yard_output.strip.empty?

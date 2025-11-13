@@ -16,7 +16,7 @@ module Yard
 
             # @param yard_list_output [String] raw yard list results string
             # @param config [Yard::Lint::Config, nil] configuration object (optional)
-            # @param _kwargs [Hash] unused keyword arguments (for compatibility)
+            # @option _kwargs [Object] :unused this parameter accepts no options (reserved for future use)
             # @return [Array<Hash>] Array with undocumented objects details
             def call(yard_list_output, config: nil, **_kwargs)
               excluded_methods = config&.validator_config(
@@ -108,7 +108,7 @@ module Yard
 
             # Match an arity pattern like "initialize/0"
             # @param method_name [String] the method name
-            # @param arity [Integer, nil] the method's arity
+            # @param arity [Integer, nil] number of parameters the method accepts (nil if unknown)
             # @param pattern [String] the full pattern like "initialize/0"
             # @return [Boolean] true if matches
             def match_arity_pattern(method_name, arity, pattern)
