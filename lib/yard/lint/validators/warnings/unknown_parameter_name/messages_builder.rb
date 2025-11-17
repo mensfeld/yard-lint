@@ -81,7 +81,7 @@ module Yard
                 lines = []
                 current_line_num = 1
                 File.foreach(file) do |source_line|
-                  lines << source_line if current_line_num >= start_line && current_line_num <= end_line
+                  lines << source_line if current_line_num.between?(start_line, end_line)
                   break if current_line_num > end_line
 
                   current_line_num += 1

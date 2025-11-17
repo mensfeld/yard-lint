@@ -55,8 +55,8 @@ module Yard
         # Set default values for base class
         self.offense_type = 'line'
 
-        attr_reader :offenses, :config
-        attr_writer :offenses
+        attr_accessor :offenses
+        attr_reader :config
 
         # Initialize a result object with parsed validator data
         # @param parsed_data [Array<Hash>] Array of offense hashes from validator parser
