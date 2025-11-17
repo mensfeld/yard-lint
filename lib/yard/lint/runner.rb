@@ -106,7 +106,6 @@ module Yard
         return result if validator_excludes.empty?
 
         working_dir = Dir.pwd
-        filtered_keys = %i[severity type name message location_line]
 
         filtered_offenses = result.offenses.reject do |offense|
           file_path = offense[:location] || offense[:file]
@@ -128,9 +127,11 @@ module Yard
         # Return nil if no offenses remain after filtering
         return nil if filtered_offenses.empty?
 
-        # Create a new result object with filtered offenses
-        # We need to preserve the result class and config
-        result.class.new(filtered_offenses.map { |o| o.except(*filtered_keys) }, result.config)
+        # Instead of creating a new Result object (which would rebuild messages),
+        # just modify the existing result object's offenses array
+        # This preserves all the processed offense data including enhanced messages
+        result.instance_variable_set(:@offenses, filtered_offenses)
+        result
       end
 
       # Parse raw results from validators and create Result objects

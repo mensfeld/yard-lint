@@ -12,10 +12,11 @@ module Yard
             self.offense_name = 'UnknownParameterName'
 
             # Build human-readable message for UnknownParameterName offense
-            # @param offense [Hash] offense data with :message key
-            # @return [String] formatted message
+            # Uses MessagesBuilder to add "did you mean" suggestions
+            # @param offense [Hash] offense data with :message, :location, :line keys
+            # @return [String] formatted message with suggestion if available
             def build_message(offense)
-              offense[:message] || 'UnknownParameterName detected'
+              MessagesBuilder.call(offense)
             end
           end
         end

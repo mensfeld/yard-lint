@@ -1,5 +1,22 @@
 # YARD-Lint Changelog
 
+## 1.3.0 (2025-11-17)
+- **[Feature]** Add "did you mean" suggestions for UnknownParameterName validator
+  - Suggests correct parameter names when documentation mismatches are detected
+  - Uses Ruby's `did_you_mean` gem as primary suggestion engine
+  - Falls back to Levenshtein distance algorithm when DidYouMean doesn't find matches
+  - Parses Ruby source files directly to extract actual method parameters
+  - Handles all parameter types: regular, keyword, splat, block, with defaults
+  - Example: `@param user_nme [String] typo` → suggests "did you mean 'user_name'?"
+  - Only suggests when parameter names are similar enough (distance threshold)
+  - Comprehensive test coverage with 19 unit tests and 12 integration tests
+  - Inspired by yard-junk's helpful error messages
+- **[Fix]** Fix Runner bug where offense messages were lost during per-validator exclusion filtering
+  - `filter_result_offenses` was creating new Result objects with stripped offense data
+  - Enhanced messages (like "did you mean" suggestions) were being discarded
+  - Now modifies existing Result object's offenses array to preserve all data
+  - Fixes issue affecting all validators with custom message builders
+
 ## 1.2.3 (2025-11-13)
 - **[Feature]** Add per-validator exclusion support for fine-grained file filtering
   - Individual validators can now specify `Exclude` patterns in `.yard-lint.yml`
