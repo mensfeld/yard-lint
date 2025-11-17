@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'did_you_mean'
+require 'shellwords'
 
 module Yard
   module Lint
@@ -72,19 +73,44 @@ module Yard
               def parse_parameters_from_source(file, line)
                 return [] unless File.exist?(file)
 
-                # Read the file and find the method definition near this line
-                lines = File.readlines(file)
+                # Calculate the search range (line numbers are 1-indexed)
+                start_line = [(line - 15), 1].max
+                end_line = line + 5
 
-                # Search backwards from the line to find the method definition
-                # (since line number points to the documentation location)
-                search_range = [(line - 15), 0].max...[line + 5, lines.length - 1].min
+                # Only read the lines in the relevant range to avoid loading the whole file
+                lines = []
+                current_line_num = 1
+                File.foreach(file) do |source_line|
+                  lines << source_line if current_line_num >= start_line && current_line_num <= end_line
+                  break if current_line_num > end_line
 
-                lines[search_range].each do |source_line|
-                  # Match method definitions: def method_name(param1, param2)
-                  # Also handle multiline definitions and keyword arguments
+                  current_line_num += 1
+                end
+
+                # Search for method definition in the collected lines
+                in_multiline_def = false
+                param_lines = []
+
+                lines.each do |source_line|
+                  # Match single-line method definitions: def method_name(param1, param2)
                   if source_line =~ /^\s*def\s+\w+\s*\((.*?)\)/
                     params_str = ::Regexp.last_match(1)
                     return extract_parameter_names(params_str)
+                  # Match start of multi-line method definition: def method_name(
+                  elsif source_line =~ /^\s*def\s+\w+\s*\((.*)$/
+                    in_multiline_def = true
+                    param_lines << ::Regexp.last_match(1)
+                    next
+                  elsif in_multiline_def
+                    param_lines << source_line.strip
+                    # Check if this line closes the parameter list
+                    if source_line.include?(')')
+                      # Join all lines and extract params
+                      params_str = param_lines.join(' ')
+                      # Remove trailing ')' and anything after it
+                      params_str = params_str[/\A(.*?)\)/, 1] || params_str
+                      return extract_parameter_names(params_str)
+                    end
                   elsif source_line.match?(/^\s*def\s+\w+\s*$/)
                     # Method with no parameters
                     return []
@@ -122,7 +148,9 @@ module Yard
               # @return [Array<String>] array of parameter names
               def fetch_parameters_via_yard(file, line)
                 # Query YARD for the method at this location
-                query = "'type == :method && file == \"#{file}\" && line >= #{line - 15} && line <= #{line + 5}'"
+                # Use Shellwords.escape to prevent command injection
+                escaped_file = Shellwords.escape(file)
+                query = "'type == :method && file == \"#{escaped_file}\" && line >= #{line - 15} && line <= #{line + 5}'"
                 cmd = "yard list --query #{query} 2>/dev/null"
 
                 output = `#{cmd}`.strip

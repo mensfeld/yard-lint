@@ -50,51 +50,59 @@ RSpec.describe Yard::Lint::Validators::Warnings::UnknownParameterName::MessagesB
 
       it 'handles multiple similar parameters' do
         test_file2 = Tempfile.new(['test2', '.rb'])
-        test_file2.write(<<~RUBY)
-          class TestClass
-            # Test method
-            # @param user_nme [String] typo
-            def process(user_name, user_email)
-              user_name
+
+        begin
+          test_file2.write(<<~RUBY)
+            class TestClass
+              # Test method
+              # @param user_nme [String] typo
+              def process(user_name, user_email)
+                user_name
+              end
             end
-          end
-        RUBY
-        test_file2.close
+          RUBY
+          test_file2.close
 
-        offense = {
-          message: '@param tag has unknown parameter name: user_nme',
-          location: test_file2.path,
-          line: 4
-        }
-        result = messages_builder.call(offense)
-        expect(result).to include("did you mean 'user_name'?")
-
-        test_file2.unlink
+          offense = {
+            message: '@param tag has unknown parameter name: user_nme',
+            location: test_file2.path,
+            line: 4
+          }
+          result = messages_builder.call(offense)
+          expect(result).to include("did you mean 'user_name'?")
+        ensure
+          test_file2.close unless test_file2.closed?
+          test_file2.unlink
+        end
       end
 
       it 'returns original message when no similar parameters found' do
         test_file3 = Tempfile.new(['test3', '.rb'])
-        test_file3.write(<<~RUBY)
-          class TestClass
-            # Test method
-            # @param completely_different [String] no match
-            def process(foo)
-              foo
+
+        begin
+          test_file3.write(<<~RUBY)
+            class TestClass
+              # Test method
+              # @param completely_different [String] no match
+              def process(foo)
+                foo
+              end
             end
-          end
-        RUBY
-        test_file3.close
+          RUBY
+          test_file3.close
 
-        offense = {
-          message: '@param tag has unknown parameter name: completely_different',
-          location: test_file3.path,
-          line: 4
-        }
-        result = messages_builder.call(offense)
-        # Should not have suggestion since parameters are too different
-        expect(result).to eq('@param tag has unknown parameter name: completely_different')
-
-        test_file3.unlink
+          offense = {
+            message: '@param tag has unknown parameter name: completely_different',
+            location: test_file3.path,
+            line: 4
+          }
+          result = messages_builder.call(offense)
+          # Should not have suggestion since parameters are too different
+          expect(result).to eq('@param tag has unknown parameter name: completely_different')
+        ensure
+          test_file3.close unless test_file3.closed?
+          test_file3.unlink
+        end
       end
 
       it 'returns original message when file does not exist' do
@@ -109,26 +117,30 @@ RSpec.describe Yard::Lint::Validators::Warnings::UnknownParameterName::MessagesB
 
       it 'handles methods with no parameters' do
         test_file4 = Tempfile.new(['test4', '.rb'])
-        test_file4.write(<<~RUBY)
-          class TestClass
-            # Test method
-            # @param wrong [String] should not be here
-            def process
-              true
+
+        begin
+          test_file4.write(<<~RUBY)
+            class TestClass
+              # Test method
+              # @param wrong [String] should not be here
+              def process
+                true
+              end
             end
-          end
-        RUBY
-        test_file4.close
+          RUBY
+          test_file4.close
 
-        offense = {
-          message: '@param tag has unknown parameter name: wrong',
-          location: test_file4.path,
-          line: 4
-        }
-        result = messages_builder.call(offense)
-        expect(result).to eq('@param tag has unknown parameter name: wrong')
-
-        test_file4.unlink
+          offense = {
+            message: '@param tag has unknown parameter name: wrong',
+            location: test_file4.path,
+            line: 4
+          }
+          result = messages_builder.call(offense)
+          expect(result).to eq('@param tag has unknown parameter name: wrong')
+        ensure
+          test_file4.close unless test_file4.closed?
+          test_file4.unlink
+        end
       end
     end
   end

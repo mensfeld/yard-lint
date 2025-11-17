@@ -130,7 +130,7 @@ module Yard
         # Instead of creating a new Result object (which would rebuild messages),
         # just modify the existing result object's offenses array
         # This preserves all the processed offense data including enhanced messages
-        result.instance_variable_set(:@offenses, filtered_offenses)
+        result.offenses = filtered_offenses
         result
       end
 

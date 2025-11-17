@@ -56,6 +56,7 @@ module Yard
         self.offense_type = 'line'
 
         attr_reader :offenses, :config
+        attr_writer :offenses
 
         # Initialize a result object with parsed validator data
         # @param parsed_data [Array<Hash>] Array of offense hashes from validator parser
