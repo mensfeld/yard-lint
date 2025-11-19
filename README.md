@@ -34,6 +34,7 @@ YARD-Lint validates your YARD documentation for:
 - **Example code syntax validation**: Validates Ruby syntax in `@example` tags to catch broken code examples
 - **Redundant parameter descriptions**: Detects meaningless parameter descriptions that add no value (e.g., `@param user [User] The user`)
 - **YARD warnings**: Unknown tags, invalid directives, duplicated parameter names, and more
+- **Smart suggestions**: Provides "did you mean" suggestions for typos in parameter names using Ruby's `did_you_mean` gem with Levenshtein distance fallback
 
 ## Installation
 
@@ -519,12 +520,12 @@ Supported glob patterns:
 | `Tags/ExampleSyntax` | Validates Ruby syntax in `@example` tags to catch broken code examples | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Tags/RedundantParamDescription` | Detects meaningless parameter descriptions that add no value beyond the parameter name | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `Articles`, `MaxRedundantWords`, `MinMeaningfulLength`, `GenericTerms`, `EnabledPatterns` |
 | **Warnings Validators** |
-| `Warnings/UnknownTag` | Detects unknown YARD tags | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
+| `Warnings/UnknownTag` | Detects unknown YARD tags with "did you mean" suggestions | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
 | `Warnings/UnknownDirective` | Detects unknown YARD directives | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
 | `Warnings/InvalidTagFormat` | Detects malformed tag syntax | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
 | `Warnings/InvalidDirectiveFormat` | Detects malformed directive syntax | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
 | `Warnings/DuplicatedParameterName` | Detects duplicate `@param` tags | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
-| `Warnings/UnknownParameterName` | Detects `@param` tags for non-existent parameters | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
+| `Warnings/UnknownParameterName` | Detects `@param` tags for non-existent parameters with "did you mean" suggestions | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
 | **Semantic Validators** |
 | `Semantic/AbstractMethods` | Ensures `@abstract` methods don't have real implementations | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 
@@ -541,6 +542,61 @@ yard server
 ```
 
 Then open http://localhost:8808 in your browser to browse the full validator documentation with examples.
+
+### Smart Suggestions with "Did You Mean"
+
+YARD-Lint provides intelligent suggestions for common typos in both tag names and parameter names.
+
+#### Unknown Tag Suggestions
+
+The `Warnings/UnknownTag` validator suggests correct YARD tags for typos:
+
+**Example:**
+
+```ruby
+# @params value [String] should be @param
+# @returns [String] should be @return
+# @raises [Error] should be @raise
+def process(value)
+  # ...
+end
+```
+
+**Output:**
+
+```
+lib/processor.rb:10: [error] Unknown tag @params (did you mean '@param'?)
+lib/processor.rb:11: [error] Unknown tag @returns (did you mean '@return'?)
+lib/processor.rb:12: [error] Unknown tag @raises (did you mean '@raise'?)
+```
+
+#### Unknown Parameter Suggestions
+
+The `Warnings/UnknownParameterName` validator suggests correct parameter names:
+
+**Example:**
+
+```ruby
+# @param usr_name [String] the username
+# @param usr_email [String] the email
+def create_user(user_name, user_email)
+  # ...
+end
+```
+
+**Output:**
+
+```
+lib/user.rb:123: [error] @param tag has unknown parameter name: usr_name (did you mean 'user_name'?)
+lib/user.rb:124: [error] @param tag has unknown parameter name: usr_email (did you mean 'user_email'?)
+```
+
+**How it works:**
+- Uses Ruby's `did_you_mean` gem for intelligent suggestions
+- Falls back to Levenshtein distance algorithm when needed
+- For parameters: Parses method signatures directly from source files for accurate parameter detection
+- Supports all parameter types: regular, keyword, splat, block, and default values
+- For tags: Checks against all standard YARD tags and directives
 
 ### Quick Configuration Examples
 
