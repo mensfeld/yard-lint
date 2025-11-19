@@ -114,9 +114,7 @@ RSpec.describe Yard::Lint::Validators::Warnings::UnknownTag::MessagesBuilder do
 
     it 'all tags are lowercase strings' do
       expect(described_class::KNOWN_TAGS).to all(be_a(String))
-      described_class::KNOWN_TAGS.each do |tag|
-        expect(tag).to eq(tag.downcase)
-      end
+      expect(described_class::KNOWN_TAGS).to all(satisfy { |tag| tag == tag.downcase })
     end
   end
 
@@ -131,9 +129,7 @@ RSpec.describe Yard::Lint::Validators::Warnings::UnknownTag::MessagesBuilder do
 
     it 'all directives are lowercase strings' do
       expect(described_class::KNOWN_DIRECTIVES).to all(be_a(String))
-      described_class::KNOWN_DIRECTIVES.each do |directive|
-        expect(directive).to eq(directive.downcase)
-      end
+      expect(described_class::KNOWN_DIRECTIVES).to all(satisfy { |directive| directive == directive.downcase })
     end
   end
 
