@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'tempfile'
-
 RSpec.describe 'Unknown Tag Integration' do
   subject(:result) { Yard::Lint.run(path: temp_file.path, progress: false, config: config) }
 

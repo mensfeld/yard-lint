@@ -6,6 +6,8 @@ require 'open3'
 require 'tempfile'
 require 'tmpdir'
 require 'digest'
+require 'did_you_mean'
+require 'yard'
 
 module Yard
   # YARD Lint module providing linting functionality for YARD documentation
