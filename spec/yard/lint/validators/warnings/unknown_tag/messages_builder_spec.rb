@@ -103,44 +103,62 @@ RSpec.describe Yard::Lint::Validators::Warnings::UnknownTag::MessagesBuilder do
     end
   end
 
-  describe 'KNOWN_TAGS constant' do
+  describe '.known_tags' do
     it 'includes standard YARD meta-data tags' do
-      expect(described_class::KNOWN_TAGS).to include('param', 'return', 'raise', 'example', 'author')
+      expect(described_class.known_tags).to include('param', 'return', 'raise', 'example', 'author')
     end
 
-    it 'includes 22 standard tags' do
-      expect(described_class::KNOWN_TAGS.size).to eq(22)
+    it 'returns tags dynamically from YARD::Tags::Library' do
+      expect(described_class.known_tags.size).to be >= 22
     end
 
     it 'all tags are lowercase strings' do
-      expect(described_class::KNOWN_TAGS).to all(be_a(String))
-      expect(described_class::KNOWN_TAGS).to all(satisfy { |tag| tag == tag.downcase })
+      expect(described_class.known_tags).to all(be_a(String))
+      expect(described_class.known_tags).to all(satisfy { |tag| tag == tag.downcase })
+    end
+
+    it 'caches the result' do
+      first_call = described_class.known_tags
+      second_call = described_class.known_tags
+      expect(first_call.object_id).to eq(second_call.object_id)
     end
   end
 
-  describe 'KNOWN_DIRECTIVES constant' do
+  describe '.known_directives' do
     it 'includes standard YARD directives' do
-      expect(described_class::KNOWN_DIRECTIVES).to include('attribute', 'method', 'macro')
+      expect(described_class.known_directives).to include('attribute', 'method', 'macro')
     end
 
-    it 'includes 8 directives' do
-      expect(described_class::KNOWN_DIRECTIVES.size).to eq(8)
+    it 'returns directives dynamically from YARD::Tags::Library' do
+      expect(described_class.known_directives.size).to be >= 8
     end
 
     it 'all directives are lowercase strings' do
-      expect(described_class::KNOWN_DIRECTIVES).to all(be_a(String))
-      expect(described_class::KNOWN_DIRECTIVES).to all(satisfy { |directive| directive == directive.downcase })
+      expect(described_class.known_directives).to all(be_a(String))
+      expect(described_class.known_directives).to all(satisfy { |directive| directive == directive.downcase })
+    end
+
+    it 'caches the result' do
+      first_call = described_class.known_directives
+      second_call = described_class.known_directives
+      expect(first_call.object_id).to eq(second_call.object_id)
     end
   end
 
-  describe 'ALL_KNOWN_TAGS constant' do
+  describe '.all_known_tags' do
     it 'combines tags and directives' do
-      expected_size = described_class::KNOWN_TAGS.size + described_class::KNOWN_DIRECTIVES.size
-      expect(described_class::ALL_KNOWN_TAGS.size).to eq(expected_size)
+      expected_size = described_class.known_tags.size + described_class.known_directives.size
+      expect(described_class.all_known_tags.size).to eq(expected_size)
     end
 
     it 'includes both tags and directives' do
-      expect(described_class::ALL_KNOWN_TAGS).to include('param', 'attribute')
+      expect(described_class.all_known_tags).to include('param', 'attribute')
+    end
+
+    it 'caches the result' do
+      first_call = described_class.all_known_tags
+      second_call = described_class.all_known_tags
+      expect(first_call.object_id).to eq(second_call.object_id)
     end
   end
 

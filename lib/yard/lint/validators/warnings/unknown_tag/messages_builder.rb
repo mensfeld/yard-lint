@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'did_you_mean'
+require 'yard'
 
 module Yard
   module Lint
@@ -9,49 +10,40 @@ module Yard
         module UnknownTag
           # Builds enhanced messages with "did you mean" suggestions for unknown tags
           class MessagesBuilder
-            # List of valid YARD meta-data tags (without @ prefix)
-            # Source: https://rubydoc.info/gems/yard/file/docs/Tags.md
-            KNOWN_TAGS = %w[
-              abstract
-              api
-              attr
-              attr_reader
-              attr_writer
-              author
-              deprecated
-              example
-              note
-              option
-              overload
-              param
-              private
-              raise
-              return
-              see
-              since
-              todo
-              version
-              yield
-              yieldparam
-              yieldreturn
-            ].freeze
-
-            # List of valid YARD directives (without @! prefix)
-            KNOWN_DIRECTIVES = %w[
-              attribute
-              endgroup
-              group
-              macro
-              method
-              parse
-              scope
-              visibility
-            ].freeze
-
-            # Combined list of all known tags and directives
-            ALL_KNOWN_TAGS = (KNOWN_TAGS + KNOWN_DIRECTIVES).freeze
-
             class << self
+              # Dynamically fetch list of valid YARD meta-data tags from YARD::Tags::Library
+              # This ensures we're always in sync with the installed YARD version
+              # @return [Array<String>] array of tag names (without @ prefix)
+              def known_tags
+                @known_tags ||= begin
+                  lib = ::YARD::Tags::Library.instance
+                  lib.methods
+                     .grep(/_tag$/)
+                     .map { |m| m.to_s.sub(/_tag$/, '') }
+                     .sort
+                     .freeze
+                end
+              end
+
+              # Dynamically fetch list of valid YARD directives from YARD::Tags::Library
+              # This ensures we're always in sync with the installed YARD version
+              # @return [Array<String>] array of directive names (without @! prefix)
+              def known_directives
+                @known_directives ||= begin
+                  lib = ::YARD::Tags::Library.instance
+                  lib.methods
+                     .grep(/_directive$/)
+                     .map { |m| m.to_s.sub(/_directive$/, '') }
+                     .sort
+                     .freeze
+                end
+              end
+
+              # Combined list of all known tags and directives
+              # @return [Array<String>] array of all valid tag and directive names
+              def all_known_tags
+                @all_known_tags ||= (known_tags + known_directives).freeze
+              end
               # Build message with suggestion for unknown tag
               # @param offense [Hash] offense data with :message, :location (file), :line keys
               # @return [String] formatted message with suggestion if available
@@ -85,7 +77,7 @@ module Yard
                 return nil if unknown_tag.nil? || unknown_tag.empty?
 
                 # Use DidYouMean::SpellChecker for smart suggestions
-                spell_checker = DidYouMean::SpellChecker.new(dictionary: ALL_KNOWN_TAGS)
+                spell_checker = DidYouMean::SpellChecker.new(dictionary: all_known_tags)
                 suggestions = spell_checker.correct(unknown_tag)
 
                 # If DidYouMean found suggestions, return the best one
@@ -104,7 +96,7 @@ module Yard
               # @return [String, nil] suggested tag name or nil
               def find_suggestion_fallback(unknown_tag)
                 # Calculate Levenshtein distance for each tag
-                distances = ALL_KNOWN_TAGS.map do |tag|
+                distances = all_known_tags.map do |tag|
                   [tag, levenshtein_distance(unknown_tag, tag)]
                 end
 

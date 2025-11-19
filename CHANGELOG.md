@@ -13,7 +13,8 @@
   - Inspired by yard-junk's helpful error messages
 - **[Feature]** Add "did you mean" suggestions for UnknownTag validator
   - Suggests correct YARD tag names when typos are detected
-  - Checks against all 22 standard YARD meta-data tags and 8 directives
+  - Dynamically loads valid tags and directives from YARD::Tags::Library for automatic compatibility with any YARD version
+  - Checks against all 22 standard YARD meta-data tags and 8 directives (in YARD 0.9.x)
   - Uses Ruby's `did_you_mean` gem as primary suggestion engine
   - Falls back to Levenshtein distance algorithm when DidYouMean doesn't find matches
   - Example: `@returns [String]` → suggests "did you mean '@return'?"
