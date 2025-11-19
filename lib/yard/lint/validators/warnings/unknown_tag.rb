@@ -29,9 +29,10 @@ module Yard
         #   def process(name)
         #   end
         #
-        # @example Output with suggestions
-        #   lib/foo.rb:10: [error] Unknown tag @returns (did you mean '@return'?)
-        #   lib/foo.rb:11: [error] Unknown tag @raises (did you mean '@raise'?)
+        # **Output with suggestions:**
+        #
+        #     lib/foo.rb:10: [error] Unknown tag @returns (did you mean '@return'?)
+        #     lib/foo.rb:11: [error] Unknown tag @raises (did you mean '@raise'?)
         #
         # ## Configuration
         #
