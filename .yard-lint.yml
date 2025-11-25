@@ -17,7 +17,7 @@ AllValidators:
     - 'test/**/*'
 
   # Exit code behavior (error, warning, convention, never)
-  FailOnSeverity: error
+  FailOnSeverity: convention
 
   MinCoverage: 99
 
@@ -49,6 +49,14 @@ Documentation/MarkdownSyntax:
   Description: 'Detects common markdown syntax errors in documentation.'
   Enabled: true
   Severity: error
+
+Documentation/EmptyCommentLine:
+  Description: 'Detects empty comment lines at the start or end of documentation blocks.'
+  Enabled: true
+  Severity: convention
+  EnabledPatterns:
+    Leading: true
+    Trailing: true
 
 # Tags validators
 Tags/Order:

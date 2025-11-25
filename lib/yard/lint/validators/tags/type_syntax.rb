@@ -29,7 +29,6 @@ module Yard
         #
         #     Tags/TypeSyntax:
         #       Enabled: false
-        #
         module TypeSyntax
         end
       end

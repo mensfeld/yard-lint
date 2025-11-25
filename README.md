@@ -33,6 +33,7 @@ YARD-Lint validates your YARD documentation for:
 - **Option hash documentation**: Validate that methods with options parameters have @option tags
 - **Example code syntax validation**: Validates Ruby syntax in `@example` tags to catch broken code examples
 - **Redundant parameter descriptions**: Detects meaningless parameter descriptions that add no value (e.g., `@param user [User] The user`)
+- **Empty comment lines**: Detects unnecessary empty `#` lines at the start or end of documentation blocks
 - **YARD warnings**: Unknown tags, invalid directives, duplicated parameter names, and more
 - **Smart suggestions**: Provides "did you mean" suggestions for typos in parameter names using Ruby's `did_you_mean` gem with Levenshtein distance fallback
 
@@ -508,6 +509,7 @@ Supported glob patterns:
 | `Documentation/UndocumentedBooleanMethods` | Checks that question mark methods document their boolean return | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Documentation/UndocumentedOptions` | Detects methods with options hash/kwargs parameters but no `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Documentation/MarkdownSyntax` | Detects common markdown syntax errors in documentation (unclosed backticks, invalid list markers, etc.) | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
+| `Documentation/EmptyCommentLine` | Detects empty `#` lines at the start or end of documentation blocks | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnabledPatterns` |
 | **Tags Validators** |
 | `Tags/Order` | Enforces consistent ordering of YARD tags | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnforcedOrder` |
 | `Tags/InvalidTypes` | Validates type definitions in `@param`, `@return`, `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags`, `ExtraTypes` |

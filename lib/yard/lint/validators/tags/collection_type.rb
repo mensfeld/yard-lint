@@ -41,7 +41,6 @@ module Yard
         #
         #     Tags/CollectionType:
         #       Enabled: false
-        #
         module CollectionType
         end
       end

@@ -28,7 +28,6 @@ module Yard
         #
         #     Tags/Order:
         #       Enabled: false
-        #
         module Order
         end
       end

@@ -31,7 +31,6 @@ module Yard
         #
         #     Documentation/UndocumentedOptions:
         #       Enabled: false
-        #
         module UndocumentedOptions
         end
       end

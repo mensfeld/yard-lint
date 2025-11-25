@@ -29,7 +29,6 @@ module Yard
         #
         #     Documentation/UndocumentedMethodArguments:
         #       Enabled: false
-        #
         module UndocumentedMethodArguments
         end
       end

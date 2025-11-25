@@ -28,7 +28,6 @@ module Yard
         #
         #     Documentation/MarkdownSyntax:
         #       Enabled: false
-        #
         module MarkdownSyntax
         end
       end

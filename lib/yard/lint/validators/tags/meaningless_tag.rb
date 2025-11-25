@@ -34,7 +34,6 @@ module Yard
         #       @name = name
         #     end
         #   end
-        #
         module MeaninglessTag
         end
       end

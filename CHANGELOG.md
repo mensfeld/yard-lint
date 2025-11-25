@@ -1,5 +1,18 @@
 # YARD-Lint Changelog
 
+## 1.4.0 (2025-11-25)
+- **[Feature]** Add `Documentation/EmptyCommentLine` validator to detect unnecessary empty comment lines in YARD documentation blocks
+  - Detects empty `#` lines at the start of documentation blocks (leading)
+  - Detects empty `#` lines at the end of documentation blocks (trailing)
+  - Correctly allows empty lines between sections (e.g., between description and @param tags)
+  - Configurable `EnabledPatterns` to check leading, trailing, or both
+  - Reads source files directly to detect comment block boundaries
+  - Enabled by default with 'convention' severity
+  - Comprehensive test coverage with 45 unit and integration tests
+- **[Change]** Update `.yard-lint.yml` to set `FailOnSeverity` to `convention` level
+  - Previously set to `error`, now fails on any severity including convention
+  - Ensures stricter enforcement of documentation style conventions
+
 ## 1.3.0 (2025-11-19)
 - **[Feature]** Add "did you mean" suggestions for UnknownParameterName validator
   - Suggests correct parameter names when documentation mismatches are detected

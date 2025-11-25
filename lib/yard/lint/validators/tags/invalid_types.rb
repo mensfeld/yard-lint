@@ -28,7 +28,6 @@ module Yard
         #
         #     Tags/InvalidTypes:
         #       Enabled: false
-        #
         module InvalidTypes
         end
       end

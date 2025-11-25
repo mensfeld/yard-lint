@@ -37,7 +37,6 @@ module Yard
         #     def some_method
         #     end
         #   end
-        #
         module ApiTags
         end
       end

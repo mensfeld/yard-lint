@@ -34,7 +34,6 @@ module Yard
         #
         #     Semantic/AbstractMethods:
         #       Enabled: false
-        #
         module AbstractMethods
         end
       end

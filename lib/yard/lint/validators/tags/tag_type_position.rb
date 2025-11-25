@@ -42,7 +42,6 @@ module Yard
         #
         #     Tags/TagTypePosition:
         #       Enabled: false
-        #
         module TagTypePosition
         end
       end

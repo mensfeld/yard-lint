@@ -33,7 +33,6 @@ module Yard
         #
         #     Tags/ExampleSyntax:
         #       Enabled: false
-        #
         module ExampleSyntax
         end
       end

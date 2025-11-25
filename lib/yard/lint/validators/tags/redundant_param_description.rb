@@ -159,7 +159,6 @@ module Yard
         #
         #     Tags/RedundantParamDescription:
         #       Enabled: false
-        #
         module RedundantParamDescription
         end
       end

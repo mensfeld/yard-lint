@@ -29,7 +29,6 @@ module Yard
         #
         #     Documentation/UndocumentedBooleanMethods:
         #       Enabled: false
-        #
         module UndocumentedBooleanMethods
         end
       end

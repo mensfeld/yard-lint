@@ -134,7 +134,6 @@ module Yard
         # 2. Splat parameters don't count: `def method(a, *rest)` has arity 1
         # 3. Block parameters don't count: `def method(a, &block)` has arity 1
         # 4. Keyword arguments count as individual parameters: `def method(a:, b:)` has arity 2
-        #
         module UndocumentedObjects
         end
       end

@@ -29,7 +29,6 @@ module Yard
         #   # @param options [Hash] configuration options
         #   def configure(name, options = {})
         #   end
-        #
         module OptionTags
         end
       end
