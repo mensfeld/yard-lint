@@ -57,6 +57,14 @@ Documentation/MarkdownSyntax:
   Enabled: true
   Severity: warning
 
+Documentation/EmptyCommentLine:
+  Description: 'Detects empty comment lines at the start or end of documentation blocks.'
+  Enabled: true
+  Severity: convention
+  EnabledPatterns:
+    Leading: true
+    Trailing: true
+
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'
