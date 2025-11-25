@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "minimumReleaseAge": "7 days",
   "github-actions": {
     "enabled": true,
     "pinDigests": true
@@ -10,13 +11,5 @@
   "includePaths": [
     "Gemfile",
     "yard-lint.gemspec"
-  ],
-  "packageRules": [
-    {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "minimumReleaseAge": "7 days"
-    }
   ]
 }
