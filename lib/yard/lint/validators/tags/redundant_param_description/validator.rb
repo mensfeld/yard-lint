@@ -25,7 +25,8 @@ module Yard
               tags_to_check = config_checked_tags
               patterns = config_enabled_patterns
 
-              object.docstring.tags.select { |tag| tags_to_check.include?(tag.tag_name) }.each do |tag|
+              object.docstring.tags.each do |tag|
+                next unless tags_to_check.include?(tag.tag_name)
                 next unless tag.name && tag.text && !tag.text.strip.empty?
 
                 param_name = tag.name
