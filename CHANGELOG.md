@@ -1,6 +1,16 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Feature]** Add in-process YARD execution for ~10x faster performance
+  - Parses files once and shares the YARD registry across all validators
+  - Eliminates subprocess spawning overhead (previously spawned 17+ processes per run)
+  - Maintains identical detection results and output format as shell mode
+  - All 17 validators migrated to support in-process execution
+  - Shell mode still available via `YARD_LINT_SHELL_MODE=true` environment variable
+  - Warning validators (UnknownTag, UnknownParameterName, etc.) capture YARD warnings during parsing
+  - Respects `--private`/`--protected` YardOptions for visibility filtering
+  - Fixed `void` typo in allowed types (was `vold`)
+  - Properly handles symbol types (`:all`, `:public`) in type validation
 - **[Feature]** Add `Documentation/EmptyCommentLine` validator to detect unnecessary empty comment lines in YARD documentation blocks
   - Detects empty `#` lines at the start of documentation blocks (leading)
   - Detects empty `#` lines at the end of documentation blocks (trailing)

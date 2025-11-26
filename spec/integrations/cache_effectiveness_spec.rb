@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
+# Cache effectiveness tests only apply to shell mode (subprocess execution).
+# In in-process mode, validators execute within the same Ruby process without
+# spawning subprocesses, so the command cache is not used.
 RSpec.describe 'YARD Command Cache Effectiveness', :cache_isolation do
+  before do
+    skip 'Cache tests only apply to shell mode' unless ENV['YARD_LINT_SHELL_MODE'] == 'true'
+  end
+
   let(:fixtures_dir) { File.expand_path('fixtures', __dir__) }
 
   # Config without exclusions so fixtures are processed

@@ -142,6 +142,20 @@ module Yard
         all_validators['MinCoverage']
       end
 
+      # Check if in-process execution is enabled
+      # In-process execution runs YARD queries within the same Ruby process,
+      # avoiding the overhead of spawning subprocesses for each validator.
+      # Can be disabled via YARD_LINT_SHELL_MODE=true environment variable
+      # or by setting InProcessExecution: false in config.
+      # @return [Boolean] true if in-process execution should be used
+      def in_process_execution?
+        # Environment variable takes precedence for easy testing/debugging
+        return false if ENV['YARD_LINT_SHELL_MODE'] == 'true'
+
+        # Config setting (defaults to true for enabled)
+        all_validators['InProcessExecution'] != false
+      end
+
       # Check if a validator is enabled
       # @param validator_name [String] full validator name (e.g., 'Tags/Order')
       # @return [Boolean] true if validator is enabled

@@ -10,6 +10,11 @@ module Yard
         # Must be stored on Base itself, not on subclasses
         @shared_command_cache = nil
 
+        # Class-level settings for in-process execution
+        # These must be set on each subclass, not on Base
+        @in_process_enabled = nil
+        @in_process_visibility = nil
+
         # Default YARD command options that we need to use
         DEFAULT_OPTIONS = [
           '--charset utf-8',
@@ -48,6 +53,46 @@ module Yard
 
             FileUtils.rm_rf(Dir.glob(File.join(YARDOC_BASE_TEMP_DIR, '*')))
           end
+
+          # Declare that this validator supports in-process execution
+          # @param visibility [Symbol] visibility filter for objects (:public or :all)
+          #   :public - only include public methods (default, no --private/--protected)
+          #   :all - include all methods (equivalent to --private --protected)
+          # @return [void]
+          # @example
+          #   class Validator < Base
+          #     in_process visibility: :all
+          #   end
+          def in_process(visibility: :public)
+            @in_process_enabled = true
+            @in_process_visibility = visibility
+          end
+
+          # Check if this validator supports in-process execution
+          # @return [Boolean]
+          def in_process?
+            @in_process_enabled == true
+          end
+
+          # Get the visibility setting for in-process execution
+          # @return [Symbol, nil] :public, :all, or nil if not set
+          def in_process_visibility
+            @in_process_visibility
+          end
+
+          # Get the validator name from the class namespace
+          # @return [String, nil] validator name like 'Tags/Order' or nil
+          # @example
+          #   Yard::Lint::Validators::Tags::Order::Validator.validator_name
+          #   # => 'Tags/Order'
+          def validator_name
+            name&.split('::')&.then do |parts|
+              idx = parts.index('Validators')
+              return nil unless idx && parts[idx + 1] && parts[idx + 2]
+
+              "#{parts[idx + 1]}/#{parts[idx + 2]}"
+            end
+          end
         end
 
         # @param config [Yard::Lint::Config] configuration object
@@ -55,6 +100,20 @@ module Yard
         def initialize(config, selection)
           @config = config
           @selection = selection
+        end
+
+        # Execute query for a single object during in-process execution.
+        # Override this method in validators that support in-process execution.
+        # @param object [YARD::CodeObjects::Base] the code object to query
+        # @param collector [Executor::ResultCollector] collector for output
+        # @return [void]
+        # @example
+        #   def in_process_query(object, collector)
+        #     return unless object.docstring.all.empty?
+        #     collector.puts "#{object.file}:#{object.line}: #{object.title}"
+        #   end
+        def in_process_query(object, collector)
+          raise NotImplementedError, "#{self.class} must implement in_process_query for in-process execution"
         end
 
         # Performs the validation and returns raw results
