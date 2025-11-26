@@ -71,14 +71,18 @@ module Yard
               # but are still recognized by Ruby as valid constant names to check.
               begin
                 const_result = Kernel.const_defined?(type)
-              rescue StandardError
+              rescue NameError
+                # Invalid constant name syntax (e.g., "foo<bar>" or names with special chars)
+                # These aren't valid Ruby constants, so we can't check them this way
                 const_result = nil
               end
               return true unless const_result.nil?
 
               # Check YARD registry (for classes defined in parsed files)
+              # This may fail for malformed type strings or registry issues
               !YARD::Registry.resolve(nil, type).nil?
-            rescue StandardError
+            rescue NameError
+              # Type couldn't be resolved - it's not defined
               false
             end
           end

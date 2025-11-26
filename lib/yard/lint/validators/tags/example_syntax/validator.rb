@@ -52,9 +52,11 @@ module Yard
                   collector.puts 'syntax_error'
                   collector.puts example_name
                   collector.puts e.message
-                rescue StandardError
-                  # Other errors (like NameError, ArgumentError) are fine
-                  # We only check syntax, not semantics
+                rescue ScriptError, EncodingError => e
+                  # Non-syntax script errors (LoadError, NotImplementedError) and encoding
+                  # issues should be logged but not reported as syntax errors.
+                  # We only validate syntax, not runtime semantics or encoding validity.
+                  warn "[YARD::Lint] Example code error in #{object.path}: #{e.class}: #{e.message}" if ENV['DEBUG']
                   next
                 end
               end

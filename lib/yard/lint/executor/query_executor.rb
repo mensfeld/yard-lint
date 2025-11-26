@@ -55,9 +55,16 @@ module Yard
         # @return [void]
         def execute_query_for_object(validator, object, collector)
           validator.in_process_query(object, collector)
-        rescue StandardError
-          # Skip objects that cause errors (mirrors YARD CLI behavior)
-          # Errors in individual objects shouldn't fail the entire validator
+        rescue NotImplementedError, NoMethodError
+          # These indicate bugs in validator implementation - re-raise them
+          raise
+        rescue StandardError => e
+          # Skip objects that cause data-related errors (mirrors YARD CLI behavior).
+          # Some code objects may have malformed data that causes errors during validation.
+          # We log these in debug mode but don't fail the entire validator run.
+          return unless ENV['DEBUG']
+
+          warn "[YARD::Lint] Validator #{validator.class} error on #{object.path}: #{e.class}: #{e.message}"
         end
 
         # Build the result hash matching shell command output format

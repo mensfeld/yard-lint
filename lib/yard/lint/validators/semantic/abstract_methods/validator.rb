@@ -20,7 +20,11 @@ module Yard
               return unless object.is_a?(YARD::CodeObjects::MethodObject)
 
               # Check if method has actual implementation (not just NotImplementedError)
-              source = object.source rescue nil
+              source = begin
+                object.source
+              rescue StandardError
+                nil
+              end
               return unless source && !source.empty?
 
               # Simple heuristic: abstract methods should be empty or raise NotImplementedError
