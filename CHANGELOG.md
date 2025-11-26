@@ -1,6 +1,11 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Fix]** Respect per-validator `YardOptions` when filtering by visibility (#41)
+  - Executor was ignoring `YardOptions` defined on individual validators
+  - Specifying `YardOptions` on a specific validator now correctly overrides `AllValidators` defaults
+  - Enables use cases like validating tag order on private methods, but skipping documentation requirement
+  - Example: Set `--private` in `AllValidators.YardOptions`, then override with empty `YardOptions: []` on `Documentation/UndocumentedObjects` to skip private methods or constants
 - **[Feature]** Add in-process YARD execution for ~10x faster performance
   - Parses files once and shares the YARD registry across all validators
   - Eliminates subprocess spawning overhead (previously spawned 17+ processes per run)
