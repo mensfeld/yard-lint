@@ -39,7 +39,7 @@ jobs:
           bundler-cache: true
 
       - name: Run specs
-        run: bundle exec rspec
+        run: bundle exec rake spec:parallel
 
   yard-lint:
     runs-on: ubuntu-latest
