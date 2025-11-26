@@ -5,5 +5,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'rspec', '~> 3.0'
-gem 'simplecov', '~> 0.22'
+gem 'rspec'
+gem 'simplecov'
+gem 'parallel_tests'

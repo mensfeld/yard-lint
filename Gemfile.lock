@@ -10,6 +10,9 @@ GEM
   specs:
     diff-lcs (1.6.2)
     docile (1.4.1)
+    parallel (1.27.0)
+    parallel_tests (5.5.0)
+      parallel
     rake (13.3.1)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
@@ -38,10 +41,11 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  parallel_tests
   rake
-  rspec (~> 3.0)
-  simplecov (~> 0.22)
+  rspec
+  simplecov
   yard-lint!
 
 BUNDLED WITH
-   2.7.1
+   2.7.2
