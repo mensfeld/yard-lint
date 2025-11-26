@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## 1.4.0 (2025-11-25)
+## 1.3.0 (Unreleased)
 - **[Feature]** Add `Documentation/EmptyCommentLine` validator to detect unnecessary empty comment lines in YARD documentation blocks
   - Detects empty `#` lines at the start of documentation blocks (leading)
   - Detects empty `#` lines at the end of documentation blocks (trailing)
@@ -9,11 +9,6 @@
   - Reads source files directly to detect comment block boundaries
   - Enabled by default with 'convention' severity
   - Comprehensive test coverage with 45 unit and integration tests
-- **[Change]** Update `.yard-lint.yml` to set `FailOnSeverity` to `convention` level
-  - Previously set to `error`, now fails on any severity including convention
-  - Ensures stricter enforcement of documentation style conventions
-
-## 1.3.0 (2025-11-19)
 - **[Feature]** Add "did you mean" suggestions for UnknownParameterName validator
   - Suggests correct parameter names when documentation mismatches are detected
   - Uses Ruby's `did_you_mean` gem as primary suggestion engine
@@ -37,11 +32,21 @@
   - Comprehensive test coverage with 35 unit tests and 12 integration tests covering common typos
   - Completes the "did you mean" feature set alongside UnknownParameterName validator
   - Inspired by yard-junk's helpful suggestion system
+- **[Fix]** Replace hard-coded `#!/bin/bash` with `#!/bin/sh` for BSD/macOS compatibility (#34)
+  - Scripts now use POSIX-compliant shell instead of Bash
+  - Fixes `Errno::ENOENT` errors on *BSD systems where `/bin/bash` doesn't exist
+  - Affects all validators that use temporary shell scripts: InvalidTypes, RedundantParamDescription, EmptyCommentLine, TypeSyntax, CollectionType, MeaninglessTag, TagTypePosition
 - **[Fix]** Fix Runner bug where offense messages were lost during per-validator exclusion filtering
   - `filter_result_offenses` was creating new Result objects with stripped offense data
   - Enhanced messages (like "did you mean" suggestions) were being discarded
   - Now modifies existing Result object's offenses array to preserve all data
   - Fixes issue affecting all validators with custom message builders
+- **[Change]** Update `.yard-lint.yml` to set `FailOnSeverity` to `convention` level
+  - Previously set to `error`, now fails on any severity including convention
+  - Ensures stricter enforcement of documentation style conventions
+- **[CI]** Add macOS testing to CI workflow
+  - Tests Ruby 3.4 on macOS to validate BSD/POSIX compatibility
+- **[CI]** Add parallel_tests gem to run specs in parallel for faster CI execution
 
 ## 1.2.3 (2025-11-13)
 - **[Feature]** Add per-validator exclusion support for fine-grained file filtering

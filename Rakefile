@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'bundler/gem_tasks'
+require 'etc'
 
 namespace :spec do
   # Determine optimal number of parallel processes

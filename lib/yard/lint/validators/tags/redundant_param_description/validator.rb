@@ -102,7 +102,7 @@ module Yard
               require 'tempfile'
 
               script = Tempfile.new(['yard_lint_query', '.sh'])
-              script.write("#!/bin/bash\n")
+              script.write("#!/bin/sh\n")
               # Write query to a variable - since query already has outer single quotes, just assign it
               script.write("QUERY=#{query}\n")
               script.write("cat #{Shellwords.escape(file_list_path)} | xargs yard list #{shell_arguments} --query \"$QUERY\" -q -b #{Shellwords.escape(dir)}\n")

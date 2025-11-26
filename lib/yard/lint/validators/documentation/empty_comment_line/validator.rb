@@ -17,13 +17,13 @@ module Yard
               cmd = "cat #{Shellwords.escape(file_list_path)} | xargs yard list --query #{query} "
 
               Tempfile.create(['yard_query', '.sh']) do |f|
-                f.write("#!/bin/bash\n")
+                f.write("#!/bin/sh\n")
                 f.write(cmd)
                 f.write("#{shell_arguments} -b #{Shellwords.escape(dir)}\n")
                 f.flush
                 f.chmod(0o755)
 
-                shell("bash #{Shellwords.escape(f.path)}")
+                shell("sh #{Shellwords.escape(f.path)}")
               end
             end
 

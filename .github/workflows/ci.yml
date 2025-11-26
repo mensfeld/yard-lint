@@ -14,17 +14,27 @@ permissions:
 
 jobs:
   specs:
-    runs-on: ubuntu-latest
     timeout-minutes: 45
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
         ruby:
           - '3.2'
           - '3.3'
           - '3.4'
           - '4.0.0-preview2'
+        exclude:
+          # Only test Ruby 3.4 on macOS to limit CI usage
+          - os: macos-latest
+            ruby: '3.2'
+          - os: macos-latest
+            ruby: '3.3'
+          - os: macos-latest
+            ruby: '4.0.0-preview2'
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
