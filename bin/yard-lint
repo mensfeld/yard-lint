@@ -11,7 +11,7 @@ config_file = nil
 diff_mode = nil
 
 OptionParser.new do |opts|
-  opts.banner = 'Usage: yard-lint [options] PATH'
+  opts.banner = 'Usage: yard-lint [options] [PATH]'
 
   opts.on('-c', '--config FILE', 'Path to config file (default: .yard-lint.yml)') do |file|
     config_file = file
@@ -76,11 +76,12 @@ OptionParser.new do |opts|
     puts opts
     puts
     puts 'Examples:'
+    puts '  yard-lint                               # Lint current directory'
     puts '  yard-lint lib/                          # Lint all files in lib/'
-    puts '  yard-lint lib/ --diff main              # Lint only files changed since main branch'
-    puts '  yard-lint lib/ --staged                 # Lint only staged files'
-    puts '  yard-lint lib/ --changed                # Lint only uncommitted files'
-    puts '  yard-lint lib/ --format json            # Output in JSON format'
+    puts '  yard-lint --diff main                   # Lint files changed since main branch'
+    puts '  yard-lint --staged                      # Lint only staged files'
+    puts '  yard-lint --changed                     # Lint only uncommitted files'
+    puts '  yard-lint --format json                 # Output in JSON format'
     puts '  yard-lint --init                        # Generate default config'
     puts '  yard-lint --init --strict               # Generate strict config (all errors, 100% coverage)'
     exit
@@ -103,14 +104,8 @@ if options[:init]
   end
 end
 
-# Get path argument
-path = ARGV[0]
-
-unless path
-  puts 'Error: PATH argument is required'
-  puts 'Usage: yard-lint [options] PATH'
-  exit 1
-end
+# Get path argument (defaults to current directory)
+path = ARGV[0] || '.'
 
 # Clear YARD registry to ensure fresh run on each CLI invocation
 YARD::Registry.clear

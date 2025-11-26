@@ -1,6 +1,10 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Enhancement]** Make PATH argument optional, defaulting to current directory (like RuboCop)
+  - Running `yard-lint` without arguments now lints the current directory
+  - Maintains backward compatibility with explicit path arguments
+  - Updated help text and examples to show default behavior
 - **[Feature]** Add in-process YARD execution for ~10x faster performance
   - Parses files once and shares the YARD registry across all validators
   - Eliminates subprocess spawning overhead (previously spawned 17+ processes per run)
@@ -206,7 +210,7 @@
 - [Change] YARD database directories are now created under a base temp directory with unique subdirectories per argument set.
 
 ## 0.2.1 (2025-11-07)
-- Release to validate Trusted Publishing flow. 
+- Release to validate Trusted Publishing flow.
 
 ## 0.2.0 (2025-11-07)
 
