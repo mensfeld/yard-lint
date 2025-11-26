@@ -16,12 +16,9 @@ RSpec.describe Yard::Lint::Validators::Tags::CollectionType::Validator do
     end
   end
 
-  describe '#call' do
-    it 'returns hash with stdout, stderr, exit_code' do
-      result = validator.call
-      expect(result).to have_key(:stdout)
-      expect(result).to have_key(:stderr)
-      expect(result).to have_key(:exit_code)
+  describe '.in_process?' do
+    it 'returns true for in-process execution' do
+      expect(described_class.in_process?).to be true
     end
   end
 end

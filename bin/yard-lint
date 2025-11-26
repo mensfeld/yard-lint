@@ -112,29 +112,8 @@ unless path
   exit 1
 end
 
-# Clear YARD database and command cache to ensure fresh run on each CLI invocation
-#
-# Why this is necessary:
-#
-# 1. **Command Cache Reset** (`reset_command_cache!`)
-#    - The command cache stores results from YARD commands across validator instances
-#    - This cache is shared at the class level (Base.@shared_command_cache)
-#    - Without reset: Results from a previous CLI run could leak into the current run
-#    - Critical for CLI: Each `yard-lint` invocation should start with clean state
-#    - Not needed in-process: Within a single run, caching YARD results is beneficial
-#
-# 2. **YARD Database Clear** (`clear_yard_database!`)
-#    - YARD creates temp database directories for parsing documentation
-#    - Directories are isolated per-argument-set using SHA256 hash (see base.rb:84-97)
-#    - Base temp dir (YARDOC_BASE_TEMP_DIR) persists across CLI invocations
-#    - Without clear: Old databases accumulate in /tmp, wasting disk space
-#    - Database isolation prevents contamination within a single run, but doesn't
-#      clean up between runs
-#
-# In summary: These ensure each CLI invocation is independent and doesn't leak state
-# from previous runs, while also preventing temp directory accumulation.
-Yard::Lint::Validators::Base.reset_command_cache!
-Yard::Lint::Validators::Base.clear_yard_database!
+# Clear YARD registry to ensure fresh run on each CLI invocation
+YARD::Registry.clear
 
 # Load config and apply CLI overrides
 config = if config_file

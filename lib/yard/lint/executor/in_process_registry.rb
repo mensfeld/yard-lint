@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'yard'
-
 module Yard
   module Lint
     # In-process execution components for YARD validation.

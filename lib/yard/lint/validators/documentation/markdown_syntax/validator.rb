@@ -45,32 +45,6 @@ module Yard
               collector.puts "#{object.file}:#{object.line}: #{object.title}"
               collector.puts errors.join('|')
             end
-
-            # YARD query to extract docstrings and check for markdown errors
-            # @return [String] YARD Ruby query code
-            def query
-              <<~QUERY.strip
-                'docstring_text = object.docstring.to_s; unless docstring_text.empty?; errors = []; backtick_count = docstring_text.scan(/\\x60/).count; errors << "unclosed_backtick" if backtick_count.odd?; code_block_count = docstring_text.scan(/^```/).count; errors << "unclosed_code_block" if code_block_count.odd?; non_code_text = docstring_text.gsub(/\\x60[^\\x60]*\\x60/, ""); bold_count = non_code_text.scan(/\\*\\*/).count; errors << "unclosed_bold" if bold_count.odd?; lines = docstring_text.lines; lines.each_with_index do |line, line_idx|; stripped = line.strip; errors << "invalid_list_marker:" + (line_idx + 1).to_s if stripped =~ /^[•·]/; end; unless errors.empty?; puts object.file + ":" + object.line.to_s + ": " + object.title; puts errors.join("|"); end; end; false'
-              QUERY
-            end
-
-            private
-
-            # Builds and executes the YARD command to detect markdown syntax errors
-            # @param dir [String] the directory containing the .yardoc database
-            # @param file_list_path [String] path to file containing list of files to analyze
-            # @return [String] command output
-            def yard_cmd(dir, file_list_path)
-              cmd = <<~CMD
-                cat #{Shellwords.escape(file_list_path)} | xargs yard list \
-                  #{shell_arguments} \
-                --query #{query} \
-                -q \
-                -b #{Shellwords.escape(dir)}
-              CMD
-              cmd = cmd.tr("\n", ' ')
-              shell(cmd)
-            end
           end
         end
       end

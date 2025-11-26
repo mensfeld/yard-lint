@@ -32,22 +32,10 @@ module Yard
 
       private
 
-      # Run all validators
-      # Automatically runs all validators from ConfigLoader::ALL_VALIDATORS if enabled
-      # Chooses between in-process and shell execution based on config
+      # Run all validators using in-process YARD execution.
+      # Parses files once and shares the registry across all validators.
       # @return [Hash] hash with raw results from all validators
       def run_validators
-        if config.in_process_execution?
-          run_validators_in_process
-        else
-          run_validators_shell
-        end
-      end
-
-      # Run validators using in-process YARD execution
-      # Parses files once and shares the registry across all validators
-      # @return [Hash] hash with raw results from all validators
-      def run_validators_in_process
         results = {}
         enabled_validators = ConfigLoader::ALL_VALIDATORS.select do |name|
           config.validator_enabled?(name)
@@ -75,8 +63,13 @@ module Yard
           validator_class = validator_namespace::Validator
           validator_selection = filter_files_for_validator(validator_name, selection)
 
-          result = if validator_class.in_process?
-                     # Use in-process execution for validators that support it
+          result = if warning_dispatcher.warning_validator?(validator_name)
+                     # Use dispatched warnings for warning validators
+                     warning_dispatcher.format_for_validator(
+                       dispatched_warnings[validator_name] || []
+                     )
+                   else
+                     # Use in-process execution
                      validator = validator_class.new(config, validator_selection)
                      in_process_result = query_executor.execute(validator, file_selection: validator_selection)
 
@@ -90,14 +83,6 @@ module Yard
                      end
 
                      in_process_result
-                   elsif warning_dispatcher.warning_validator?(validator_name)
-                     # Use dispatched warnings for warning validators
-                     warning_dispatcher.format_for_validator(
-                       dispatched_warnings[validator_name] || []
-                     )
-                   else
-                     # Fallback to shell execution for non-migrated validators
-                     validator_class.new(config, validator_selection).call
                    end
 
           results[validator_cfg.id] = result
@@ -105,60 +90,6 @@ module Yard
 
         @progress_formatter&.finish
         results
-      end
-
-      # Run validators using shell execution (original implementation)
-      # @return [Hash] hash with raw results from all validators
-      def run_validators_shell
-        results = {}
-        enabled_validators = ConfigLoader::ALL_VALIDATORS.select do |name|
-          config.validator_enabled?(name)
-        end
-
-        @progress_formatter&.start(enabled_validators.size)
-
-        # Iterate through all registered validators
-        enabled_validators.each_with_index do |validator_name, index|
-          # Get the validator namespace and config
-          validator_namespace = ConfigLoader.validator_module(validator_name)
-          validator_cfg = ConfigLoader.validator_config(validator_name)
-
-          # Show progress before running validator
-          @progress_formatter&.update(index + 1, validator_name)
-
-          # Run the validator if it has a module
-          # (validators with modules have Validator classes)
-          if validator_namespace
-            run_and_store_validator(validator_namespace, validator_cfg, results, validator_name)
-          end
-        end
-
-        @progress_formatter&.finish
-
-        results
-      end
-
-      # Run a validator and store its result using the module's ID
-      # @param validator_namespace [Module] validator namespace module (e.g., Validators::Tags::Order)
-      # @param validator_config [Class] validator config class
-      # @param results [Hash] hash to store results in
-      # @param validator_name [String] full validator name for per-validator exclusions
-      def run_and_store_validator(
-        validator_namespace, validator_config, results, validator_name
-      )
-        results[validator_config.id] = run_validator(
-          validator_namespace::Validator,
-          validator_name
-        )
-      end
-
-      # Run a single validator with per-validator file filtering
-      # @param validator_class [Class] validator class to instantiate and run
-      # @param validator_name [String] full validator name for exclusions
-      # @return [Hash] hash with stdout, stderr and exit_code keys
-      def run_validator(validator_class, validator_name)
-        validator_selection = filter_files_for_validator(validator_name, selection)
-        validator_class.new(config, validator_selection).call
       end
 
       # Filter files for a specific validator based on per-validator exclusions

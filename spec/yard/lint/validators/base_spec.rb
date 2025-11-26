@@ -15,57 +15,48 @@ RSpec.describe Yard::Lint::Validators::Base do
     end
   end
 
-  describe '.command_cache' do
-    it 'returns a CommandCache instance' do
-      expect(described_class.command_cache).to be_a(Yard::Lint::CommandCache)
-    end
-
-    it 'returns same instance on subsequent calls' do
-      cache1 = described_class.command_cache
-      cache2 = described_class.command_cache
-      expect(cache1).to equal(cache2)
-    end
-  end
-
-  describe '.reset_command_cache!' do
-    it 'resets the command cache' do
-      old_cache = described_class.command_cache
-      described_class.reset_command_cache!
-      new_cache = described_class.command_cache
-      expect(new_cache).not_to equal(old_cache)
-    end
-  end
-
-  describe '.clear_yard_database!' do
-    it 'clears YARD database files' do
-      expect { described_class.clear_yard_database! }.not_to raise_error
-    end
-  end
-
-  describe '#call' do
-    let(:concrete_validator_class) do
+  describe '.in_process' do
+    let(:validator_class) do
       Class.new(described_class) do
-        private
-
-        def yard_cmd(_dir, _escaped_file_names)
-          raw('test output', '', 0)
-        end
+        in_process visibility: :all
       end
     end
 
-    it 'returns raw hash with stdout, stderr, exit_code' do
-      concrete_validator = concrete_validator_class.new(config, selection)
-      result = concrete_validator.call
-      expect(result).to be_a(Hash)
-      expect(result).to have_key(:stdout)
-      expect(result).to have_key(:stderr)
-      expect(result).to have_key(:exit_code)
+    it 'marks the validator as in_process enabled' do
+      expect(validator_class.in_process?).to be true
     end
 
-    it 'returns empty result when selection is empty' do
-      empty_validator = concrete_validator_class.new(config, [])
-      result = empty_validator.call
-      expect(result[:stdout]).to eq('')
+    it 'stores the visibility setting' do
+      expect(validator_class.in_process_visibility).to eq(:all)
+    end
+  end
+
+  describe '.in_process?' do
+    it 'returns false by default' do
+      expect(described_class.in_process?).to be false
+    end
+  end
+
+  describe '.validator_name' do
+    let(:named_class) do
+      Class.new(described_class)
+    end
+
+    it 'returns nil for base class' do
+      expect(described_class.validator_name).to be_nil
+    end
+
+    it 'extracts name from valid namespace' do
+      stub_const('Yard::Lint::Validators::Tags::Order::Validator', named_class)
+      expect(named_class.validator_name).to eq('Tags/Order')
+    end
+  end
+
+  describe '#in_process_query' do
+    it 'raises NotImplementedError by default' do
+      object = instance_double(YARD::CodeObjects::Base)
+      collector = instance_double(Yard::Lint::Executor::ResultCollector)
+      expect { validator.in_process_query(object, collector) }.to raise_error(NotImplementedError)
     end
   end
 
@@ -75,12 +66,6 @@ RSpec.describe Yard::Lint::Validators::Base do
         # Fake namespace for testing: Yard::Lint::Validators::Tags::TestValidator::Validator
         def self.name
           'Yard::Lint::Validators::Tags::TestValidator::Validator'
-        end
-
-        private
-
-        def yard_cmd(_dir, _escaped_file_names)
-          raw('test output', '', 0)
         end
       end
     end
@@ -124,12 +109,6 @@ RSpec.describe Yard::Lint::Validators::Base do
         Class.new(described_class) do
           def self.name
             'InvalidClassName'
-          end
-
-          private
-
-          def yard_cmd(_dir, _escaped_file_names)
-            raw('test output', '', 0)
           end
         end
       end

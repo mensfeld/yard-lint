@@ -30,21 +30,8 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  # Only reset cache for tests that explicitly need isolation
-  # Use :cache_isolation tag to force cache clearing for specific tests
-  config.before(:each, :cache_isolation) do
-    Yard::Lint::Validators::Base.reset_command_cache!
-    Yard::Lint::Validators::Base.clear_yard_database!
-  end
-
-  # Clear cache once before the entire suite to ensure clean start
+  # Clear YARD registry before the entire suite to ensure clean start
   config.before(:suite) do
-    Yard::Lint::Validators::Base.reset_command_cache!
-    Yard::Lint::Validators::Base.clear_yard_database!
-  end
-
-  # Clear cache after the entire suite to clean up
-  config.after(:suite) do
-    Yard::Lint::Validators::Base.clear_yard_database!
+    YARD::Registry.clear
   end
 end

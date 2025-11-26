@@ -2,22 +2,23 @@
 
 RSpec.describe Yard::Lint::Validators::Tags::TypeSyntax::Validator do
   let(:config) { Yard::Lint::Config.new }
-  let(:selection) { [] }
+  let(:selection) { ['lib/example.rb'] }
   let(:validator) { described_class.new(config, selection) }
 
-  describe 'inheritance' do
-    it 'inherits from Validators::Base' do
-      expect(described_class.superclass).to eq(Yard::Lint::Validators::Base)
+  describe '#initialize' do
+    it 'inherits from Base validator' do
+      expect(validator).to be_a(Yard::Lint::Validators::Base)
+    end
+
+    it 'stores config and selection' do
+      expect(validator.config).to eq(config)
+      expect(validator.selection).to eq(selection)
     end
   end
 
-  describe '#call' do
-    it 'returns a hash with command execution results' do
-      result = validator.call
-      expect(result).to be_a(Hash)
-      expect(result).to have_key(:stdout)
-      expect(result).to have_key(:stderr)
-      expect(result).to have_key(:exit_code)
+  describe '.in_process?' do
+    it 'returns true for in-process execution' do
+      expect(described_class.in_process?).to be true
     end
   end
 end
