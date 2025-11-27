@@ -9,7 +9,7 @@ module Yard
           class MessagesBuilder
             class << self
               # Formats an informal notation violation message
-              # @param offense [Hash] offense details with :pattern, :replacement, :object_name keys
+              # @param offense [Hash] offense details with :pattern, :replacement, :line_text keys
               # @return [String] formatted message
               def call(offense)
                 pattern = offense[:pattern]

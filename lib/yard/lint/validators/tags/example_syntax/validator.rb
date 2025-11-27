@@ -44,7 +44,11 @@ module Yard
                 end
 
                 # Try to parse the code
+                # Suppress Ruby parser warnings (like "... at EOL, should be parenthesized?")
+                # that can occur during compilation of valid but stylistically questionable code
+                original_verbose = $VERBOSE
                 begin
+                  $VERBOSE = nil
                   RubyVM::InstructionSequence.compile(cleaned_code)
                 rescue SyntaxError => e
                   example_name = example.name || "Example #{index + 1}"
@@ -58,6 +62,8 @@ module Yard
                   # We only validate syntax, not runtime semantics or encoding validity.
                   warn "[YARD::Lint] Example code error in #{object.path}: #{e.class}: #{e.message}" if ENV['DEBUG']
                   next
+                ensure
+                  $VERBOSE = original_verbose
                 end
               end
             end

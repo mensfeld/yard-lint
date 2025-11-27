@@ -22,9 +22,15 @@ RSpec.describe Yard::Lint::Validators::Tags::InformalNotation::Config do
       expect(patterns['TODO']).to eq('@todo')
       expect(patterns['FIXME']).to eq('@todo')
       expect(patterns['See']).to eq('@see')
+      expect(patterns['See also']).to eq('@see')
+      expect(patterns['Warning']).to eq('@deprecated')
       expect(patterns['Deprecated']).to eq('@deprecated')
       expect(patterns['Author']).to eq('@author')
       expect(patterns['Version']).to eq('@version')
+      expect(patterns['Since']).to eq('@since')
+      expect(patterns['Returns']).to eq('@return')
+      expect(patterns['Raises']).to eq('@raise')
+      expect(patterns['Example']).to eq('@example')
     end
   end
 
