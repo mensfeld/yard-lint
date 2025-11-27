@@ -227,9 +227,7 @@ RSpec.describe Yard::Lint::Config do
     end
 
     it 'returns correct validator severity' do
-      config = described_class.new({
-        'Tags/Order' => { 'Severity' => 'error' }
-      })
+      config = described_class.new({ 'Tags/Order' => { 'Severity' => 'error' } })
 
       expect(config.validator_severity('Tags/Order')).to eq('error')
     end
@@ -241,9 +239,7 @@ RSpec.describe Yard::Lint::Config do
     end
 
     it 'returns validator exclude patterns' do
-      config = described_class.new({
-        'Tags/Order' => { 'Exclude' => ['test/**/*'] }
-      })
+      config = described_class.new({ 'Tags/Order' => { 'Exclude' => ['test/**/*'] } })
 
       expect(config.validator_exclude('Tags/Order')).to eq(['test/**/*'])
     end
@@ -255,9 +251,7 @@ RSpec.describe Yard::Lint::Config do
     end
 
     it 'returns validator config value' do
-      config = described_class.new({
-        'Tags/Order' => { 'EnforcedOrder' => %w[param return] }
-      })
+      config = described_class.new({ 'Tags/Order' => { 'EnforcedOrder' => %w[param return] } })
 
       expect(config.validator_config('Tags/Order', 'EnforcedOrder')).to eq(%w[param return])
     end
@@ -273,6 +267,55 @@ RSpec.describe Yard::Lint::Config do
     it 'raises ConfigFileNotFoundError for non-existent file' do
       expect { described_class.from_file('/non/existent/file.yml') }
         .to raise_error(Yard::Lint::Errors::ConfigFileNotFoundError, /Config file not found/)
+    end
+  end
+
+  describe '#only_validators' do
+    it 'defaults to nil' do
+      config = described_class.new
+
+      expect(config.only_validators).to be_nil
+    end
+
+    it 'can be set to a list of validators' do
+      config = described_class.new
+      config.only_validators = ['Tags/TypeSyntax', 'Tags/Order']
+
+      expect(config.only_validators).to eq(['Tags/TypeSyntax', 'Tags/Order'])
+    end
+  end
+
+  describe '#validator_enabled? with only_validators' do
+    it 'returns true only for validators in the only list' do
+      config = described_class.new
+      config.only_validators = ['Tags/TypeSyntax', 'Tags/Order']
+
+      expect(config.validator_enabled?('Tags/TypeSyntax')).to be true
+      expect(config.validator_enabled?('Tags/Order')).to be true
+      expect(config.validator_enabled?('Tags/InvalidTypes')).to be false
+      expect(config.validator_enabled?('Documentation/UndocumentedObjects')).to be false
+    end
+
+    it 'overrides Enabled: false in config when validator is in only list' do
+      config = described_class.new({ 'Tags/TypeSyntax' => { 'Enabled' => false } })
+      config.only_validators = ['Tags/TypeSyntax']
+
+      expect(config.validator_enabled?('Tags/TypeSyntax')).to be true
+    end
+
+    it 'uses normal enabled logic when only_validators is nil' do
+      config = described_class.new({ 'Tags/TypeSyntax' => { 'Enabled' => false } })
+
+      expect(config.validator_enabled?('Tags/TypeSyntax')).to be false
+      expect(config.validator_enabled?('Tags/Order')).to be true
+    end
+
+    it 'uses normal enabled logic when only_validators is empty' do
+      config = described_class.new({ 'Tags/TypeSyntax' => { 'Enabled' => false } })
+      config.only_validators = []
+
+      expect(config.validator_enabled?('Tags/TypeSyntax')).to be false
+      expect(config.validator_enabled?('Tags/Order')).to be true
     end
   end
 end

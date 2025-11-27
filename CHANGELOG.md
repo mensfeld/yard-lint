@@ -103,6 +103,13 @@
   - Enabled by default via `EnabledPatterns.ArticleParamPhrase`
   - Pattern-specific error message explaining the filler phrase adds no value
   - Comprehensive test coverage with fixtures and integration tests
+- **[Feature]** Add `--only` CLI option to run specific validators
+  - Run single validator: `yard-lint --only Tags/TypeSyntax`
+  - Run multiple validators: `yard-lint --only Tags/Order,Tags/TypeSyntax`
+  - Overrides `Enabled: false` in config for specified validators
+  - Provides "did you mean" suggestions for typos using Ruby's `did_you_mean` gem
+  - Lists all available validators when unknown validator is specified
+  - Requires exact validator names (case-sensitive, full path like `Tags/Order`)
 
 ## 1.2.3 (2025-11-13)
 - **[Feature]** Add per-validator exclusion support for fine-grained file filtering

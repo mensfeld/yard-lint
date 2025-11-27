@@ -6,6 +6,7 @@ module Yard
     # Configuration object for YARD Lint
     class Config
       attr_reader :raw_config, :validators
+      attr_accessor :only_validators
 
       # Default YAML config file name
       DEFAULT_CONFIG_FILE = '.yard-lint.yml'
@@ -146,6 +147,9 @@ module Yard
       # @param validator_name [String] full validator name (e.g., 'Tags/Order')
       # @return [Boolean] true if validator is enabled
       def validator_enabled?(validator_name)
+        # If --only is specified, it takes full control
+        return only_validators.include?(validator_name) if only_validators&.any?
+
         validator_config = validators[validator_name] || {}
         validator_config['Enabled'] != false # Default to true
       end

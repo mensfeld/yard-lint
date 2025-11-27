@@ -12,6 +12,9 @@ module Yard
 
       # Raised when a circular dependency is detected in configuration inheritance
       class CircularDependencyError < BaseError; end
+
+      # Raised when an unknown validator name is specified via --only
+      class UnknownValidatorError < BaseError; end
     end
   end
 end
