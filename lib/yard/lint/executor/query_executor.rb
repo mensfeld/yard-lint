@@ -86,7 +86,7 @@ module Yard
         def determine_visibility(validator)
           # Check if config specifies private/protected analysis
           if validator.config
-            yard_options = validator.config.all_validators['YardOptions'] || []
+            yard_options = validator.config.validator_yard_options(validator.class.validator_name)
             if yard_options.any? { |opt| opt.include?('--private') || opt.include?('--protected') }
               return :all
             end
