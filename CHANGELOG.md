@@ -1,6 +1,13 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Fix]** Fix relative exclusion patterns not matching files discovered with absolute paths
+  - Patterns like `vendor/**/*` were not being applied when running `yard-lint /path/to/project` or `yard-lint .`
+  - Root cause: `expand_path` converted files to absolute paths before filtering, but compared against relative patterns
+  - Now matches patterns against both relative and absolute paths (similar to RuboCop's `PathUtil#match_path?`)
+  - Extracted `discover_ruby_files` method for better separation of concerns
+  - Added `determine_base_dir`, `excluded_file?`, `relative_path_from`, and `match_path?` helper methods
+  - Comprehensive integration tests in `spec/integrations/global_exclusions_spec.rb`
 - **[Enhancement]** Make PATH argument optional, defaulting to current directory (like RuboCop)
   - Running `yard-lint` without arguments now lints the current directory
   - Maintains backward compatibility with explicit path arguments
