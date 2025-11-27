@@ -118,6 +118,18 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Parser d
       expect(result[0][:pattern_type]).to eq('type_generic')
     end
 
+    it 'parses article_param_phrase pattern correctly' do
+      output = <<~OUTPUT
+        lib/example.rb:45: MyClass#perform
+        param|action|The action being performed|Symbol|article_param_phrase|4
+      OUTPUT
+
+      result = parser.call(output)
+      expect(result.length).to eq(1)
+      expect(result[0][:pattern_type]).to eq('article_param_phrase')
+      expect(result[0][:description]).to eq('The action being performed')
+    end
+
     it 'parses multiple violations' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#method1

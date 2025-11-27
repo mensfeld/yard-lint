@@ -513,7 +513,8 @@ RSpec.describe 'Yard::Lint Validators' do
             'ParamToVerb' => false,
             'IdPattern' => false,
             'DirectionalDate' => false,
-            'TypeGeneric' => false
+            'TypeGeneric' => false,
+            'ArticleParamPhrase' => false
           })
         end
       end
@@ -529,6 +530,39 @@ RSpec.describe 'Yard::Lint Validators' do
         end
 
         expect(article_only).to be true
+      end
+    end
+
+    context 'with ArticleParamPhrase pattern enabled' do
+      let(:config) do
+        test_config do |c|
+          c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
+          c.set_validator_config('Tags/RedundantParamDescription', 'EnabledPatterns', {
+            'ArticleParam' => false,
+            'PossessiveParam' => false,
+            'TypeRestatement' => false,
+            'ParamToVerb' => false,
+            'IdPattern' => false,
+            'DirectionalDate' => false,
+            'TypeGeneric' => false,
+            'ArticleParamPhrase' => true
+          })
+        end
+      end
+
+      it 'detects filler phrase patterns from GitHub issue #32 examples' do
+        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+
+        redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+        # Should find article_param_phrase violations for our fixture examples
+        phrase_violations = redundant_offenses.select do |o|
+          o[:message].include?('filler phrase')
+        end
+
+        # Should detect examples like "The action being performed", "A callback to invoke", etc.
+        expect(phrase_violations).not_to be_empty
+        expect(phrase_violations.length).to be >= 3
       end
     end
   end

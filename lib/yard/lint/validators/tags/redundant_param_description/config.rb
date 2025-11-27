@@ -15,6 +15,19 @@ module Yard
               'Articles' => %w[The the A a An an],
               'MaxRedundantWords' => 6,
               'GenericTerms' => %w[object instance value data item element],
+              'LowValueConnectors' => %w[being to that which for],
+              'LowValueVerbs' => %w[
+                perform performed performing
+                process processed processing
+                use used using
+                handle handled handling
+                act acted acting
+                pass passed passing
+                invoke invoked invoking
+                call called calling
+                execute executed executing
+                run running
+              ],
               'EnabledPatterns' => {
                 'ArticleParam' => true,
                 'PossessiveParam' => true,
@@ -22,7 +35,8 @@ module Yard
                 'ParamToVerb' => true,
                 'IdPattern' => true,
                 'DirectionalDate' => true,
-                'TypeGeneric' => true
+                'TypeGeneric' => true,
+                'ArticleParamPhrase' => true
               }
             }.freeze
           end

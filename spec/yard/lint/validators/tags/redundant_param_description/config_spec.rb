@@ -17,6 +17,9 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Config d
       expect(defaults['Articles']).to eq(%w[The the A a An an])
       expect(defaults['MaxRedundantWords']).to eq(6)
       expect(defaults['GenericTerms']).to eq(%w[object instance value data item element])
+      expect(defaults['LowValueConnectors']).to eq(%w[being to that which for])
+      expect(defaults['LowValueVerbs']).to include('perform', 'performed', 'performing')
+      expect(defaults['LowValueVerbs']).to include('invoke', 'invoked', 'invoking')
     end
 
     it 'includes all pattern toggles' do
@@ -29,6 +32,7 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Config d
       expect(patterns['IdPattern']).to be true
       expect(patterns['DirectionalDate']).to be true
       expect(patterns['TypeGeneric']).to be true
+      expect(patterns['ArticleParamPhrase']).to be true
     end
 
     it 'returns frozen hash' do
