@@ -1,6 +1,17 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Feature]** Add `Tags/NonAsciiType` validator to detect non-ASCII characters in YARD type specifications (#39)
+  - Ruby type names must be valid Ruby identifiers (ASCII only)
+  - Detects characters like `…` (U+2026), `→` (U+2192), `—` (U+2014) in type specs
+  - Common cause: copy-paste from word processors with smart typography
+  - Reports specific character and Unicode code point in error message
+  - Example: `@param flags [Symbol, …]` → reports `'…' (U+2026)`
+  - Enabled by default with 'warning' severity
+  - Configurable `ValidatedTags` (default: param, option, return, yieldreturn, yieldparam)
+- **[Fix]** Fix `Encoding::CompatibilityError` crash when YARD encounters non-ASCII characters in type specifications
+  - TypeSyntax validator now handles encoding issues gracefully
+  - Sanitizes YARD error messages that may contain invalid UTF-8 sequences
 - **[Fix]** Fix relative exclusion patterns not matching files discovered with absolute paths
   - Patterns like `vendor/**/*` were not being applied when running `yard-lint /path/to/project` or `yard-lint .`
   - Root cause: `expand_path` converted files to absolute paths before filtering, but compared against relative patterns

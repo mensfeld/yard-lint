@@ -23,6 +23,7 @@ YARD-Lint validates your YARD documentation for:
 - **Missing parameter documentation**: Methods with undocumented parameters
 - **Invalid tag types**: Type definitions that aren't valid Ruby classes or allowed defaults
 - **Invalid type syntax**: Malformed YARD type syntax (unclosed brackets, empty generics, etc.)
+- **Non-ASCII type characters**: Detects Unicode characters in type specifications (e.g., `…`, `→`, `—`) that are invalid Ruby identifiers
 - **Invalid tag ordering**: Tags that don't follow your specified order
 - **Meaningless tags**: `@param` or `@option` tags on classes, modules, or constants (only valid on methods)
 - **Collection type syntax**: Enforces `Hash{K => V}` over `Hash<K, V>` (YARD standard)
@@ -514,6 +515,7 @@ Supported glob patterns:
 | `Tags/Order` | Enforces consistent ordering of YARD tags | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnforcedOrder` |
 | `Tags/InvalidTypes` | Validates type definitions in `@param`, `@return`, `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags`, `ExtraTypes` |
 | `Tags/TypeSyntax` | Validates YARD type syntax (detects unclosed brackets, empty generics, etc.) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
+| `Tags/NonAsciiType` | Detects non-ASCII characters in type specifications (e.g., `…`, `→`, `—`) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
 | `Tags/MeaninglessTag` | Detects `@param`/`@option` tags on classes, modules, or constants (only valid on methods) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `InvalidObjectTypes` |
 | `Tags/CollectionType` | Enforces `Hash{K => V}` over `Hash<K, V>` (YARD standard collection syntax) | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
 | `Tags/TagTypePosition` | Validates type annotation position (`@param name [Type]` vs `@param [Type] name`) | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `EnforcedStyle` |
