@@ -2,6 +2,8 @@
 
 require 'simplecov'
 require 'fileutils'
+require 'tempfile'
+require 'stringio'
 
 SimpleCov.start do
   add_filter '/spec/'

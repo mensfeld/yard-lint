@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'tempfile'
-require 'stringio'
-
 RSpec.describe 'ExampleSyntax Warning Suppression' do
   let(:config) do
     test_config do |c|

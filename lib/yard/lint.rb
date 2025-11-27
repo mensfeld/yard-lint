@@ -8,6 +8,7 @@ require 'tmpdir'
 require 'digest'
 require 'did_you_mean'
 require 'yard'
+require 'set'
 
 module Yard
   # YARD Lint module providing linting functionality for YARD documentation
