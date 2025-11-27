@@ -125,13 +125,13 @@ module Yard
               end
 
               # ArticleParamPhrase pattern: "The action being performed"
-              if patterns['ArticleParamPhrase'] && word_count >= 3 && desc_parts.length >= 3
-                if desc_parts[0].match?(articles_re) &&
-                   desc_parts[1].downcase == param_name.downcase &&
-                   connectors.include?(desc_parts[2].downcase) &&
-                   (desc_parts.length == 3 || low_value_verbs.include?(desc_parts[3].downcase))
-                  return 'article_param_phrase'
-                end
+              if patterns['ArticleParamPhrase'] && word_count >= 3 && desc_parts.length >= 3 &&
+                 desc_parts[0].match?(articles_re) &&
+                 desc_parts[1].downcase == param_name.downcase &&
+                 connectors.include?(desc_parts[2].downcase) &&
+                 (desc_parts.length == 3 ||
+                  (desc_parts.length == 4 && low_value_verbs.include?(desc_parts[3].downcase)))
+                return 'article_param_phrase'
               end
 
               nil
