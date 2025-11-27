@@ -1,6 +1,10 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Enhancement]** Make PATH argument optional, defaulting to current directory (like RuboCop)
+  - Running `yard-lint` without arguments now lints the current directory
+  - Maintains backward compatibility with explicit path arguments
+  - Updated help text and examples to show default behavior
 - **[Fix]** Respect per-validator `YardOptions` when filtering by visibility (#41)
   - Executor was ignoring `YardOptions` defined on individual validators
   - Specifying `YardOptions` on a specific validator now correctly overrides `AllValidators` defaults
@@ -211,7 +215,7 @@
 - [Change] YARD database directories are now created under a base temp directory with unique subdirectories per argument set.
 
 ## 0.2.1 (2025-11-07)
-- Release to validate Trusted Publishing flow. 
+- Release to validate Trusted Publishing flow.
 
 ## 0.2.0 (2025-11-07)
 
