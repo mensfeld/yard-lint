@@ -22,8 +22,8 @@ module Yard
         #       - 'to_s'           # Excludes ALL to_s methods regardless of parameters
         #       - 'inspect'        # Excludes ALL inspect methods
         #
-        # Note: Exact name matching excludes the method with **any arity**. If you need
-        # arity-specific exclusions, use arity notation instead.
+        # @note Exact name matching excludes the method with **any arity**. If you need
+        #   arity-specific exclusions, use arity notation instead.
         #
         # ### 2. Arity Notation (method_name/N)
         #
@@ -34,8 +34,8 @@ module Yard
         #       - 'call/1'         # Only excludes call methods with exactly 1 parameter
         #       - 'initialize/2'   # Only excludes initialize with exactly 2 parameters
         #
-        # Note: Arity counts total parameters (required + optional) excluding splat (*)
-        # and block (&) parameters.
+        # @note Arity counts total parameters (required + optional) excluding splat (*)
+        #   and block (&) parameters.
         #
         # ### 3. Regex Patterns
         #

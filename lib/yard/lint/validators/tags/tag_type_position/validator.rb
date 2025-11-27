@@ -9,7 +9,7 @@ module Yard
           # YARD standard (type_after_name): @param name [String] description
           # Alternative (type_first): @param name [String] description
           #
-          # Note: @return tags are not checked as they don't have parameter names
+          # @note @return tags are not checked as they don't have parameter names
           class Validator < Base
             # Enable in-process execution
             in_process visibility: :public
