@@ -21,6 +21,8 @@ module Yard
 
               articles = config_articles
               generic_terms = config_generic_terms.map(&:downcase)
+              connectors = config_low_value_connectors.map(&:downcase)
+              low_value_verbs = config_low_value_verbs.map(&:downcase)
               max_words = config_max_redundant_words
               tags_to_check = config_checked_tags
               patterns = config_enabled_patterns
@@ -38,7 +40,7 @@ module Yard
 
                 pattern_type = detect_pattern(
                   param_name, description, type_name, word_count,
-                  articles, generic_terms, patterns
+                  articles, generic_terms, connectors, low_value_verbs, patterns
                 )
 
                 next unless pattern_type
@@ -58,10 +60,12 @@ module Yard
             # @param word_count [Integer] number of words in description
             # @param articles [Array<String>] article words
             # @param generic_terms [Array<String>] generic terms
+            # @param connectors [Array<String>] low-value connectors
+            # @param low_value_verbs [Array<String>] low-value verbs
             # @param patterns [Hash] enabled pattern flags
             # @return [String, nil] pattern type or nil
             # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/ParameterLists
-            def detect_pattern(param_name, description, type_name, word_count, articles, generic_terms, patterns)
+            def detect_pattern(param_name, description, type_name, word_count, articles, generic_terms, connectors, low_value_verbs, patterns)
               desc_parts = description.split
               articles_re = /^(#{articles.join('|')})/i
 
@@ -120,6 +124,16 @@ module Yard
                 end
               end
 
+              # ArticleParamPhrase pattern: "The action being performed"
+              if patterns['ArticleParamPhrase'] && word_count >= 3 && desc_parts.length >= 3
+                if desc_parts[0].match?(articles_re) &&
+                   desc_parts[1].downcase == param_name.downcase &&
+                   connectors.include?(desc_parts[2].downcase) &&
+                   (desc_parts.length == 3 || low_value_verbs.include?(desc_parts[3].downcase))
+                  return 'article_param_phrase'
+                end
+              end
+
               nil
             end
             # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/ParameterLists
@@ -134,6 +148,16 @@ module Yard
             # @return [Array<String>] configured generic terms to check
             def config_generic_terms
               config_or_default('GenericTerms')
+            end
+
+            # @return [Array<String>] configured low-value connectors
+            def config_low_value_connectors
+              config_or_default('LowValueConnectors')
+            end
+
+            # @return [Array<String>] configured low-value verbs
+            def config_low_value_verbs
+              config_or_default('LowValueVerbs')
             end
 
             # @return [Integer] maximum word count for redundant descriptions

@@ -135,6 +135,25 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Messages
       end
     end
 
+    context 'with article_param_phrase pattern' do
+      let(:offense) do
+        {
+          tag_name: 'param',
+          param_name: 'action',
+          description: 'The action being performed',
+          pattern_type: 'article_param_phrase'
+        }
+      end
+
+      it 'returns message about filler phrase' do
+        message = described_class.call(offense)
+        expect(message).to include('filler phrase')
+        expect(message).to include('adds no value')
+        expect(message).to include('The action being performed')
+        expect(message).to include('specific purpose of action')
+      end
+    end
+
     context 'with unknown pattern type' do
       let(:offense) do
         {
@@ -210,6 +229,7 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Messages
         patterns = %w[
           article_param possessive_param type_restatement
           param_to_verb id_pattern directional_date type_generic
+          article_param_phrase
         ]
 
         patterns.each do |pattern|
@@ -228,6 +248,7 @@ RSpec.describe Yard::Lint::Validators::Tags::RedundantParamDescription::Messages
         patterns = %w[
           article_param possessive_param type_restatement
           param_to_verb id_pattern directional_date type_generic
+          article_param_phrase
         ]
 
         patterns.each do |pattern|
