@@ -8,6 +8,15 @@
   - Extracted `discover_ruby_files` method for better separation of concerns
   - Added `determine_base_dir`, `excluded_file?`, `relative_path_from`, and `match_path?` helper methods
   - Comprehensive integration tests in `spec/integrations/global_exclusions_spec.rb`
+- **[Enhancement]** Make PATH argument optional, defaulting to current directory (like RuboCop)
+  - Running `yard-lint` without arguments now lints the current directory
+  - Maintains backward compatibility with explicit path arguments
+  - Updated help text and examples to show default behavior
+- **[Fix]** Respect per-validator `YardOptions` when filtering by visibility (#41)
+  - Executor was ignoring `YardOptions` defined on individual validators
+  - Specifying `YardOptions` on a specific validator now correctly overrides `AllValidators` defaults
+  - Enables use cases like validating tag order on private methods, but skipping documentation requirement
+  - Example: Set `--private` in `AllValidators.YardOptions`, then override with empty `YardOptions: []` on `Documentation/UndocumentedObjects` to skip private methods or constants
 - **[Feature]** Add in-process YARD execution for ~10x faster performance
   - Parses files once and shares the YARD registry across all validators
   - Eliminates subprocess spawning overhead (previously spawned 17+ processes per run)
@@ -213,7 +222,7 @@
 - [Change] YARD database directories are now created under a base temp directory with unique subdirectories per argument set.
 
 ## 0.2.1 (2025-11-07)
-- Release to validate Trusted Publishing flow. 
+- Release to validate Trusted Publishing flow.
 
 ## 0.2.0 (2025-11-07)
 
