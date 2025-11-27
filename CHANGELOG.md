@@ -95,6 +95,14 @@
 - **[CI]** Add macOS testing to CI workflow
   - Tests Ruby 3.4 on macOS to validate BSD/POSIX compatibility
 - **[CI]** Add parallel_tests gem to run specs in parallel for faster CI execution
+- **[Feature]** Add `ArticleParamPhrase` pattern to `Tags/RedundantParamDescription` validator (#32)
+  - Detects filler phrases like "The action being performed" or "A callback to invoke"
+  - Matches pattern: `<Article> <param_name> <connector> [<low_value_verb>...]`
+  - Configurable `LowValueConnectors` list (default: being, to, that, which, for)
+  - Configurable `LowValueVerbs` list (default: perform, process, use, handle, act, pass, invoke, call, execute, run)
+  - Enabled by default via `EnabledPatterns.ArticleParamPhrase`
+  - Pattern-specific error message explaining the filler phrase adds no value
+  - Comprehensive test coverage with fixtures and integration tests
 
 ## 1.2.3 (2025-11-13)
 - **[Feature]** Add per-validator exclusion support for fine-grained file filtering

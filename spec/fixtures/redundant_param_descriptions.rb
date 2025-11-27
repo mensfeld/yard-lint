@@ -41,6 +41,14 @@ class RedundantParamFixtures
   # @param data [Hash] Hash data
   def type_generic_redundant(payment, data); end
 
+  # Pattern 8: Article + param + connector + verb (filler phrase)
+  # @param action [Symbol] The action being performed
+  # @param callback [Proc] A callback to invoke
+  # @param data [Hash] The data being passed
+  # @param user [User] The user to handle
+  # @param request [Request] The request being processed
+  def article_param_phrase_redundant(action, callback, data, user, request); end
+
   # VALID EXAMPLES - Should NOT be flagged
 
   # Long, meaningful descriptions
@@ -75,4 +83,15 @@ class RedundantParamFixtures
   # @param value [Integer] the maximum retry count value
   # @param config [Hash] application level configuration data
   def at_threshold_but_meaningful(value, config); end
+
+  # Pattern 8 valid: Article + param + connector but meaningful continuation
+  # @param action [Symbol] The action that determines which options to show
+  # @param callback [Proc] A callback to invoke after completion with results
+  # @param data [Hash] The data containing user configuration for display
+  def article_param_phrase_but_meaningful(action, callback, data); end
+
+  # Pattern 8 valid: Similar structure but not matching pattern
+  # @param action [Symbol] Determines which behavior to use
+  # @param callback [Proc] Invoked after the request completes
+  def similar_but_no_article_param(action, callback); end
 end

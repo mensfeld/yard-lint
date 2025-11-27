@@ -48,6 +48,11 @@ module Yard
                 'The @' + tag_name + ' description \'' + description + '\' just combines type and generic terms. ' \
                 'Consider removing it or providing specific details about this ' + param_name + '.'
 
+              when 'article_param_phrase'
+                'The @' + tag_name + ' description \'' + description + '\' is a filler phrase that adds no value ' \
+                'beyond the parameter name. ' \
+                'Consider removing it or explaining the specific purpose of ' + param_name + '.'
+
               else
                 'The @' + tag_name + ' description \'' + description + '\' appears redundant. ' \
                 'Consider providing a meaningful description or omitting it entirely.'
