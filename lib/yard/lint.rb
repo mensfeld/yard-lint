@@ -61,6 +61,9 @@ module Yard
       # @param config [Yard::Lint::Config] configuration object
       # @return [Array<String>] array of absolute file paths
       def get_diff_files(diff, path, config)
+        # Determine the base directory for relative path calculations
+        base_dir = determine_base_dir(path)
+
         # Get changed files from git based on mode
         git_files = case diff[:mode]
                     when :ref
@@ -74,11 +77,7 @@ module Yard
                     end
 
         # Apply exclusion patterns
-        git_files.reject do |file|
-          config.exclude.any? do |pattern|
-            File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
-          end
-        end
+        git_files.reject { |file| excluded_file?(file, config.exclude, base_dir) }
       end
 
       # Expand path/glob patterns into an array of files
@@ -86,6 +85,22 @@ module Yard
       # @param config [Yard::Lint::Config] configuration object
       # @return [Array<String>] array of absolute file paths
       def expand_path(path, config)
+        # Determine the base directory for relative path calculations
+        base_dir = determine_base_dir(path)
+
+        files = discover_ruby_files(path)
+
+        # Convert to absolute paths for YARD
+        files = files.map { |file| File.expand_path(file) }
+
+        # Filter out excluded files
+        files.reject { |file| excluded_file?(file, config.exclude, base_dir) }
+      end
+
+      # Discover Ruby files from path/glob patterns
+      # @param path [String, Array<String>] path or array of paths
+      # @return [Array<String>] array of discovered Ruby file paths
+      def discover_ruby_files(path)
         files = Array(path).flat_map do |p|
           if p.include?('*')
             Dir.glob(p)
@@ -96,17 +111,56 @@ module Yard
           end
         end
 
-        files = files.select { |f| File.file?(f) && f.end_with?('.rb') }
+        files.select { |file| File.file?(file) && file.end_with?('.rb') }
+      end
 
-        # Convert to absolute paths for YARD
-        files = files.map { |f| File.expand_path(f) }
+      # Determine base directory for relative path calculations
+      # @param path [String, Array<String>] path or array of paths
+      # @return [String] absolute base directory path
+      def determine_base_dir(path)
+        first_path = Array(path).first
+        return Dir.pwd unless first_path
 
-        # Filter out excluded files
-        files.reject do |file|
-          config.exclude.any? do |pattern|
-            File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
-          end
+        absolute_path = File.expand_path(first_path)
+        File.directory?(absolute_path) ? absolute_path : File.dirname(absolute_path)
+      end
+
+      # Check if a file matches any exclusion pattern
+      # Patterns are matched against both absolute and relative paths
+      # @param file [String] absolute file path
+      # @param patterns [Array<String>] exclusion patterns
+      # @param base_dir [String] base directory for relative path calculation
+      # @return [Boolean] true if file should be excluded
+      def excluded_file?(file, patterns, base_dir)
+        relative_path = relative_path_from(file, base_dir)
+
+        patterns.any? do |pattern|
+          match_path?(pattern, file, relative_path)
         end
+      end
+
+      # Calculate relative path from base directory
+      # @param file [String] absolute file path
+      # @param base_dir [String] base directory
+      # @return [String] relative path
+      def relative_path_from(file, base_dir)
+        if file.start_with?("#{base_dir}/")
+          file.sub("#{base_dir}/", '')
+        else
+          file
+        end
+      end
+
+      # Check if a pattern matches a file path
+      # Tries matching against both relative and absolute paths
+      # @param pattern [String] glob pattern
+      # @param absolute_path [String] absolute file path
+      # @param relative_path [String] relative file path
+      # @return [Boolean] true if pattern matches
+      def match_path?(pattern, absolute_path, relative_path)
+        flags = File::FNM_PATHNAME | File::FNM_EXTGLOB
+
+        File.fnmatch(pattern, relative_path, flags) || File.fnmatch(pattern, absolute_path, flags)
       end
     end
   end
