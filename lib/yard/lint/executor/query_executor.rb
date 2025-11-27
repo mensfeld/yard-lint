@@ -80,19 +80,27 @@ module Yard
 
         # Determine visibility setting based on validator and config
         # If config has --private or --protected in YardOptions, use :all
+        # If config explicitly sets empty YardOptions, use :public (override validator default)
         # Otherwise use the validator's declared visibility
         # @param validator [Validators::Base] validator instance
         # @return [Symbol] visibility setting (:public or :all)
         def determine_visibility(validator)
-          # Check if config specifies private/protected analysis
-          if validator.config
-            yard_options = validator.config.all_validators['YardOptions'] || []
-            if yard_options.any? { |opt| opt.include?('--private') || opt.include?('--protected') }
-              return :all
-            end
+          return validator.class.in_process_visibility || :public unless validator.config
+
+          validator_name = validator.class.validator_name
+          yard_options = validator.config.validator_yard_options(validator_name)
+
+          # If YardOptions contains --private or --protected, use :all visibility
+          if yard_options.any? { |opt| opt.include?('--private') || opt.include?('--protected') }
+            return :all
           end
 
-          # Fall back to validator's declared visibility
+          # Check if validator has explicit YardOptions set in config
+          # If explicitly set (even to empty), respect that choice and use :public
+          validator_cfg = validator.config.validators[validator_name] || {}
+          return :public if validator_cfg.key?('YardOptions')
+
+          # No explicit YardOptions - fall back to validator's declared visibility
           validator.class.in_process_visibility || :public
         end
       end

@@ -226,6 +226,69 @@ RSpec.describe 'Per-validator file exclusions', :integration, type: :feature do
     end
   end
 
+  describe 'private constants: enforce tag order but allow undocumented' do
+    it 'checks tag order on documented private methods but ignores undocumented ones' do
+      files = [
+        File.join(fixtures_dir, 'private_constants.rb')
+      ]
+
+      # Configuration that:
+      # 1. Includes private methods in YARD parsing (--private)
+      # 2. Excludes private methods from documentation validators (YardOptions is empty)
+      # 3. Still checks tag order on private methods (if they have docs)
+      config = Yard::Lint::Config.new(
+        {
+          'AllValidators' => {
+            'YardOptions' => ['--private'],
+            'Exclude' => []
+          },
+          # Don't require documentation on private constants
+          'Documentation/UndocumentedObjects' => {
+            'Enabled' => true,
+            'YardOptions' => [],
+            'Exclude' => []
+          },
+          # But DO enforce tag order if private methods have docs
+          'Tags/Order' => {
+            'Enabled' => true,
+            'Exclude' => []
+          }
+        }
+      )
+
+      runner = Yard::Lint::Runner.new(files, config)
+      result = runner.run
+
+      # Should NOT complain about undocumented private methods
+      undoc_object_offenses = result.offenses.select { |o| o[:name] == 'UndocumentedObject' && o[:element] != "AnsiHelper#red" }
+      undoc_arg_offenses = result.offenses.select { |o| o[:name] == 'UndocumentedMethodArgument' && o[:method_name] != "red" }
+
+      expect(undoc_object_offenses).to be_empty
+      expect(undoc_arg_offenses).to be_empty
+
+      # Should complain about undocumented public methods
+      undoc_public_object_offenses = result.offenses.select { |o| o[:name] == 'UndocumentedObject' }
+
+      expect(undoc_public_object_offenses).not_to be_empty
+      expect(undoc_public_object_offenses.first[:element]).to eq("AnsiHelper#red")
+
+      # But SHOULD enforce tag order on documented private methods
+      tag_order_offenses = result.offenses.select { |o| o[:name] == 'InvalidTagOrder' }
+
+      expect(tag_order_offenses).not_to be_empty
+
+      # Verify it found the wrong order in documented_private_wrong_order
+      # Check that at least one offense is from private_methods.rb
+      private_methods_offense = tag_order_offenses.find do |o|
+        o[:location].include?('private_constants.rb')
+      end
+
+      expect(private_methods_offense).not_to be_nil
+      # The offense should be about documented_private_wrong_order method
+      expect(private_methods_offense[:method_name]).to eq('colorize')
+    end
+  end
+
   describe 'protected methods: enforce tag order but allow undocumented' do
     it 'checks tag order on documented protected methods but ignores undocumented ones' do
       files = [
