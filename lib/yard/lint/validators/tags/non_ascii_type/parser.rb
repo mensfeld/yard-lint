@@ -4,22 +4,21 @@ module Yard
   module Lint
     module Validators
       module Tags
-        module TypeSyntax
-          # Parser for TypeSyntax validator output
-          # Parses YARD query output that reports type syntax errors
+        module NonAsciiType
+          # Parser for NonAsciiType validator output
+          # Parses output that reports non-ASCII characters in type specifications
           class Parser < ::Yard::Lint::Parsers::Base
-            # Parses YARD output and extracts type syntax violations
+            # Parses validator output and extracts non-ASCII type violations
             # Expected format (two lines per violation):
             #   file.rb:LINE: ClassName#method_name
-            #   tag_name|type_string|error_message
-            # @param yard_output [String] raw YARD query results
+            #   tag_name|type_string|character|codepoint
+            # @param yard_output [String] raw validator query results
             # @option _kwargs [Object] :unused this parameter accepts no options (reserved for future use)
             # @return [Array<Hash>] array with violation details
             def call(yard_output, **_kwargs)
               return [] if yard_output.nil?
 
-              # Handle encoding issues from YARD output that may contain invalid UTF-8 sequences
-              # This can happen when YARD processes files with non-ASCII characters in type specs
+              # Handle potential encoding issues
               sanitized = yard_output.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
               return [] if sanitized.strip.empty?
 
@@ -33,11 +32,11 @@ module Yard
                 location_match = location_line.match(/^(.+):(\d+): (.+)$/)
                 next unless location_match
 
-                # Parse details: "tag_name|type_string|error_message"
-                details = details_line.split('|', 3)
-                next unless details.size == 3
+                # Parse details: "tag_name|type_string|character|codepoint"
+                details = details_line.split('|', 4)
+                next unless details.size == 4
 
-                tag_name, type_string, error_message = details
+                tag_name, type_string, character, codepoint = details
 
                 violations << {
                   location: location_match[1],
@@ -45,7 +44,8 @@ module Yard
                   method_name: location_match[3],
                   tag_name: tag_name,
                   type_string: type_string,
-                  error_message: error_message
+                  character: character,
+                  codepoint: codepoint
                 }
               end
 
