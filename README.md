@@ -35,6 +35,7 @@ YARD-Lint validates your YARD documentation for:
 - **Example code syntax validation**: Validates Ruby syntax in `@example` tags to catch broken code examples
 - **Redundant parameter descriptions**: Detects meaningless parameter descriptions that add no value (e.g., `@param user [User] The user`)
 - **Empty comment lines**: Detects unnecessary empty `#` lines at the start or end of documentation blocks
+- **Informal notation patterns**: Detects `Note:`, `TODO:`, `See:` etc. and suggests proper YARD tags (`@note`, `@todo`, `@see`)
 - **YARD warnings**: Unknown tags, invalid directives, duplicated parameter names, and more
 - **Smart suggestions**: Provides "did you mean" suggestions for typos in parameter names using Ruby's `did_you_mean` gem with Levenshtein distance fallback
 
@@ -523,6 +524,7 @@ Supported glob patterns:
 | `Tags/OptionTags` | Requires `@option` tags for methods with options parameters | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Tags/ExampleSyntax` | Validates Ruby syntax in `@example` tags to catch broken code examples | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Tags/RedundantParamDescription` | Detects meaningless parameter descriptions that add no value beyond the parameter name | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `Articles`, `MaxRedundantWords`, `MinMeaningfulLength`, `GenericTerms`, `EnabledPatterns` |
+| `Tags/InformalNotation` | Detects informal notation patterns (`Note:`, `TODO:`, etc.) and suggests proper YARD tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `CaseSensitive`, `RequireStartOfLine`, `Patterns` |
 | **Warnings Validators** |
 | `Warnings/UnknownTag` | Detects unknown YARD tags with "did you mean" suggestions | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
 | `Warnings/UnknownDirective` | Detects unknown YARD directives | Enabled (error) | `Enabled`, `Severity`, `Exclude` |

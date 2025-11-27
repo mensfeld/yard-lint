@@ -1,6 +1,14 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Feature]** Add `Tags/InformalNotation` validator to detect informal notation patterns in documentation (#33)
+  - Detects patterns like `Note:`, `TODO:`, `See:`, `Warning:`, `Deprecated:` and suggests proper YARD tags
+  - Suggests appropriate replacements: `@note`, `@todo`, `@see`, `@deprecated`, `@author`, `@version`, etc.
+  - Skips patterns inside fenced code blocks to avoid false positives
+  - Case-insensitive matching by default (configurable via `CaseSensitive`)
+  - Start-of-line matching by default (configurable via `RequireStartOfLine`)
+  - Fully configurable pattern mappings via `Patterns` option
+  - Enabled by default with 'warning' severity
 - **[Feature]** Add `Tags/NonAsciiType` validator to detect non-ASCII characters in YARD type specifications (#39)
   - Ruby type names must be valid Ruby identifiers (ASCII only)
   - Detects characters like `…` (U+2026), `→` (U+2192), `—` (U+2014) in type specs
