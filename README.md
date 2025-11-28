@@ -215,6 +215,21 @@ jobs:
 - Works with diff mode to enforce coverage only on changed files
 - Performance optimized with auto-cleanup temp directories for large codebases
 
+### Running Specific Validators
+
+Run only specific validators using the `--only` option - useful for debugging, gradual adoption, or focused CI checks:
+
+```bash
+# Run only one validator
+yard-lint --only Tags/TypeSyntax lib/
+
+# Run multiple validators (comma-separated)
+yard-lint --only Tags/Order,Tags/TypeSyntax lib/
+
+# Combine with other options
+yard-lint --only Documentation/UndocumentedObjects --diff main lib/
+```
+
 ## Configuration
 
 YARD-Lint is configured via a `.yard-lint.yml` configuration file (similar to `.rubocop.yml`).
@@ -670,6 +685,7 @@ Options:
       --diff [REF]        Lint only files changed since REF
       --staged            Lint only staged files
       --changed           Lint only uncommitted files
+      --only VALIDATORS   Run only specified validators (comma-separated)
       --init              Generate .yard-lint.yml config file
       --strict            Generate strict config (use with --init)
       --force             Force overwrite when using --init
