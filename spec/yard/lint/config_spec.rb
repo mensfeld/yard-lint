@@ -271,10 +271,10 @@ RSpec.describe Yard::Lint::Config do
   end
 
   describe '#only_validators' do
-    it 'defaults to nil' do
+    it 'defaults to empty array' do
       config = described_class.new
 
-      expect(config.only_validators).to be_nil
+      expect(config.only_validators).to eq([])
     end
 
     it 'can be set to a list of validators' do
@@ -303,16 +303,8 @@ RSpec.describe Yard::Lint::Config do
       expect(config.validator_enabled?('Tags/TypeSyntax')).to be true
     end
 
-    it 'uses normal enabled logic when only_validators is nil' do
-      config = described_class.new({ 'Tags/TypeSyntax' => { 'Enabled' => false } })
-
-      expect(config.validator_enabled?('Tags/TypeSyntax')).to be false
-      expect(config.validator_enabled?('Tags/Order')).to be true
-    end
-
     it 'uses normal enabled logic when only_validators is empty' do
       config = described_class.new({ 'Tags/TypeSyntax' => { 'Enabled' => false } })
-      config.only_validators = []
 
       expect(config.validator_enabled?('Tags/TypeSyntax')).to be false
       expect(config.validator_enabled?('Tags/Order')).to be true
