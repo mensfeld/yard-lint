@@ -118,7 +118,7 @@ module Yard
       end
 
       # Validate that a path exists
-      # @param path [String] path to validate
+      # @param path [String] file or directory path to check for existence
       # @raise [Errors::FileNotFoundError] if path does not exist
       def validate_path_exists!(path)
         return if File.exist?(path)
