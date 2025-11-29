@@ -35,6 +35,7 @@ YARD-Lint validates your YARD documentation for:
 - **Example code syntax validation**: Validates Ruby syntax in `@example` tags to catch broken code examples
 - **Redundant parameter descriptions**: Detects meaningless parameter descriptions that add no value (e.g., `@param user [User] The user`)
 - **Empty comment lines**: Detects unnecessary empty `#` lines at the start or end of documentation blocks
+- **Blank lines before definitions**: Detects blank lines between YARD documentation and method/class/module definitions (single blank line = convention violation, 2+ blank lines = orphaned documentation that YARD ignores)
 - **Informal notation patterns**: Detects `Note:`, `TODO:`, `See:` etc. and suggests proper YARD tags (`@note`, `@todo`, `@see`)
 - **YARD warnings**: Unknown tags, invalid directives, duplicated parameter names, and more
 - **Smart suggestions**: Provides "did you mean" suggestions for typos in parameter names using Ruby's `did_you_mean` gem with Levenshtein distance fallback
@@ -527,6 +528,7 @@ Supported glob patterns:
 | `Documentation/UndocumentedOptions` | Detects methods with options hash/kwargs parameters but no `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Documentation/MarkdownSyntax` | Detects common markdown syntax errors in documentation (unclosed backticks, invalid list markers, etc.) | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Documentation/EmptyCommentLine` | Detects empty `#` lines at the start or end of documentation blocks | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnabledPatterns` |
+| `Documentation/BlankLineBeforeDefinition` | Detects blank lines between documentation and definitions (single blank = convention violation, 2+ blank = orphaned docs) | Enabled (convention) | `Enabled`, `Severity`, `OrphanedSeverity`, `Exclude`, `EnabledPatterns` |
 | **Tags Validators** |
 | `Tags/Order` | Enforces consistent ordering of YARD tags | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnforcedOrder` |
 | `Tags/InvalidTypes` | Validates type definitions in `@param`, `@return`, `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags`, `ExtraTypes` |

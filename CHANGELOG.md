@@ -110,6 +110,14 @@
   - Provides "did you mean" suggestions for typos using Ruby's `did_you_mean` gem
   - Lists all available validators when unknown validator is specified
   - Requires exact validator names (case-sensitive, full path like `Tags/Order`)
+- **[Feature]** Add `Documentation/BlankLineBeforeDefinition` validator to detect blank lines between YARD documentation and definitions (#30)
+  - Detects single blank line violations where YARD still associates docs but violates conventions
+  - Detects orphaned documentation (2+ blank lines) where YARD completely ignores the documentation
+  - Works with methods, classes, and modules
+  - Configurable `EnabledPatterns` to check only single blank lines, only orphaned docs, or both
+  - Separate `Severity` and `OrphanedSeverity` configuration options for different violation types
+  - Respects `--private` and `--protected` YardOptions for visibility filtering
+  - Enabled by default with 'convention' severity for both violation types
 
 ## 1.2.3 (2025-11-13)
 - **[Feature]** Add per-validator exclusion support for fine-grained file filtering
