@@ -158,6 +158,9 @@ begin
 rescue Yard::Lint::Git::Error => e
   puts "Git error: #{e.message}"
   exit 1
+rescue Yard::Lint::Errors::FileNotFoundError => e
+  puts "Error: #{e.message}"
+  exit 1
 end
 
 # Format and display results

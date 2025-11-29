@@ -369,10 +369,10 @@ RSpec.describe 'Yard::Lint Integration Tests' do
   end
 
   describe 'Error Handling' do
-    it 'handles non-existent files gracefully' do
+    it 'raises FileNotFoundError for non-existent files' do
       expect do
         Yard::Lint.run(path: '/nonexistent/file.rb')
-      end.not_to raise_error
+      end.to raise_error(Yard::Lint::Errors::FileNotFoundError, 'No such file or directory: /nonexistent/file.rb')
     end
 
     it 'handles empty file lists gracefully' do

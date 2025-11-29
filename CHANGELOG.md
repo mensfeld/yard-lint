@@ -110,6 +110,11 @@
   - Provides "did you mean" suggestions for typos using Ruby's `did_you_mean` gem
   - Lists all available validators when unknown validator is specified
   - Requires exact validator names (case-sensitive, full path like `Tags/Order`)
+- **[Fix]** Fix yard-lint silently returning "No offenses found" for non-existent file paths
+  - Previously, specifying a non-existent path would silently succeed with empty results
+  - Now raises `Errors::FileNotFoundError` with clear message: "No such file or directory: /path"
+  - Matches behavior of similar tools like RuboCop
+  - Only validates explicit file paths (glob patterns and directories are not affected)
 
 ## 1.2.3 (2025-11-13)
 - **[Feature]** Add per-validator exclusion support for fine-grained file filtering

@@ -15,6 +15,9 @@ module Yard
 
       # Raised when an unknown validator name is specified via --only
       class UnknownValidatorError < BaseError; end
+
+      # Raised when a specified file or directory does not exist
+      class FileNotFoundError < BaseError; end
     end
   end
 end
