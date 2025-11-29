@@ -50,6 +50,9 @@ module Yard
                 if stripped.empty?
                   blank_count += 1
                 elsif stripped.start_with?('#')
+                  # Skip Ruby magic comments - they're not YARD documentation
+                  next if magic_comment?(stripped)
+
                   has_doc_block = true
                   break
                 else
@@ -59,6 +62,14 @@ module Yard
               end
 
               [blank_count, has_doc_block]
+            end
+
+            # Check if a comment line is a Ruby magic comment
+            # @param line [String] stripped comment line
+            # @return [Boolean] true if line is a magic comment
+            def magic_comment?(line)
+              # Ruby magic comments: frozen_string_literal, encoding, warn_indent, shareable_constant_value
+              line.match?(/^#\s*(frozen[_-]string[_-]literal|encoding|warn[_-]indent|shareable[_-]constant[_-]value)\s*:/i)
             end
 
             # Check if the given pattern is enabled in configuration
