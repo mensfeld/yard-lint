@@ -101,6 +101,7 @@ module Yard
       # Discover Ruby files from path/glob patterns
       # @param path [String, Array<String>] path or array of paths
       # @return [Array<String>] array of discovered Ruby file paths
+      # @raise [Errors::FileNotFoundError] if a specified path does not exist
       def discover_ruby_files(path)
         files = Array(path).flat_map do |p|
           if p.include?('*')
@@ -108,11 +109,21 @@ module Yard
           elsif File.directory?(p)
             Dir.glob(File.join(p, '**/*.rb'))
           else
+            validate_path_exists!(p)
             p
           end
         end
 
         files.select { |file| File.file?(file) && file.end_with?('.rb') }
+      end
+
+      # Validate that a path exists
+      # @param path [String] file or directory path to check for existence
+      # @raise [Errors::FileNotFoundError] if path does not exist
+      def validate_path_exists!(path)
+        return if File.exist?(path)
+
+        raise Errors::FileNotFoundError, "No such file or directory: #{path}"
       end
 
       # Determine base directory for relative path calculations
