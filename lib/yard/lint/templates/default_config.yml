@@ -195,6 +195,21 @@ Tags/InformalNotation:
   Severity: warning
   CaseSensitive: false
   RequireStartOfLine: true
+  Patterns:
+    Note: '@note'
+    Todo: '@todo'
+    TODO: '@todo'
+    FIXME: '@todo'
+    See: '@see'
+    See also: '@see'
+    Warning: '@deprecated'
+    Deprecated: '@deprecated'
+    Author: '@author'
+    Version: '@version'
+    Since: '@since'
+    Returns: '@return'
+    Raises: '@raise'
+    Example: '@example'
 
 Tags/NonAsciiType:
   Description: 'Detects non-ASCII characters in type annotations.'
