@@ -65,6 +65,15 @@ Documentation/EmptyCommentLine:
     Leading: true
     Trailing: true
 
+Documentation/BlankLineBeforeDefinition:
+  Description: 'Detects blank lines between YARD documentation and method definition.'
+  Enabled: true
+  Severity: convention
+  OrphanedSeverity: convention
+  EnabledPatterns:
+    SingleBlankLine: true
+    OrphanedDocs: true
+
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'
@@ -143,6 +152,60 @@ Tags/OptionTags:
   Description: 'Requires @option tags for methods with options parameters.'
   Enabled: true
   Severity: warning
+
+Tags/ExampleSyntax:
+  Description: 'Validates Ruby syntax in @example tags.'
+  Enabled: true
+  Severity: warning
+
+Tags/RedundantParamDescription:
+  Description: 'Detects meaningless parameter descriptions that add no value.'
+  Enabled: true
+  Severity: convention
+  CheckedTags:
+    - param
+    - option
+  Articles:
+    - The
+    - the
+    - A
+    - a
+    - An
+    - an
+  MaxRedundantWords: 6
+  GenericTerms:
+    - object
+    - instance
+    - value
+    - data
+    - item
+    - element
+  EnabledPatterns:
+    ArticleParam: true
+    PossessiveParam: true
+    TypeRestatement: true
+    ParamToVerb: true
+    IdPattern: true
+    DirectionalDate: true
+    TypeGeneric: true
+
+Tags/InformalNotation:
+  Description: 'Detects informal tag notation patterns like "Note:" instead of @note.'
+  Enabled: true
+  Severity: warning
+  CaseSensitive: false
+  RequireStartOfLine: true
+
+Tags/NonAsciiType:
+  Description: 'Detects non-ASCII characters in type annotations.'
+  Enabled: true
+  Severity: warning
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+    - yieldparam
 
 # Warnings validators - catches YARD parser errors
 Warnings/UnknownTag:

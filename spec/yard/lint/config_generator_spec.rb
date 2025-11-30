@@ -44,36 +44,16 @@ RSpec.describe Yard::Lint::ConfigGenerator do
         expect(content).to include('FailOnSeverity: warning')
       end
 
-      it 'creates file with all validator configurations' do
+      it 'creates file with all discovered validator configurations' do
         described_class.generate
 
         content = File.read(config_path)
 
-        # Documentation validators
-        expect(content).to include('Documentation/UndocumentedObjects:')
-        expect(content).to include('Documentation/UndocumentedMethodArguments:')
-        expect(content).to include('Documentation/UndocumentedBooleanMethods:')
-
-        # Tags validators
-        expect(content).to include('Tags/Order:')
-        expect(content).to include('Tags/InvalidTypes:')
-        expect(content).to include('Tags/TypeSyntax:')
-        expect(content).to include('Tags/MeaninglessTag:')
-        expect(content).to include('Tags/CollectionType:')
-        expect(content).to include('Tags/TagTypePosition:')
-        expect(content).to include('Tags/ApiTags:')
-        expect(content).to include('Tags/OptionTags:')
-
-        # Warnings validators
-        expect(content).to include('Warnings/UnknownTag:')
-        expect(content).to include('Warnings/UnknownDirective:')
-        expect(content).to include('Warnings/InvalidTagFormat:')
-        expect(content).to include('Warnings/InvalidDirectiveFormat:')
-        expect(content).to include('Warnings/DuplicatedParameterName:')
-        expect(content).to include('Warnings/UnknownParameterName:')
-
-        # Semantic validators
-        expect(content).to include('Semantic/AbstractMethods:')
+        # Dynamically check all validators from ConfigLoader
+        Yard::Lint::ConfigLoader::ALL_VALIDATORS.each do |validator_name|
+          expect(content).to include("#{validator_name}:"),
+            "Expected config to include #{validator_name}"
+        end
       end
 
       it 'creates file with default exclusions' do

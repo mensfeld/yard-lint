@@ -58,6 +58,15 @@ Documentation/EmptyCommentLine:
     Leading: true
     Trailing: true
 
+Documentation/BlankLineBeforeDefinition:
+  Description: 'Detects blank lines between YARD documentation and method definition.'
+  Enabled: true
+  Severity: convention
+  OrphanedSeverity: convention
+  EnabledPatterns:
+    SingleBlankLine: true
+    OrphanedDocs: true
+
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'
@@ -179,6 +188,39 @@ Tags/RedundantParamDescription:
     IdPattern: true           # "ID of the treatment" for *_id params
     DirectionalDate: true     # "from this date" for from/to/till
     TypeGeneric: true         # "Payment object", "Hash data"
+
+Tags/InformalNotation:
+  Description: 'Detects informal tag notation patterns like "Note:" instead of @note.'
+  Enabled: true
+  Severity: warning
+  CaseSensitive: false
+  RequireStartOfLine: true
+  Patterns:
+    Note: '@note'
+    Todo: '@todo'
+    TODO: '@todo'
+    FIXME: '@todo'
+    See: '@see'
+    See also: '@see'
+    Warning: '@deprecated'
+    Deprecated: '@deprecated'
+    Author: '@author'
+    Version: '@version'
+    Since: '@since'
+    Returns: '@return'
+    Raises: '@raise'
+    Example: '@example'
+
+Tags/NonAsciiType:
+  Description: 'Detects non-ASCII characters in type annotations.'
+  Enabled: true
+  Severity: warning
+  ValidatedTags:
+    - param
+    - option
+    - return
+    - yieldreturn
+    - yieldparam
 
 # Warnings validators - catches YARD parser errors
 Warnings/UnknownTag:
