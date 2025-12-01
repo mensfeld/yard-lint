@@ -1,6 +1,12 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Feature]** Add `Tags/TagGroupSeparator` validator to enforce blank line separators between different YARD tag groups (#29)
+  - Enforces visual separation between semantically different tag groups (e.g., `@param` tags should be separated from `@return` tags by a blank line)
+  - Configurable tag groups: param (param, option), return (return), error (raise, throws), example (example), meta (see, note, todo, deprecated, since, version, api), yield (yield, yieldparam, yieldreturn)
+  - Optional `RequireAfterDescription` setting to require blank line between description and first tag
+  - Unknown tags are treated as their own group (require separator from known groups)
+  - Disabled by default (opt-in validator) with 'convention' severity
 - **[Feature]** Add `Tags/InformalNotation` validator to detect informal notation patterns in documentation (#33)
   - Detects patterns like `Note:`, `TODO:`, `See:`, `Warning:`, `Deprecated:` and suggests proper YARD tags
   - Suggests appropriate replacements: `@note`, `@todo`, `@see`, `@deprecated`, `@author`, `@version`, etc.

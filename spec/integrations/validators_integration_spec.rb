@@ -567,6 +567,194 @@ RSpec.describe 'Yard::Lint Validators' do
     end
   end
 
+  describe 'Tag Group Separator Validation' do
+    context 'when tag_group_separator is enabled' do
+      let(:config) do
+        test_config do |c|
+          c.set_validator_config('Tags/TagGroupSeparator', 'Enabled', true)
+        end
+      end
+
+      it 'runs tag group separator validation' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+        expect(separator_offenses).not_to be_empty
+        expect(result).to respond_to(:offenses)
+      end
+
+      it 'detects missing separator between param and return' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        param_return_offenses = separator_offenses.select do |o|
+          o[:message].include?('param') && o[:message].include?('return')
+        end
+
+        expect(param_return_offenses).not_to be_empty
+      end
+
+      it 'detects multiple missing separators in same method' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        # multiple_missing_separators method should have multiple issues
+        multiple_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'multiple_missing_separators'
+        end
+
+        expect(multiple_offenses).not_to be_empty
+      end
+
+      it 'does not flag properly separated tag groups' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        proper_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'proper_separators'
+        end
+
+        expect(proper_offenses).to be_empty
+      end
+
+      it 'does not flag same-group consecutive tags' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        same_group_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'same_group_tags'
+        end
+
+        expect(same_group_offenses).to be_empty
+      end
+
+      it 'does not flag methods with single tag group' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        single_group_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'single_group'
+        end
+
+        expect(single_group_offenses).to be_empty
+      end
+
+      it 'provides detailed error messages' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        separator_offenses.each do |offense|
+          expect(offense).to have_key(:location)
+          expect(offense).to have_key(:location_line)
+          expect(offense).to have_key(:message)
+          expect(offense[:severity]).to eq('convention')
+          expect(offense[:message]).to include('blank line')
+        end
+      end
+    end
+
+    context 'when tag_group_separator is disabled' do
+      let(:config) do
+        test_config do |c|
+          c.set_validator_config('Tags/TagGroupSeparator', 'Enabled', false)
+        end
+      end
+
+      it 'does not run tag group separator validation' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+        expect(separator_offenses).to be_empty
+      end
+    end
+
+    context 'with custom tag groups' do
+      let(:config) do
+        test_config do |c|
+          c.set_validator_config('Tags/TagGroupSeparator', 'Enabled', true)
+          c.set_validator_config('Tags/TagGroupSeparator', 'TagGroups', {
+            'param' => %w[param option],
+            'return' => %w[return raise]
+          })
+        end
+      end
+
+      it 'respects custom tag group configuration' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        # With return and raise in same group, missing_return_raise_separator should not trigger
+        return_raise_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'missing_return_raise_separator' &&
+            o[:message].include?('return') && o[:message].include?('error')
+        end
+
+        expect(return_raise_offenses).to be_empty
+      end
+    end
+
+    context 'with RequireAfterDescription enabled' do
+      let(:config) do
+        test_config do |c|
+          c.set_validator_config('Tags/TagGroupSeparator', 'Enabled', true)
+          c.set_validator_config('Tags/TagGroupSeparator', 'RequireAfterDescription', true)
+        end
+      end
+
+      it 'detects missing separator after description' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        description_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'description_to_param_no_separator'
+        end
+
+        expect(description_offenses).not_to be_empty
+      end
+
+      it 'does not flag description with proper separator' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        proper_desc_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'description_to_param_with_separator' &&
+            o[:message].include?('description')
+        end
+
+        expect(proper_desc_offenses).to be_empty
+      end
+    end
+
+    context 'with complex documentation' do
+      let(:config) do
+        test_config do |c|
+          c.set_validator_config('Tags/TagGroupSeparator', 'Enabled', true)
+        end
+      end
+
+      it 'validates complex documentation with all separators correctly' do
+        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+
+        separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
+
+        complex_offenses = separator_offenses.select do |o|
+          o[:method_name] == 'complex_with_all_separators'
+        end
+
+        expect(complex_offenses).to be_empty
+      end
+    end
+  end
+
   describe 'All Validators Enabled' do
     let(:config) do
       test_config do |c|
