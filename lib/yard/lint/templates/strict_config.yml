@@ -226,6 +226,19 @@ Tags/NonAsciiType:
     - yieldreturn
     - yieldparam
 
+Tags/TagGroupSeparator:
+  Description: 'Enforces blank line separators between different YARD tag groups.'
+  Enabled: false  # Opt-in validator
+  Severity: error
+  TagGroups:
+    param: [param, option]
+    return: [return]
+    error: [raise, throws]
+    example: [example]
+    meta: [see, note, todo, deprecated, since, version, api]
+    yield: [yield, yieldparam, yieldreturn]
+  RequireAfterDescription: false
+
 # Warnings validators - catches YARD parser errors
 Warnings/UnknownTag:
   Description: 'Detects unknown YARD tags.'

@@ -37,6 +37,7 @@ YARD-Lint validates your YARD documentation for:
 - **Empty comment lines**: Detects unnecessary empty `#` lines at the start or end of documentation blocks
 - **Blank lines before definitions**: Detects blank lines between YARD documentation and method/class/module definitions (single blank line = convention violation, 2+ blank lines = orphaned documentation that YARD ignores)
 - **Informal notation patterns**: Detects `Note:`, `TODO:`, `See:` etc. and suggests proper YARD tags (`@note`, `@todo`, `@see`)
+- **Tag group separation**: Enforces blank lines between different YARD tag groups (e.g., between `@param` and `@return` tags) for improved readability
 - **YARD warnings**: Unknown tags, invalid directives, duplicated parameter names, and more
 - **Smart suggestions**: Provides "did you mean" suggestions for typos in parameter names using Ruby's `did_you_mean` gem with Levenshtein distance fallback
 
@@ -542,6 +543,7 @@ Supported glob patterns:
 | `Tags/ExampleSyntax` | Validates Ruby syntax in `@example` tags to catch broken code examples | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
 | `Tags/RedundantParamDescription` | Detects meaningless parameter descriptions that add no value beyond the parameter name | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `Articles`, `MaxRedundantWords`, `MinMeaningfulLength`, `GenericTerms`, `EnabledPatterns` |
 | `Tags/InformalNotation` | Detects informal notation patterns (`Note:`, `TODO:`, etc.) and suggests proper YARD tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `CaseSensitive`, `RequireStartOfLine`, `Patterns` |
+| `Tags/TagGroupSeparator` | Enforces blank line separators between different YARD tag groups (e.g., between `@param` and `@return` tags) | Disabled (opt-in) | `Enabled`, `Severity`, `Exclude`, `TagGroups`, `RequireAfterDescription` |
 | **Warnings Validators** |
 | `Warnings/UnknownTag` | Detects unknown YARD tags with "did you mean" suggestions | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
 | `Warnings/UnknownDirective` | Detects unknown YARD directives | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
