@@ -84,6 +84,17 @@ This creates a strict configuration with:
 - Minimum documentation coverage set to 100%
 - Perfect for bootstrapping new repositories with high quality standards
 
+After upgrading yard-lint, update your config to include any new validators:
+
+```bash
+yard-lint --update
+```
+
+This will:
+- Add any new validators introduced in the latest version (with their default settings)
+- Remove any obsolete validators that no longer exist
+- Preserve all your existing configuration
+
 ### Command Line
 
 Basic usage:
@@ -691,7 +702,8 @@ Options:
       --changed           Lint only uncommitted files
       --only VALIDATORS   Run only specified validators (comma-separated)
       --init              Generate .yard-lint.yml config file
-      --strict            Generate strict config (use with --init)
+      --update            Update .yard-lint.yml with new validators
+      --strict            Generate strict config (use with --init or --update)
       --force             Force overwrite when using --init
   -v, --version           Show version
   -h, --help              Show this help
