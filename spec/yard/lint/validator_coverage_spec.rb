@@ -2,9 +2,10 @@
 
 RSpec.describe 'Validator Documentation Coverage' do
   let(:all_validators) { Yard::Lint::ConfigLoader::ALL_VALIDATORS }
+  let(:project_root) { File.expand_path('../../../', __dir__) }
 
   describe '.yard-lint.yml' do
-    let(:config_content) { File.read('.yard-lint.yml') }
+    let(:config_content) { File.read(File.join(project_root, '.yard-lint.yml')) }
 
     it 'includes all discovered validators' do
       all_validators.each do |validator_name|
@@ -15,7 +16,7 @@ RSpec.describe 'Validator Documentation Coverage' do
   end
 
   describe 'default_config.yml template' do
-    let(:template_path) { 'lib/yard/lint/templates/default_config.yml' }
+    let(:template_path) { File.join(project_root, 'lib/yard/lint/templates/default_config.yml') }
     let(:template_content) { File.read(template_path) }
 
     it 'includes all discovered validators' do
@@ -27,7 +28,7 @@ RSpec.describe 'Validator Documentation Coverage' do
   end
 
   describe 'strict_config.yml template' do
-    let(:template_path) { 'lib/yard/lint/templates/strict_config.yml' }
+    let(:template_path) { File.join(project_root, 'lib/yard/lint/templates/strict_config.yml') }
     let(:template_content) { File.read(template_path) }
 
     it 'includes all discovered validators' do

@@ -2,7 +2,7 @@
 
 RSpec.describe 'Multi-Validator Comprehensive Integration' do
   let(:fixture_path) do
-    File.expand_path('spec/integrations/fixtures/multi_validator_comprehensive.rb')
+    File.expand_path('fixtures/multi_validator_comprehensive.rb', __dir__)
   end
 
   describe 'With default configuration' do

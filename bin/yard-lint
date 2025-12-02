@@ -66,7 +66,11 @@ OptionParser.new do |opts|
     options[:init] = true
   end
 
-  opts.on('--strict', 'Generate strict config (all Error severity, 100% coverage). Use with --init') do
+  opts.on('--update', 'Update .yard-lint.yml to add new validators and remove obsolete ones') do
+    options[:update] = true
+  end
+
+  opts.on('--strict', 'Generate strict config (all Error severity, 100% coverage). Use with --init or --update') do
     options[:strict] = true
   end
 
@@ -93,6 +97,7 @@ OptionParser.new do |opts|
     puts '  yard-lint --format json lib/                   # Output in JSON format'
     puts '  yard-lint --init                               # Generate default config'
     puts '  yard-lint --init --strict                      # Generate strict config'
+    puts '  yard-lint --update                             # Update config with new validators'
     exit
   end
 end.parse!
@@ -109,6 +114,30 @@ if options[:init]
   else
     puts 'Error: .yard-lint.yml already exists'
     puts 'Use --init --force to overwrite'
+    exit 1
+  end
+end
+
+# Handle --update flag
+if options[:update]
+  begin
+    result = Yard::Lint::ConfigUpdater.update(strict: options[:strict])
+
+    if result[:added].any? || result[:removed].any?
+      puts 'Updated .yard-lint.yml:'
+      if result[:added].any?
+        puts "  Added #{result[:added].size} new validator(s): #{result[:added].join(', ')}"
+      end
+      if result[:removed].any?
+        puts "  Removed #{result[:removed].size} obsolete validator(s): #{result[:removed].join(', ')}"
+      end
+      puts "  Preserved #{result[:preserved].size} existing validator(s)"
+    else
+      puts '.yard-lint.yml is already up to date'
+    end
+    exit 0
+  rescue Yard::Lint::Errors::ConfigFileNotFoundError => e
+    puts "Error: #{e.message}"
     exit 1
   end
 end

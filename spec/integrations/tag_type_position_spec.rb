@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'TagTypePosition Integration' do
-  let(:fixture_path) { 'spec/fixtures/tag_type_position_examples.rb' }
+  let(:fixture_path) { File.expand_path('../fixtures/tag_type_position_examples.rb', __dir__) }
   let(:config) do
     test_config do |c|
       c.send(:set_validator_config, 'Tags/TagTypePosition', 'Enabled', true)

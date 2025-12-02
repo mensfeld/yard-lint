@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'MeaninglessTag Integration' do
-  let(:fixture_path) { 'spec/fixtures/meaningless_tag_examples.rb' }
+  let(:fixture_path) { File.expand_path('../fixtures/meaningless_tag_examples.rb', __dir__) }
 
   let(:config) do
     test_config do |c|

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'BlankLineBeforeDefinition Integration' do
-  let(:fixture_path) { 'spec/fixtures/blank_line_before_definition.rb' }
+  let(:fixture_path) { File.expand_path('../fixtures/blank_line_before_definition.rb', __dir__) }
 
   let(:config) do
     test_config do |c|

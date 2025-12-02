@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'CollectionType Integration' do
-  let(:fixture_path) { 'spec/fixtures/collection_type_examples.rb' }
+  let(:fixture_path) { File.expand_path('../fixtures/collection_type_examples.rb', __dir__) }
 
   let(:config) do
     test_config do |c|
