@@ -85,6 +85,30 @@ RSpec.describe 'Yard::Lint Integration Tests' do
       expect(methods).to include(match(/process/))
       expect(methods).to include(match(/validate/))
     end
+
+    it 'does not flag consecutive same tags as order violations' do
+      file = File.join(fixtures_dir, 'invalid_tag_order.rb')
+
+      config = Yard::Lint::Config.new do |c|
+        c.exclude = []
+        c.send(
+          :set_validator_config,
+          'Tags/Order',
+          'EnforcedOrder',
+          %w[param option yield yieldparam yieldreturn return raise see example note todo]
+        )
+      end
+
+      result = Yard::Lint.run(path: file, config: config)
+
+      order_offenses = result.offenses.select { |o| o[:name] == 'InvalidTagOrder' }
+      offense_methods = order_offenses.map { |o| o[:method_name] }
+
+      # Methods with consecutive same tags (multiple @note or @example) should NOT trigger violations
+      expect(offense_methods).not_to include(match(/with_multiple_notes/))
+      expect(offense_methods).not_to include(match(/configure_with_notes/))
+      expect(offense_methods).not_to include(match(/process_example/))
+    end
   end
 
   describe 'Undocumented Boolean Methods' do
