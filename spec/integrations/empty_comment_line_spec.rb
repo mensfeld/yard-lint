@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'EmptyCommentLine Integration' do
-  let(:fixture_path) { 'spec/fixtures/empty_comment_lines.rb' }
+  let(:fixture_path) { File.expand_path('../fixtures/empty_comment_lines.rb', __dir__) }
 
   let(:config) do
     test_config do |c|
