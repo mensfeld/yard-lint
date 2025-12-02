@@ -136,7 +136,10 @@
   - Reports added, removed, and preserved validator counts
   - Supports `--strict` flag to use strict template defaults for new validators
   - Example: `yard-lint --update` or `yard-lint --update --strict`
-- **[Fix]** Fix `MeaninglessTag` integration spec failing in parallel test runs due to relative fixture path
+- **[Fix]** Fix integration specs failing in parallel test runs due to relative fixture paths
+  - Updated `MeaninglessTag`, `EmptyCommentLine`, `MultiValidatorComprehensive`, `InformalNotation`, `BlankLineBeforeDefinition`, `MagicComments`, `CollectionType`, `TagTypePosition` specs to use absolute paths
+  - Updated `ValidatorCoverage` spec to use absolute paths for config and template files
+  - Uses `File.expand_path` with `__dir__` for reliable path resolution regardless of working directory
 
 ## 1.2.3 (2025-11-13)
 - **[Feature]** Add per-validator exclusion support for fine-grained file filtering

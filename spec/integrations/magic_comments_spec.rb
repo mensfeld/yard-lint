@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'BlankLineBeforeDefinition with Magic Comments' do
-  let(:fixture_path) { 'spec/fixtures/magic_comments.rb' }
+  let(:fixture_path) { File.expand_path('../fixtures/magic_comments.rb', __dir__) }
 
   let(:config) do
     test_config do |c|

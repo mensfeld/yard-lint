@@ -150,7 +150,7 @@ module Yard
       end
 
       # Generate YAML content with proper formatting and section comments
-      # @param config [Hash] config to serialize
+      # @param config [Hash] merged configuration with AllValidators and validator sections
       # @return [String] formatted YAML content
       def generate_yaml_content(config)
         lines = []
@@ -203,7 +203,7 @@ module Yard
       end
 
       # Convert a hash to indented YAML lines
-      # @param hash [Hash] hash to convert
+      # @param hash [Hash] validator or AllValidators configuration to format as YAML
       # @param indent [Integer] number of spaces to indent
       # @return [Array<String>] indented YAML lines
       def yaml_hash_lines(hash, indent:)

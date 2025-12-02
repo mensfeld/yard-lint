@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'InformalNotation Integration' do
-  let(:fixture_path) { 'spec/fixtures/informal_notation_examples.rb' }
+  let(:fixture_path) { File.expand_path('../fixtures/informal_notation_examples.rb', __dir__) }
 
   let(:config) do
     test_config do |c|
