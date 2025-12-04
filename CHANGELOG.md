@@ -1,6 +1,9 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Enhancement]** Add `IMPORTANT:` pattern detection to `Tags/InformalNotation` validator
+  - Detects `IMPORTANT:` and `Important:` informal notation and suggests using `@note` tag
+  - YARD does not have a dedicated `@important` tag; `@note` is the standard tag for emphasized notes
 - **[Feature]** Add `Tags/TagGroupSeparator` validator to enforce blank line separators between different YARD tag groups (#29)
   - Enforces visual separation between semantically different tag groups (e.g., `@param` tags should be separated from `@return` tags by a blank line)
   - Configurable tag groups: param (param, option), return (return), error (raise, throws), example (example), meta (see, note, todo, deprecated, since, version, api), yield (yield, yieldparam, yieldreturn)
