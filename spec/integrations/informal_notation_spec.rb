@@ -82,6 +82,18 @@ RSpec.describe 'InformalNotation Integration' do
       expect(fixme_offenses.first[:message]).to include('@todo')
     end
 
+    it 'finds IMPORTANT: patterns' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      important_offenses = result.offenses.select do |o|
+        o[:name] == 'InformalNotation' &&
+          o[:message].include?("'IMPORTANT:'")
+      end
+
+      expect(important_offenses).not_to be_empty
+      expect(important_offenses.first[:message]).to include('@note')
+    end
+
     it 'does not flag patterns inside code blocks' do
       result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 

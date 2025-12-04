@@ -15,6 +15,8 @@ module Yard
               'RequireStartOfLine' => true,
               'Patterns' => {
                 'Note' => '@note',
+                'IMPORTANT' => '@note',
+                'Important' => '@note',
                 'Todo' => '@todo',
                 'TODO' => '@todo',
                 'FIXME' => '@todo',

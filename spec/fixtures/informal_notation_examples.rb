@@ -59,4 +59,10 @@ class InformalNoteClass
   def with_fixme
     true
   end
+
+  # IMPORTANT: The batch endpoint uses repeated query parameters
+  # @return [String]
+  def with_important
+    'important'
+  end
 end
