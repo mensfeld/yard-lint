@@ -83,13 +83,13 @@ module Yard
         #
         # @param key [String] the configuration key to retrieve
         # @return [Object] the configured value or default value from the validator's Config.defaults
-        # @note The validator name is automatically extracted from the class namespace.
-        #   For example, Yard::Lint::Validators::Tags::RedundantParamDescription::Validator
-        #   becomes 'Tags/RedundantParamDescription'
         # @example Usage in a validator (e.g., Tags::RedundantParamDescription)
         #   def config_articles
         #     config_or_default('Articles')
         #   end
+        # @note The validator name is automatically extracted from the class namespace.
+        #   For example, Yard::Lint::Validators::Tags::RedundantParamDescription::Validator
+        #   becomes 'Tags/RedundantParamDescription'
         def config_or_default(key)
           validator_name = self.class.name&.split('::')&.then do |parts|
             idx = parts.index('Validators')
