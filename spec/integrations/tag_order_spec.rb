@@ -11,7 +11,7 @@ RSpec.describe 'Tags/Order Integration' do
 
   describe 'detecting invalid tag order' do
     it 'detects @return before @param' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -24,7 +24,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'detects @note before @return' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -35,7 +35,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'detects @note before @example' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -46,7 +46,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'detects @see before @return' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -57,7 +57,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'detects @todo before @note' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -68,7 +68,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'detects @yield tags in wrong order' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -79,7 +79,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'detects @raise before @return' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -92,7 +92,7 @@ RSpec.describe 'Tags/Order Integration' do
 
   describe 'correct tag order' do
     it 'does not flag methods with correct full tag order' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -103,7 +103,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'does not flag methods with correct partial tag order' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -114,7 +114,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'does not flag simple param-return order' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -127,7 +127,7 @@ RSpec.describe 'Tags/Order Integration' do
 
   describe 'consecutive same tags' do
     it 'does not flag multiple consecutive @param tags' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -138,7 +138,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'does not flag multiple consecutive @note tags' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -149,7 +149,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'does not flag multiple consecutive @example tags' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       offenses = result.offenses.select do |o|
         o[:name] == 'InvalidTagOrder' &&
@@ -177,7 +177,7 @@ RSpec.describe 'Tags/Order Integration' do
     end
 
     it 'does not run validation' do
-      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+      result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
       order_offenses = result.offenses.select { |o| o[:name] == 'InvalidTagOrder' }
       expect(order_offenses).to be_empty

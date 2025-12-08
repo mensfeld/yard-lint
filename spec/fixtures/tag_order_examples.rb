@@ -26,7 +26,7 @@ class CorrectTagOrder
   # @param data [Hash] input data
   # @return [Boolean] success status
   # @note Remember to validate input
-  def correct_partial_order(data)
+  def correct_partial_order(_data)
     true
   end
 
@@ -88,7 +88,7 @@ class InvalidTagOrderExamples
   # @yield [value] yields value
   # @yieldparam value [String] the value
   # @return [void]
-  def yield_tags_wrong_order(&block)
+  def yield_tags_wrong_order
     yield 'test'
   end
 
