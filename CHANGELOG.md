@@ -1,6 +1,11 @@
 # YARD-Lint Changelog
 
 ## 1.3.0 (Unreleased)
+- **[Fix]** Expand `Tags/Order` default `EnforcedOrder` to include all standard YARD tags
+  - Previous config only included: `param`, `option`, `return`, `raise`, `example`
+  - Now includes full order: `param`, `option`, `yield`, `yieldparam`, `yieldreturn`, `return`, `raise`, `see`, `example`, `note`, `todo`
+  - Tags not in the list were silently ignored, so `@note`, `@todo`, `@see`, and `@yield*` ordering was not validated
+  - Updated both `default_config.yml` and `strict_config.yml`
 - **[Enhancement]** Add `IMPORTANT:` pattern detection to `Tags/InformalNotation` validator
   - Detects `IMPORTANT:` and `Important:` informal notation and suggests using `@note` tag
   - YARD does not have a dedicated `@important` tag; `@note` is the standard tag for emphasized notes
