@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## 1.3.0 (Unreleased)
+## 1.3.0 (2025-12-10)
 - **[Fix]** Expand `Tags/Order` default `EnforcedOrder` to include all standard YARD tags
   - Previous config only included: `param`, `option`, `return`, `raise`, `example`
   - Now includes full order: `param`, `option`, `yield`, `yieldparam`, `yieldreturn`, `return`, `raise`, `see`, `example`, `note`, `todo`
