@@ -1,5 +1,15 @@
 # YARD-Lint Changelog
 
+## 1.4.0 (2025-12-10)
+- **[Feature]** Add `Tags/ForbiddenTags` validator to detect forbidden tag and type combinations (#59)
+  - Allows projects to disallow specific tag patterns like `@return [void]`
+  - Supports tag-only patterns (forbid entire tag) and tag+type patterns
+  - Configurable `ForbiddenPatterns` list with `Tag` and optional `Types` keys
+  - Use case: Enforce documentation of side effects instead of `@return [void]`
+  - Use case: Forbid overly generic types like `@param [Object]`
+  - Use case: Forbid specific tags entirely (e.g., `@api`)
+  - Disabled by default (opt-in validator) with 'convention' severity
+
 ## 1.3.0 (2025-12-10)
 - **[Fix]** Expand `Tags/Order` default `EnforcedOrder` to include all standard YARD tags
   - Previous config only included: `param`, `option`, `return`, `raise`, `example`

@@ -241,6 +241,20 @@ Tags/TagGroupSeparator:
     yield: [yield, yieldparam, yieldreturn]
   RequireAfterDescription: false
 
+Tags/ForbiddenTags:
+  Description: 'Detects forbidden tag and type combinations.'
+  Enabled: false  # Opt-in validator
+  Severity: convention
+  ForbiddenPatterns: []
+  # Example patterns:
+  # - Tag: return
+  #   Types:
+  #     - void
+  # - Tag: param
+  #   Types:
+  #     - Object
+  # - Tag: api  # Forbids @api tag entirely (no Types = any occurrence)
+
 # Warnings validators - catches YARD parser errors
 Warnings/UnknownTag:
   Description: 'Detects unknown YARD tags.'

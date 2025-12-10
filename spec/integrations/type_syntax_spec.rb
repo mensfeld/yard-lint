@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Type Syntax Validation Integration' do
-  let(:fixture_path) { File.expand_path('spec/fixtures/type_syntax_examples.rb') }
+  let(:fixture_path) { File.expand_path('../fixtures/type_syntax_examples.rb', __dir__) }
   let(:config) do
     test_config do |c|
       c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
