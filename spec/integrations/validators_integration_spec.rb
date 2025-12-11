@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Yard::Lint Validators' do
+  # Helper to convert relative paths to absolute paths from project root
+  def project_path(relative_path)
+    File.expand_path("../../#{relative_path}", __dir__)
+  end
+
   describe 'API Tags Validation' do
     context 'when require_api_tags is enabled' do
       let(:config) do
@@ -12,7 +17,7 @@ RSpec.describe 'Yard::Lint Validators' do
 
       it 'detects API tag issues' do
         # Run against a simple Ruby string to avoid loading full project
-        result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config)
+        result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config)
 
         # Since require_api_tags is enabled, should find missing @api tags
         expect(result.offenses.select { |o| o[:name].to_s.include?('Api') }).to be_an(Array)
@@ -29,7 +34,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not run API tag validation' do
-        result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config)
+        result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config)
 
         expect(result.offenses.select { |o| o[:name].to_s.include?('Api') }).to be_empty
       end
@@ -44,7 +49,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'uses custom allowed_apis configuration' do
-        result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config)
+        result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config)
 
         # Feature should work with custom config
         expect(result.offenses.select { |o| o[:name].to_s.include?('Api') }).to be_an(Array)
@@ -61,7 +66,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'runs abstract method validation' do
-        result = Yard::Lint.run(path: 'lib', config: config)
+        result = Yard::Lint.run(path: project_path('lib'), config: config)
 
         expect(result.offenses.select { |o| o[:name].to_s.include?('Abstract') }).to be_an(Array)
         expect(result).to respond_to(:offenses)
@@ -76,7 +81,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not run abstract method validation' do
-        result = Yard::Lint.run(path: 'lib', config: config)
+        result = Yard::Lint.run(path: project_path('lib'), config: config)
 
         expect(result.offenses.select { |o| o[:name].to_s.include?('Abstract') }).to be_empty
       end
@@ -92,7 +97,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'runs option tags validation' do
-        result = Yard::Lint.run(path: 'lib', config: config)
+        result = Yard::Lint.run(path: project_path('lib'), config: config)
 
         expect(result.offenses.select { |o| o[:name].to_s.include?('Option') }).to be_an(Array)
         expect(result).to respond_to(:offenses)
@@ -109,7 +114,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not run option tags validation' do
-        result = Yard::Lint.run(path: 'lib', config: config)
+        result = Yard::Lint.run(path: project_path('lib'), config: config)
 
         # Check specifically for OptionTags violations, not other validators with "Option" in name
         expect(result.offenses.select { |o| o[:name] == 'OptionTags' }).to be_empty
@@ -127,7 +132,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'runs all validators when enabled' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       expect(result.offenses.select { |o| o[:name].to_s.include?('Api') }).to be_an(Array)
       expect(result.offenses.select { |o| o[:name].to_s.include?('Abstract') }).to be_an(Array)
@@ -135,7 +140,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'includes all offense types in the offenses array' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       expect(result.offenses).to be_an(Array)
       expect(result).to respond_to(:offenses)
@@ -154,7 +159,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'runs all documentation validators simultaneously' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       offense_names = result.offenses.map { |o| o[:name] }.uniq
       documentation_validators = offense_names.select { |n| n.start_with?('Undocumented') }
@@ -165,7 +170,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'can detect multiple documentation issues in the same file' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       # Group offenses by file
       by_file = result.offenses.group_by { |o| o[:location] }
@@ -197,7 +202,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'runs all tag validators simultaneously' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       offense_names = result.offenses.map { |o| o[:name] }.uniq
       tag_validators = %w[InvalidTagOrder InvalidTypes InvalidTypeSyntax]
@@ -207,7 +212,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'handles type validation interactions correctly' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       type_syntax = result.offenses.select { |o| o[:name] == 'InvalidTypeSyntax' }
       invalid_types = result.offenses.select { |o| o[:name] == 'InvalidTypes' }
@@ -229,7 +234,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'runs all warning validators simultaneously' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       warning_offenses = result.offenses.select do |o|
         %w[UnknownTag UnknownParameterName DuplicatedParameterName
@@ -240,7 +245,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'detects parameter-related warnings together' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       unknown_param = result.offenses.select { |o| o[:name] == 'UnknownParameterName' }
       duplicated_param = result.offenses.select { |o| o[:name] == 'DuplicatedParameterName' }
@@ -262,7 +267,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'runs validators from different categories together' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       has_documentation = result.offenses.any? { |o| o[:name] == 'UndocumentedMethodArguments' }
       has_tags = result.offenses.any? { |o| o[:name] == 'InvalidTagOrder' }
@@ -273,7 +278,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'handles multiple categories on the same method' do
-      result = Yard::Lint.run(path: 'lib', config: config)
+      result = Yard::Lint.run(path: project_path('lib'), config: config)
 
       # Group by location and line to find methods with multiple issues
       by_method = result.offenses.group_by { |o| [o[:location], o[:location_line]] }
@@ -298,7 +303,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'runs example syntax validation' do
-        result = Yard::Lint.run(path: 'spec/fixtures/example_syntax.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/example_syntax.rb'), config: config)
 
         example_syntax_offenses = result.offenses.select { |o| o[:name] == 'ExampleSyntax' }
         expect(example_syntax_offenses).not_to be_empty
@@ -306,7 +311,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects syntax errors in example code blocks' do
-        result = Yard::Lint.run(path: 'spec/fixtures/example_syntax.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/example_syntax.rb'), config: config)
 
         example_syntax_offenses = result.offenses.select { |o| o[:name] == 'ExampleSyntax' }
 
@@ -320,7 +325,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'provides detailed error messages with line numbers' do
-        result = Yard::Lint.run(path: 'spec/fixtures/example_syntax.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/example_syntax.rb'), config: config)
 
         example_syntax_offenses = result.offenses.select { |o| o[:name] == 'ExampleSyntax' }
 
@@ -334,7 +339,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'skips incomplete single-line snippets' do
-        result = Yard::Lint.run(path: 'spec/fixtures/example_syntax.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/example_syntax.rb'), config: config)
 
         # The multiply method has a single-line incomplete snippet that should be skipped
         # Only subtract and broken_example should have errors
@@ -356,7 +361,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not run example syntax validation' do
-        result = Yard::Lint.run(path: 'spec/fixtures/example_syntax.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/example_syntax.rb'), config: config)
 
         example_syntax_offenses = result.offenses.select { |o| o[:name] == 'ExampleSyntax' }
         expect(example_syntax_offenses).to be_empty
@@ -373,7 +378,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not report errors for files without examples' do
-        result = Yard::Lint.run(path: 'spec/fixtures/clean_code.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/clean_code.rb'), config: config)
 
         example_syntax_offenses = result.offenses.select { |o| o[:name] == 'ExampleSyntax' }
         # clean_code.rb has no @example tags at all
@@ -394,7 +399,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'runs redundant param description validation' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
         expect(redundant_offenses).not_to be_empty
@@ -402,7 +407,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects article + param pattern' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -415,7 +420,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects possessive + param pattern' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -427,7 +432,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects type restatement pattern' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -439,7 +444,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not flag long meaningful descriptions' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -452,7 +457,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'provides detailed error messages with suggestions' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -476,7 +481,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not run redundant param description validation' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
         expect(redundant_offenses).to be_empty
@@ -492,7 +497,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'respects custom MaxRedundantWords threshold' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -520,7 +525,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'only detects enabled patterns' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -551,7 +556,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects filler phrase patterns from GitHub issue #32 examples' do
-        result = Yard::Lint.run(path: 'spec/fixtures/redundant_param_descriptions.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/redundant_param_descriptions.rb'), config: config)
 
         redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
 
@@ -576,7 +581,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'runs tag group separator validation' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
         expect(separator_offenses).not_to be_empty
@@ -584,7 +589,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects missing separator between param and return' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -596,7 +601,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects multiple missing separators in same method' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -609,7 +614,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not flag properly separated tag groups' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -621,7 +626,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not flag same-group consecutive tags' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -633,7 +638,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not flag methods with single tag group' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -645,7 +650,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'provides detailed error messages' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -667,7 +672,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not run tag group separator validation' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
         expect(separator_offenses).to be_empty
@@ -686,7 +691,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'respects custom tag group configuration' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -709,7 +714,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'detects missing separator after description' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -721,7 +726,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'does not flag description with proper separator' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -742,7 +747,7 @@ RSpec.describe 'Yard::Lint Validators' do
       end
 
       it 'validates complex documentation with all separators correctly' do
-        result = Yard::Lint.run(path: 'spec/fixtures/tag_group_separators.rb', config: config)
+        result = Yard::Lint.run(path: project_path('spec/fixtures/tag_group_separators.rb'), config: config)
 
         separator_offenses = result.offenses.select { |o| o[:name] == 'MissingTagGroupSeparator' }
 
@@ -766,7 +771,7 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'successfully runs with all validators enabled' do
-      result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config, progress: false)
+      result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config, progress: false)
 
       expect(result).to respond_to(:offenses)
       expect(result).to respond_to(:count)
@@ -775,7 +780,7 @@ RSpec.describe 'Yard::Lint Validators' do
 
     it 'completes analysis in reasonable time with all validators' do
       start_time = Time.now
-      result = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config, progress: false)
+      result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config, progress: false)
       elapsed = Time.now - start_time
 
       expect(elapsed).to be < 10 # Should complete quickly on a small file
