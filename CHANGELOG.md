@@ -1,6 +1,11 @@
 # YARD-Lint Changelog
 
 ## 1.4.0 (Unreleased)
+- **[CI]** Update Ruby 4.0 from preview2 to stable release as the default version
+  - Ruby 4.0 is now the default for yard-lint dogfooding and gem release workflows
+  - Code coverage is now tracked only on Ruby 4.0
+  - Added `.ruby-version` file specifying Ruby 4.0
+  - Continues to support Ruby 3.2, 3.3, and 3.4
 - **[Feature]** Add `Tags/ForbiddenTags` validator to detect forbidden tag and type combinations (#59)
   - Allows projects to disallow specific tag patterns like `@return [void]`
   - Supports tag-only patterns (forbid entire tag) and tag+type patterns
