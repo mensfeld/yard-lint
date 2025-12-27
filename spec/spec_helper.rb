@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
-require 'simplecov'
 require 'fileutils'
 require 'tempfile'
 require 'stringio'
 
-SimpleCov.start do
-  add_filter '/spec/'
-  add_filter '/vendor/'
+# Only track coverage on Ruby 4.0
+if RUBY_VERSION.start_with?('4.0')
+  require 'simplecov'
 
-  minimum_coverage 95
+  SimpleCov.start do
+    add_filter '/spec/'
+    add_filter '/vendor/'
+
+    minimum_coverage 95
+  end
 end
 
 require 'yard-lint'
