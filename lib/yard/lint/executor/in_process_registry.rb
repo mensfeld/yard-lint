@@ -33,6 +33,15 @@ module Yard
             original_level = YARD::Logger.instance.level
             YARD::Logger.instance.level = 4 # Only show fatal errors
 
+            # First pass: parse all files to process directive definitions
+            YARD.parse(files)
+
+            # Clear checksums to force reparsing without clearing the registry.
+            # This allows macro definitions from the first pass to be available
+            # during the second pass, enabling proper directive expansion regardless of parse order.
+            YARD::Registry.checksums.clear
+
+            # Second pass: reparse files now that all directive definitions are available
             @warnings = capture_warnings { YARD.parse(files) }
             @parsed = true
 
