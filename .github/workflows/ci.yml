@@ -85,7 +85,7 @@ jobs:
 
       - name: Verify checksum
         run: |
-          echo "0aecc5aa010f53fca264548a41467a2b0a1208d750ce1da3e98a217304cacbbc  coditsu_script.sh" | sha256sum -c -
+          echo "7dc7f736b81ad79cfa065ceb87506908dfcd1ec1202f384426d72342396f7377  coditsu_script.sh" | sha256sum -c -
 
       - name: Run Coditsu
         run: bash coditsu_script.sh
