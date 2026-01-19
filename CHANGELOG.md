@@ -1,6 +1,7 @@
 # YARD-Lint Changelog
 
 ## 1.4.0 (Unreleased)
+- **[Fix]** Handle directive definitions depending on file load order (#65, @zaben903)
 - **[CI]** Update Ruby 4.0 from preview2 to stable release as the default version
   - Ruby 4.0 is now the default for yard-lint dogfooding and gem release workflows
   - Code coverage is now tracked only on Ruby 4.0
