@@ -1,5 +1,21 @@
 # YARD-Lint Changelog
 
+## 1.5.0 (2026-01-21)
+- **[Feature]** Add `--auto-gen-config` for incremental adoption on legacy codebases (#71)
+  - Generates `.yard-lint-todo.yml` with per-validator exclusions for all current violations
+  - Allows teams to adopt yard-lint without fixing all existing violations first
+  - New CLI flags:
+    - `--auto-gen-config`: Generate baseline configuration silencing existing violations
+    - `--regenerate-todo`: Regenerate todo file (overwrites existing)
+    - `--exclude-limit N`: Min files in directory before grouping into pattern (default: 15)
+  - Intelligent path grouping: converts many individual files into patterns (e.g., `lib/legacy/**/*`)
+  - Automatically updates `.yard-lint.yml` to inherit from `.yard-lint-todo.yml`
+  - Incremental workflow: remove exclusions from todo file to re-expose violations for fixing
+  - Use case: Enforce strict standards on new code while incrementally fixing legacy issues
+  - Use case: Generate baseline before CI/CD integration to prevent breaking existing builds
+  - Inspired by RuboCop's `--auto-gen-config` feature
+  - See README "Adopting YARD-Lint on Existing Projects" section for detailed usage
+
 ## 1.4.0 (2026-01-19)
 - **[Fix]** Handle directive definitions depending on file load order (#65, @zaben903)
 - **[CI]** Update Ruby 4.0 from preview2 to stable release as the default version
