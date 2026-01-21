@@ -64,8 +64,8 @@ module Yard
       private
 
       # Validate that the todo file doesn't already exist
-      # @raise [Errors::TodoFileExistsError] if todo file exists and force is false
       # @return [void]
+      # @raise [Errors::TodoFileExistsError] if todo file exists and force is false
       def validate_todo_file_not_exists!
         return unless File.exist?(@todo_path)
 
