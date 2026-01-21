@@ -78,6 +78,22 @@ OptionParser.new do |opts|
     options[:force] = true
   end
 
+  opts.separator ''
+  opts.separator 'Todo file generation:'
+
+  opts.on('--auto-gen-config', 'Generate .yard-lint-todo.yml to silence existing violations') do
+    options[:auto_gen_config] = true
+  end
+
+  opts.on('--regenerate-todo', 'Regenerate .yard-lint-todo.yml (overwrites existing)') do
+    options[:auto_gen_config] = true
+    options[:force] = true
+  end
+
+  opts.on('--exclude-limit COUNT', Integer, 'Min files before grouping into pattern (default: 15)') do |count|
+    options[:exclude_limit] = count
+  end
+
   opts.on('-v', '--version', 'Show version') do
     puts "yard-lint #{Yard::Lint::VERSION}"
     exit
@@ -98,6 +114,9 @@ OptionParser.new do |opts|
     puts '  yard-lint --init                               # Generate default config'
     puts '  yard-lint --init --strict                      # Generate strict config'
     puts '  yard-lint --update                             # Update config with new validators'
+    puts '  yard-lint --auto-gen-config                    # Generate todo file for existing violations'
+    puts '  yard-lint --regenerate-todo                    # Regenerate todo file'
+    puts '  yard-lint --auto-gen-config --exclude-limit 10 # Custom grouping threshold'
     exit
   end
 end.parse!
@@ -137,6 +156,38 @@ if options[:update]
     end
     exit 0
   rescue Yard::Lint::Errors::ConfigFileNotFoundError => e
+    puts "Error: #{e.message}"
+    exit 1
+  end
+end
+
+# Handle --auto-gen-config flag
+if options[:auto_gen_config]
+  begin
+    # Load config
+    config = if config_file
+               Yard::Lint::Config.from_file(config_file)
+             else
+               Yard::Lint::Config.load || Yard::Lint::Config.new
+             end
+
+    # Get path argument
+    path = ARGV[0] || '.'
+
+    # Generate todo file
+    result = Yard::Lint::TodoGenerator.generate(
+      path: path,
+      config: config,
+      force: options[:force] || false,
+      exclude_limit: options[:exclude_limit] || 15
+    )
+
+    puts result[:message]
+    exit 0
+  rescue Yard::Lint::Errors::TodoFileExistsError => e
+    puts "Error: #{e.message}"
+    exit 1
+  rescue Yard::Lint::Git::Error, Yard::Lint::Errors::FileNotFoundError => e
     puts "Error: #{e.message}"
     exit 1
   end
