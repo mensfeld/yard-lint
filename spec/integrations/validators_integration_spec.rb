@@ -788,8 +788,9 @@ RSpec.describe 'Yard::Lint Validators' do
     end
 
     it 'produces consistent results across multiple runs' do
-      result1 = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config, progress: false)
-      result2 = Yard::Lint.run(path: 'lib/yard/lint/version.rb', config: config, progress: false)
+      version_file = File.expand_path('../../lib/yard/lint/version.rb', __dir__)
+      result1 = Yard::Lint.run(path: version_file, config: config, progress: false)
+      result2 = Yard::Lint.run(path: version_file, config: config, progress: false)
 
       expect(result1.count).to eq(result2.count)
       expect(result1.offenses.size).to eq(result2.offenses.size)

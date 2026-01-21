@@ -8,12 +8,10 @@ RSpec.describe 'Todo Generation Integration', :integration do
   let(:test_dir) { Dir.mktmpdir('yard-lint-todo-test') }
   let(:bin_path) { File.expand_path('../../bin/yard-lint', __dir__) }
 
-  before do
-    Dir.chdir(test_dir)
-  end
-
-  after do
-    Dir.chdir('/')
+  around do |example|
+    Dir.chdir(test_dir) do
+      example.run
+    end
     FileUtils.rm_rf(test_dir)
   end
 

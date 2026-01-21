@@ -4,9 +4,10 @@ RSpec.describe Yard::Lint::TodoGenerator do
   let(:test_dir) { Dir.mktmpdir('todo-generator-test') }
   let(:config) { Yard::Lint::Config.new }
 
-  before { Dir.chdir(test_dir) }
-  after do
-    Dir.chdir('/')
+  around do |example|
+    Dir.chdir(test_dir) do
+      example.run
+    end
     FileUtils.rm_rf(test_dir)
   end
 
