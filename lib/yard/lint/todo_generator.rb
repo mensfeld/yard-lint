@@ -8,17 +8,22 @@ module Yard
       DEFAULT_EXCLUDE_LIMIT = 15
 
       class << self
-        # Generate .yard-lint-todo.yml file
-        # @param path [String] path to lint
-        # @param config [Config] yard-lint configuration
-        # @param force [Boolean] overwrite existing todo file
-        # @param exclude_limit [Integer] threshold for path grouping
+        # Generate .yard-lint-todo.yml file with exclusions for current violations
+        # @param path [String] directory or file path containing Ruby files to analyze for violations
+        # @param config [Config] yard-lint configuration object with validator settings
+        # @param force [Boolean] whether to overwrite existing todo file if present
+        # @param exclude_limit [Integer] minimum files in directory before grouping into wildcard patterns
         # @return [Hash] result with :message, :offense_count, :validator_count
         def generate(path:, config:, force: false, exclude_limit: DEFAULT_EXCLUDE_LIMIT)
           new(path: path, config: config, force: force, exclude_limit: exclude_limit).generate
         end
       end
 
+      # Initialize a new TodoGenerator instance
+      # @param path [String] directory or file path containing Ruby files to analyze
+      # @param config [Config] yard-lint configuration object
+      # @param force [Boolean] whether to overwrite existing todo file
+      # @param exclude_limit [Integer] minimum files before grouping into patterns
       def initialize(path:, config:, force:, exclude_limit:)
         @path = path
         @config = config
@@ -28,6 +33,8 @@ module Yard
         @config_path = File.join(Dir.pwd, Config::DEFAULT_CONFIG_FILE)
       end
 
+      # Generate the .yard-lint-todo.yml file with exclusions for current violations
+      # @return [Hash] result hash with :message, :offense_count, :validator_count keys
       def generate
         # Step 1: Check if todo file exists
         validate_todo_file_not_exists! unless @force
@@ -56,6 +63,9 @@ module Yard
 
       private
 
+      # Validate that the todo file doesn't already exist
+      # @raise [Errors::TodoFileExistsError] if todo file exists and force is false
+      # @return [void]
       def validate_todo_file_not_exists!
         return unless File.exist?(@todo_path)
 
@@ -63,6 +73,8 @@ module Yard
           '.yard-lint-todo.yml already exists. Use --regenerate-todo to overwrite.'
       end
 
+      # Run linting and collect violations per validator
+      # @return [Hash] hash with :violations_by_validator and :total_offenses keys
       def run_linting
         # Run each validator individually to track violations per validator
         # This is more reliable than trying to infer validator from offense name
@@ -95,6 +107,8 @@ module Yard
         { violations_by_validator: violations_by_validator, total_offenses: total_offenses }
       end
 
+      # Build result hash for when no violations are found
+      # @return [Hash] result indicating clean codebase
       def no_violations_result
         {
           message: "No offenses found. No .yard-lint-todo.yml needed.\nYour codebase is already compliant!",
@@ -103,6 +117,9 @@ module Yard
         }
       end
 
+      # Apply path grouping to each validator's file list
+      # @param lint_result [Hash] hash containing violations_by_validator data
+      # @return [Hash] hash of validator names to grouped file patterns
       def group_violations_by_validator(lint_result)
         # Apply path grouping to each validator's file list
         lint_result[:violations_by_validator].transform_values do |files|
@@ -110,11 +127,17 @@ module Yard
         end
       end
 
+      # Convert absolute path to relative path from current directory
+      # @param path [String] absolute or relative file path
+      # @return [String] relative path from current directory
       def make_relative_path(path)
         pwd = Dir.pwd
         path.start_with?(pwd) ? path.sub("#{pwd}/", '') : path
       end
 
+      # Build YAML content for the todo file
+      # @param violations_by_validator [Hash] hash of validator names to file patterns
+      # @return [String] formatted YAML content
       def build_todo_yaml(violations_by_validator)
         lines = []
 
@@ -154,6 +177,9 @@ module Yard
         lines.join("\n")
       end
 
+      # Group validators by their category (Documentation, Tags, etc.)
+      # @param violations_by_validator [Hash] hash of validator names to patterns
+      # @return [Hash] validators grouped by category
       def group_by_category(violations_by_validator)
         categories = Hash.new { |h, k| h[k] = {} }
 
@@ -165,6 +191,8 @@ module Yard
         categories
       end
 
+      # Update or create main config file to inherit from todo file
+      # @return [void]
       def update_main_config
         if File.exist?(@config_path)
           update_existing_config
@@ -173,6 +201,8 @@ module Yard
         end
       end
 
+      # Update existing config file to add inherit_from todo file
+      # @return [void]
       def update_existing_config
         config_yaml = YAML.load_file(@config_path) || {}
         inherit_from = Array(config_yaml['inherit_from'] || [])
@@ -187,6 +217,8 @@ module Yard
         end
       end
 
+      # Create a minimal config file that inherits from todo file
+      # @return [void]
       def create_minimal_config
         content = <<~YAML
           # YARD-Lint Configuration
@@ -199,6 +231,10 @@ module Yard
         File.write(@config_path, content)
       end
 
+      # Build success result hash with summary message
+      # @param violations_by_validator [Hash] hash of validator names to file patterns
+      # @param total_offenses [Integer] total number of offenses found
+      # @return [Hash] result with :message, :offense_count, :validator_count keys
       def build_success_result(violations_by_validator, total_offenses)
         lines = []
         lines << 'Created .yard-lint-todo.yml'

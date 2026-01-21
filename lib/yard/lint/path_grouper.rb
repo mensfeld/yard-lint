@@ -22,6 +22,9 @@ module Yard
         private
 
         # Find directories where files can be grouped into patterns
+        # @param files [Array<String>] unique file paths to analyze
+        # @param limit [Integer] minimum file count threshold for grouping
+        # @return [Array<String>] array of file paths or directory patterns
         def find_common_directories(files, limit)
           # Deduplicate files first
           unique_files = files.uniq
@@ -40,6 +43,10 @@ module Yard
         end
 
         # Determine if a directory should be grouped
+        # @param dir [String] directory path to evaluate
+        # @param dir_files [Array<String>] files in this directory
+        # @param limit [Integer] minimum file count threshold
+        # @return [Boolean] true if directory should be grouped into pattern
         def should_group_directory?(dir, dir_files, limit)
           # Must have enough files and more than just one file
           return false if dir_files.size < limit || dir_files.size == 1
