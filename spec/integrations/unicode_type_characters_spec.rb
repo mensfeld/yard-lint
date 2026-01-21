@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Unicode Characters in Type Specifications' do
+  let(:fixture_path) { File.expand_path('../fixtures/unicode_type_characters.rb', __dir__) }
   let(:config) do
     test_config do |c|
       c.set_validator_config('Tags/NonAsciiType', 'Enabled', true)
@@ -13,12 +14,12 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
       # when encountering Unicode characters in type specifications
       # instead of handling them gracefully
       expect do
-        Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+        Yard::Lint.run(path: fixture_path, config: config)
       end.not_to raise_error
     end
 
     it 'continues processing and returns a valid result' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       # Should complete processing and return a proper result object
       expect(result).to respond_to(:offenses)
@@ -26,7 +27,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'reports NonAsciiType offenses for each method with Unicode in type specs' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
 
@@ -38,7 +39,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'includes the Unicode character and code point in the message' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
 
@@ -49,7 +50,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'does not report offenses for valid ASCII type specifications' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
 
@@ -62,7 +63,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'detects horizontal ellipsis (U+2026)' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       ellipsis_offenses = result.offenses.select do |o|
         o[:name] == 'NonAsciiType' && o[:message]&.include?('U+2026')
@@ -73,7 +74,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'detects right arrow (U+2192)' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       arrow_offenses = result.offenses.select do |o|
         o[:name] == 'NonAsciiType' && o[:message]&.include?('U+2192')
@@ -84,7 +85,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'detects em dash (U+2014)' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       em_dash_offenses = result.offenses.select do |o|
         o[:name] == 'NonAsciiType' && o[:message]&.include?('U+2014')
@@ -95,7 +96,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'includes helpful guidance in the error message' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
 
@@ -105,7 +106,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'sets severity to warning' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
 
@@ -115,7 +116,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'provides correct file location' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
 
@@ -133,7 +134,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'does not report NonAsciiType offenses' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
       expect(non_ascii_offenses).to be_empty
@@ -141,7 +142,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
 
     it 'still does not crash with encoding errors' do
       expect do
-        Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+        Yard::Lint.run(path: fixture_path, config: config)
       end.not_to raise_error
     end
   end
@@ -156,12 +157,12 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
 
     it 'both validators can run together without crashing' do
       expect do
-        Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+        Yard::Lint.run(path: fixture_path, config: config)
       end.not_to raise_error
     end
 
     it 'NonAsciiType reports its offenses independently' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
       expect(non_ascii_offenses.size).to eq(3)
@@ -177,7 +178,7 @@ RSpec.describe 'Unicode Characters in Type Specifications' do
     end
 
     it 'only validates configured tags' do
-      result = Yard::Lint.run(path: 'spec/fixtures/unicode_type_characters.rb', config: config)
+      result = Yard::Lint.run(path: fixture_path, config: config)
 
       non_ascii_offenses = result.offenses.select { |o| o[:name] == 'NonAsciiType' }
 
