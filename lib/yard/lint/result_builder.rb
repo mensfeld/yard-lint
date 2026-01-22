@@ -91,7 +91,16 @@ module Yard
         return nil if parsers.empty?
 
         # Parse output with all parsers (single or multiple)
-        parsed = parsers.flat_map { |parser| parser.new.call(stdout) }
+        # Try passing config to parser if it accepts it (for filtering)
+        # Otherwise, call without config for backwards compatibility
+        parsed = parsers.flat_map do |parser|
+          parser_instance = parser.new
+          begin
+            parser_instance.call(stdout, config: config)
+          rescue ArgumentError
+            parser_instance.call(stdout)
+          end
+        end
         return nil if parsed.nil? || parsed.empty?
 
         validator_module::Result.new(parsed, config)
