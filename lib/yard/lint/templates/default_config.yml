@@ -52,6 +52,14 @@ Documentation/UndocumentedOptions:
   Enabled: true
   Severity: warning
 
+Documentation/MissingReturn:
+  Description: 'Requires @return tags on all methods (opt-in for strict documentation).'
+  Enabled: false  # Opt-in validator
+  Severity: warning
+  ExcludedMethods:
+    - 'initialize'    # Exclude all initialize methods
+    # - '/^_/'        # Uncomment to exclude private methods (by convention)
+
 Documentation/MarkdownSyntax:
   Description: 'Detects common markdown syntax errors in documentation.'
   Enabled: true
