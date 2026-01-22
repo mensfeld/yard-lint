@@ -10,7 +10,7 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Parser do
   end
 
   describe '#call' do
-    context 'basic parsing' do
+    context 'when parsing basic input' do
       it 'parses input and returns array' do
         result = parser.call('')
         expect(result).to be_an(Array)
@@ -85,7 +85,7 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Parser do
       end
     end
 
-    context 'config parameter' do
+    context 'with config parameter' do
       it 'accepts config keyword argument' do
         config = Yard::Lint::Config.new
         expect { parser.call('', config: config) }.not_to raise_error
@@ -96,14 +96,14 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Parser do
       end
     end
 
-    context 'ExcludedMethods filtering' do
+    context 'with ExcludedMethods filtering' do
       let(:config) do
         Yard::Lint::Config.new do |c|
           c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', excluded)
         end
       end
 
-      context 'simple name exclusion' do
+      context 'with simple name exclusion' do
         let(:excluded) { ['initialize'] }
 
         it 'excludes methods matching simple name' do
@@ -132,7 +132,7 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Parser do
         end
       end
 
-      context 'regex pattern exclusion' do
+      context 'with regex pattern exclusion' do
         let(:excluded) { ['/^_/'] }
 
         it 'excludes methods matching regex pattern' do
@@ -190,7 +190,7 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Parser do
         end
       end
 
-      context 'arity pattern exclusion' do
+      context 'with arity pattern exclusion' do
         let(:excluded) { ['fetch/1'] }
 
         it 'excludes methods matching name and arity' do
@@ -230,7 +230,7 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Parser do
         end
       end
 
-      context 'mixed exclusion patterns' do
+      context 'with mixed exclusion patterns' do
         let(:excluded) { ['initialize', '/^_/', 'fetch/1'] }
 
         it 'applies all exclusion patterns' do
@@ -253,7 +253,7 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Parser do
         end
       end
 
-      context 'edge cases' do
+      context 'with edge cases' do
         it 'handles nil ExcludedMethods' do
           config = Yard::Lint::Config.new do |c|
             c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', nil)

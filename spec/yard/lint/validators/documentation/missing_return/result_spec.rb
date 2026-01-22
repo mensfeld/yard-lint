@@ -90,10 +90,13 @@ RSpec.describe Yard::Lint::Validators::Documentation::MissingReturn::Result do
     let(:offense) { { element: 'Example#method' } }
 
     it 'delegates to MessagesBuilder' do
-      expect(Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder)
-        .to receive(:call).with(offense)
+      allow(Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder)
+        .to receive(:call).and_call_original
 
       result.build_message(offense)
+
+      expect(Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder)
+        .to have_received(:call).with(offense)
     end
   end
 end
