@@ -23,8 +23,8 @@ class MissingReturnExamples
     :private
   end
 
-  # Boolean method also missing @return
-  # (will be caught by both validators if MissingReturn is enabled)
+  # Boolean method without an explicit @return tag in source.
+  # YARD auto-populates @return for `?` methods, so MissingReturn will not flag this.
   def enabled?
     true
   end

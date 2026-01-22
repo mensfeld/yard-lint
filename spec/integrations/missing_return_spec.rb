@@ -224,13 +224,13 @@ RSpec.describe 'MissingReturn validator', :cache_isolation do
 
         result = Yard::Lint.run(path: file, config: config_with_arity)
 
-        # Both fetch methods should not be flagged because YARD will only see
-        # the last definition in this case
+        # Only the last fetch definition (fetch/2) is visible to YARD here,
+        # so only that method can be evaluated and potentially flagged
         fetch_offenses = result.offenses.select do |o|
           o[:name].to_s == 'MissingReturnTag' && o[:message].include?('fetch')
         end
 
-        # The fetch/2 should be flagged, fetch/1 would be if it existed separately
+        # The fetch/2 should be flagged; fetch/1 would be excluded if it existed separately
         # In Ruby, the second definition overwrites the first
         expect(fetch_offenses.count).to eq(1),
           'Only the 2-parameter fetch should be flagged'
