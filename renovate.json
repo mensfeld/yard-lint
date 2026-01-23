@@ -9,7 +9,19 @@
     "pinDigests": true
   },
   "includePaths": [
+    ".ruby-version",
     "Gemfile",
-    "yard-lint.gemspec"
+    "yard-lint.gemspec",
+    ".github/workflows/**"
+  ],
+  "packageRules": [
+    {
+      "description": "Group ruby/setup-ruby action with ruby version updates",
+      "matchPackageNames": [
+        "ruby/setup-ruby",
+        "ruby"
+      ],
+      "groupName": "ruby setup"
+    }
   ]
 }
