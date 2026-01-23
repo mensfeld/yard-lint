@@ -9,7 +9,9 @@
     "pinDigests": true
   },
   "includePaths": [
+    ".ruby-version",
     "Gemfile",
-    "yard-lint.gemspec"
+    "yard-lint.gemspec",
+    ".github/workflows/**"
   ]
 }
