@@ -1,5 +1,11 @@
 # YARD-Lint Changelog
 
+## 1.5.0 (Unreleased)
+- **[Feature]** Add optional check for missing `@return` tags (#70, #72, @mensfeld)
+  - Enforces `@return` tag presence for all method definitions
+  - Excludes `initialize` methods by default (they typically don't need return documentation)
+  - Opt-in validator to help catch forgotten return value documentation
+
 ## 1.4.0 (2026-01-19)
 - **[Fix]** Handle directive definitions depending on file load order (#65, @zaben903)
 - **[CI]** Update Ruby 4.0 from preview2 to stable release as the default version
