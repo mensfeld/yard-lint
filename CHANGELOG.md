@@ -1,6 +1,20 @@
 # YARD-Lint Changelog
 
-## 1.5.0 (Unreleased)
+## 1.5.0 (2026-01-21)
+- **[Feature]** Add `--auto-gen-config` for incremental adoption on legacy codebases (#71)
+  - Generates `.yard-lint-todo.yml` with per-validator exclusions for all current violations
+  - Allows teams to adopt yard-lint without fixing all existing violations first
+  - New CLI flags:
+    - `--auto-gen-config`: Generate baseline configuration silencing existing violations
+    - `--regenerate-todo`: Regenerate todo file (overwrites existing)
+    - `--exclude-limit N`: Min files in directory before grouping into pattern (default: 15)
+  - Intelligent path grouping: converts many individual files into patterns (e.g., `lib/legacy/**/*`)
+  - Automatically updates `.yard-lint.yml` to inherit from `.yard-lint-todo.yml`
+  - Incremental workflow: remove exclusions from todo file to re-expose violations for fixing
+  - Use case: Enforce strict standards on new code while incrementally fixing legacy issues
+  - Use case: Generate baseline before CI/CD integration to prevent breaking existing builds
+  - Inspired by RuboCop's `--auto-gen-config` feature
+  - See README "Adopting YARD-Lint on Existing Projects" section for detailed usage
 - **[Feature]** Add optional check for missing `@return` tags (#70, #72, @mensfeld)
   - Enforces `@return` tag presence for all method definitions
   - Excludes `initialize` methods by default (they typically don't need return documentation)

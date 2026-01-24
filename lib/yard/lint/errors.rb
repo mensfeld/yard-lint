@@ -18,6 +18,9 @@ module Yard
 
       # Raised when a specified file or directory does not exist
       class FileNotFoundError < BaseError; end
+
+      # Raised when .yard-lint-todo.yml already exists without force flag
+      class TodoFileExistsError < BaseError; end
     end
   end
 end
