@@ -91,7 +91,15 @@ module Yard
         return nil if parsers.empty?
 
         # Parse output with all parsers (single or multiple)
-        parsed = parsers.flat_map { |parser| parser.new.call(stdout) }
+        # Check if parser accepts config keyword argument and pass it if supported
+        parsed = parsers.flat_map do |parser|
+          parser_instance = parser.new
+          if parser_accepts_config?(parser_instance)
+            parser_instance.call(stdout, config: config)
+          else
+            parser_instance.call(stdout)
+          end
+        end
         return nil if parsed.nil? || parsed.empty?
 
         validator_module::Result.new(parsed, config)
@@ -111,14 +119,20 @@ module Yard
         parsers = discover_parsers(validator_module)
         parsers.flat_map do |parser|
           parser_instance = parser.new
-          # Try passing config to parser if it accepts it (for filtering)
-          # Otherwise, call without config for backwards compatibility
-          begin
+          if parser_accepts_config?(parser_instance)
             parser_instance.call(stdout, config: config)
-          rescue ArgumentError
+          else
             parser_instance.call(stdout)
           end
         end
+      end
+
+      # Check if a parser instance accepts a config keyword argument
+      # @param parser_instance [Object] parser instance to check
+      # @return [Boolean] true if parser accepts config keyword
+      def parser_accepts_config?(parser_instance)
+        params = parser_instance.method(:call).parameters
+        params.any? { |type, name| [:key, :keyreq].include?(type) && name == :config }
       end
 
       # Auto-discover parser classes in a validator module

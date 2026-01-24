@@ -15,6 +15,10 @@
   - Use case: Generate baseline before CI/CD integration to prevent breaking existing builds
   - Inspired by RuboCop's `--auto-gen-config` feature
   - See README "Adopting YARD-Lint on Existing Projects" section for detailed usage
+- **[Feature]** Add optional check for missing `@return` tags (#70, #72, @mensfeld)
+  - Enforces `@return` tag presence for all method definitions
+  - Excludes `initialize` methods by default (they typically don't need return documentation)
+  - Opt-in validator to help catch forgotten return value documentation
 
 ## 1.4.0 (2026-01-19)
 - **[Fix]** Handle directive definitions depending on file load order (#65, @zaben903)
