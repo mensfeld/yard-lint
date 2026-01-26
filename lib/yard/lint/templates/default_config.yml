@@ -172,6 +172,15 @@ Tags/ExampleSyntax:
   Enabled: true
   Severity: warning
 
+Tags/ExampleStyle:
+  Description: 'Validates code style in @example tags using RuboCop/StandardRB.'
+  Enabled: false  # Opt-in validator (requires RuboCop or StandardRB)
+  Severity: convention
+  # Linter: auto  # Uncomment to explicitly configure: 'auto', 'rubocop', 'standard', 'none'
+  # SkipPatterns:  # Uncomment to skip examples matching patterns
+  #   - '/skip-lint/i'
+  #   - '/bad code/i'
+
 Tags/RedundantParamDescription:
   Description: 'Detects meaningless parameter descriptions that add no value.'
   Enabled: true
