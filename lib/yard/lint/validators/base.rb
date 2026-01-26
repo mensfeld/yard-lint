@@ -85,7 +85,7 @@ module Yard
         # @return [Object] the configured value or default value from the validator's Config.defaults
         # @example Usage in a validator (e.g., Tags::RedundantParamDescription)
         #   def config_articles
-        #     config_or_default('Articles')
+        #     config_or_default("Articles")
         #   end
         # @note The validator name is automatically extracted from the class namespace.
         #   For example, Yard::Lint::Validators::Tags::RedundantParamDescription::Validator

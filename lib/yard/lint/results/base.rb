@@ -8,9 +8,9 @@ module Yard
       #
       # @example Creating a validator result class
       #   class MyValidator::Result < Results::Base
-      #     self.default_severity = 'warning'
-      #     self.offense_type = 'method'
-      #     self.offense_name = 'MyOffense'
+      #     self.default_severity = "warning"
+      #     self.offense_type = "method"
+      #     self.offense_name = "MyOffense"
       #
       #     def build_message(offense)
       #       "Found issue in #{offense[:location]}"

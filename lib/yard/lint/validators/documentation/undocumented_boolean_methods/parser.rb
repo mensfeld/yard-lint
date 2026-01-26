@@ -7,7 +7,7 @@ module Yard
       module Documentation
         module UndocumentedBooleanMethods
           # Class used to extract details about undocumented boolean methods
-          # @example
+          # @example Output format (skip-lint)
           #   Platform::Analysis::Authors#valid?
           class Parser < Parsers::Base
             # Regex to extract location and method name from yard list output

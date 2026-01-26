@@ -37,14 +37,14 @@ module Yard
         #   # Does something
         #   # @return [void]
         #   def do_something
-        #     puts 'done'
+        #     puts "done"
         #   end
         #
         # @example Good - Document side effects instead
         #   # Prints 'done' to stdout
         #   # @return [nil] always returns nil after printing
         #   def do_something
-        #     puts 'done'
+        #     puts "done"
         #   end
         #
         # @example Bad - @param [Object] (when configured as forbidden)
