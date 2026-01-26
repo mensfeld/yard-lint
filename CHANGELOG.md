@@ -1,5 +1,19 @@
 # YARD-Lint Changelog
 
+## Unreleased
+- **[Feature]** Add `Tags/ExampleStyle` validator for linting code examples with RuboCop/StandardRB (#74)
+  - Validates code style in `@example` tags using RuboCop or StandardRB
+  - Auto-detects RuboCop or StandardRB from project setup (checks for `.rubocop.yml`, `.standard.yml`, Gemfile, or Gemfile.lock)
+  - Respects project's `.rubocop.yml` or `.standard.yml` configuration
+  - Supports skip patterns for intentional "bad code" examples (e.g., `@example Bad code (skip-lint)`)
+  - Opt-in validator (disabled by default, requires RuboCop or StandardRB gem)
+  - Convention severity by default for style issues
+  - Automatically disables file-level cops irrelevant to code snippets (e.g., `Style/FrozenStringLiteralComment`, metrics cops)
+  - Gracefully degrades when no linter is available (no crashes, debug warning only)
+  - Ensures code examples follow the same style guidelines as your codebase for consistency
+  - Configurable linter selection (`Linter: auto`, `rubocop`, `standard`, or `none`)
+  - Supports inline RuboCop directives (e.g., `# rubocop:disable Style/StringLiterals`)
+
 ## 1.5.0 (2026-01-21)
 - **[Feature]** Add `--auto-gen-config` for incremental adoption on legacy codebases (#71)
   - Generates `.yard-lint-todo.yml` with per-validator exclusions for all current violations

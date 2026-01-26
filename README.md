@@ -33,6 +33,7 @@ YARD-Lint validates your YARD documentation for:
 - **Abstract method validation**: Ensure @abstract methods don't have real implementations
 - **Option hash documentation**: Validate that methods with options parameters have @option tags
 - **Example code syntax validation**: Validates Ruby syntax in `@example` tags to catch broken code examples
+- **Example code style validation**: Validates code style in `@example` tags using RuboCop or StandardRB to ensure consistency with your codebase (opt-in)
 - **Redundant parameter descriptions**: Detects meaningless parameter descriptions that add no value (e.g., `@param user [User] The user`)
 - **Empty comment lines**: Detects unnecessary empty `#` lines at the start or end of documentation blocks
 - **Blank lines before definitions**: Detects blank lines between YARD documentation and method/class/module definitions (single blank line = convention violation, 2+ blank lines = orphaned documentation that YARD ignores)
@@ -161,6 +162,61 @@ yard-lint --auto-gen-config --exclude-limit 10
 - **Incremental refactoring**: Fix documentation violations one module at a time
 - **CI/CD enforcement**: Ensure no new violations are introduced while allowing existing ones
 - **Baseline tracking**: Regenerate periodically to track progress as you fix violations
+
+### Validating Code Example Style
+
+The `Tags/ExampleStyle` validator ensures code examples in `@example` tags follow your project's style guidelines using RuboCop or StandardRB.
+
+**Requirements:**
+- RuboCop or StandardRB gem must be installed in your project
+- Validator auto-detects which linter to use based on your project setup
+
+**Enable the validator:**
+
+```yaml
+# .yard-lint.yml
+Tags/ExampleStyle:
+  Enabled: true
+```
+
+The validator will automatically:
+- Detect RuboCop or StandardRB from your project setup
+- Use your project's `.rubocop.yml` or `.standard.yml` configuration
+- Report style offenses in code examples
+
+**Skipping specific examples:**
+
+For examples intentionally showing bad code (anti-patterns, common mistakes):
+
+```ruby
+# @example Bad code (skip-lint)
+#   user = User.new("invalid")
+```
+
+Or use inline RuboCop directives:
+
+```ruby
+# @example
+#   # rubocop:disable Style/StringLiterals
+#   user = User.new("invalid")
+#   # rubocop:enable Style/StringLiterals
+```
+
+**Advanced configuration:**
+
+```yaml
+Tags/ExampleStyle:
+  Enabled: true
+  Linter: auto  # Options: 'auto', 'rubocop', 'standard', 'none'
+  SkipPatterns:
+    - '/skip-lint/i'
+    - '/bad code/i'
+    - '/anti-pattern/i'
+  DisabledCops:  # Additional cops to disable beyond defaults
+    - 'Style/SomeCustomCop'
+```
+
+**Note:** This validator is opt-in (disabled by default). Style violations have 'convention' severity by default and won't fail CI unless your `FailOnSeverity` is set to 'convention'.
 
 ### Command Line
 
