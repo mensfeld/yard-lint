@@ -19,7 +19,6 @@ module Yard
               return unless object.has_tag?(:example)
 
               # Get or initialize runner (memoized for performance)
-              runner = get_or_create_runner
               return unless runner
 
               # Process each example
@@ -47,9 +46,9 @@ module Yard
 
             private
 
-            # Get or create memoized runner instance
+            # Memoized runner instance
             # @return [RubocopRunner, nil] runner instance or nil if no linter available
-            def get_or_create_runner
+            def runner
               return @runner if defined?(@runner)
 
               # Detect linter
