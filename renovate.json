@@ -11,6 +11,7 @@
   "includePaths": [
     ".ruby-version",
     "Gemfile",
+    "Gemfile.lint",
     "yard-lint.gemspec",
     ".github/workflows/**"
   ],

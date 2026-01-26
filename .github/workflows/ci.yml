@@ -54,6 +54,8 @@ jobs:
   yard-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      BUNDLE_GEMFILE: Gemfile.lint
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -70,9 +72,11 @@ jobs:
       - name: Run YARD Lint (dogfooding)
         run: bundle exec bin/yard-lint lib/
 
-  coditsu:
+  rubocop:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      BUNDLE_GEMFILE: Gemfile.lint
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -80,15 +84,14 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Download Coditsu script
-        run: curl -sSL https://api.coditsu.io/run/ci -o coditsu_script.sh
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
 
-      - name: Verify checksum
-        run: |
-          echo "7dc7f736b81ad79cfa065ceb87506908dfcd1ec1202f384426d72342396f7377  coditsu_script.sh" | sha256sum -c -
-
-      - name: Run Coditsu
-        run: bash coditsu_script.sh
+      - name: Run rubocop
+        run: bundle exec rubocop
 
   ci-success:
     name: CI Success
@@ -97,7 +100,7 @@ jobs:
     needs:
       - specs
       - yard-lint
-      - coditsu
+      - rubocop
 
     steps:
       - name: Check all jobs passed

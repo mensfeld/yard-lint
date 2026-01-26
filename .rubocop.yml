@@ -1,0 +1,218 @@
+# frozen_string_literal: true
+
+plugins:
+  - rubocop-capybara
+  - rubocop-factory_bot
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-thread_safety
+
+inherit_gem:
+  standard: config/base.yml
+  standard-performance: config/base.yml
+  standard-rspec: config/base.yml
+
+# Disabled departments - not needed for this project
+Capybara:
+  Enabled: false
+
+FactoryBot:
+  Enabled: false
+
+RSpecRails:
+  Enabled: false
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+
+  Include:
+    - Gemfile.lint
+
+  Exclude:
+    - bin/**/*
+    - db/schema.rb
+    - .gemspec/**/*
+    - .bundle/**/*
+    - vendor/**/*
+    - '**/dummy**/*'
+    - !ruby/regexp /old_and_unused\.rb$/
+
+Naming/PredicateMethod:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 199
+
+Lint/DuplicateBranch:
+  Enabled: false
+
+Lint/EmptyClass:
+  Enabled: false
+
+Naming/FileName:
+  Exclude:
+    - '*.gemspec'
+    - 'lib/yard-lint.rb'
+    - 'spec/yard-lint_spec.rb'
+
+Naming/AccessorMethodName:
+  Exclude:
+    - spec/support/vendors/**/*.rb
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: never
+
+Lint/MissingSuper:
+  Exclude:
+    - 'spec/support/rspec_locator.rb'
+
+# We use object_id often in the integration specs to check instances of objects, etc
+Lint/HashCompareByIdentity:
+  Exclude:
+    - 'spec/integrations/**/*'
+
+Layout/FirstParameterIndentation:
+  EnforcedStyle: consistent
+
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/LineEndStringConcatenationIndentation:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/OpenStructUse:
+  Exclude:
+    - 'spec/**/*'
+
+Lint/UselessAssignment:
+  Exclude:
+    - 'spec/integrations/**/*'
+
+Style/CommentAnnotation:
+  Exclude:
+    - 'spec/integrations/**/*'
+
+Lint/UselessAccessModifier:
+  Exclude:
+    - 'spec/integrations/**/*'
+
+Lint/UnusedMethodArgument:
+  Exclude:
+    - 'spec/integrations/**/*'
+    - 'spec/fixtures/**/*'
+
+Metrics/BlockNesting:
+  Exclude:
+    - bin/yard-lint
+
+Style/SafeNavigation:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
+
+Lint/NonLocalExitFromIterator:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Style/OptionalBooleanParameter:
+  Enabled: false
+
+Lint/StructNewOverride:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/SymbolProc:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Style/ExplicitBlockArgument:
+  Enabled: false
+
+Style/StringConcatenation:
+  Enabled: false
+
+Performance/RedundantBlockCall:
+  Exclude:
+    - spec/benchmarks_helper.rb
+
+RSpec/DescribeClass:
+  Exclude:
+    - 'spec/integrations/**/*'
+    - spec/yard-lint_spec.rb
+    - spec/yard/lint/version_spec.rb
+
+RSpec/SpecFilePathFormat:
+  Exclude:
+    - spec/yard/lint/version_spec.rb
+
+  CustomTransform:
+    RuboCop: rubo_cop
+    Rspec: r_spec
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: true
+  Max: 5
+
+RSpec/MessageSpies:
+  EnforcedStyle: have_received
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: true
+  Max: 20
+
+RSpec/SubjectStub:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/IndexedLet:
+  Enabled: false
+
+RSpec/NoExpectationExample:
+  Enabled: false
