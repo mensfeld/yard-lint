@@ -46,8 +46,8 @@ module Yard
 
                 example_name = example.name || "Example #{index + 1}"
 
-                # Run linter
-                offenses = runner.run(code, example_name)
+                # Run linter (pass file path for context/config discovery)
+                offenses = runner.run(code, example_name, file_path: object.file)
 
                 # Output each offense
                 offenses.each do |offense|

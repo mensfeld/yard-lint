@@ -179,7 +179,7 @@ Tags/ExampleSyntax:
 Tags/ExampleStyle:
   Description: 'Validates code style in @example tags using RuboCop/StandardRB.'
   Enabled: false  # Opt-in validator (requires RuboCop or StandardRB)
-  Severity: error
+  Severity: convention
   # Linter: auto  # Uncomment to explicitly configure: 'auto', 'rubocop', 'standard', 'none'
   # SkipPatterns:  # Uncomment to skip examples matching patterns
   #   - '/skip-lint/i'

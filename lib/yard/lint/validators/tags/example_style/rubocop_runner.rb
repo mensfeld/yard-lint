@@ -22,8 +22,9 @@ module Yard
             # Run linter on code example and return offenses
             # @param code [String] Ruby code extracted from @example tag to check for style violations
             # @param example_name [String] name of the example for context
+            # @param file_path [String] path to the file being linted (for config discovery)
             # @return [Array<Hash>] array of offense hashes with :cop_name, :message, :line, :column keys
-            def run(code, example_name)
+            def run(code, example_name, file_path: nil)
               return [] if should_skip?(example_name)
 
               cleaned_code = clean_code(code)
@@ -31,9 +32,9 @@ module Yard
 
               case @linter
               when :rubocop
-                run_rubocop(cleaned_code)
+                run_rubocop(cleaned_code, file_path: file_path)
               when :standard
-                run_standard(cleaned_code)
+                run_standard(cleaned_code, file_path: file_path)
               else
                 []
               end
@@ -73,6 +74,29 @@ module Yard
               flags
             end
 
+            # Find RuboCop config file in starting directory or parent directories
+            # @param start_dir [String] directory to start searching from
+            # @return [String, nil] path to config file or nil if not found
+            def find_rubocop_config(start_dir = Dir.pwd)
+              current_dir = start_dir
+              config_names = ['.rubocop.yml', '.rubocop.yaml']
+
+              # Search up the directory tree
+              loop do
+                config_names.each do |name|
+                  config_path = File.join(current_dir, name)
+                  return config_path if File.exist?(config_path)
+                end
+
+                parent_dir = File.dirname(current_dir)
+                break if parent_dir == current_dir # Reached root
+
+                current_dir = parent_dir
+              end
+
+              nil
+            end
+
             # Check if example should be skipped based on skip patterns
             # @param example_name [String] name of the example
             # @return [Boolean] true if should skip
@@ -97,17 +121,25 @@ module Yard
 
             # Run RuboCop on code and parse JSON output
             # @param code [String] Ruby code snippet to analyze with RuboCop
+            # @param file_path [String] path to the file being linted (for config discovery)
             # @return [Array<Hash>] array of offense hashes
-            def run_rubocop(code)
+            def run_rubocop(code, file_path: nil)
+              # Determine working directory from file path
+              work_dir = file_path ? File.dirname(file_path) : Dir.pwd
+
               # Build RuboCop command
               cmd = ['rubocop', '--format', 'json', '--stdin', 'example.rb']
 
-              # Add disabled cops
-              @disabled_cops.each do |cop|
-                cmd += ['--except', cop]
+              # Add config file if it exists in the file's directory
+              config_file = find_rubocop_config(work_dir)
+              cmd += ['--config', config_file] if config_file
+
+              # Add disabled cops (comma-separated)
+              unless @disabled_cops.empty?
+                cmd += ['--except', @disabled_cops.join(',')]
               end
 
-              stdout, = Open3.capture3(*cmd, stdin_data: code)
+              stdout, = Open3.capture3(*cmd, stdin_data: code, chdir: work_dir)
 
               # RuboCop returns non-zero exit status when offenses are found
               # We only care about actual errors (not offense findings)
@@ -121,13 +153,17 @@ module Yard
 
             # Run StandardRB on code and parse JSON output
             # @param code [String] Ruby code snippet to analyze with StandardRB
+            # @param file_path [String] path to the file being linted (for config discovery)
             # @return [Array<Hash>] array of offense hashes
-            def run_standard(code)
+            def run_standard(code, file_path: nil)
+              # Determine working directory from file path
+              work_dir = file_path ? File.dirname(file_path) : Dir.pwd
+
               # StandardRB doesn't support --except for individual cops
               # Users must configure exclusions in .standard.yml
               cmd = ['standardrb', '--format', 'json', '--stdin', 'example.rb']
 
-              stdout, = Open3.capture3(*cmd, stdin_data: code)
+              stdout, = Open3.capture3(*cmd, stdin_data: code, chdir: work_dir)
 
               # StandardRB returns non-zero exit status when offenses are found
               return [] if stdout.empty?

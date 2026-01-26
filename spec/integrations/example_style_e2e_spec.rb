@@ -37,6 +37,8 @@ RSpec.describe 'ExampleStyle E2E Integration' do
         rubocop_config = <<~YAML
           Style/StringLiterals:
             EnforcedStyle: single_quotes
+          Layout/TrailingEmptyLines:
+            Enabled: false
           AllCops:
             NewCops: disable
         YAML
@@ -46,7 +48,7 @@ RSpec.describe 'ExampleStyle E2E Integration' do
 
         style_offenses = result.offenses.select { |o| o[:name] == 'ExampleStyle' }
         expect(style_offenses).not_to be_empty
-        expect(style_offenses.first[:message]).to include('StringLiterals')
+        expect(style_offenses.any? { |o| o[:message].include?('StringLiterals') }).to be true
         expect(style_offenses.first[:severity]).to eq('convention')
       end
     end
@@ -76,6 +78,8 @@ RSpec.describe 'ExampleStyle E2E Integration' do
         rubocop_config = <<~YAML
           Style/StringLiterals:
             EnforcedStyle: single_quotes
+          Layout/TrailingEmptyLines:
+            Enabled: false
           AllCops:
             NewCops: disable
         YAML
@@ -117,6 +121,8 @@ RSpec.describe 'ExampleStyle E2E Integration' do
         rubocop_config = <<~YAML
           Style/StringLiterals:
             EnforcedStyle: single_quotes
+          Layout/TrailingEmptyLines:
+            Enabled: false
         YAML
         File.write(File.join(dir, '.rubocop.yml'), rubocop_config)
 
@@ -153,6 +159,8 @@ RSpec.describe 'ExampleStyle E2E Integration' do
         rubocop_config = <<~YAML
           Style/StringLiterals:
             EnforcedStyle: single_quotes
+          Layout/TrailingEmptyLines:
+            Enabled: false
           AllCops:
             NewCops: disable
         YAML
@@ -196,6 +204,8 @@ RSpec.describe 'ExampleStyle E2E Integration' do
         rubocop_config = <<~YAML
           Style/StringLiterals:
             EnforcedStyle: single_quotes
+          Layout/TrailingEmptyLines:
+            Enabled: false
           AllCops:
             NewCops: disable
         YAML
