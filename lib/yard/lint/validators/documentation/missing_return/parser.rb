@@ -6,7 +6,7 @@ module Yard
       module Documentation
         module MissingReturn
           # Class used to extract details about methods missing @return tags from validator output
-          # @example
+          # @example Output format (skip-lint)
           #   /path/to/file.rb:3: ClassName#method_name|2
           #   /path/to/file.rb:10: ModuleName.class_method|0
           class Parser < ::Yard::Lint::Parsers::Base

@@ -6,7 +6,7 @@ module Yard
       module Documentation
         module UndocumentedMethodArguments
           # Class used to extract details about methods with undocumented arguments
-          # @example
+          # @example Output format (skip-lint)
           #   /path/to/file.rb:10: Platform::Analysis::Authors#initialize
           class Parser < Parsers::Base
             # Regex to extract file, line, and method name from yard list output

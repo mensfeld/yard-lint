@@ -6,7 +6,7 @@ module Yard
       module Documentation
         module UndocumentedObjects
           # Class used to extract details about undocumented objects from raw yard list output
-          # @example
+          # @example Output format (skip-lint)
           #   /path/to/file.rb:3: UndocumentedClass
           #   /path/to/file.rb:4: UndocumentedClass#method_one|2
           class Parser < ::Yard::Lint::Parsers::Base

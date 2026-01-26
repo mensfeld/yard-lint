@@ -7,7 +7,7 @@ module Yard
         module TagGroupSeparator
           # Parser for extracting tag group separator violations from raw validator output.
           #
-          # @example Output format
+          # @example Output format (skip-lint)
           #   /path/to/file.rb:10: ClassName#method_name
           #   param->return,return->error
           class Parser < Parsers::Base

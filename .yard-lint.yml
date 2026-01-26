@@ -171,6 +171,8 @@ Tags/ExampleStyle:
   Description: 'Validates code style in @example tags using RuboCop/StandardRB.'
   Enabled: true
   Severity: convention
+  SkipPatterns:
+    - '/skip-lint/i'
 
 Tags/RedundantParamDescription:
   Description: 'Detects meaningless parameter descriptions that add no value.'
