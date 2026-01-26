@@ -13,8 +13,6 @@
   - Ensures code examples follow the same style guidelines as your codebase for consistency
   - Configurable linter selection (`Linter: auto`, `rubocop`, `standard`, or `none`)
   - Supports inline RuboCop directives (e.g., `# rubocop:disable Style/StringLiterals`)
-
-## 1.5.0 (2026-01-21)
 - **[Feature]** Add `--auto-gen-config` for incremental adoption on legacy codebases (#71)
   - Generates `.yard-lint-todo.yml` with per-validator exclusions for all current violations
   - Allows teams to adopt yard-lint without fixing all existing violations first
