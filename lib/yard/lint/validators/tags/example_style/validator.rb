@@ -18,24 +18,9 @@ module Yard
             def in_process_query(object, collector)
               return unless object.has_tag?(:example)
 
-              # Detect linter
-              linter_type = config_or_default('Linter')
-              detected_linter = LinterDetector.detect(linter_type)
-
-              # Gracefully skip if no linter available
-              if detected_linter == :none
-                warn_once_about_missing_linter if ENV['DEBUG']
-                return
-              end
-
-              # Initialize runner
-              disabled_cops = config_or_default('DisabledCops')
-              skip_patterns = config_or_default('SkipPatterns')
-              runner = RubocopRunner.new(
-                linter: detected_linter,
-                disabled_cops: disabled_cops,
-                skip_patterns: skip_patterns
-              )
+              # Get or initialize runner (memoized for performance)
+              runner = get_or_create_runner
+              return unless runner
 
               # Process each example
               example_tags = object.tags(:example)
@@ -61,6 +46,32 @@ module Yard
             end
 
             private
+
+            # Get or create memoized runner instance
+            # @return [RubocopRunner, nil] runner instance or nil if no linter available
+            def get_or_create_runner
+              return @runner if defined?(@runner)
+
+              # Detect linter
+              linter_type = config_or_default('Linter')
+              detected_linter = LinterDetector.detect(linter_type)
+
+              # Gracefully skip if no linter available
+              if detected_linter == :none
+                warn_once_about_missing_linter if ENV['DEBUG']
+                @runner = nil
+                return nil
+              end
+
+              # Initialize and memoize runner
+              disabled_cops = config_or_default('DisabledCops')
+              skip_patterns = config_or_default('SkipPatterns')
+              @runner = RubocopRunner.new(
+                linter: detected_linter,
+                disabled_cops: disabled_cops,
+                skip_patterns: skip_patterns
+              )
+            end
 
             # Warn once about missing linter (class-level tracking)
             def warn_once_about_missing_linter

@@ -12,8 +12,6 @@ module Yard
               'Enabled' => false,  # Opt-in validator
               'Severity' => 'convention',
               'Linter' => 'auto',  # 'auto', 'rubocop', 'standard', or 'none'
-              'RespectProjectConfig' => true,
-              'CustomConfigPath' => nil,
               'SkipPatterns' => [],
               'DisabledCops' => [
                 # File-level cops that don't make sense for code snippets

@@ -13,8 +13,6 @@ RSpec.describe Yard::Lint::Validators::Tags::ExampleStyle::Config do
         'Enabled' => false,  # Opt-in validator
         'Severity' => 'convention',
         'Linter' => 'auto',
-        'RespectProjectConfig' => true,
-        'CustomConfigPath' => nil,
         'SkipPatterns' => [],
         'DisabledCops' => [
           'Style/FrozenStringLiteralComment',

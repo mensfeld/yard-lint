@@ -212,7 +212,9 @@ Tags/ExampleStyle:
     - '/skip-lint/i'
     - '/bad code/i'
     - '/anti-pattern/i'
-  DisabledCops:  # Additional cops to disable beyond defaults
+  DisabledCops:  # Override default disabled cops (replaces entire list)
+    - 'Style/FrozenStringLiteralComment'
+    - 'Layout/TrailingEmptyLines'
     - 'Style/SomeCustomCop'
 ```
 

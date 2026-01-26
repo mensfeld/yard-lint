@@ -4,6 +4,8 @@ RSpec.describe 'ExampleStyle E2E Integration' do
   let(:config) do
     test_config do |c|
       c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
+      # Explicitly set linter to avoid non-deterministic auto-detection
+      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Linter', 'rubocop')
     end
   end
 
@@ -220,6 +222,12 @@ RSpec.describe 'ExampleStyle E2E Integration' do
     end
 
     it 'detects actual style violations using real StandardRB' do
+      # Explicitly configure StandardRB linter
+      standard_config = test_config do |c|
+        c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
+        c.send(:set_validator_config, 'Tags/ExampleStyle', 'Linter', 'standard')
+      end
+
       fixture_content = <<~RUBY
         # frozen_string_literal: true
 
@@ -240,13 +248,7 @@ RSpec.describe 'ExampleStyle E2E Integration' do
         file_path = File.join(dir, 'test.rb')
         File.write(file_path, fixture_content)
 
-        # Create a .standard.yml to ensure StandardRB is used
-        standard_config = <<~YAML
-          parallel: true
-        YAML
-        File.write(File.join(dir, '.standard.yml'), standard_config)
-
-        result = Yard::Lint.run(path: file_path, config: config, progress: false)
+        result = Yard::Lint.run(path: file_path, config: standard_config, progress: false)
 
         style_offenses = result.offenses.select { |o| o[:name] == 'ExampleStyle' }
         # Verify validator works with StandardRB (behavior varies by version)
