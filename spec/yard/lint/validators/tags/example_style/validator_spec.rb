@@ -94,7 +94,7 @@ RSpec.describe Yard::Lint::Validators::Tags::ExampleStyle::Validator do
 
         runner = double('runner')
         allow(Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner).to receive(:new).and_return(runner)
-        allow(runner).to receive(:run).with('user = User.new', 'Example 1').and_return([])
+        allow(runner).to receive(:run).with('user = User.new', 'Example 1', file_path: 'lib/user.rb').and_return([])
 
         validator.in_process_query(object, collector)
       end

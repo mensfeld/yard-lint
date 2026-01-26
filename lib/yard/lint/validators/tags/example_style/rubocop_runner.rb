@@ -107,7 +107,7 @@ module Yard
             # Clean code by removing output indicators and extra whitespace
             # Mirrors the logic from ExampleSyntax validator
             # @param code [String] raw code from @example tag
-            # @return [String] cleaned code
+            # @return [String] cleaned code with preserved trailing newline
             def clean_code(code)
               return '' if code.nil? || code.empty?
 
@@ -116,7 +116,9 @@ module Yard
                 line.sub(/\s*#\s*=>.*$/, '')
               end
 
-              code_lines.join("\n").strip
+              # Join lines and add single trailing newline for RuboCop
+              cleaned = code_lines.join("\n").strip
+              cleaned.empty? ? '' : "#{cleaned}\n"
             end
 
             # Run RuboCop on code and parse JSON output

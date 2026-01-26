@@ -431,9 +431,8 @@ RSpec.describe 'ExampleStyle Advanced Features' do
       )
 
       expect(Open3).to receive(:capture3) do |*args, **_kwargs|
-        disabled_cops.each do |cop|
-          expect(args).to include('--except', cop)
-        end
+        # Cops should be passed as a comma-separated list
+        expect(args).to include('--except', disabled_cops.join(','))
         ['{"files":[]}', '', double(success?: true)]
       end
 
