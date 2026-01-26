@@ -32,12 +32,7 @@ AllCops:
 
   Exclude:
     - bin/**/*
-    - db/schema.rb
-    - .gemspec/**/*
-    - .bundle/**/*
     - vendor/**/*
-    - '**/dummy**/*'
-    - !ruby/regexp /old_and_unused\.rb$/
 
 Naming/PredicateMethod:
   Enabled: false
@@ -65,8 +60,7 @@ Style/HashSyntax:
   EnforcedShorthandSyntax: never
 
 Lint/MissingSuper:
-  Exclude:
-    - 'spec/support/rspec_locator.rb'
+  Enabled: false
 
 # We use object_id often in the integration specs to check instances of objects, etc
 Lint/HashCompareByIdentity:
@@ -174,8 +168,7 @@ Style/StringConcatenation:
   Enabled: false
 
 Performance/RedundantBlockCall:
-  Exclude:
-    - spec/benchmarks_helper.rb
+  Enabled: false
 
 RSpec/DescribeClass:
   Exclude:
