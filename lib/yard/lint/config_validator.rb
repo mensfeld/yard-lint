@@ -71,7 +71,11 @@ module Yard
       def validate_global_settings!
         all_validators = @raw_config['AllValidators']
         return unless all_validators
-        return unless all_validators.is_a?(Hash)
+
+        unless all_validators.is_a?(Hash)
+          @errors << "Invalid AllValidators: must be a Hash, got #{all_validators.class}"
+          return
+        end
 
         # Only validate specific known settings, allow unknown keys to pass through
         # This allows users to put custom data in AllValidators
@@ -108,7 +112,11 @@ module Yard
         @raw_config.each do |key, value|
           # Only process validator keys (containing '/')
           next unless key.include?('/')
-          next unless value.is_a?(Hash)
+
+          unless value.is_a?(Hash)
+            @errors << "Invalid configuration for validator '#{key}': expected a Hash, got #{value.class}"
+            next
+          end
 
           validate_validator_exists!(key)
           validate_validator_config!(key, value)
@@ -149,6 +157,12 @@ module Yard
         exclude = config['Exclude']
         if exclude && !exclude.is_a?(Array)
           @errors << "Invalid Exclude for #{validator_name}: must be an array, got #{exclude.class}"
+        end
+
+        # Validate YardOptions is an array
+        yard_options = config['YardOptions']
+        if yard_options && !yard_options.is_a?(Array)
+          @errors << "Invalid YardOptions for #{validator_name}: must be an array, got #{yard_options.class}"
         end
 
         # Check for unknown validator-specific keys

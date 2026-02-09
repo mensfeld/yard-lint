@@ -238,5 +238,42 @@ RSpec.describe Yard::Lint::ConfigValidator do
         expect { described_class.validate!(config) }.not_to raise_error
       end
     end
+
+    context 'with type validation for config structures' do
+      it 'raises error when AllValidators is not a Hash' do
+        config = {
+          'AllValidators' => true
+        }
+
+        expect { described_class.validate!(config) }
+          .to raise_error(Yard::Lint::Errors::InvalidConfigError) do |error|
+          expect(error.message).to include('Invalid AllValidators: must be a Hash, got TrueClass')
+        end
+      end
+
+      it 'raises error when validator config is not a Hash' do
+        config = {
+          'Tags/Order' => true
+        }
+
+        expect { described_class.validate!(config) }
+          .to raise_error(Yard::Lint::Errors::InvalidConfigError) do |error|
+          expect(error.message).to include("Invalid configuration for validator 'Tags/Order': expected a Hash, got TrueClass")
+        end
+      end
+
+      it 'raises error when per-validator YardOptions is not an array' do
+        config = {
+          'Documentation/UndocumentedObjects' => {
+            'YardOptions' => '--private'
+          }
+        }
+
+        expect { described_class.validate!(config) }
+          .to raise_error(Yard::Lint::Errors::InvalidConfigError) do |error|
+          expect(error.message).to include('Invalid YardOptions for Documentation/UndocumentedObjects: must be an array')
+        end
+      end
+    end
   end
 end
