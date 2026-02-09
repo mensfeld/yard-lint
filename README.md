@@ -15,34 +15,20 @@ Accurate documentation isn't just for human developers anymore. [Research shows]
 
 **The solution:** YARD-Lint automatically validates your YARD documentation stays synchronized with your code, ensuring both human developers and AI tools have accurate context.
 
-## Features
+## Features Overview
 
 YARD-Lint validates your YARD documentation for:
 
-- **Undocumented code**: Classes, modules, methods, and constants without documentation
-- **Missing parameter documentation**: Methods with undocumented parameters
-- **Invalid tag types**: Type definitions that aren't valid Ruby classes or allowed defaults
-- **Invalid type syntax**: Malformed YARD type syntax (unclosed brackets, empty generics, etc.)
-- **Non-ASCII type characters**: Detects Unicode characters in type specifications (e.g., `…`, `→`, `—`) that are invalid Ruby identifiers
-- **Invalid tag ordering**: Tags that don't follow your specified order
-- **Meaningless tags**: `@param` or `@option` tags on classes, modules, or constants (only valid on methods)
-- **Collection type syntax**: Enforces `Hash{K => V}` over `Hash<K, V>` (YARD standard)
-- **Type annotation position**: Validates whether types appear before or after parameter names (configurable)
-- **Boolean method documentation**: Question mark methods missing return type documentation
-- **API tag validation**: Enforce @api tags on public objects and validate API values
-- **Abstract method validation**: Ensure @abstract methods don't have real implementations
-- **Option hash documentation**: Validate that methods with options parameters have @option tags
-- **Example code syntax validation**: Validates Ruby syntax in `@example` tags to catch broken code examples
-- **Example code style validation**: Validates code style in `@example` tags using RuboCop or StandardRB to ensure consistency with your codebase (opt-in)
-- **Redundant parameter descriptions**: Detects meaningless parameter descriptions that add no value (e.g., `@param user [User] The user`)
-- **Empty comment lines**: Detects unnecessary empty `#` lines at the start or end of documentation blocks
-- **Blank lines before definitions**: Detects blank lines between YARD documentation and method/class/module definitions (single blank line = convention violation, 2+ blank lines = orphaned documentation that YARD ignores)
-- **Informal notation patterns**: Detects `Note:`, `TODO:`, `See:` etc. and suggests proper YARD tags (`@note`, `@todo`, `@see`)
-- **Tag group separation**: Enforces blank lines between different YARD tag groups (e.g., between `@param` and `@return` tags) for improved readability
-- **Forbidden tag patterns**: Configurable patterns to disallow specific tags or tag/type combinations (e.g., `@return [void]`, `@param [Object]`)
-- **YARD warnings**: Unknown tags, invalid directives, duplicated parameter names, and more
-- **Smart suggestions**: Provides "did you mean" suggestions for typos in parameter names using Ruby's `did_you_mean` gem with Levenshtein distance fallback
-- **Configuration validation**: Validates `.yard-lint.yml` for typos and invalid settings before processing files, with helpful "did you mean" suggestions
+- **Documentation Completeness** - Undocumented classes, modules, methods, parameters, and boolean return values
+- **Type Accuracy** - Invalid type definitions, malformed type syntax, non-ASCII characters in types
+- **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions
+- **Code Examples** - Syntax validation in `@example` tags, optional style validation with RuboCop/StandardRB
+- **Semantic Correctness** - Abstract methods with implementations, redundant descriptions
+- **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns
+- **Smart Suggestions** - "Did you mean" suggestions for typos in parameter names and tags
+- **Configuration Safety** - Validates `.yard-lint.yml` for typos and invalid settings before processing
+
+**See the complete list:** [📚 All 28 Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [🔍 30+ Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -64,371 +50,133 @@ Or install it yourself as:
 gem install yard-lint
 ```
 
-## Usage
+**See also:** [📦 Installation Guide](https://github.com/mensfeld/yard-lint/wiki/Installation) - Platform notes, troubleshooting, upgrading
 
-### Quick Start
+## Quick Start
 
-Generate a default configuration file:
+### Generate Configuration
 
 ```bash
+# Create .yard-lint.yml with sensible defaults
 yard-lint --init
-```
 
-This creates `.yard-lint.yml` with sensible defaults in your current directory.
-
-For new projects with high documentation standards, use strict mode:
-
-```bash
+# For new projects with high standards, use strict mode
 yard-lint --init --strict
 ```
 
-This creates a strict configuration with:
-- All validators set to `error` severity (no warnings or conventions)
-- Minimum documentation coverage set to 100%
-- Perfect for bootstrapping new repositories with high quality standards
-
-After upgrading yard-lint, update your config to include any new validators:
+### Run on Your Codebase
 
 ```bash
+# Lint all files in lib/
+yard-lint lib/
+```
+
+### Update Configuration After Upgrading
+
+```bash
+# Add new validators, remove obsolete ones
 yard-lint --update
 ```
 
-This will:
-- Add any new validators introduced in the latest version (with their default settings)
-- Remove any obsolete validators that no longer exist
-- Preserve all your existing configuration
+**Learn more:** [⚙️ Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
 
-### Adopting YARD-Lint on Existing Projects
+## Common Workflows
 
-For existing projects with many violations, use `--auto-gen-config` to generate a baseline configuration that silences all current violations. This allows you to enforce strict standards on new code while incrementally fixing legacy issues.
+### Lint Only Changed Files (Diff Mode)
+
+Perfect for CI/CD, pre-commit hooks, and legacy codebases:
+
+```bash
+# Lint files changed since main branch
+yard-lint lib/ --diff
+
+# Lint only staged files (pre-commit hook)
+yard-lint lib/ --staged
+
+# Lint uncommitted changes
+yard-lint lib/ --changed
+```
+
+**Learn more:** [🔄 Diff Mode Guide](https://github.com/mensfeld/yard-lint/wiki/Diff-Mode)
+
+### Adopt on Existing Projects (Incremental Adoption)
+
+For projects with many existing violations, generate a baseline that excludes current issues:
 
 ```bash
 # Generate .yard-lint-todo.yml with exclusions for all current violations
 yard-lint --auto-gen-config
-```
 
-This creates two files:
-
-1. `.yard-lint-todo.yml` - Contains per-validator exclusions for all files with current violations
-2. `.yard-lint.yml` - Created or updated to inherit from the todo file
-
-After running `--auto-gen-config`, your next `yard-lint` run will show no offenses:
-
-```bash
-yard-lint lib/
-# => No offenses found
-```
-
-**Incremental adoption workflow:**
-
-```bash
-# 1. Generate baseline
-yard-lint --auto-gen-config
-
-# 2. Edit .yard-lint-todo.yml to remove some exclusions
-#    (e.g., remove lib/models/user.rb from Documentation/UndocumentedObjects)
-
-# 3. Run yard-lint to see violations for those files
+# Now yard-lint shows no offenses
 yard-lint lib/
 
-# 4. Fix the violations
-
-# 5. Commit the changes
-
-# 6. Repeat until .yard-lint-todo.yml is empty
+# Fix violations incrementally by removing exclusions from .yard-lint-todo.yml
 ```
 
-**Regenerating the todo file:**
+**Learn more:** [📈 Incremental Adoption Guide](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)
+
+### Check Documentation Coverage
 
 ```bash
-# Regenerate .yard-lint-todo.yml (overwrites existing)
-yard-lint --regenerate-todo
-
-# Customize grouping threshold (default: 15 files)
-# Lower values = more specific patterns, higher values = more individual files
-yard-lint --auto-gen-config --exclude-limit 10
-```
-
-**How it works:**
-
-- Runs yard-lint on your codebase and collects all violations
-- Groups violations by validator type
-- Generates exclusion patterns for each validator
-- Intelligently groups related files into patterns (e.g., `lib/legacy/**/*` instead of listing 50 individual files)
-- Uses relative paths for portability across environments
-
-**Use cases:**
-
-- **Legacy codebases**: Adopt yard-lint without fixing thousands of existing violations first
-- **Incremental refactoring**: Fix documentation violations one module at a time
-- **CI/CD enforcement**: Ensure no new violations are introduced while allowing existing ones
-- **Baseline tracking**: Regenerate periodically to track progress as you fix violations
-
-### Validating Code Example Style
-
-The `Tags/ExampleStyle` validator ensures code examples in `@example` tags follow your project's style guidelines using RuboCop or StandardRB.
-
-**Requirements:**
-- RuboCop or StandardRB gem must be installed in your project
-- Validator auto-detects which linter to use based on your project setup
-
-**Enable the validator:**
-
-```yaml
-# .yard-lint.yml
-Tags/ExampleStyle:
-  Enabled: true
-```
-
-The validator will automatically:
-- Detect RuboCop or StandardRB from your project setup
-- Use your project's `.rubocop.yml` or `.standard.yml` configuration
-- Report style offenses in code examples
-
-**Skipping specific examples:**
-
-For examples intentionally showing bad code (anti-patterns, common mistakes):
-
-```ruby
-# @example Bad code (skip-lint)
-#   user = User.new("invalid")
-```
-
-Or use inline RuboCop directives:
-
-```ruby
-# @example
-#   # rubocop:disable Style/StringLiterals
-#   user = User.new("invalid")
-#   # rubocop:enable Style/StringLiterals
-```
-
-**Advanced configuration:**
-
-```yaml
-Tags/ExampleStyle:
-  Enabled: true
-  Linter: auto  # Options: 'auto', 'rubocop', 'standard', 'none'
-  SkipPatterns:
-    - '/skip-lint/i'
-    - '/bad code/i'
-    - '/anti-pattern/i'
-  DisabledCops:  # Override default disabled cops (replaces entire list)
-    - 'Style/FrozenStringLiteralComment'
-    - 'Layout/TrailingEmptyLines'
-    - 'Style/SomeCustomCop'
-```
-
-**Note:** This validator is opt-in (disabled by default). Style violations have 'convention' severity by default and won't fail CI unless your `FailOnSeverity` is set to 'convention'.
-
-### Command Line
-
-Basic usage:
-
-```bash
-yard-lint lib/
-```
-
-With options:
-
-```bash
-# Use a specific config file
-yard-lint lib/ --config config/yard-lint.yml
-
-# Output as JSON
-yard-lint lib/ --format json > report.json
-
-# Generate config file (use --force to overwrite existing)
-yard-lint --init
-yard-lint --init --force
-
-# Generate strict config (all errors, 100% coverage)
-yard-lint --init --strict
-```
-
-### Diff Mode (Incremental Linting)
-
-Lint only files that changed - perfect for large projects, CI/CD, and pre-commit hooks:
-
-```bash
-# Lint only files changed since main branch (auto-detects main/master)
-yard-lint lib/ --diff
-
-# Lint only files changed since specific branch/commit
-yard-lint lib/ --diff develop
-yard-lint lib/ --diff HEAD~3
-
-# Lint only staged files (perfect for pre-commit hooks)
-yard-lint lib/ --staged
-
-# Lint only uncommitted files
-yard-lint lib/ --changed
-```
-
-**Use Cases:**
-
-**Pre-commit Hook:**
-```bash
-#!/bin/bash
-# .git/hooks/pre-commit
-bundle exec yard-lint lib/ --staged --fail-on-severity error
-```
-
-**GitHub Actions CI/CD:**
-```yaml
-name: YARD Lint
-on: [pull_request]
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Need full history for --diff
-      - name: Run YARD-Lint on changed files
-        run: bundle exec yard-lint lib/ --diff origin/${{ github.base_ref }}
-```
-
-**Legacy Codebase Incremental Adoption:**
-```bash
-# Only enforce rules on NEW code
-yard-lint lib/ --diff main
-```
-
-### Documentation Coverage Statistics
-
-Monitor and enforce minimum documentation coverage thresholds:
-
-```bash
-# Show coverage statistics with --stats flag
+# Show coverage statistics
 yard-lint lib/ --stats
 
-# Output:
-# Documentation Coverage: 85.5%
-#   Total objects:      120
-#   Documented:         102
-#   Undocumented:       18
-
-# Enforce minimum coverage threshold (fails if below)
+# Enforce minimum coverage threshold
 yard-lint lib/ --min-coverage 80
 
-# Use with diff mode to check coverage only for changed files
+# Combine with diff mode for new code only
 yard-lint lib/ --diff main --min-coverage 90
-
-# Quiet mode shows only summary with coverage
-yard-lint lib/ --quiet --min-coverage 80
 ```
 
-**Configuration File:**
-```yaml
-# .yard-lint.yml
-AllValidators:
-  # Fail if documentation coverage is below this percentage
-  MinCoverage: 80.0
-```
-
-**CI/CD Pipeline Example:**
-```yaml
-name: Documentation Quality
-on: [pull_request]
-jobs:
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Check documentation coverage for new code
-        run: |
-          bundle exec yard-lint \
-            lib/ \
-            --diff origin/${{ github.base_ref }} \
-            --min-coverage 90 \
-            --quiet
-```
-
-**Key Features:**
-- Calculates percentage of documented classes, modules, and methods
-- CLI `--min-coverage` flag overrides config file setting
-- Exit code 1 if coverage is below threshold
-- Works with diff mode to enforce coverage only on changed files
-- Performance optimized with auto-cleanup temp directories for large codebases
-
-### Running Specific Validators
-
-Run only specific validators using the `--only` option - useful for debugging, gradual adoption, or focused CI checks:
+### Run Specific Validators
 
 ```bash
 # Run only one validator
-yard-lint --only Tags/TypeSyntax lib/
+yard-lint lib/ --only Tags/TypeSyntax
 
-# Run multiple validators (comma-separated)
-yard-lint --only Tags/Order,Tags/TypeSyntax lib/
-
-# Combine with other options
-yard-lint --only Documentation/UndocumentedObjects --diff main lib/
+# Run multiple validators
+yard-lint lib/ --only Tags/Order,Documentation/UndocumentedObjects
 ```
 
-## Configuration
+**Learn more:** [🚀 Advanced Usage Guide](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)
 
-YARD-Lint is configured via a `.yard-lint.yml` configuration file (similar to `.rubocop.yml`).
-
-### Configuration File
+## Configuration Basics
 
 Create a `.yard-lint.yml` file in your project root:
 
 ```yaml
-# .yard-lint.yml
 # Global settings for all validators
 AllValidators:
-  # YARD command-line options (applied to all validators by default)
+  # YARD command-line options
   YardOptions:
     - --private
     - --protected
 
-  # Global file exclusion patterns
+  # Global file exclusions
   Exclude:
-    - '\.git'
     - 'vendor/**/*'
-    - 'node_modules/**/*'
     - 'spec/**/*'
 
   # Exit code behavior (error, warning, convention, never)
   FailOnSeverity: warning
 
-  # Diff mode settings
-  DiffMode:
-    # Default base ref for --diff (auto-detects main/master if not specified)
-    DefaultBaseRef: ~
-    # Include untracked files in diff mode (not yet implemented)
-    IncludeUntracked: false
+  # Minimum documentation coverage percentage
+  MinCoverage: 80.0
 
 # Individual validator configuration
 Documentation/UndocumentedObjects:
   Description: 'Checks for classes, modules, and methods without documentation.'
   Enabled: true
   Severity: warning
-  # List of methods to exclude from validation
-  # Supports three patterns:
-  #   - Exact names: 'method_name' (excludes all methods with this name)
-  #   - Arity notation: 'method_name/N' (excludes only if method has N parameters)
-  #   - Regex patterns: '/pattern/' (excludes methods matching the regex)
   ExcludedMethods:
-    - 'initialize/0'  # Exclude only parameter-less initialize (default)
-    - '/^_/'          # Exclude private methods (by convention)
+    - 'initialize/0'
+    - '/^_/'
 
 Documentation/UndocumentedMethodArguments:
-  Description: 'Checks for method parameters without @param tags.'
-  Enabled: true
-  Severity: warning
-
-Documentation/UndocumentedBooleanMethods:
-  Description: 'Checks that question mark methods document their boolean return.'
   Enabled: true
   Severity: warning
 
 Tags/Order:
-  Description: 'Enforces consistent ordering of YARD tags.'
   Enabled: true
   Severity: convention
   EnforcedOrder:
@@ -439,445 +187,95 @@ Tags/Order:
     - example
 
 Tags/InvalidTypes:
-  Description: 'Validates type definitions in @param, @return, @option tags.'
   Enabled: true
   Severity: warning
-  ValidatedTags:
-    - param
-    - option
-    - return
   ExtraTypes:
     - CustomType
-    - MyType
-
-Tags/TypeSyntax:
-  Description: 'Validates YARD type syntax using YARD parser.'
-  Enabled: true
-  Severity: warning
-  ValidatedTags:
-    - param
-    - option
-    - return
-    - yieldreturn
-
-Tags/MeaninglessTag:
-  Description: 'Detects @param/@option tags on classes, modules, or constants.'
-  Enabled: true
-  Severity: warning
-  CheckedTags:
-    - param
-    - option
-  InvalidObjectTypes:
-    - class
-    - module
-    - constant
-
-Tags/CollectionType:
-  Description: 'Validates Hash collection syntax (enforces Hash{K => V} over Hash<K, V>).'
-  Enabled: true
-  Severity: convention
-  ValidatedTags:
-    - param
-    - option
-    - return
-    - yieldreturn
-
-Tags/TagTypePosition:
-  Description: 'Validates type annotation position in tags.'
-  Enabled: true
-  Severity: convention
-  CheckedTags:
-    - param
-    - option
-  # EnforcedStyle: 'type_after_name' (YARD standard: @param name [Type])
-  #                or 'type_first' (@param [Type] name)
-  EnforcedStyle: type_after_name
-
-Tags/ApiTags:
-  Description: 'Enforces @api tags on public objects.'
-  Enabled: false  # Opt-in validator
-  Severity: warning
-  AllowedApis:
-    - public
-    - private
-    - internal
-
-Tags/OptionTags:
-  Description: 'Requires @option tags for methods with options parameters.'
-  Enabled: true
-  Severity: warning
-
-# Warnings validators - catches YARD parser errors
-Warnings/UnknownTag:
-  Description: 'Detects unknown YARD tags.'
-  Enabled: true
-  Severity: error
-
-Warnings/UnknownDirective:
-  Description: 'Detects unknown YARD directives.'
-  Enabled: true
-  Severity: error
-
-Warnings/InvalidTagFormat:
-  Description: 'Detects malformed tag syntax.'
-  Enabled: true
-  Severity: error
-
-Warnings/InvalidDirectiveFormat:
-  Description: 'Detects malformed directive syntax.'
-  Enabled: true
-  Severity: error
-
-Warnings/DuplicatedParameterName:
-  Description: 'Detects duplicate @param tags.'
-  Enabled: true
-  Severity: error
-
-Warnings/UnknownParameterName:
-  Description: 'Detects @param tags for non-existent parameters.'
-  Enabled: true
-  Severity: error
-
-Semantic/AbstractMethods:
-  Description: 'Ensures @abstract methods do not have real implementations.'
-  Enabled: true
-  Severity: warning
+    - MyNamespace::CustomType
 ```
 
-#### Key Features
-
-- **Per-validator control**: Enable/disable and configure each validator independently
-- **Custom severity**: Override severity levels per validator
-- **Per-validator exclusions**: Add validator-specific file exclusions (in addition to global ones)
-- **Per-validator YardOptions**: Override YARD options for specific validators if needed
-- **Inheritance support**: Use `inherit_from` and `inherit_gem` to share configurations
-- **Self-documenting**: Each validator can include a `Description` field
-
-#### Configuration Discovery
-
-YARD-Lint will automatically search for `.yard-lint.yml` in the current directory and parent directories.
-
-You can specify a different config file:
-
-```bash
-yard-lint lib/ --config path/to/config.yml
-```
-
-#### Configuration Inheritance
-
-Share configurations across projects using inheritance (like RuboCop):
-
-```yaml
-# Inherit from local files
-inherit_from:
-  - .yard-lint-todo.yml  # Generated by --auto-gen-config
-  - ../.yard-lint.yml    # Parent directory config
-
-# Inherit from gems
-inherit_gem:
-  my-company-style: .yard-lint.yml
-
-# Your project-specific overrides
-Documentation/UndocumentedObjects:
-  Exclude:
-    - 'lib/legacy/**/*'
-```
-
-#### Configuration Validation
-
-YARD-Lint automatically validates your configuration file to catch typos and invalid settings before processing files. This prevents silent failures and provides helpful error messages:
-
-**Common validation errors caught:**
-
-```bash
-# Invalid validator name
-$ cat .yard-lint.yml
-UndocumentedMethod:  # Missing category prefix
-  Enabled: true
-
-$ yard-lint lib/
-Error: Invalid configuration detected:
-  Unknown validator: 'UndocumentedMethod'
-    Did you mean: Documentation/UndocumentedObjects?
-    Run `yard-lint --list-validators` to see all available validators
-
-# Typo in severity level
-$ cat .yard-lint.yml
-Documentation/UndocumentedObjects:
-  Severity: erro  # Typo
-
-$ yard-lint lib/
-Error: Invalid configuration detected:
-  Invalid Severity for Documentation/UndocumentedObjects: 'erro'
-    Valid values: error, warning, convention, never
-    Did you mean: error?
-
-# Invalid configuration value
-$ cat .yard-lint.yml
-Documentation/UndocumentedObjects:
-  Enabled: yes  # Should be true/false
-
-$ yard-lint lib/
-Error: Invalid configuration detected:
-  Invalid Enabled value for Documentation/UndocumentedObjects: 'yes'
-    Must be true or false
-```
-
-**What's validated:**
-- Validator names exist (prevents typos like `UndocumentedMethod` instead of `Documentation/UndocumentedObjects`)
-- Severity levels are valid (`error`, `warning`, `convention`, `never`)
-- Boolean values for `Enabled` settings
-- Global settings in `AllValidators` section
-- Validator-specific configuration keys match the validator's supported options
-- Numeric ranges for settings like `MinCoverage` (0-100)
-
-The validator fails fast with clear error messages, saving time debugging configuration issues.
-
-#### Per-Validator Exclusions
-
-You can exclude specific files from individual validators while still checking them with other validators. This is useful when you want different validators to apply to different parts of your codebase.
-
-**Example: Skip type checking in legacy code**
-
-```yaml
-# .yard-lint.yml
-AllValidators:
-  Exclude:
-    - 'vendor/**/*'
-
-# Exclude legacy files from type validation only
-Tags/InvalidTypes:
-  Exclude:
-    - 'lib/legacy/**/*'
-    - 'lib/deprecated/*.rb'
-
-# But still check for undocumented methods in those files
-Documentation/UndocumentedObjects:
-  Enabled: true
-```
-
-**Example: Different rules for different directories**
-
-```yaml
-# Strict documentation for public API
-Documentation/UndocumentedMethodArguments:
-  Enabled: true
-  Exclude:
-    - 'lib/internal/**/*'
-    - 'spec/**/*'
-
-# But enforce @api tags everywhere
-Tags/ApiTags:
-  Enabled: true
-  Exclude:
-    - 'spec/**/*'  # Only exclude specs
-```
-
-**Example: Override YARD options per validator**
-
-```yaml
-AllValidators:
-  # Default: only parse public methods
-  YardOptions: []
-
-# Check all methods (including private) for tag order
-Tags/Order:
-  YardOptions:
-    - --private
-    - --protected
-
-# But only require documentation for public methods
-Documentation/UndocumentedObjects:
-  YardOptions: []  # Only public methods
-```
-
-This allows you to enforce correct tag formatting on all methods while only requiring documentation on public methods.
-
-**How it works:**
-
-1. **Global exclusions** (defined in `AllValidators/Exclude`) apply to ALL validators
-2. **Per-validator exclusions** (defined in each validator's `Exclude`) apply ONLY to that validator
-3. Both types of exclusions work together - a file must pass both filters to be checked
-
-Supported glob patterns:
-- `**/*` - Recursive match (all files in subdirectories)
-- `*.rb` - Simple wildcard
-- `lib/foo/*.rb` - Directory with wildcard
-- `**/test_*.rb` - Recursive with prefix match
-
-### Available Validators
-
-| Validator | Description | Default | Configuration Options |
-|-----------|-------------|---------|----------------------|
-| **Documentation Validators** |
-| `Documentation/UndocumentedObjects` | Checks for classes, modules, and methods without documentation | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ExcludedMethods` |
-| `Documentation/UndocumentedMethodArguments` | Checks for method parameters without `@param` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
-| `Documentation/UndocumentedBooleanMethods` | Checks that question mark methods document their boolean return | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
-| `Documentation/UndocumentedOptions` | Detects methods with options hash/kwargs parameters but no `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
-| `Documentation/MarkdownSyntax` | Detects common markdown syntax errors in documentation (unclosed backticks, invalid list markers, etc.) | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
-| `Documentation/EmptyCommentLine` | Detects empty `#` lines at the start or end of documentation blocks | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnabledPatterns` |
-| `Documentation/BlankLineBeforeDefinition` | Detects blank lines between documentation and definitions (single blank = convention violation, 2+ blank = orphaned docs) | Enabled (convention) | `Enabled`, `Severity`, `OrphanedSeverity`, `Exclude`, `EnabledPatterns` |
-| **Tags Validators** |
-| `Tags/Order` | Enforces consistent ordering of YARD tags | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `EnforcedOrder` |
-| `Tags/InvalidTypes` | Validates type definitions in `@param`, `@return`, `@option` tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags`, `ExtraTypes` |
-| `Tags/TypeSyntax` | Validates YARD type syntax (detects unclosed brackets, empty generics, etc.) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
-| `Tags/NonAsciiType` | Detects non-ASCII characters in type specifications (e.g., `…`, `→`, `—`) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
-| `Tags/MeaninglessTag` | Detects `@param`/`@option` tags on classes, modules, or constants (only valid on methods) | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `InvalidObjectTypes` |
-| `Tags/CollectionType` | Enforces `Hash{K => V}` over `Hash<K, V>` (YARD standard collection syntax) | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `ValidatedTags` |
-| `Tags/TagTypePosition` | Validates type annotation position (`@param name [Type]` vs `@param [Type] name`) | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `EnforcedStyle` |
-| `Tags/ApiTags` | Enforces `@api` tags on public objects | Disabled (opt-in) | `Enabled`, `Severity`, `Exclude`, `AllowedApis` |
-| `Tags/OptionTags` | Requires `@option` tags for methods with options parameters | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
-| `Tags/ExampleSyntax` | Validates Ruby syntax in `@example` tags to catch broken code examples | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
-| `Tags/RedundantParamDescription` | Detects meaningless parameter descriptions that add no value beyond the parameter name | Enabled (convention) | `Enabled`, `Severity`, `Exclude`, `CheckedTags`, `Articles`, `MaxRedundantWords`, `MinMeaningfulLength`, `GenericTerms`, `EnabledPatterns` |
-| `Tags/InformalNotation` | Detects informal notation patterns (`Note:`, `TODO:`, etc.) and suggests proper YARD tags | Enabled (warning) | `Enabled`, `Severity`, `Exclude`, `CaseSensitive`, `RequireStartOfLine`, `Patterns` |
-| `Tags/TagGroupSeparator` | Enforces blank line separators between different YARD tag groups (e.g., between `@param` and `@return` tags) | Disabled (opt-in) | `Enabled`, `Severity`, `Exclude`, `TagGroups`, `RequireAfterDescription` |
-| `Tags/ForbiddenTags` | Detects forbidden tag and type combinations (e.g., `@return [void]`, `@param [Object]`) | Disabled (opt-in) | `Enabled`, `Severity`, `Exclude`, `ForbiddenPatterns` |
-| **Warnings Validators** |
-| `Warnings/UnknownTag` | Detects unknown YARD tags with "did you mean" suggestions | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
-| `Warnings/UnknownDirective` | Detects unknown YARD directives | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
-| `Warnings/InvalidTagFormat` | Detects malformed tag syntax | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
-| `Warnings/InvalidDirectiveFormat` | Detects malformed directive syntax | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
-| `Warnings/DuplicatedParameterName` | Detects duplicate `@param` tags | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
-| `Warnings/UnknownParameterName` | Detects `@param` tags for non-existent parameters with "did you mean" suggestions | Enabled (error) | `Enabled`, `Severity`, `Exclude` |
-| **Semantic Validators** |
-| `Semantic/AbstractMethods` | Ensures `@abstract` methods don't have real implementations | Enabled (warning) | `Enabled`, `Severity`, `Exclude` |
-
-### Detailed Validator Documentation
-
-For detailed documentation on each validator including configuration examples, pattern types, and troubleshooting guides, see the validator module documentation:
-
-- Each validator module file in `lib/yard/lint/validators/` contains comprehensive YARD documentation
-- You can browse the source files directly, or generate YARD documentation to view in HTML format:
-
-```bash
-yard doc lib/yard/lint/validators/**/*.rb
-yard server
-```
-
-Then open http://localhost:8808 in your browser to browse the full validator documentation with examples.
-
-### Smart Suggestions with "Did You Mean"
-
-YARD-Lint provides intelligent suggestions for common typos in both tag names and parameter names.
-
-#### Unknown Tag Suggestions
-
-The `Warnings/UnknownTag` validator suggests correct YARD tags for typos:
-
-**Example:**
-
-```ruby
-# @params value [String] should be @param
-# @returns [String] should be @return
-# @raises [Error] should be @raise
-def process(value)
-  # ...
-end
-```
-
-**Output:**
-
-```
-lib/processor.rb:10: [error] Unknown tag @params (did you mean '@param'?)
-lib/processor.rb:11: [error] Unknown tag @returns (did you mean '@return'?)
-lib/processor.rb:12: [error] Unknown tag @raises (did you mean '@raise'?)
-```
-
-#### Unknown Parameter Suggestions
-
-The `Warnings/UnknownParameterName` validator suggests correct parameter names:
-
-**Example:**
-
-```ruby
-# @param usr_name [String] the username
-# @param usr_email [String] the email
-def create_user(user_name, user_email)
-  # ...
-end
-```
-
-**Output:**
-
-```
-lib/user.rb:123: [error] @param tag has unknown parameter name: usr_name (did you mean 'user_name'?)
-lib/user.rb:124: [error] @param tag has unknown parameter name: usr_email (did you mean 'user_email'?)
-```
-
-**How it works:**
-- Uses Ruby's `did_you_mean` gem for intelligent suggestions
-- Falls back to Levenshtein distance algorithm when needed
-- For parameters: Parses method signatures directly from source files for accurate parameter detection
-- Supports all parameter types: regular, keyword, splat, block, and default values
-- For tags: Checks against all standard YARD tags and directives
-
-### Quick Configuration Examples
-
-```yaml
-# Exclude specific methods from documentation requirements
-Documentation/UndocumentedObjects:
-  ExcludedMethods:
-    - 'initialize/0'       # Parameter-less constructors
-    - '/^_/'               # Private methods (by convention)
-    - 'to_s'               # String conversion
-
-# Enable @api tag validation (disabled by default)
-Tags/ApiTags:
-  Enabled: true
-  AllowedApis:
-    - public
-    - private
-
-# Disable a validator
-Tags/RedundantParamDescription:
-  Enabled: false
-```
-
-### Global Configuration
-
-| Option | Description | Default | Type |
-|--------|-------------|---------|------|
-| `AllValidators/YardOptions` | YARD command-line options applied to all validators (e.g., `--private`, `--protected`). Can be overridden per-validator. | `[]` | Array of strings |
-| `AllValidators/Exclude` | File patterns to exclude from all validators. Per-validator exclusions are additive. | `['\.git', 'vendor/**/*', 'node_modules/**/*']` | Array of glob patterns |
-| `AllValidators/FailOnSeverity` | Exit with error code for this severity level and above | `warning` | `error`, `warning`, `convention`, or `never` |
-| `<Validator>/YardOptions` | Override YARD options for a specific validator | Inherits from `AllValidators/YardOptions` | Array of strings |
-| `<Validator>/Exclude` | Additional file patterns to exclude for this validator only | `[]` | Array of glob patterns |
-
-## Severity Levels
-
-| Severity | Description | Examples |
-|----------|-------------|----------|
-| **error** | Critical issues that prevent proper documentation parsing | Unknown tags, invalid formats, malformed syntax, duplicate parameters |
-| **warning** | Missing or incorrect documentation | Undocumented methods, missing `@param` tags, invalid type definitions, semantic issues |
-| **convention** | Style and consistency issues | Tag ordering, formatting preferences |
-
-## Integration with CI
+**Key features:**
+- Per-validator control (enable/disable, severity, exclusions)
+- Configuration inheritance with `inherit_from` and `inherit_gem`
+- Automatic configuration validation with helpful error messages
+- Per-validator YARD options and file exclusions
+
+**Learn more:** [⚙️ Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
+
+## CI Integration
 
 ### GitHub Actions
 
 ```yaml
-- name: Run YARD Lint
-  run: bundle exec yard-lint lib/
+name: YARD Lint
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for --diff
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Run YARD-Lint on changed files
+        run: bundle exec yard-lint lib/ --diff origin/${{ github.base_ref }}
 ```
 
-## CLI Options
+### Pre-Commit Hook
 
-YARD-Lint supports the following command-line options:
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+bundle exec yard-lint lib/ --staged --fail-on-severity error
+```
+
+### GitLab CI
+
+```yaml
+yard-lint:
+  stage: test
+  script:
+    - git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - bundle exec yard-lint lib/ --diff origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+  only:
+    - merge_requests
+```
+
+**Learn more:** [🔧 CI/CD Integration Guide](https://github.com/mensfeld/yard-lint/wiki/CI-CD-Integration) - GitHub Actions, GitLab, CircleCI, Jenkins, hooks, badges
+
+## CLI Options
 
 ```bash
 yard-lint [options] PATH
 
-Options:
+Configuration:
   -c, --config FILE       Path to config file (default: .yard-lint.yml)
+
+Output:
   -f, --format FORMAT     Output format (text, json)
   -q, --quiet             Quiet mode (only show summary)
-      --stats             Show statistics summary
-      --min-coverage N    Minimum documentation coverage required (0-100)
+      --stats             Show documentation coverage statistics
       --[no-]progress     Show progress indicator (default: auto-detect TTY)
+
+Coverage:
+      --min-coverage N    Minimum documentation coverage required (0-100)
+
+Diff Mode:
       --diff [REF]        Lint only files changed since REF
       --staged            Lint only staged files
       --changed           Lint only uncommitted files
+
+Validators:
       --only VALIDATORS   Run only specified validators (comma-separated)
+
+Configuration Generation:
       --init              Generate .yard-lint.yml config file
       --update            Update .yard-lint.yml with new validators
       --strict            Generate strict config (use with --init or --update)
@@ -885,11 +283,40 @@ Options:
       --auto-gen-config   Generate .yard-lint-todo.yml to silence existing violations
       --regenerate-todo   Regenerate .yard-lint-todo.yml (overwrites existing)
       --exclude-limit N   Min files before grouping into pattern (default: 15)
+
+Information:
   -v, --version           Show version
   -h, --help              Show this help
 ```
 
-All configuration (tag order, exclude patterns, severity levels, validator settings) should be defined in `.yard-lint.yml`.
+**Learn more:** [🚀 Advanced Usage](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage) - CLI reference, JSON output, coverage
+
+## Documentation
+
+### Quick Links
+
+- **[📚 Wiki Home](https://github.com/mensfeld/yard-lint/wiki)** - Full documentation
+- **[📦 Installation](https://github.com/mensfeld/yard-lint/wiki/Installation)** - Installation guide
+- **[⚙️ Configuration](https://github.com/mensfeld/yard-lint/wiki/Configuration)** - Complete configuration reference
+- **[🔍 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 30+ validators documented
+- **[✨ Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All 28 features explained
+
+### Workflows
+
+- **[📈 Incremental Adoption](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)** - Adopt on existing projects
+- **[🔄 Diff Mode](https://github.com/mensfeld/yard-lint/wiki/Diff-Mode)** - Lint only changed files
+- **[🚀 Advanced Usage](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)** - CLI options, coverage, JSON output
+
+### Integration
+
+- **[🔧 CI/CD Integration](https://github.com/mensfeld/yard-lint/wiki/CI-CD-Integration)** - GitHub Actions, GitLab CI, hooks
+- **[🔧 Troubleshooting](https://github.com/mensfeld/yard-lint/wiki/Troubleshooting)** - Common issues and solutions
+
+## Getting Help
+
+- **Questions or issues?** Open an issue on [GitHub Issues](https://github.com/mensfeld/yard-lint/issues)
+- **Need configuration help?** See [Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
+- **Common problems?** Check [Troubleshooting](https://github.com/mensfeld/yard-lint/wiki/Troubleshooting)
 
 ## License
 
