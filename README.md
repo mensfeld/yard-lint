@@ -42,6 +42,7 @@ YARD-Lint validates your YARD documentation for:
 - **Forbidden tag patterns**: Configurable patterns to disallow specific tags or tag/type combinations (e.g., `@return [void]`, `@param [Object]`)
 - **YARD warnings**: Unknown tags, invalid directives, duplicated parameter names, and more
 - **Smart suggestions**: Provides "did you mean" suggestions for typos in parameter names using Ruby's `did_you_mean` gem with Levenshtein distance fallback
+- **Configuration validation**: Validates `.yard-lint.yml` for typos and invalid settings before processing files, with helpful "did you mean" suggestions
 
 ## Installation
 
@@ -581,6 +582,56 @@ Documentation/UndocumentedObjects:
   Exclude:
     - 'lib/legacy/**/*'
 ```
+
+#### Configuration Validation
+
+YARD-Lint automatically validates your configuration file to catch typos and invalid settings before processing files. This prevents silent failures and provides helpful error messages:
+
+**Common validation errors caught:**
+
+```bash
+# Invalid validator name
+$ cat .yard-lint.yml
+UndocumentedMethod:  # Missing category prefix
+  Enabled: true
+
+$ yard-lint lib/
+Error: Invalid configuration detected:
+  Unknown validator: 'UndocumentedMethod'
+    Did you mean: Documentation/UndocumentedObjects?
+    Run `yard-lint --list-validators` to see all available validators
+
+# Typo in severity level
+$ cat .yard-lint.yml
+Documentation/UndocumentedObjects:
+  Severity: erro  # Typo
+
+$ yard-lint lib/
+Error: Invalid configuration detected:
+  Invalid Severity for Documentation/UndocumentedObjects: 'erro'
+    Valid values: error, warning, convention, never
+    Did you mean: error?
+
+# Invalid configuration value
+$ cat .yard-lint.yml
+Documentation/UndocumentedObjects:
+  Enabled: yes  # Should be true/false
+
+$ yard-lint lib/
+Error: Invalid configuration detected:
+  Invalid Enabled value for Documentation/UndocumentedObjects: 'yes'
+    Must be true or false
+```
+
+**What's validated:**
+- Validator names exist (prevents typos like `UndocumentedMethod` instead of `Documentation/UndocumentedObjects`)
+- Severity levels are valid (`error`, `warning`, `convention`, `never`)
+- Boolean values for `Enabled` settings
+- Global settings in `AllValidators` section
+- Validator-specific configuration keys match the validator's supported options
+- Numeric ranges for settings like `MinCoverage` (0-100)
+
+The validator fails fast with clear error messages, saving time debugging configuration issues.
 
 #### Per-Validator Exclusions
 

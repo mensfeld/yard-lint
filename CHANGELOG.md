@@ -1,6 +1,14 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Feature]** Add configuration validation to catch typos and invalid settings
+  - Validates validator names exist before processing files (prevents silent failures)
+  - Detects typos in severity levels (e.g., `erro` instead of `error`) with "did you mean" suggestions
+  - Validates boolean values for `Enabled` settings
+  - Validates global settings in `AllValidators` section (FailOnSeverity, MinCoverage, etc.)
+  - Provides helpful error messages pointing to valid options
+  - Fails fast with clear error messages instead of silently ignoring invalid configuration
+  - Catches common mistakes like using non-existent validator names (e.g., `UndocumentedMethod` instead of `Documentation/UndocumentedObjects`)
 - **[Feature]** Add `Tags/ExampleStyle` validator for linting code examples with RuboCop/StandardRB (#74)
   - Validates code style in `@example` tags using RuboCop or StandardRB
   - Auto-detects RuboCop or StandardRB from project setup (checks for `.rubocop.yml`, `.standard.yml`, Gemfile, or Gemfile.lock)
