@@ -28,7 +28,7 @@ YARD-Lint validates your YARD documentation for:
 - **Smart Suggestions** - "Did you mean" suggestions for typos in parameter names and tags
 - **Configuration Safety** - Validates `.yard-lint.yml` for typos and invalid settings before processing
 
-**See the complete list:** [📚 All 28 Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [🔍 30+ Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All 28 Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [30+ Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -50,7 +50,7 @@ Or install it yourself as:
 gem install yard-lint
 ```
 
-**See also:** [📦 Installation Guide](https://github.com/mensfeld/yard-lint/wiki/Installation) - Platform notes, troubleshooting, upgrading
+**See also:** [Installation Guide](https://github.com/mensfeld/yard-lint/wiki/Installation) - Platform notes, troubleshooting, upgrading
 
 ## Quick Start
 
@@ -78,7 +78,7 @@ yard-lint lib/
 yard-lint --update
 ```
 
-**Learn more:** [⚙️ Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
+**Learn more:** [Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
 
 ## Common Workflows
 
@@ -97,7 +97,7 @@ yard-lint lib/ --staged
 yard-lint lib/ --changed
 ```
 
-**Learn more:** [🔄 Diff Mode Guide](https://github.com/mensfeld/yard-lint/wiki/Diff-Mode)
+**Learn more:** [Diff Mode Guide](https://github.com/mensfeld/yard-lint/wiki/Diff-Mode)
 
 ### Adopt on Existing Projects (Incremental Adoption)
 
@@ -113,7 +113,7 @@ yard-lint lib/
 # Fix violations incrementally by removing exclusions from .yard-lint-todo.yml
 ```
 
-**Learn more:** [📈 Incremental Adoption Guide](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)
+**Learn more:** [Incremental Adoption Guide](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)
 
 ### Check Documentation Coverage
 
@@ -138,7 +138,7 @@ yard-lint lib/ --only Tags/TypeSyntax
 yard-lint lib/ --only Tags/Order,Documentation/UndocumentedObjects
 ```
 
-**Learn more:** [🚀 Advanced Usage Guide](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)
+**Learn more:** [Advanced Usage Guide](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)
 
 ## Configuration Basics
 
@@ -200,7 +200,7 @@ Tags/InvalidTypes:
 - Automatic configuration validation with helpful error messages
 - Per-validator YARD options and file exclusions
 
-**Learn more:** [⚙️ Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
+**Learn more:** [Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
 
 ## CI Integration
 
@@ -248,7 +248,7 @@ yard-lint:
     - merge_requests
 ```
 
-**Learn more:** [🔧 CI/CD Integration Guide](https://github.com/mensfeld/yard-lint/wiki/CI-CD-Integration) - GitHub Actions, GitLab, CircleCI, Jenkins, hooks, badges
+**Learn more:** [CI/CD Integration Guide](https://github.com/mensfeld/yard-lint/wiki/CI-CD-Integration) - GitHub Actions, GitLab, CircleCI, Jenkins, hooks, badges
 
 ## CLI Options
 
@@ -289,28 +289,28 @@ Information:
   -h, --help              Show this help
 ```
 
-**Learn more:** [🚀 Advanced Usage](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage) - CLI reference, JSON output, coverage
+**Learn more:** [Advanced Usage](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage) - CLI reference, JSON output, coverage
 
 ## Documentation
 
 ### Quick Links
 
-- **[📚 Wiki Home](https://github.com/mensfeld/yard-lint/wiki)** - Full documentation
-- **[📦 Installation](https://github.com/mensfeld/yard-lint/wiki/Installation)** - Installation guide
-- **[⚙️ Configuration](https://github.com/mensfeld/yard-lint/wiki/Configuration)** - Complete configuration reference
-- **[🔍 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 30+ validators documented
-- **[✨ Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All 28 features explained
+- **[Wiki Home](https://github.com/mensfeld/yard-lint/wiki)** - Full documentation
+- **[Installation](https://github.com/mensfeld/yard-lint/wiki/Installation)** - Installation guide
+- **[Configuration](https://github.com/mensfeld/yard-lint/wiki/Configuration)** - Complete configuration reference
+- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 30+ validators documented
+- **[Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All 28 features explained
 
 ### Workflows
 
-- **[📈 Incremental Adoption](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)** - Adopt on existing projects
-- **[🔄 Diff Mode](https://github.com/mensfeld/yard-lint/wiki/Diff-Mode)** - Lint only changed files
-- **[🚀 Advanced Usage](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)** - CLI options, coverage, JSON output
+- **[Incremental Adoption](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)** - Adopt on existing projects
+- **[Diff Mode](https://github.com/mensfeld/yard-lint/wiki/Diff-Mode)** - Lint only changed files
+- **[Advanced Usage](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)** - CLI options, coverage, JSON output
 
 ### Integration
 
-- **[🔧 CI/CD Integration](https://github.com/mensfeld/yard-lint/wiki/CI-CD-Integration)** - GitHub Actions, GitLab CI, hooks
-- **[🔧 Troubleshooting](https://github.com/mensfeld/yard-lint/wiki/Troubleshooting)** - Common issues and solutions
+- **[CI/CD Integration](https://github.com/mensfeld/yard-lint/wiki/CI-CD-Integration)** - GitHub Actions, GitLab CI, hooks
+- **[Troubleshooting](https://github.com/mensfeld/yard-lint/wiki/Troubleshooting)** - Common issues and solutions
 
 ## Getting Help
 
