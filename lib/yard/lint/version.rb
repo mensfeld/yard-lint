@@ -3,6 +3,6 @@
 module Yard
   module Lint
     # @return [String] version of the YARD Lint gem
-    VERSION = '1.6.0'
+    VERSION = '1.5.0'
   end
 end
