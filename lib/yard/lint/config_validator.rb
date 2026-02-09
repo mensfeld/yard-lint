@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+# YARD Lint - comprehensive linter for YARD documentation
 module Yard
+  # YARD Lint module providing linting functionality for YARD documentation
   module Lint
     # Validates configuration structure and values to catch typos and invalid settings
     class ConfigValidator
@@ -14,24 +16,18 @@ module Yard
         inherit_gem
       ].freeze
 
-      # Keys allowed in AllValidators section
-      GLOBAL_SETTINGS = %w[
-        YardOptions
-        Exclude
-        FailOnSeverity
-        MinCoverage
-        DiffMode
-      ].freeze
-
       # Valid boolean values
       BOOLEAN_VALUES = [true, false].freeze
 
+      # @param raw_config [Hash] raw configuration hash to validate
       def initialize(raw_config)
         @raw_config = raw_config
         @errors = []
       end
 
       # Validate configuration and raise error if invalid
+      # @param raw_config [Hash] raw configuration hash to validate
+      # @return [void]
       # @raise [Errors::InvalidConfigError] if configuration is invalid
       def self.validate!(raw_config)
         validator = new(raw_config)
@@ -39,6 +35,7 @@ module Yard
       end
 
       # Perform validation
+      # @return [void]
       # @raise [Errors::InvalidConfigError] if configuration is invalid
       def validate!
         validate_root_keys!
@@ -76,12 +73,8 @@ module Yard
         return unless all_validators
         return unless all_validators.is_a?(Hash)
 
-        all_validators.each_key do |key|
-          next if GLOBAL_SETTINGS.include?(key)
-
-          @errors << "Unknown setting in AllValidators: '#{key}'"
-          @errors << "  Valid settings: #{GLOBAL_SETTINGS.join(', ')}"
-        end
+        # Only validate specific known settings, allow unknown keys to pass through
+        # This allows users to put custom data in AllValidators
 
         # Validate FailOnSeverity value
         fail_on = all_validators['FailOnSeverity']
@@ -102,6 +95,12 @@ module Yard
         if exclude && !exclude.is_a?(Array)
           @errors << "Invalid Exclude in AllValidators: must be an array, got #{exclude.class}"
         end
+
+        # Validate YardOptions is an array
+        yard_options = all_validators['YardOptions']
+        if yard_options && !yard_options.is_a?(Array)
+          @errors << "Invalid YardOptions in AllValidators: must be an array, got #{yard_options.class}"
+        end
       end
 
       # Validate validator-specific configurations
@@ -117,6 +116,8 @@ module Yard
       end
 
       # Check if validator name exists
+      # @param validator_name [String] validator name to check
+      # @return [void]
       def validate_validator_exists!(validator_name)
         return if ConfigLoader::ALL_VALIDATORS.include?(validator_name)
 
@@ -125,6 +126,9 @@ module Yard
       end
 
       # Validate individual validator configuration
+      # @param validator_name [String] validator name
+      # @param config [Hash] validator configuration hash
+      # @return [void]
       def validate_validator_config!(validator_name, config)
         # Validate Enabled value
         enabled = config['Enabled']
@@ -152,6 +156,9 @@ module Yard
       end
 
       # Validate validator-specific configuration keys
+      # @param validator_name [String] validator name
+      # @param config [Hash] validator configuration hash
+      # @return [void]
       def validate_validator_specific_keys!(validator_name, config)
         # Skip if validator doesn't exist (already reported)
         return unless ConfigLoader::ALL_VALIDATORS.include?(validator_name)
@@ -172,6 +179,8 @@ module Yard
       end
 
       # Suggest similar validator names using did_you_mean
+      # @param invalid_name [String] invalid validator name
+      # @return [void]
       def suggest_validator_name(invalid_name)
         checker = DidYouMean::SpellChecker.new(dictionary: ConfigLoader::ALL_VALIDATORS)
         suggestions = checker.correct(invalid_name)
@@ -184,6 +193,8 @@ module Yard
       end
 
       # Suggest similar severity values
+      # @param invalid_severity [String] invalid severity value
+      # @return [void]
       def suggest_similar_severity(invalid_severity)
         checker = DidYouMean::SpellChecker.new(dictionary: Config::VALID_SEVERITIES)
         suggestions = checker.correct(invalid_severity)

@@ -107,19 +107,16 @@ RSpec.describe Yard::Lint::ConfigValidator do
     end
 
     context 'with invalid global settings' do
-      it 'raises error for unknown AllValidators key' do
+      it 'allows unknown AllValidators keys (for user flexibility)' do
         config = {
           'AllValidators' => {
-            'UnknownSetting' => 'value'
+            'UnknownSetting' => 'value',
+            'Severity' => 'warning'
           }
         }
 
-        expect { described_class.validate!(config) }
-          .to raise_error(Yard::Lint::Errors::InvalidConfigError) do |error|
-          expect(error.message).to include("Unknown setting in AllValidators: 'UnknownSetting'")
-          expect(error.message)
-            .to include('Valid settings: YardOptions, Exclude, FailOnSeverity, MinCoverage, DiffMode')
-        end
+        # Unknown keys in AllValidators are allowed
+        expect { described_class.validate!(config) }.not_to raise_error
       end
 
       it 'raises error for invalid MinCoverage value' do
