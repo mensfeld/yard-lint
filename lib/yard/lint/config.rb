@@ -20,6 +20,10 @@ module Yard
       # @param raw_config [Hash] raw configuration hash (new hierarchical format)
       def initialize(raw_config = {})
         @raw_config = raw_config
+
+        # Validate configuration structure and values
+        ConfigValidator.validate!(@raw_config) unless raw_config.empty?
+
         @validators = build_validators_config
         @only_validators = []
 
