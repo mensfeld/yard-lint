@@ -13,7 +13,8 @@
     "Gemfile",
     "Gemfile.lint",
     "yard-lint.gemspec",
-    ".github/workflows/**"
+    ".github/workflows/**",
+    "package.json"
   ],
   "packageRules": [
     {
