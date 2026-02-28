@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
       (f == gemspec) ||
         f.end_with?('.gem') ||
         f.start_with?(
-          *%w[Gemfile .gitignore .rspec spec/ .github/ .rubocop.yml .yard-lint.yml]
+          *%w[Gemfile .gitignore test/ .github/ .rubocop.yml .yard-lint.yml]
         )
     end
   end

@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  specs:
+  tests:
     timeout-minutes: 45
 
     strategy:
@@ -48,8 +48,8 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
-      - name: Run specs
-        run: bundle exec rake spec:parallel
+      - name: Run tests
+        run: bundle exec rake test:parallel
 
   yard-lint:
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     needs:
-      - specs
+      - tests
       - yard-lint
       - rubocop
       - lostconf
