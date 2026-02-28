@@ -12,7 +12,7 @@ AllValidators:
   Exclude:
     - 'vendor/**/*'
     - 'node_modules/**/*'
-    - 'spec/**/*'
+    - 'test/**/*'
 
   # Exit code behavior (error, warning, convention, never)
   FailOnSeverity: convention
@@ -163,7 +163,7 @@ Tags/ExampleSyntax:
   Severity: error
   Exclude:
     - '**/validators/**/parser.rb'
-    - 'spec/fixtures/**/*'
+    - 'test/fixtures/**/*'
 
 Tags/ExampleStyle:
   Description: 'Validates code style in @example tags using RuboCop/StandardRB.'
