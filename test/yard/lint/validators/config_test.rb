@@ -2,64 +2,66 @@
 
 require 'test_helper'
 
-class YardLintValidatorsConfigTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Config' do
   attr_reader :test_config_class
 
-  def setup
+
+  before do
     @test_config_class = Class.new(Yard::Lint::Validators::Config) do
       self.id = :test_validator
       self.defaults = { 'Enabled' => true, 'Severity' => 'warning' }.freeze
     end
   end
 
-  def test_class_attributes_id_allows_setting_and_getting_validator_identifier
+  it 'class attributes id allows setting and getting validator identifier' do
     assert_equal(:test_validator, test_config_class.id)
   end
 
-  def test_class_attributes_id_is_accessible_as_class_attribute
+  it 'class attributes id is accessible as class attribute' do
     assert_respond_to(test_config_class, :id)
     assert_respond_to(test_config_class, :id=)
   end
 
-  def test_class_attributes_defaults_allows_setting_and_getting_default_configuration
+  it 'class attributes defaults allows setting and getting default configuration' do
     assert_equal(
       { 'Enabled' => true, 'Severity' => 'warning' },
       test_config_class.defaults
     )
   end
 
-  def test_class_attributes_defaults_is_accessible_as_class_attribute
+  it 'class attributes defaults is accessible as class attribute' do
     assert_respond_to(test_config_class, :defaults)
     assert_respond_to(test_config_class, :defaults=)
   end
 
-  def test_class_attributes_combines_with_returns_empty_array_by_default
+  it 'class attributes combines with returns empty array by default' do
     assert_equal([], test_config_class.combines_with)
   end
 
-  def test_class_attributes_combines_with_allows_setting_validators_to_combine_with
+  it 'class attributes combines with allows setting validators to combine with' do
     test_config_class.combines_with = ['Other/Validator']
     assert_equal(['Other/Validator'], test_config_class.combines_with)
   end
 
-  def test_class_attributes_combines_with_is_accessible_as_class_method
+  it 'class attributes combines with is accessible as class method' do
     assert_respond_to(test_config_class, :combines_with)
     assert_respond_to(test_config_class, :combines_with=)
   end
 
-  def test_class_attributes_combines_with_memoizes_empty_array_on_first_access
+  it 'class attributes combines with memoizes empty array on first access' do
     config_class = Class.new(Yard::Lint::Validators::Config)
     first_call = config_class.combines_with
     second_call = config_class.combines_with
     assert_same(first_call, second_call)
   end
 
-  def test_inheritance_can_be_subclassed
+  it 'inheritance can be subclassed' do
     subclass = Class.new(Yard::Lint::Validators::Config)
     assert_equal(Yard::Lint::Validators::Config, subclass.superclass)
   end
 
-  def test_inheritance_allows_each_subclass_to_have_independent_configuration
+  it 'inheritance allows each subclass to have independent configuration' do
     config_a = Class.new(Yard::Lint::Validators::Config) do
       self.id = :validator_a
       self.defaults = { 'A' => true }.freeze

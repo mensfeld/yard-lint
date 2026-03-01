@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleRubocopRunnerSkipPatternsTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner' do
   attr_reader :runner
 
-  def setup
+
+  before do
     @runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
       disabled_cops: [],
@@ -13,17 +15,17 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerSkipPatternsTest < Minitest
     )
   end
 
-  def test_skips_examples_matching_skip_patterns_case_insensitive
+  it 'skips examples matching skip patterns case insensitive' do
     result = runner.run('user = User.new', 'Bad code (skip-lint)')
     assert_equal([], result)
   end
 
-  def test_skips_examples_matching_alternative_pattern
+  it 'skips examples matching alternative pattern' do
     result = runner.run('user = User.new', 'Example showing bad code')
     assert_equal([], result)
   end
 
-  def test_does_not_skip_examples_that_do_not_match_patterns
+  it 'does not skip examples that do not match patterns' do
     status = stub('status', success?: true)
     Open3.stubs(:capture3).returns(['{"files":[]}', '', status])
     result = runner.run('user = User.new', 'Valid example')
@@ -31,14 +33,14 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerSkipPatternsTest < Minitest
   end
 end
 
-class YardLintValidatorsTagsExampleStyleRubocopRunnerCodeCleaningTest < Minitest::Test
+describe 'YardLintValidatorsTagsExampleStyleRubocopRunnerCodeCleaning' do
   attr_reader :runner
 
-  def setup
+  before do
     @runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(linter: :rubocop, disabled_cops: [], skip_patterns: [])
   end
 
-  def test_removes_output_indicators
+  it 'removes output indicators' do
     code = <<~RUBY
       result = User.new
       result.name  # => "John"
@@ -55,26 +57,26 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerCodeCleaningTest < Minitest
     runner.run(code, 'Example')
   end
 
-  def test_returns_empty_array_for_empty_code
+  it 'returns empty array for empty code' do
     result = runner.run('', 'Example')
     assert_equal([], result)
   end
 
-  def test_returns_empty_array_for_nil_code
+  it 'returns empty array for nil code' do
     result = runner.run(nil, 'Example')
     assert_equal([], result)
   end
 
-  def test_returns_empty_array_for_whitespace_only_code
+  it 'returns empty array for whitespace only code' do
     result = runner.run("   \n  \n  ", 'Example')
     assert_equal([], result)
   end
 end
 
-class YardLintValidatorsTagsExampleStyleRubocopRunnerRubocopLinterTest < Minitest::Test
+describe 'YardLintValidatorsTagsExampleStyleRubocopRunnerRubocopLinter' do
   attr_reader :runner
 
-  def setup
+  before do
     @runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
       disabled_cops: ['Style/FrozenStringLiteralComment'],
@@ -82,7 +84,7 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerRubocopLinterTest < Minites
     )
   end
 
-  def test_runs_rubocop_with_disabled_cops
+  it 'runs rubocop with disabled cops' do
     code = 'user = User.new'
 
     status = stub('status', success?: true)
@@ -99,7 +101,7 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerRubocopLinterTest < Minites
     runner.run(code, 'Example')
   end
 
-  def test_parses_rubocop_json_output_correctly
+  it 'parses rubocop json output correctly' do
     code = 'user = User.new'
     rubocop_output = {
       'files' => [
@@ -131,24 +133,24 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerRubocopLinterTest < Minites
     ], result)
   end
 
-  def test_handles_empty_rubocop_output
+  it 'handles empty rubocop output' do
     status = stub('status', success?: true)
     Open3.stubs(:capture3).returns(['', '', status])
     result = runner.run('user = User.new', 'Example')
     assert_equal([], result)
   end
 
-  def test_handles_missing_rubocop_command
+  it 'handles missing rubocop command' do
     Open3.stubs(:capture3).raises(Errno::ENOENT)
     result = runner.run('user = User.new', 'Example')
     assert_equal([], result)
   end
 end
 
-class YardLintValidatorsTagsExampleStyleRubocopRunnerStandardRBLinterTest < Minitest::Test
+describe 'YardLintValidatorsTagsExampleStyleRubocopRunnerStandardRBLinter' do
   attr_reader :runner
 
-  def setup
+  before do
     @runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :standard,
       disabled_cops: [],
@@ -156,7 +158,7 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerStandardRBLinterTest < Mini
     )
   end
 
-  def test_runs_standardrb_command
+  it 'runs standardrb command' do
     code = 'user = User.new'
 
     status = stub('status', success?: true)
@@ -171,7 +173,7 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerStandardRBLinterTest < Mini
     runner.run(code, 'Example')
   end
 
-  def test_parses_standardrb_json_output_correctly
+  it 'parses standardrb json output correctly' do
     code = 'user = User.new'
     standard_output = {
       'files' => [
@@ -203,28 +205,28 @@ class YardLintValidatorsTagsExampleStyleRubocopRunnerStandardRBLinterTest < Mini
     ], result)
   end
 
-  def test_handles_missing_standardrb_command
+  it 'handles missing standardrb command' do
     Open3.stubs(:capture3).raises(Errno::ENOENT)
     result = runner.run('user = User.new', 'Example')
     assert_equal([], result)
   end
 end
 
-class YardLintValidatorsTagsExampleStyleRubocopRunnerErrorHandlingTest < Minitest::Test
+describe 'YardLintValidatorsTagsExampleStyleRubocopRunnerErrorHandling' do
   attr_reader :runner
 
-  def setup
+  before do
     @runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(linter: :rubocop, disabled_cops: [], skip_patterns: [])
   end
 
-  def test_handles_json_parse_errors_gracefully
+  it 'handles json parse errors gracefully' do
     status = stub('status', success?: true)
     Open3.stubs(:capture3).returns(['invalid json', '', status])
     result = runner.run('user = User.new', 'Example')
     assert_equal([], result)
   end
 
-  def test_handles_general_errors_gracefully
+  it 'handles general errors gracefully' do
     Open3.stubs(:capture3).raises(StandardError.new('Something went wrong'))
     result = runner.run('user = User.new', 'Example')
     assert_equal([], result)

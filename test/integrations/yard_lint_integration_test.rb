@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class YardLintIntegrationTestsTest < Minitest::Test
-  attr_reader :config
 
-  def setup
+describe 'Yard Lint Integration' do
+  attr_reader :fixtures_dir, :config
+
+
+  before do
     @fixtures_dir = File.expand_path('fixtures', __dir__)
     @config = Yard::Lint::Config.new do |c|
       c.exclude = []
@@ -14,7 +16,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
       end
   end
 
-  def test_undocumented_classes_detection_detects_undocumented_classes_and_modules
+  it 'undocumented classes detection detects undocumented classes and modules' do
     file = File.join(@fixtures_dir, 'undocumented_class.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -28,7 +30,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
                                .map { |o| o[:element] }
   end
 
-  def test_undocumented_classes_detection_reports_correct_file_locations
+  it 'undocumented classes detection reports correct file locations' do
     file = File.join(@fixtures_dir, 'undocumented_class.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -39,7 +41,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
       end
   end
 
-  def test_missing_parameter_documentation_detects_methods_with_missing_param_docs
+  it 'missing parameter documentation detects methods with missing param docs' do
     file = File.join(@fixtures_dir, 'missing_param_docs.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -52,15 +54,13 @@ class YardLintIntegrationTestsTest < Minitest::Test
                     .map { |o| o[:method_name] }
   end
 
-  def test_invalid_tag_ordering_detects_tags_in_wrong_order
+  it 'invalid tag ordering detects tags in wrong order' do
     file = File.join(@fixtures_dir, 'invalid_tag_order.rb')
 
     config = Yard::Lint::Config.new do |c|
       c.exclude = []
       # Use default tag order (param should come before return)
-      c.send(
-        :set_validator_config,
-        'Tags/Order',
+      c.set_validator_config('Tags/Order',
         'EnforcedOrder',
         %w[param option yield yieldparam yieldreturn return raise see example note todo]
       )
@@ -76,14 +76,12 @@ class YardLintIntegrationTestsTest < Minitest::Test
                     .map { |o| o[:method_name] }
   end
 
-  def test_invalid_tag_ordering_does_not_flag_consecutive_same_tags_as_order_violations
+  it 'invalid tag ordering does not flag consecutive same tags as order violations' do
     file = File.join(@fixtures_dir, 'invalid_tag_order.rb')
 
     config = Yard::Lint::Config.new do |c|
       c.exclude = []
-      c.send(
-        :set_validator_config,
-        'Tags/Order',
+      c.set_validator_config('Tags/Order',
         'EnforcedOrder',
         %w[param option yield yieldparam yieldreturn return raise see example note todo]
       )
@@ -97,7 +95,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
     # Methods with consecutive same tags (multiple @note or @example) should NOT trigger violations
   end
 
-  def test_undocumented_boolean_methods_detects_boolean_methods_without_return_docs
+  it 'undocumented boolean methods detects boolean methods without return docs' do
     file = File.join(@fixtures_dir, 'boolean_methods.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -115,7 +113,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
     assert_empty(undocumented_booleans)
   end
 
-  def test_invalid_tag_types_validates_that_tags_use_valid_type_definitions
+  it 'invalid tag types validates that tags use valid type definitions' do
     file = File.join(@fixtures_dir, 'invalid_tag_types.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -126,13 +124,13 @@ class YardLintIntegrationTestsTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_api_tags_detects_missing_or_incorrect_api_tags_when_enforced
+  it 'api tags detects missing or incorrect api tags when enforced' do
     file = File.join(@fixtures_dir, 'api_tags.rb')
 
     config = Yard::Lint::Config.new do |c|
       c.exclude = []
-      c.send(:set_validator_config, 'Tags/ApiTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ApiTags', 'AllowedApis', %w[public private internal])
+      c.set_validator_config('Tags/ApiTags', 'Enabled', true)
+      c.set_validator_config('Tags/ApiTags', 'AllowedApis', %w[public private internal])
       end
     result = Yard::Lint.run(path: file, config: config)
 
@@ -141,12 +139,12 @@ class YardLintIntegrationTestsTest < Minitest::Test
     assert_kind_of(Array, result.offenses.select { |o| o[:name].to_s.include?('Api') })
   end
 
-  def test_option_tags_detects_methods_with_options_parameters_but_no_option_tags
+  it 'option tags detects methods with options parameters but no option tags' do
     file = File.join(@fixtures_dir, 'option_tags.rb')
 
     config = Yard::Lint::Config.new do |c|
       c.exclude = []
-      c.send(:set_validator_config, 'Tags/OptionTags', 'Enabled', true)
+      c.set_validator_config('Tags/OptionTags', 'Enabled', true)
       end
     result = Yard::Lint.run(path: file, config: config)
 
@@ -167,7 +165,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
       end
   end
 
-  def test_yard_warnings_detects_various_yard_parser_warnings
+  it 'yard warnings detects various yard parser warnings' do
     file = File.join(@fixtures_dir, 'yard_warnings.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -186,12 +184,12 @@ class YardLintIntegrationTestsTest < Minitest::Test
       end
   end
 
-  def test_abstract_methods_detects_abstract_methods_with_actual_implementations
+  it 'abstract methods detects abstract methods with actual implementations' do
     file = File.join(@fixtures_dir, 'abstract_methods.rb')
 
     config = Yard::Lint::Config.new do |c|
       c.exclude = []
-      c.send(:set_validator_config, 'Semantic/AbstractMethods', 'Enabled', true)
+      c.set_validator_config('Semantic/AbstractMethods', 'Enabled', true)
       end
     result = Yard::Lint.run(path: file, config: config)
 
@@ -207,7 +205,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
                                   end
   end
 
-  def test_clean_code_no_offenses_finds_no_offenses_in_properly_documented_code
+  it 'clean code no offenses finds no offenses in properly documented code' do
     file = File.join(@fixtures_dir, 'clean_code.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -217,7 +215,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
     assert_empty(result.offenses)
   end
 
-  def test_multiple_files_processes_multiple_files_and_aggregates_results
+  it 'multiple files processes multiple files and aggregates results' do
     files = [
       File.join(@fixtures_dir, 'undocumented_class.rb'),
       File.join(@fixtures_dir, 'missing_param_docs.rb'),
@@ -234,7 +232,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
     assert_operator(result.offenses.count { |o| o[:name] == 'UndocumentedMethodArgument' }, :>, 0)
   end
 
-  def test_configuration_options_respects_custom_exclude_patterns
+  it 'configuration options respects custom exclude patterns' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['**/undocumented_class.rb']
       end
@@ -246,7 +244,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
     assert_equal(true, result.clean?)
   end
 
-  def test_configuration_options_applies_custom_fail_on_severity
+  it 'configuration options applies custom fail on severity' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = []
       c.fail_on_severity = 'error'
@@ -257,7 +255,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
     # Exit code should be 0 because tag order is convention, not error
   end
 
-  def test_result_statistics_provides_accurate_offense_statistics
+  it 'result statistics provides accurate offense statistics' do
     file = File.join(@fixtures_dir, 'undocumented_class.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -269,7 +267,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
     assert_operator(stats[:convention], :>=, 0)
   end
 
-  def test_glob_patterns_processes_files_matching_glob_patterns
+  it 'glob patterns processes files matching glob patterns' do
     pattern = File.join(@fixtures_dir, '*.rb')
 
     result = Yard::Lint.run(path: pattern, config: @config)
@@ -290,7 +288,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
       "Expected to find UndocumentedObject for GlobTestClass. Found: #{result.offenses.map { |o| [o[:name], o[:element]] }}")
   end
 
-  def test_directory_processing_recursively_processes_ruby_files_in_directories
+  it 'directory processing recursively processes ruby files in directories' do
     result = Yard::Lint.run(path: @fixtures_dir, config: @config)
 
     # Should process files in the directory
@@ -312,7 +310,7 @@ class YardLintIntegrationTestsTest < Minitest::Test
       "Expected multiple offense types, found: #{offense_types.join(', ')}")
   end
 
-  def test_offense_structure_returns_offenses_with_consistent_structure
+  it 'offense structure returns offenses with consistent structure' do
     file = File.join(@fixtures_dir, 'undocumented_class.rb')
 
     result = Yard::Lint.run(path: file, config: @config)
@@ -337,18 +335,18 @@ class YardLintIntegrationTestsTest < Minitest::Test
       end
   end
 
-  def test_error_handling_raises_filenotfounderror_for_non_existent_files
+  it 'error handling raises filenotfounderror for non existent files' do
     assert_raises(Yard::Lint::Errors::FileNotFoundError) do
       Yard::Lint.run(path: '/nonexistent/file.rb')
     end
   end
 
-  def test_error_handling_handles_empty_file_lists_gracefully
+  it 'error handling handles empty file lists gracefully' do
     # Should not raise
     Yard::Lint.run(path: [])
   end
 
-  def test_error_handling_handles_invalid_ruby_files_gracefully
+  it 'error handling handles invalid ruby files gracefully' do
     # Create a file with invalid Ruby syntax
     invalid_file = File.join(@fixtures_dir, 'invalid_syntax.rb')
     File.write(invalid_file, 'class Foo def end')

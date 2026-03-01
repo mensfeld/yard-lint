@@ -2,42 +2,43 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::Result' do
   attr_reader :config
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
   end
 
-  def test_class_attributes_has_correct_default_severity
+  it 'class attributes has correct default severity' do
     assert_equal('convention', Yard::Lint::Validators::Tags::RedundantParamDescription::Result.default_severity)
   end
 
-  def test_class_attributes_has_correct_offense_type
+  it 'class attributes has correct offense type' do
     assert_equal('tag', Yard::Lint::Validators::Tags::RedundantParamDescription::Result.offense_type)
   end
 
-  def test_class_attributes_has_correct_offense_name
+  it 'class attributes has correct offense name' do
     assert_equal('RedundantParamDescription', Yard::Lint::Validators::Tags::RedundantParamDescription::Result.offense_name)
   end
 
-  def test_initialize_inherits_from_base_result
+  it 'initialize inherits from base result' do
     result = Yard::Lint::Validators::Tags::RedundantParamDescription::Result.new([], config)
     assert_kind_of(Yard::Lint::Results::Base, result)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     result = Yard::Lint::Validators::Tags::RedundantParamDescription::Result.new([], config)
     assert_equal(config, result.config)
   end
 
-  def test_offense_building_with_no_violations_returns_empty_offenses_array
+  it 'offense building with no violations returns empty offenses array' do
     result = Yard::Lint::Validators::Tags::RedundantParamDescription::Result.new([], config)
     assert_equal([], result.offenses)
   end
 
-  def test_offense_building_with_single_violation_returns_offense_with_all_required_fields
+  it 'offense building with single violation returns offense with all required fields' do
     parsed_data = [{
       name: 'RedundantParamDescription',
       tag_name: 'param',
@@ -62,7 +63,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert_includes(offense[:message], 'The user')
   end
 
-  def test_offense_building_with_single_violation_includes_pattern_specific_message
+  it 'offense building with single violation includes pattern specific message' do
     parsed_data = [{
       name: 'RedundantParamDescription',
       tag_name: 'param',
@@ -83,7 +84,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert_includes(message, 'restates the parameter name')
   end
 
-  def test_offense_building_with_single_violation_preserves_object_name_in_offense
+  it 'offense building with single violation preserves object name in offense' do
     parsed_data = [{
       name: 'RedundantParamDescription',
       tag_name: 'param',
@@ -103,7 +104,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert_equal('MyClass#method', offense[:object_name])
   end
 
-  def test_offense_building_with_multiple_violations_returns_all_offenses
+  it 'offense building with multiple violations returns all offenses' do
     parsed_data = [
       {
         name: 'RedundantParamDescription',
@@ -147,7 +148,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert_equal(3, result.offenses.length)
   end
 
-  def test_offense_building_with_multiple_violations_parses_each_offense_correctly
+  it 'offense building with multiple violations parses each offense correctly' do
     parsed_data = [
       {
         name: 'RedundantParamDescription',
@@ -201,7 +202,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert_equal('lib/other.rb', offenses[2][:location])
   end
 
-  def test_offense_building_with_different_pattern_types_generates_different_messages
+  it 'offense building with different pattern types generates different messages' do
     parsed_data = [
       {
         name: 'RedundantParamDescription',
@@ -249,7 +250,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert_includes(messages[2], 'repeats the type name')
   end
 
-  def test_severity_defaults_to_convention
+  it 'severity defaults to convention' do
     parsed_data = [{
       name: 'RedundantParamDescription',
       tag_name: 'param',
@@ -267,7 +268,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert_equal('convention', result.offenses.first[:severity])
   end
 
-  def test_offense_structure_includes_all_required_offense_keys
+  it 'offense structure includes all required offense keys' do
     parsed_data = [{
       name: 'RedundantParamDescription',
       tag_name: 'param',
@@ -292,7 +293,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionResultTest < Minitest::Test
     assert(offense.key?(:object_name))
   end
 
-  def test_offense_structure_has_correct_offense_name
+  it 'offense structure has correct offense name' do
     parsed_data = [{
       name: 'RedundantParamDescription',
       tag_name: 'param',

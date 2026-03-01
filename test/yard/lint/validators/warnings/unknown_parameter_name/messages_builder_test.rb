@@ -2,27 +2,28 @@
 
 require 'test_helper'
 
-class YardLintValidatorsWarningsUnknownParameterNameMessagesBuilderTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Warnings::UnknownParameterName::MessagesBuilder' do
   attr_reader :messages_builder
 
-  def setup
+
+  before do
     @messages_builder = Yard::Lint::Validators::Warnings::UnknownParameterName::MessagesBuilder
   end
 
-  def test_call_when_offense_has_no_message_returns_default_message
+  it 'call when offense has no message returns default message' do
     offense = { location: '/tmp/test.rb', line: 10 }
     result = messages_builder.call(offense)
     assert_equal('UnknownParameterName detected', result)
   end
 
-  def test_call_when_message_does_not_match_expected_format_returns_the_message_as_is
+  it 'call when message does not match expected format returns the message as is' do
     offense = { message: 'Some other error', location: '/tmp/test.rb', line: 10 }
     result = messages_builder.call(offense)
     assert_equal('Some other error', result)
   end
 
-  def test_call_when_message_matches_unknown_parameter_format_adds_did_you_mean_suggestion_for_similar_parameter
+  it 'call when message matches unknown parameter format adds did you mean suggestion for similar parameter' do
     test_file = Tempfile.new(['test', '.rb'])
 
     begin
@@ -50,7 +51,7 @@ class YardLintValidatorsWarningsUnknownParameterNameMessagesBuilderTest < Minite
     end
   end
 
-  def test_call_when_message_matches_unknown_parameter_format_handles_multiple_similar_parameters
+  it 'call when message matches unknown parameter format handles multiple similar parameters' do
     test_file2 = Tempfile.new(['test2', '.rb'])
 
     begin
@@ -78,7 +79,7 @@ class YardLintValidatorsWarningsUnknownParameterNameMessagesBuilderTest < Minite
     end
   end
 
-  def test_call_returns_original_message_when_no_similar_parameters_found
+  it 'call returns original message when no similar parameters found' do
     test_file3 = Tempfile.new(['test3', '.rb'])
 
     begin
@@ -107,7 +108,7 @@ class YardLintValidatorsWarningsUnknownParameterNameMessagesBuilderTest < Minite
     end
   end
 
-  def test_call_returns_original_message_when_file_does_not_exist
+  it 'call returns original message when file does not exist' do
     offense = {
       message: '@param tag has unknown parameter name: old_name',
       location: '/nonexistent/file.rb',
@@ -117,7 +118,7 @@ class YardLintValidatorsWarningsUnknownParameterNameMessagesBuilderTest < Minite
     assert_equal('@param tag has unknown parameter name: old_name', result)
   end
 
-  def test_call_handles_methods_with_no_parameters
+  it 'call handles methods with no parameters' do
     test_file4 = Tempfile.new(['test4', '.rb'])
 
     begin
@@ -145,42 +146,42 @@ class YardLintValidatorsWarningsUnknownParameterNameMessagesBuilderTest < Minite
     end
   end
 
-  def test_parameter_extraction_extracts_simple_parameters
+  it 'parameter extraction extracts simple parameters' do
     params = messages_builder.send(:extract_parameter_names, 'name, email')
     assert_equal(%w[name email], params)
   end
 
-  def test_parameter_extraction_extracts_parameters_with_default_values
+  it 'parameter extraction extracts parameters with default values' do
     params = messages_builder.send(:extract_parameter_names, "name, email = 'default'")
     assert_equal(%w[name email], params)
   end
 
-  def test_parameter_extraction_extracts_keyword_parameters
+  it 'parameter extraction extracts keyword parameters' do
     params = messages_builder.send(:extract_parameter_names, 'name:, email:')
     assert_equal(%w[name email], params)
   end
 
-  def test_parameter_extraction_extracts_splat_parameters
+  it 'parameter extraction extracts splat parameters' do
     params = messages_builder.send(:extract_parameter_names, 'name, *args, **kwargs, &block')
     assert_equal(%w[name args kwargs block], params)
   end
 
-  def test_parameter_extraction_handles_empty_parameter_string
+  it 'parameter extraction handles empty parameter string' do
     params = messages_builder.send(:extract_parameter_names, '')
     assert_equal([], params)
   end
 
-  def test_levenshtein_distance_calculates_distance_between_identical_strings
+  it 'levenshtein distance calculates distance between identical strings' do
     distance = messages_builder.send(:levenshtein_distance, 'hello', 'hello')
     assert_equal(0, distance)
   end
 
-  def test_levenshtein_distance_calculates_distance_between_different_strings
+  it 'levenshtein distance calculates distance between different strings' do
     distance = messages_builder.send(:levenshtein_distance, 'kitten', 'sitting')
     assert_equal(3, distance)
   end
 
-  def test_levenshtein_distance_calculates_distance_with_empty_string
+  it 'levenshtein distance calculates distance with empty string' do
     distance = messages_builder.send(:levenshtein_distance, '', 'hello')
     assert_equal(5, distance)
 
@@ -188,22 +189,22 @@ class YardLintValidatorsWarningsUnknownParameterNameMessagesBuilderTest < Minite
     assert_equal(5, distance)
   end
 
-  def test_suggestion_finder_finds_best_match_using_levenshtein_distance
+  it 'suggestion finder finds best match using levenshtein distance' do
     suggestion = messages_builder.send(:find_suggestion, 'user_nme', %w[user_name user_email])
     assert_equal('user_name', suggestion)
   end
 
-  def test_suggestion_finder_returns_nil_when_no_good_match_exists
+  it 'suggestion finder returns nil when no good match exists' do
     suggestion = messages_builder.send(:find_suggestion, 'xyz', %w[abc def ghi])
     assert_nil(suggestion)
   end
 
-  def test_suggestion_finder_returns_nil_when_parameters_list_is_empty
+  it 'suggestion finder returns nil when parameters list is empty' do
     suggestion = messages_builder.send(:find_suggestion, 'param', [])
     assert_nil(suggestion)
   end
 
-  def test_suggestion_finder_uses_didyoumean_when_available_and_has_suggestions
+  it 'suggestion finder uses didyoumean when available and has suggestions' do
     # DidYouMean is very conservative, so test with a close typo
     suggestion = messages_builder.send(:find_suggestion, 'proces', %w[process])
     refute_nil(suggestion)

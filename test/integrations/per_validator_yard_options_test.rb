@@ -2,14 +2,16 @@
 
 require 'test_helper'
 
-class PerValidatorYardoptionsConfigurationTest < Minitest::Test
+
+describe 'Per Validator Yard Options' do
   attr_reader :fixtures_dir
 
-  def setup
+
+  before do
     @fixtures_dir = File.expand_path('fixtures', __dir__)
   end
 
-  def test_validator_specific_yardoptions_override_global_options_when_global_has_private_but_validator_ha
+  it 'validator specific yardoptions override global options when global has private but validator ha' do
       files = [File.join(fixtures_dir, 'private_methods.rb')]
 
       config = Yard::Lint::Config.new(
@@ -44,7 +46,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
       refute_empty(private_order)
   end
 
-  def test_validator_specific_yardoptions_override_global_options_when_global_has_no_private_but_validator
+  it 'validator specific yardoptions override global options when global has no private but validator' do
       files = [File.join(fixtures_dir, 'private_methods.rb')]
 
       config = Yard::Lint::Config.new(
@@ -79,7 +81,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
       refute_empty(private_order)
   end
 
-  def test_different_validators_with_different_visibility_settings_allows_fine_grained_control_over_which_
+  it 'different validators with different visibility settings allows fine grained control over which ' do
     files = [File.join(fixtures_dir, 'mixed_visibility.rb')]
 
     config = Yard::Lint::Config.new(
@@ -123,7 +125,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, wrong_order_methods.any? { |m| m&.include?('private_wrong_order') })
   end
 
-  def test_protected_visibility_configuration_treats_protected_as_including_all_non_public_visibility_leve
+  it 'protected visibility configuration treats protected as including all non public visibility leve' do
     # Note: YARD treats both --protected and --private as "include non-public"
     # So --protected alone will include private methods as well
     files = [File.join(fixtures_dir, 'mixed_visibility.rb')]
@@ -165,7 +167,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, undoc_methods.none? { |m| m&.include?('private_undocumented') })
   end
 
-  def test_multiple_validators_each_with_different_yardoptions_each_validator_respects_its_own_yardoptions
+  it 'multiple validators each with different yardoptions each validator respects its own yardoptions' do
     files = [File.join(fixtures_dir, 'mixed_visibility.rb')]
 
     config = Yard::Lint::Config.new(
@@ -205,7 +207,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, wrong_order_methods.any? { |m| m&.include?('private_wrong_order') })
   end
 
-  def test_yardoptions_with_tags_validators_with_invalidtypes_validator_respects_per_validator_yardoptions
+  it 'yardoptions with tags validators with invalidtypes validator respects per validator yardoptions' do
       files = [File.join(fixtures_dir, 'private_methods.rb')]
 
       # Test that InvalidTypes can be configured to only check public methods
@@ -234,7 +236,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
       assert_equal(true, tag_order_offenses.any? { |o| o[:method_name]&.include?('private') })
   end
 
-  def test_yardoptions_with_tags_validators_with_typesyntax_validator_respects_per_validator_yardoptions_f
+  it 'yardoptions with tags validators with typesyntax validator respects per validator yardoptions f' do
       files = [File.join(fixtures_dir, 'private_methods.rb')]
 
       config = Yard::Lint::Config.new(
@@ -260,7 +262,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
       assert_empty(private_offenses)
   end
 
-  def test_yardoptions_inheritance_and_fallback_behavior_validators_without_explicit_yardoptions_inherit_f
+  it 'yardoptions inheritance and fallback behavior validators without explicit yardoptions inherit f' do
     files = [File.join(fixtures_dir, 'private_methods.rb')]
 
     config = Yard::Lint::Config.new(
@@ -285,7 +287,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     refute_empty(private_order)
   end
 
-  def test_yardoptions_inheritance_and_fallback_behavior_explicit_empty_yardoptions_overrides_global_non_e
+  it 'yardoptions inheritance and fallback behavior explicit empty yardoptions overrides global non e' do
     files = [File.join(fixtures_dir, 'private_methods.rb')]
 
     config = Yard::Lint::Config.new(
@@ -316,7 +318,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_empty(public_order)
   end
 
-  def test_regression_test_config_validator_yard_options_is_used_for_visibility_uses_validator_yard_option
+  it 'regression test config validator yard options is used for visibility uses validator yard option' do
     # This test verifies the fix from PR #41 is working
     # The bug was that determine_visibility used all_validators['YardOptions'] directly
     # instead of calling validator_yard_options which respects per-validator settings
@@ -356,7 +358,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     refute_nil(colorize_offense)
   end
 
-  def test_combined_yardoptions_and_exclude_configurations_both_yardoptions_and_exclude_work_together_per_
+  it 'combined yardoptions and exclude configurations both yardoptions and exclude work together per ' do
     files = [
       File.join(fixtures_dir, 'private_methods.rb'),
       File.join(fixtures_dir, 'protected_methods.rb')
@@ -406,7 +408,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
   # Some validators like Tags/Order and Tags/InvalidTypes have in_process_visibility: :all
   # by default. This tests that explicit empty YardOptions can override this.
 
-  def test_validators_with_default_in_process_visibility_all_tags_order_defaults_to_all_but_respects_expli
+  it 'validators with default in process visibility all tags order defaults to all but respects expli' do
     files = [File.join(fixtures_dir, 'mixed_visibility.rb')]
 
     # Without explicit YardOptions - inherits global empty, falls back to validator default (:all)
@@ -456,7 +458,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
   # Documentation validators like UndocumentedObjects have in_process_visibility: :public
   # This tests that --private YardOptions can expand their visibility
 
-  def test_validators_with_default_in_process_visibility_public_documentation_validators_default_to_public
+  it 'validators with default in process visibility public documentation validators default to public' do
     files = [File.join(fixtures_dir, 'private_methods.rb')]
 
     # Without --private - should only see public methods
@@ -499,7 +501,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, undoc_arg_offenses2.any? { |o| o[:method_name]&.include?('undocumented_private') })
   end
 
-  def test_three_validators_with_three_different_visibility_settings_all_three_respect_their_individual_se
+  it 'three validators with three different visibility settings all three respect their individual se' do
     files = [File.join(fixtures_dir, 'mixed_visibility.rb')]
 
     config = Yard::Lint::Config.new(
@@ -541,7 +543,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, tag_order_offenses.any? { |o| o[:method_name]&.include?('protected_wrong_order') })
   end
 
-  def test_edge_case_validator_config_without_yardoptions_key_inherits_from_global_when_yardoptions_key_is
+  it 'edge case validator config without yardoptions key inherits from global when yardoptions key is' do
     files = [File.join(fixtures_dir, 'private_methods.rb')]
 
     config = Yard::Lint::Config.new(
@@ -565,7 +567,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, tag_order_offenses.any? { |o| o[:method_name]&.include?('documented_private_wrong_order') })
   end
 
-  def test_complex_scenario_multiple_files_with_mixed_visibility_correctly_applies_per_validator_yardoptio
+  it 'complex scenario multiple files with mixed visibility correctly applies per validator yardoptio' do
     files = [
       File.join(fixtures_dir, 'private_methods.rb'),
       File.join(fixtures_dir, 'protected_methods.rb'),
@@ -613,7 +615,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, wrong_order_methods.any? { |m| m&.include?('protected') })
   end
 
-  def test_yardoptions_array_with_multiple_flags_correctly_handles_arrays_with_multiple_yard_options
+  it 'yardoptions array with multiple flags correctly handles arrays with multiple yard options' do
     files = [File.join(fixtures_dir, 'mixed_visibility.rb')]
 
     config = Yard::Lint::Config.new(
@@ -640,7 +642,7 @@ class PerValidatorYardoptionsConfigurationTest < Minitest::Test
     assert_equal(true, wrong_order_methods.any? { |m| m&.include?('protected_wrong_order') })
   end
 
-  def test_yardoptions_with_partial_flag_matches_correctly_matches_private_and_protected_flags
+  it 'yardoptions with partial flag matches correctly matches private and protected flags' do
     files = [File.join(fixtures_dir, 'mixed_visibility.rb')]
 
     # Test that --private-api or similar doesn't falsely match

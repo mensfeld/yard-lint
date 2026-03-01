@@ -2,19 +2,21 @@
 
 require 'test_helper'
 
-class YardLintExecutorQueryExecutorTest < Minitest::Test
+
+describe 'Yard::Lint::Executor::QueryExecutor' do
   attr_reader :registry, :executor
 
-  def setup
+
+  before do
     @registry = stub('registry')
     @executor = Yard::Lint::Executor::QueryExecutor.new(@registry)
   end
 
-  def test_initialize_stores_the_registry
+  it 'initialize stores the registry' do
     assert_equal(@registry, @executor.instance_variable_get(:@registry))
   end
 
-  def test_execute_returns_a_result_hash_with_stdout_stderr_and_exit_code
+  it 'execute returns a result hash with stdout stderr and exit code' do
     config = Yard::Lint::Config.new
     validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.validator_name
@@ -50,7 +52,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     assert_equal(0, result[:exit_code])
   end
 
-  def test_execute_calls_registry_objects_for_validator_with_correct_visibility
+  it 'execute calls registry objects for validator with correct visibility' do
     config = Yard::Lint::Config.new
     validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.validator_name
@@ -84,7 +86,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator)
   end
 
-  def test_execute_passes_file_selection_to_registry_when_provided
+  it 'execute passes file selection to registry when provided' do
     config = Yard::Lint::Config.new
     validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.validator_name
@@ -118,7 +120,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator, file_selection: ['lib/foo.rb'])
   end
 
-  def test_execute_skips_objects_without_file_info
+  it 'execute skips objects without file info' do
     config = Yard::Lint::Config.new
     validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.validator_name
@@ -148,7 +150,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     assert_equal('', result[:stdout])
   end
 
-  def test_execute_skips_objects_without_line_info
+  it 'execute skips objects without line info' do
     config = Yard::Lint::Config.new
     validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.validator_name
@@ -178,7 +180,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     assert_equal('', result[:stdout])
   end
 
-  def test_execute_processes_objects_with_both_file_and_line_info
+  it 'execute processes objects with both file and line info' do
     config = Yard::Lint::Config.new
     validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.validator_name
@@ -210,7 +212,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     assert_includes(result[:stdout], 'test:TestClass#method:1')
   end
 
-  def test_execute_with_file_excludes_from_config_passes_excludes_to_registry
+  it 'execute with file excludes from config passes excludes to registry' do
     config = Yard::Lint::Config.new
     validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.validator_name
@@ -246,7 +248,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
 
   # determine_visibility tests
 
-  def test_determine_visibility_when_validator_has_no_config_uses_validator_in_process_visibility
+  it 'determine visibility when validator has no config uses validator in process visibility' do
     mock_object = stub(
       file: 'lib/test.rb',
       line: 10,
@@ -274,7 +276,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator)
   end
 
-  def test_determine_visibility_when_config_has_private_in_global_yardoptions_uses_all_visibility
+  it 'determine visibility when config has private in global yardoptions uses all visibility' do
     mock_object = stub(
       file: 'lib/test.rb',
       line: 10,
@@ -309,7 +311,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator)
   end
 
-  def test_determine_visibility_when_config_has_protected_in_global_yardoptions_uses_all_visibility
+  it 'determine visibility when config has protected in global yardoptions uses all visibility' do
     mock_object = stub(
       file: 'lib/test.rb',
       line: 10,
@@ -344,7 +346,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator)
   end
 
-  def test_determine_visibility_when_validator_has_explicit_empty_yardoptions_uses_public_visibility
+  it 'determine visibility when validator has explicit empty yardoptions uses public visibility' do
     mock_object = stub(
       file: 'lib/test.rb',
       line: 10,
@@ -379,7 +381,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator)
   end
 
-  def test_determine_visibility_when_validator_has_private_in_its_own_yardoptions_uses_all_visibility
+  it 'determine visibility when validator has private in its own yardoptions uses all visibility' do
     mock_object = stub(
       file: 'lib/test.rb',
       line: 10,
@@ -414,7 +416,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator)
   end
 
-  def test_determine_visibility_when_no_yardoptions_key_and_global_is_empty_falls_back_to_validator_default
+  it 'determine visibility when no yardoptions key and global is empty falls back to validator default' do
     mock_object = stub(
       file: 'lib/test.rb',
       line: 10,
@@ -451,7 +453,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
 
   # Error handling tests
 
-  def test_error_handling_when_validator_raises_notimplementederror_re_raises_the_error
+  it 'error handling when validator raises notimplementederror re raises the error' do
     config = Yard::Lint::Config.new
     mock_object = stub(
       file: 'lib/test.rb',
@@ -481,7 +483,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     assert_raises(NotImplementedError) { @executor.execute(validator) }
   end
 
-  def test_error_handling_when_validator_raises_nomethoderror_re_raises_the_error
+  it 'error handling when validator raises nomethoderror re raises the error' do
     config = Yard::Lint::Config.new
     mock_object = stub(
       file: 'lib/test.rb',
@@ -511,7 +513,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     assert_raises(NoMethodError) { @executor.execute(validator) }
   end
 
-  def test_error_handling_when_validator_raises_standarderror_catches_the_error_and_continues
+  it 'error handling when validator raises standarderror catches the error and continues' do
     config = Yard::Lint::Config.new
     mock_object = stub(
       file: 'lib/test.rb',
@@ -541,7 +543,7 @@ class YardLintExecutorQueryExecutorTest < Minitest::Test
     @executor.execute(validator)
   end
 
-  def test_error_handling_when_validator_raises_standarderror_returns_empty_result
+  it 'error handling when validator raises standarderror returns empty result' do
     config = Yard::Lint::Config.new
     mock_object = stub(
       file: 'lib/test.rb',

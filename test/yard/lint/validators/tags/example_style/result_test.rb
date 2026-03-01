@@ -2,26 +2,26 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleResultTest < Minitest::Test
 
-  def test_class_attributes_has_convention_default_severity
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::Result' do
+  it 'class attributes has convention default severity' do
     assert_equal('convention', Yard::Lint::Validators::Tags::ExampleStyle::Result.default_severity)
   end
 
-  def test_class_attributes_has_line_offense_type
+  it 'class attributes has line offense type' do
     assert_equal('line', Yard::Lint::Validators::Tags::ExampleStyle::Result.offense_type)
   end
 
-  def test_class_attributes_has_examplestyleoffense_as_offense_name
+  it 'class attributes has examplestyleoffense as offense name' do
     assert_equal('ExampleStyleOffense', Yard::Lint::Validators::Tags::ExampleStyle::Result.offense_name)
   end
 
-  def test_initialize_inherits_from_result_base_class
+  it 'initialize inherits from result base class' do
     result = Yard::Lint::Validators::Tags::ExampleStyle::Result.new([])
     assert_kind_of(Yard::Lint::Results::Base, result)
   end
 
-  def test_initialize_builds_offenses_from_parsed_data
+  it 'initialize builds offenses from parsed data' do
     parsed_data = [
       {
         name: 'ExampleStyle',
@@ -40,7 +40,7 @@ class YardLintValidatorsTagsExampleStyleResultTest < Minitest::Test
     assert_equal('ExampleStyle', result.offenses.first[:name])
   end
 
-  def test_initialize_respects_configured_severity_from_config
+  it 'initialize respects configured severity from config' do
     parsed_data = [
       {
         name: 'ExampleStyle',
@@ -60,7 +60,7 @@ class YardLintValidatorsTagsExampleStyleResultTest < Minitest::Test
     assert_equal('warning', result.offenses.first[:severity])
   end
 
-  def test_build_message_delegates_to_messagesbuilder
+  it 'build message delegates to messagesbuilder' do
     parsed_data = [
       {
         name: 'ExampleStyle',

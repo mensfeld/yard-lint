@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsCollectionTypeTest < Minitest::Test
 
-  def test_has_all_required_components
+describe 'Yard::Lint::Validators::Tags::CollectionType' do
+  it 'has all required components' do
   assert(defined?(Yard::Lint::Validators::Tags::CollectionType::Validator))
   assert(defined?(Yard::Lint::Validators::Tags::CollectionType::Parser))
   assert(defined?(Yard::Lint::Validators::Tags::CollectionType::Result))

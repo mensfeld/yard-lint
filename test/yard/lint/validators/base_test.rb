@@ -2,52 +2,54 @@
 
 require 'test_helper'
 
-class YardLintValidatorsBaseInitializeTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Base' do
   attr_reader :config, :selection, :validator
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @selection = ['lib/example.rb']
     @validator = Yard::Lint::Validators::Base.new(config, selection)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(config, validator.config)
   end
 
-  def test_initialize_stores_selection
+  it 'initialize stores selection' do
     assert_equal(selection, validator.selection)
   end
 end
 
-class YardLintValidatorsBaseInProcessTest < Minitest::Test
+describe 'YardLintValidatorsBaseInProcess' do
   attr_reader :validator_class
 
-  def setup
+  before do
     @validator_class = Class.new(Yard::Lint::Validators::Base) do
       in_process visibility: :all
     end
   end
 
-  def test_in_process_marks_the_validator_as_in_process_enabled
+  it 'in process marks the validator as in process enabled' do
     assert_equal(true, validator_class.in_process?)
   end
 
-  def test_in_process_stores_the_visibility_setting
+  it 'in process stores the visibility setting' do
     assert_equal(:all, validator_class.in_process_visibility)
   end
 
-  def test_in_process_returns_false_by_default
+  it 'in process returns false by default' do
     assert_equal(false, Yard::Lint::Validators::Base.in_process?)
   end
 end
 
-class YardLintValidatorsBaseValidatorNameTest < Minitest::Test
-  def test_validator_name_returns_nil_for_base_class
+describe 'YardLintValidatorsBaseValidatorName' do
+  it 'validator name returns nil for base class' do
     assert_nil(Yard::Lint::Validators::Base.validator_name)
   end
 
-  def test_validator_name_extracts_name_from_valid_namespace
+  it 'validator name extracts name from valid namespace' do
     named_class = Class.new(Yard::Lint::Validators::Base) do
       def self.name
         'Yard::Lint::Validators::Tags::Order::Validator'
@@ -57,26 +59,26 @@ class YardLintValidatorsBaseValidatorNameTest < Minitest::Test
   end
 end
 
-class YardLintValidatorsBaseInProcessQueryTest < Minitest::Test
-  attr_reader :validator
+describe 'YardLintValidatorsBaseInProcessQuery' do
+  attr_reader :config, :selection, :validator
 
-  def setup
+  before do
     @config = Yard::Lint::Config.new
     @selection = ['lib/example.rb']
     @validator = Yard::Lint::Validators::Base.new(@config, @selection)
   end
 
-  def test_in_process_query_raises_notimplementederror_by_default
+  it 'in process query raises notimplementederror by default' do
     object = stub
     collector = stub
     assert_raises(NotImplementedError) { validator.in_process_query(object, collector) }
   end
 end
 
-class YardLintValidatorsBaseConfigOrDefaultTest < Minitest::Test
+describe 'YardLintValidatorsBaseConfigOrDefault' do
   attr_reader :config, :selection, :validator
 
-  def setup
+  before do
     @config = Yard::Lint::Config.new
     @selection = ['lib/example.rb']
 
@@ -89,7 +91,7 @@ class YardLintValidatorsBaseConfigOrDefaultTest < Minitest::Test
     @validator = concrete_validator_class.new(config, selection)
   end
 
-  def test_config_or_default_when_config_value_exists_returns_the_configured_value
+  it 'config or default when config value exists returns the configured value' do
     config.stubs(:validator_config)
       .with('Tags/TestValidator', 'SomeKey')
       .returns('configured_value')
@@ -98,7 +100,7 @@ class YardLintValidatorsBaseConfigOrDefaultTest < Minitest::Test
     assert_equal('configured_value', result)
   end
 
-  def test_config_or_default_when_config_value_is_nil_returns_the_default_value
+  it 'config or default when config value is nil returns the default value' do
     config.stubs(:validator_config)
       .with('Tags/TestValidator', 'SomeKey')
       .returns(nil)
@@ -128,7 +130,7 @@ class YardLintValidatorsBaseConfigOrDefaultTest < Minitest::Test
     end
   end
 
-  def test_config_or_default_when_validator_name_cannot_be_extracted_returns_nil
+  it 'config or default when validator name cannot be extracted returns nil' do
     invalid_validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.name
         'InvalidClassName'

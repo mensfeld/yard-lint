@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTagTypePositionParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::TagTypePosition::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::TagTypePosition::Parser.new
   end
 
-  def test_call_with_valid_yard_output_parses_violations_correctly
+  it 'call with valid yard output parses violations correctly' do
     output = <<~OUTPUT
       lib/example.rb:25: User#initialize
       param|name|String|type_after_name
@@ -40,7 +41,7 @@ class YardLintValidatorsTagsTagTypePositionParserTest < Minitest::Test
     assert_equal('type_first', result[1][:detected_style])
   end
 
-  def test_call_with_valid_yard_output_handles_violations_without_detected_style
+  it 'call with valid yard output handles violations without detected style' do
     output = <<~OUTPUT
       lib/test.rb:10: Test#method
       param|value|Integer
@@ -58,19 +59,19 @@ class YardLintValidatorsTagsTagTypePositionParserTest < Minitest::Test
     assert_nil(result[0][:detected_style])
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_nil
+  it 'call with empty output returns empty array for nil' do
     assert_equal([], parser.call(nil))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_empty_string
+  it 'call with empty output returns empty array for empty string' do
     assert_equal([], parser.call(''))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_whitespace_only
+  it 'call with empty output returns empty array for whitespace only' do
     assert_equal([], parser.call("  \n  \t  "))
   end
 
-  def test_call_with_malformed_output_skips_lines_without_proper_location_format
+  it 'call with malformed output skips lines without proper location format' do
     output = <<~OUTPUT
       invalid location line
       param|name|String|type_after_name
@@ -83,13 +84,13 @@ class YardLintValidatorsTagsTagTypePositionParserTest < Minitest::Test
     assert_equal('Valid#method', result[0][:object_name])
   end
 
-  def test_call_with_malformed_output_skips_incomplete_violation_pairs
+  it 'call with malformed output skips incomplete violation pairs' do
     output = "lib/example.rb:10: Test#method\n"
     result = parser.call(output)
     assert_equal([], result)
   end
 
-  def test_call_with_malformed_output_skips_details_with_insufficient_fields
+  it 'call with malformed output skips details with insufficient fields' do
     output = <<~OUTPUT
       lib/example.rb:10: Test#method
       param|name

@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class CollectionTypeIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Collection Type' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/collection_type_examples.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', true)
+      c.set_validator_config('Tags/CollectionType', 'Enabled', true)
     end
   end
 
-  def test_detecting_incorrect_hash_syntax_finds_hash_k_v_in_param_tags
+  it 'detecting incorrect hash syntax finds hash k v in param tags' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     hash_in_param = result.offenses.select do |o|
@@ -23,7 +25,7 @@ class CollectionTypeIntegrationTest < Minitest::Test
     refute_empty(hash_in_param)
   end
 
-  def test_detecting_incorrect_hash_syntax_finds_nested_hash_syntax
+  it 'detecting incorrect hash syntax finds nested hash syntax' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     nested_hash = result.offenses.select do |o|
@@ -34,7 +36,7 @@ class CollectionTypeIntegrationTest < Minitest::Test
     refute_empty(nested_hash)
   end
 
-  def test_detecting_incorrect_hash_syntax_finds_hash_in_return_tags
+  it 'detecting incorrect hash syntax finds hash in return tags' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     hash_in_return = result.offenses.select do |o|
@@ -45,7 +47,7 @@ class CollectionTypeIntegrationTest < Minitest::Test
     refute_empty(hash_in_return)
   end
 
-  def test_detecting_incorrect_hash_syntax_does_not_flag_hash_curly_syntax
+  it 'detecting incorrect hash syntax does not flag hash curly syntax' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # All offenses should be about Hash<>, not Hash{}
@@ -57,7 +59,7 @@ class CollectionTypeIntegrationTest < Minitest::Test
     end
   end
 
-  def test_detecting_incorrect_hash_syntax_does_not_flag_array_syntax
+  it 'detecting incorrect hash syntax does not flag array syntax' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # Should not have violations for Array<String>
@@ -69,7 +71,7 @@ class CollectionTypeIntegrationTest < Minitest::Test
     assert_empty(array_violations)
   end
 
-  def test_detecting_incorrect_hash_syntax_provides_helpful_error_messages
+  it 'detecting incorrect hash syntax provides helpful error messages' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find { |o| o[:name] == 'CollectionType' }
@@ -79,10 +81,10 @@ class CollectionTypeIntegrationTest < Minitest::Test
     assert_includes(offense[:message], 'long collection syntax')
   end
 
-  def test_when_enforcing_short_style_finds_hash_k_v_in_param_tags
+  it 'when enforcing short style finds hash k v in param tags' do
     short_style_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/CollectionType', 'EnforcedStyle', 'short')
+      c.set_validator_config('Tags/CollectionType', 'Enabled', true)
+      c.set_validator_config('Tags/CollectionType', 'EnforcedStyle', 'short')
     end
 
     result = Yard::Lint.run(path: fixture_path, config: short_style_config, progress: false)
@@ -95,10 +97,10 @@ class CollectionTypeIntegrationTest < Minitest::Test
     refute_empty(hash_violations)
   end
 
-  def test_when_enforcing_short_style_suggests_removing_hash_prefix
+  it 'when enforcing short style suggests removing hash prefix' do
     short_style_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/CollectionType', 'EnforcedStyle', 'short')
+      c.set_validator_config('Tags/CollectionType', 'Enabled', true)
+      c.set_validator_config('Tags/CollectionType', 'EnforcedStyle', 'short')
     end
 
     result = Yard::Lint.run(path: fixture_path, config: short_style_config, progress: false)
@@ -110,10 +112,10 @@ class CollectionTypeIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '=>')
   end
 
-  def test_when_enforcing_short_style_does_not_flag_hash_angle_syntax
+  it 'when enforcing short style does not flag hash angle syntax' do
     short_style_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/CollectionType', 'EnforcedStyle', 'short')
+      c.set_validator_config('Tags/CollectionType', 'Enabled', true)
+      c.set_validator_config('Tags/CollectionType', 'EnforcedStyle', 'short')
     end
 
     result = Yard::Lint.run(path: fixture_path, config: short_style_config, progress: false)
@@ -126,10 +128,10 @@ class CollectionTypeIntegrationTest < Minitest::Test
     end
   end
 
-  def test_when_enforcing_short_style_does_not_flag_k_v_syntax
+  it 'when enforcing short style does not flag k v syntax' do
     short_style_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/CollectionType', 'EnforcedStyle', 'short')
+      c.set_validator_config('Tags/CollectionType', 'Enabled', true)
+      c.set_validator_config('Tags/CollectionType', 'EnforcedStyle', 'short')
     end
 
     result = Yard::Lint.run(path: fixture_path, config: short_style_config, progress: false)
@@ -143,9 +145,9 @@ class CollectionTypeIntegrationTest < Minitest::Test
     end
   end
 
-  def test_when_disabled_does_not_run_validation
+  it 'when disabled does not run validation' do
     disabled_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/CollectionType', 'Enabled', false)
+      c.set_validator_config('Tags/CollectionType', 'Enabled', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: disabled_config, progress: false)

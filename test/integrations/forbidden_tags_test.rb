@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class ForbiddenTagsIntegrationTest < Minitest::Test
+
+describe 'Forbidden Tags' do
   attr_reader :fixture_path
 
-  def setup
+
+  before do
     @fixture_path = File.expand_path('../fixtures/forbidden_tags_examples.rb', __dir__)
   end
 
-  def test_detecting_return_void_finds_return_void_tags
+  it 'detecting return void finds return void tags' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'return', 'Types' => ['void'] }
              ])
     end
@@ -28,10 +30,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     refute_empty(void_offenses)
   end
 
-  def test_detecting_return_void_does_not_flag_return_boolean
+  it 'detecting return void does not flag return boolean' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'return', 'Types' => ['void'] }
              ])
     end
@@ -46,10 +48,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     assert_empty(boolean_offenses)
   end
 
-  def test_detecting_return_void_does_not_flag_return_nil
+  it 'detecting return void does not flag return nil' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'return', 'Types' => ['void'] }
              ])
     end
@@ -64,10 +66,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     assert_empty(nil_offenses)
   end
 
-  def test_detecting_return_void_flags_return_with_void_among_multiple_types
+  it 'detecting return void flags return with void among multiple types' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'return', 'Types' => ['void'] }
              ])
     end
@@ -84,10 +86,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     refute_empty(mixed_offenses)
   end
 
-  def test_detecting_param_object_finds_param_object_tags
+  it 'detecting param object finds param object tags' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'param', 'Types' => ['Object'] }
              ])
     end
@@ -103,10 +105,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     refute_empty(object_offenses)
   end
 
-  def test_detecting_param_object_does_not_flag_param_string
+  it 'detecting param object does not flag param string' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'param', 'Types' => ['Object'] }
              ])
     end
@@ -121,10 +123,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     assert_empty(string_offenses)
   end
 
-  def test_detecting_tag_only_patterns_finds_api_tags
+  it 'detecting tag only patterns finds api tags' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'api' }
              ])
     end
@@ -139,10 +141,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     refute_empty(api_offenses)
   end
 
-  def test_detecting_tag_only_patterns_provides_helpful_error_message
+  it 'detecting tag only patterns provides helpful error message' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'api' }
              ])
     end
@@ -157,10 +159,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     assert_includes(offense[:message], 'not allowed by project configuration')
   end
 
-  def test_multiple_patterns_detects_all_configured_patterns
+  it 'multiple patterns detects all configured patterns' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'return', 'Types' => ['void'] },
                { 'Tag' => 'param', 'Types' => ['Object'] },
                { 'Tag' => 'api' }
@@ -181,10 +183,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     assert_equal(true, api_found)
   end
 
-  def test_when_disabled_does_not_run_validation
+  it 'when disabled does not run validation' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', false)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', false)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'return', 'Types' => ['void'] }
              ])
     end
@@ -195,10 +197,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     assert_empty(forbidden_offenses)
   end
 
-  def test_with_empty_patterns_does_not_report_any_offenses
+  it 'with empty patterns does not report any offenses' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [])
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [])
     end
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -207,10 +209,10 @@ class ForbiddenTagsIntegrationTest < Minitest::Test
     assert_empty(forbidden_offenses)
   end
 
-  def test_error_messages_provides_descriptive_messages_for_type_patterns
+  it 'error messages provides descriptive messages for type patterns' do
     config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ForbiddenTags', 'ForbiddenPatterns', [
+      c.set_validator_config('Tags/ForbiddenTags', 'Enabled', true)
+      c.set_validator_config('Tags/ForbiddenTags', 'ForbiddenPatterns', [
                { 'Tag' => 'return', 'Types' => ['void'] }
              ])
     end

@@ -2,28 +2,30 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::MissingReturn::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Documentation::MissingReturn::Parser.new
   end
 
-  def test_initialize_inherits_from_parser_base_class
+  it 'initialize inherits from parser base class' do
     assert_kind_of(Yard::Lint::Parsers::Base, parser)
   end
 
-  def test_call_parses_input_and_returns_array
+  it 'call parses input and returns array' do
     result = parser.call('')
     assert_kind_of(Array, result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
     assert_equal([], result)
   end
 
-  def test_call_parses_valid_offense_line
+  it 'call parses valid offense line' do
     input = 'lib/example.rb:10: Calculator#add|2'
     result = parser.call(input)
 
@@ -34,7 +36,7 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     }], result)
   end
 
-  def test_call_parses_multiple_offense_lines
+  it 'call parses multiple offense lines' do
     input = <<~OUTPUT
       lib/example.rb:10: Calculator#add|2
       lib/example.rb:20: Calculator#multiply|2
@@ -46,7 +48,7 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal('Calculator#multiply', result[1][:element])
   end
 
-  def test_call_parses_class_methods
+  it 'call parses class methods' do
     input = 'lib/example.rb:5: Calculator.new|1'
     result = parser.call(input)
 
@@ -57,7 +59,7 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     }], result)
   end
 
-  def test_call_handles_methods_with_zero_arity
+  it 'call handles methods with zero arity' do
     input = 'lib/example.rb:15: Calculator#current_value|0'
     result = parser.call(input)
 
@@ -68,7 +70,7 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     }], result)
   end
 
-  def test_call_skips_invalid_lines
+  it 'call skips invalid lines' do
     input = <<~OUTPUT
       lib/example.rb:10: Calculator#add|2
       Invalid line without proper format
@@ -79,25 +81,25 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(2, result.size)
   end
 
-  def test_call_handles_lines_with_whitespace
+  it 'call handles lines with whitespace' do
     input = "  lib/example.rb:10: Calculator#add|2  \n\n"
     result = parser.call(input)
 
     assert_equal(1, result.size)
   end
 
-  def test_call_with_config_parameter_accepts_config_keyword_argument
+  it 'call with config parameter accepts config keyword argument' do
     config = Yard::Lint::Config.new
     parser.call('', config: config)
   end
 
-  def test_call_with_config_parameter_works_without_config_parameter_backwards_compatibility
+  it 'call with config parameter works without config parameter backwards compatibility' do
     parser.call('')
   end
 
-  def test_call_with_simple_name_exclusion_excludes_methods_matching_simple_name
+  it 'call with simple name exclusion excludes methods matching simple name' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['initialize'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['initialize'])
     end
 
     input = 'lib/example.rb:5: Example#initialize|1'
@@ -106,9 +108,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_empty(result)
   end
 
-  def test_call_with_simple_name_exclusion_does_not_exclude_methods_with_different_names
+  it 'call with simple name exclusion does not exclude methods with different names' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['initialize'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['initialize'])
     end
 
     input = 'lib/example.rb:10: Example#calculate|0'
@@ -117,9 +119,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_simple_name_exclusion_matches_simple_names_with_any_arity
+  it 'call with simple name exclusion matches simple names with any arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['initialize'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['initialize'])
     end
 
     input = <<~OUTPUT
@@ -132,9 +134,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_empty(result)
   end
 
-  def test_call_with_regex_pattern_exclusion_excludes_methods_matching_regex_pattern
+  it 'call with regex pattern exclusion excludes methods matching regex pattern' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['/^_/'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['/^_/'])
     end
 
     input = 'lib/example.rb:10: Example#_private_helper|0'
@@ -143,9 +145,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_empty(result)
   end
 
-  def test_call_with_regex_pattern_exclusion_does_not_exclude_methods_not_matching_pattern
+  it 'call with regex pattern exclusion does not exclude methods not matching pattern' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['/^_/'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['/^_/'])
     end
 
     input = 'lib/example.rb:10: Example#public_method|0'
@@ -154,9 +156,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_regex_pattern_exclusion_handles_multiple_regex_patterns
+  it 'call with regex pattern exclusion handles multiple regex patterns' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['/^_/', '/^test_/'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['/^_/', '/^test_/'])
     end
 
     input = <<~OUTPUT
@@ -170,9 +172,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal('Example#regular_method', result[0][:element])
   end
 
-  def test_call_with_regex_pattern_exclusion_handles_invalid_regex_gracefully
+  it 'call with regex pattern exclusion handles invalid regex gracefully' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['/[invalid/'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['/[invalid/'])
     end
 
     input = 'lib/example.rb:10: Example#method|0'
@@ -182,9 +184,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_regex_pattern_exclusion_rejects_empty_regex_patterns
+  it 'call with regex pattern exclusion rejects empty regex patterns' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['//'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['//'])
     end
 
     input = 'lib/example.rb:10: Example#method|0'
@@ -194,9 +196,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_arity_pattern_exclusion_excludes_methods_matching_name_and_arity
+  it 'call with arity pattern exclusion excludes methods matching name and arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['fetch/1'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['fetch/1'])
     end
 
     input = 'lib/example.rb:10: Cache#fetch|1'
@@ -205,9 +207,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_empty(result)
   end
 
-  def test_call_with_arity_pattern_exclusion_does_not_exclude_methods_with_same_name_but_different_arity
+  it 'call with arity pattern exclusion does not exclude methods with same name but different arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['fetch/1'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['fetch/1'])
     end
 
     input = 'lib/example.rb:10: Cache#fetch|2'
@@ -216,9 +218,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_arity_pattern_exclusion_does_not_exclude_methods_with_different_name_but_same_arity
+  it 'call with arity pattern exclusion does not exclude methods with different name but same arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['fetch/1'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['fetch/1'])
     end
 
     input = 'lib/example.rb:10: Cache#get|1'
@@ -227,9 +229,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_arity_pattern_exclusion_handles_zero_arity_patterns
+  it 'call with arity pattern exclusion handles zero arity patterns' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['initialize/0'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['initialize/0'])
     end
 
     input = <<~OUTPUT
@@ -242,9 +244,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(10, result[0][:line])
   end
 
-  def test_call_with_mixed_exclusion_patterns_applies_all_exclusion_patterns
+  it 'call with mixed exclusion patterns applies all exclusion patterns' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['initialize', '/^_/', 'fetch/1'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['initialize', '/^_/', 'fetch/1'])
     end
 
     input = <<~OUTPUT
@@ -265,9 +267,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal('Example#calculate', result[1][:element])
   end
 
-  def test_call_with_edge_cases_handles_nil_excluded_methods
+  it 'call with edge cases handles nil excluded methods' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', nil)
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', nil)
     end
 
     input = 'lib/example.rb:10: Example#method|0'
@@ -276,9 +278,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_edge_cases_handles_empty_excluded_methods_array
+  it 'call with edge cases handles empty excluded methods array' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', [])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', [])
     end
 
     input = 'lib/example.rb:10: Example#method|0'
@@ -287,9 +289,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_edge_cases_sanitizes_patterns_with_whitespace
+  it 'call with edge cases sanitizes patterns with whitespace' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['  initialize  ', '', nil])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['  initialize  ', '', nil])
     end
 
     input = <<~OUTPUT
@@ -304,9 +306,9 @@ class YardLintValidatorsDocumentationMissingReturnParserTest < Minitest::Test
     assert_equal('Example#method', result[0][:element])
   end
 
-  def test_call_with_edge_cases_handles_class_methods_with_namespaces
+  it 'call with edge cases handles class methods with namespaces' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'ExcludedMethods', ['new'])
+      c.set_validator_config('Documentation/MissingReturn', 'ExcludedMethods', ['new'])
     end
 
     input = 'lib/example.rb:5: Foo::Bar::Baz.new|0'

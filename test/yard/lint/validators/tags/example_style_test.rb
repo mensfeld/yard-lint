@@ -2,37 +2,37 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleTest < Minitest::Test
 
-  def test_module_structure_is_defined_as_a_module
+describe 'Yard::Lint::Validators::Tags::ExampleStyle' do
+  it 'module structure is defined as a module' do
     assert_kind_of(Module, Yard::Lint::Validators::Tags::ExampleStyle)
   end
 
-  def test_module_structure_has_config_class
+  it 'module structure has config class' do
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle.const_defined?(:Config))
   end
 
-  def test_module_structure_has_validator_class
+  it 'module structure has validator class' do
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle.const_defined?(:Validator))
   end
 
-  def test_module_structure_has_parser_class
+  it 'module structure has parser class' do
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle.const_defined?(:Parser))
   end
 
-  def test_module_structure_has_result_class
+  it 'module structure has result class' do
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle.const_defined?(:Result))
   end
 
-  def test_module_structure_has_messagesbuilder_class
+  it 'module structure has messagesbuilder class' do
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle.const_defined?(:MessagesBuilder))
   end
 
-  def test_module_structure_has_linterdetector_class
+  it 'module structure has linterdetector class' do
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle.const_defined?(:LinterDetector))
   end
 
-  def test_module_structure_has_rubocoprunner_class
+  it 'module structure has rubocoprunner class' do
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle.const_defined?(:RubocopRunner))
   end
 end

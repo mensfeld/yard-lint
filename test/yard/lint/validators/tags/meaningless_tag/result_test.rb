@@ -2,21 +2,21 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsMeaninglessTagResultTest < Minitest::Test
 
-  def test_class_attributes_has_default_severity_set_to_warning
+describe 'Yard::Lint::Validators::Tags::MeaninglessTag::Result' do
+  it 'class attributes has default severity set to warning' do
     assert_equal('warning', Yard::Lint::Validators::Tags::MeaninglessTag::Result.default_severity)
   end
 
-  def test_class_attributes_has_offense_type_set_to_class
+  it 'class attributes has offense type set to class' do
     assert_equal('class', Yard::Lint::Validators::Tags::MeaninglessTag::Result.offense_type)
   end
 
-  def test_class_attributes_has_offense_name_set_to_meaninglesstag
+  it 'class attributes has offense name set to meaninglesstag' do
     assert_equal('MeaninglessTag', Yard::Lint::Validators::Tags::MeaninglessTag::Result.offense_name)
   end
 
-  def test_build_message_delegates_to_messagesbuilder
+  it 'build message delegates to messagesbuilder' do
     offense = {
       object_type: 'class',
       tag_name: 'param',
@@ -34,7 +34,7 @@ class YardLintValidatorsTagsMeaninglessTagResultTest < Minitest::Test
     assert_equal('formatted message', message)
   end
 
-  def test_inheritance_inherits_from_results_base
+  it 'inheritance inherits from results base' do
     assert_equal(Yard::Lint::Results::Base, Yard::Lint::Validators::Tags::MeaninglessTag::Result.superclass)
   end
 end

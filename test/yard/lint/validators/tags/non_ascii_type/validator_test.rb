@@ -2,31 +2,32 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsNonAsciiTypeValidatorTest < Minitest::Test
 
-  attr_reader :validator, :pattern
+describe 'Yard::Lint::Validators::Tags::NonAsciiType::Validator' do
+  attr_reader :config, :selection, :validator, :pattern
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @selection = ['lib/example.rb']
     @validator = Yard::Lint::Validators::Tags::NonAsciiType::Validator.new(@config, @selection)
     @pattern = Yard::Lint::Validators::Tags::NonAsciiType::Validator::NON_ASCII_PATTERN
   end
 
-  def test_initialize_inherits_from_base_validator
+  it 'initialize inherits from base validator' do
     assert_kind_of(Yard::Lint::Validators::Base, validator)
   end
 
-  def test_initialize_stores_config_and_selection
+  it 'initialize stores config and selection' do
     assert_equal(@config, validator.config)
     assert_equal(@selection, validator.selection)
   end
 
-  def test_in_process_returns_true_for_in_process_execution
+  it 'in process returns true for in process execution' do
     assert_equal(true, Yard::Lint::Validators::Tags::NonAsciiType::Validator.in_process?)
   end
 
-  def test_non_ascii_pattern_matches_non_ascii_characters
+  it 'non ascii pattern matches non ascii characters' do
     ellipsis = "\u2026"
     arrow = "\u2192"
     em_dash = "\u2014"
@@ -38,7 +39,7 @@ class YardLintValidatorsTagsNonAsciiTypeValidatorTest < Minitest::Test
     assert_match(pattern, accented)
   end
 
-  def test_non_ascii_pattern_does_not_match_ascii_characters
+  it 'non ascii pattern does not match ascii characters' do
     simple_type = 'String'
     generic_type = 'Array<Integer>'
     hash_type = 'Hash{Symbol => String}'

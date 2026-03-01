@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class YardLintStatsCalculatorTest < Minitest::Test
-  attr_reader :calculator, :config, :files
 
-  def setup
+describe 'Yard::Lint::StatsCalculator' do
+  attr_reader :config, :files, :calculator
+
+
+  before do
     @config = Yard::Lint::Config.new
     @files = ['/path/to/file1.rb', '/path/to/file2.rb']
     @calculator = Yard::Lint::StatsCalculator.new(config, files)
@@ -13,25 +15,25 @@ class YardLintStatsCalculatorTest < Minitest::Test
 
   # #initialize
 
-  def test_initialize_stores_config_and_files
+  it 'initialize stores config and files' do
     assert_equal(config, calculator.config)
     assert_equal(files, calculator.files)
   end
 
-  def test_initialize_handles_nil_files_gracefully
+  it 'initialize handles nil files gracefully' do
     calc = Yard::Lint::StatsCalculator.new(config, nil)
     assert_equal([], calc.files)
   end
 
   # #calculate
 
-  def test_calculate_with_empty_file_list_returns_100_coverage
+  it 'calculate with empty file list returns 100 coverage' do
     empty_calculator = Yard::Lint::StatsCalculator.new(config, [])
     result = empty_calculator.calculate
     assert_equal({ total: 0, documented: 0, coverage: 100.0 }, result)
   end
 
-  def test_calculate_with_valid_yard_output_calculates_correct_coverage
+  it 'calculate with valid yard output calculates correct coverage' do
     yard_output = <<~OUTPUT
       method:doc
       method:doc
@@ -49,7 +51,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
     assert_in_delta(66.67, result[:coverage], 0.01)
   end
 
-  def test_calculate_with_all_documented_objects_returns_100_coverage
+  it 'calculate with all documented objects returns 100 coverage' do
     yard_output = <<~OUTPUT
       method:doc
       class:doc
@@ -63,7 +65,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
     assert_equal(100.0, result[:coverage])
   end
 
-  def test_calculate_with_all_undocumented_objects_returns_0_coverage
+  it 'calculate with all undocumented objects returns 0 coverage' do
     yard_output = <<~OUTPUT
       method:undoc
       class:undoc
@@ -76,7 +78,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
     assert_equal(0.0, result[:coverage])
   end
 
-  def test_calculate_when_yard_command_fails_returns_default_stats
+  it 'calculate when yard command fails returns default stats' do
     calculator.stubs(:run_yard_stats_query).returns('')
 
     result = calculator.calculate
@@ -85,7 +87,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
 
   # #parse_stats_output
 
-  def test_parse_stats_output_parses_valid_output_correctly
+  it 'parse stats output parses valid output correctly' do
     output = <<~OUTPUT
       method:doc
       method:undoc
@@ -101,12 +103,12 @@ class YardLintStatsCalculatorTest < Minitest::Test
     assert_equal({ documented: 0, undocumented: 1 }, result['module'])
   end
 
-  def test_parse_stats_output_handles_empty_output
+  it 'parse stats output handles empty output' do
     result = calculator.send(:parse_stats_output, '')
     assert_equal({}, result)
   end
 
-  def test_parse_stats_output_handles_malformed_lines_gracefully
+  it 'parse stats output handles malformed lines gracefully' do
     output = <<~OUTPUT
       method:doc
       invalid_line
@@ -119,7 +121,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
     assert_equal(2, result.keys.size)
   end
 
-  def test_parse_stats_output_ignores_lines_with_extra_colons
+  it 'parse stats output ignores lines with extra colons' do
     output = "method:doc:extra\n"
     result = calculator.send(:parse_stats_output, output)
     # Line is malformed (extra colon), should be ignored
@@ -129,7 +131,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
 
   # #calculate_coverage_percentage
 
-  def test_calculate_coverage_percentage_calculates_correct_percentage
+  it 'calculate coverage percentage calculates correct percentage' do
     stats = {
       'method' => { documented: 8, undocumented: 2 },
       'class' => { documented: 5, undocumented: 0 }
@@ -142,7 +144,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
     assert_in_delta(86.67, result[:coverage], 0.01)
   end
 
-  def test_calculate_coverage_percentage_returns_100_for_empty_stats
+  it 'calculate coverage percentage returns 100 for empty stats' do
     stats = {}
     result = calculator.send(:calculate_coverage_percentage, stats)
 
@@ -151,7 +153,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
     assert_equal(100.0, result[:coverage])
   end
 
-  def test_calculate_coverage_percentage_handles_zero_documented_objects
+  it 'calculate coverage percentage handles zero documented objects' do
     stats = {
       'method' => { documented: 0, undocumented: 10 }
     }
@@ -165,7 +167,7 @@ class YardLintStatsCalculatorTest < Minitest::Test
 
   # #build_stats_query
 
-  def test_build_stats_query_returns_valid_yard_query
+  it 'build stats query returns valid yard query' do
     query = calculator.send(:build_stats_query)
     assert_includes(query, 'object.type.to_s')
     assert_includes(query, 'object.docstring.all.empty?')

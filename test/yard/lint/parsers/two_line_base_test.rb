@@ -2,11 +2,13 @@
 
 require 'test_helper'
 
-class YardLintParsersTwoLineBaseTest < Minitest::Test
-  attr_reader :parser, :parser_class
+
+describe 'Yard::Lint::Parsers::TwoLineBase' do
+  attr_reader :parser_class, :parser
 
 
-  def setup
+
+  before do
     @parser_class = Class.new(Yard::Lint::Parsers::TwoLineBase) do
     self.regexps = {
     general: /^Error:/,
@@ -18,14 +20,14 @@ class YardLintParsersTwoLineBaseTest < Minitest::Test
     @parser = parser_class.new
   end
 
-  def test_call_parses_two_line_patterns
+  it 'call parses two line patterns' do
     input = "Error: Something wrong\n  in file.rb at line 10\n"
     result = parser.call(input)
 
     assert_kind_of(Array, result)
   end
 
-  def test_call_ignores_incomplete_patterns
+  it 'call ignores incomplete patterns' do
     input = "Error: Something\nNot matching second line\n"
     result = parser.call(input)
 
@@ -33,15 +35,15 @@ class YardLintParsersTwoLineBaseTest < Minitest::Test
     assert_nil(result.first[:location])
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
   end
 
-  def test_call_handles_multiple_two_line_patterns
+  it 'call handles multiple two line patterns' do
     input = "Error: First\n  in file1.rb at line 5\nError: Second\n  in file2.rb at line 10\n"
     result = parser.call(input)
     end
-  def test_inheritance_can_be_subclassed
+  it 'inheritance can be subclassed' do
     assert_kind_of(Yard::Lint::Parsers::TwoLineBase, parser)
   end
 end

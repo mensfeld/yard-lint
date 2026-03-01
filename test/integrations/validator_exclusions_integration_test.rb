@@ -2,10 +2,11 @@
 
 require 'test_helper'
 
-class ValidatorExclusionsIntegrationTest < Minitest::Test
+
+describe 'Validator Exclusions Integration' do
   attr_reader :config
 
-  def setup
+  before do
     YARD::Registry.clear
   end
 
@@ -31,7 +32,7 @@ class ValidatorExclusionsIntegrationTest < Minitest::Test
     end
   end
 
-  def test_per_validator_exclusions_when_tags_examplesyntax_has_exclude_patterns_excludes_parser_rb_files
+  it 'per validator exclusions when tags examplesyntax has exclude patterns excludes parser rb files' do
     setup_example_syntax_with_exclusions
 
     result = Yard::Lint.run(path: project_path('lib/yard/lint/validators'), config: config)
@@ -43,7 +44,7 @@ class ValidatorExclusionsIntegrationTest < Minitest::Test
     assert_empty(parser_offenses)
   end
 
-  def test_per_validator_exclusions_when_tags_examplesyntax_has_exclude_patterns_excludes_spec_fixtures_files
+  it 'per validator exclusions when tags examplesyntax has exclude patterns excludes spec fixtures files' do
     setup_example_syntax_with_exclusions
 
     result = Yard::Lint.run(path: project_path('test/fixtures'), config: config)
@@ -55,7 +56,7 @@ class ValidatorExclusionsIntegrationTest < Minitest::Test
     assert_empty(fixture_offenses)
   end
 
-  def test_per_validator_exclusions_when_tags_examplesyntax_has_exclude_patterns_still_validates_other_files
+  it 'per validator exclusions when tags examplesyntax has exclude patterns still validates other files' do
     setup_example_syntax_with_exclusions
 
     result = Yard::Lint.run(path: project_path('lib/yard/lint/stats_calculator.rb'), config: config)
@@ -66,7 +67,7 @@ class ValidatorExclusionsIntegrationTest < Minitest::Test
 
   # -- Combining global and per-validator exclusions --
 
-  def test_per_validator_exclusions_when_combining_global_and_per_validator_exclusions_applies_both
+  it 'per validator exclusions when combining global and per validator exclusions applies both' do
     @config = Yard::Lint::Config.new do |c|
       c.exclude = ['spec/**/*', 'test/**/*']
 
@@ -95,7 +96,7 @@ class ValidatorExclusionsIntegrationTest < Minitest::Test
 
   # -- No exclusions set --
 
-  def test_per_validator_exclusions_when_no_exclusions_are_set_validates_all_files_including_parser_rb_files
+  it 'per validator exclusions when no exclusions are set validates all files including parser rb files' do
     @config = Yard::Lint::Config.new do |c|
       c.exclude = []
       c.set_validator_config('Tags/ExampleSyntax', 'Enabled', true)
@@ -115,7 +116,7 @@ class ValidatorExclusionsIntegrationTest < Minitest::Test
 
   # -- Glob patterns --
 
-  def test_exclusion_pattern_matching_with_glob_patterns_matches_files_with_glob_pattern
+  it 'exclusion pattern matching with glob patterns matches files with glob pattern' do
     @config = Yard::Lint::Config.new do |c|
       c.exclude = ['spec/**/*', 'test/**/*']
       c.set_validator_config('Documentation/UndocumentedObjects', 'Enabled', true)
@@ -141,7 +142,7 @@ class ValidatorExclusionsIntegrationTest < Minitest::Test
 
   # -- Wildcard patterns --
 
-  def test_exclusion_pattern_matching_with_wildcard_patterns_matches_files_with_wildcard_pattern
+  it 'exclusion pattern matching with wildcard patterns matches files with wildcard pattern' do
     @config = Yard::Lint::Config.new do |c|
       c.exclude = ['spec/**/*', 'test/**/*']
       c.set_validator_config('Documentation/UndocumentedObjects', 'Enabled', true)

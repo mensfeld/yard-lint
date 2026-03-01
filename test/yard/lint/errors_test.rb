@@ -2,32 +2,33 @@
 
 require 'test_helper'
 
-class YardLintErrorsTest < Minitest::Test
-  def test_baseerror_is_a_standarderror
+
+describe 'Yard::Lint::Errors' do
+  it 'baseerror is a standarderror' do
     assert_kind_of(StandardError, Yard::Lint::Errors::BaseError.new)
   end
 
-  def test_baseerror_accepts_a_custom_message
+  it 'baseerror accepts a custom message' do
     error = Yard::Lint::Errors::BaseError.new('custom message')
     assert_equal('custom message', error.message)
   end
 
-  def test_configfilenotfounderror_inherits_from_baseerror
+  it 'configfilenotfounderror inherits from baseerror' do
     assert_kind_of(Yard::Lint::Errors::BaseError, Yard::Lint::Errors::ConfigFileNotFoundError.new)
   end
 
-  def test_configfilenotfounderror_can_be_raised_with_a_message
+  it 'configfilenotfounderror can be raised with a message' do
     error = assert_raises(Yard::Lint::Errors::ConfigFileNotFoundError) do
       raise Yard::Lint::Errors::ConfigFileNotFoundError, 'File not found'
       end
     assert_equal('File not found', error.message)
   end
 
-  def test_circulardependencyerror_inherits_from_baseerror
+  it 'circulardependencyerror inherits from baseerror' do
     assert_kind_of(Yard::Lint::Errors::BaseError, Yard::Lint::Errors::CircularDependencyError.new)
   end
 
-  def test_circulardependencyerror_can_be_raised_with_a_message
+  it 'circulardependencyerror can be raised with a message' do
     error = assert_raises(Yard::Lint::Errors::CircularDependencyError) do
       raise Yard::Lint::Errors::CircularDependencyError, 'Circular dependency detected'
       end

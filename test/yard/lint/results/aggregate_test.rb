@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class YardLintResultsAggregateTest < Minitest::Test
+
+describe 'Yard::Lint::Results::Aggregate' do
   attr_reader :result1, :result2, :result3, :config, :aggregate
 
-  def setup
+
+  before do
     @result1 = stub(
       offenses: [
         { severity: 'error', type: 'line', name: 'Error1', message: 'msg1',
@@ -25,35 +27,35 @@ class YardLintResultsAggregateTest < Minitest::Test
     @aggregate = Yard::Lint::Results::Aggregate.new([@result1, @result2, @result3], @config)
   end
 
-  def test_initialize_accepts_array_of_results
+  it 'initialize accepts array of results' do
     Yard::Lint::Results::Aggregate.new([@result1, @result2], @config)
   end
 
-  def test_initialize_handles_single_result
+  it 'initialize handles single result' do
     agg = Yard::Lint::Results::Aggregate.new(@result1, @config)
     assert_equal(2, agg.offenses.size)
   end
 
-  def test_initialize_handles_nil_results
+  it 'initialize handles nil results' do
     agg = Yard::Lint::Results::Aggregate.new(nil, @config)
     assert_equal([], agg.offenses)
   end
 
-  def test_initialize_handles_empty_array
+  it 'initialize handles empty array' do
     agg = Yard::Lint::Results::Aggregate.new([], @config)
     assert_equal([], agg.offenses)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(@config, @aggregate.config)
   end
 
-  def test_offenses_flattens_all_offenses_from_all_results
+  it 'offenses flattens all offenses from all results' do
     assert_kind_of(Array, @aggregate.offenses)
     assert_equal(3, @aggregate.offenses.size)
   end
 
-  def test_offenses_preserves_offense_structure
+  it 'offenses preserves offense structure' do
     offense = @aggregate.offenses.first
     assert(offense.key?(:severity))
     assert(offense.key?(:type))
@@ -63,30 +65,30 @@ class YardLintResultsAggregateTest < Minitest::Test
     assert(offense.key?(:location_line))
   end
 
-  def test_offenses_includes_offenses_from_all_results
+  it 'offenses includes offenses from all results' do
     names = @aggregate.offenses.map { |o| o[:name] }.sort
     assert_equal(%w[Convention1 Error1 Warning1], names)
   end
 
-  def test_count_returns_total_number_of_offenses
+  it 'count returns total number of offenses' do
     assert_equal(3, @aggregate.count)
   end
 
-  def test_count_returns_0_when_no_offenses
+  it 'count returns 0 when no offenses' do
     empty_aggregate = Yard::Lint::Results::Aggregate.new([@result3], @config)
     assert_equal(0, empty_aggregate.count)
   end
 
-  def test_clean_returns_false_when_offenses_exist
+  it 'clean returns false when offenses exist' do
     assert_equal(false, @aggregate.clean?)
   end
 
-  def test_clean_returns_true_when_no_offenses
+  it 'clean returns true when no offenses' do
     empty_aggregate = Yard::Lint::Results::Aggregate.new([@result3], @config)
     assert_equal(true, empty_aggregate.clean?)
   end
 
-  def test_statistics_counts_offenses_by_severity
+  it 'statistics counts offenses by severity' do
     stats = @aggregate.statistics
     assert_kind_of(Hash, stats)
     assert_equal(1, stats[:error])
@@ -94,7 +96,7 @@ class YardLintResultsAggregateTest < Minitest::Test
     assert_equal(1, stats[:convention])
   end
 
-  def test_statistics_initializes_all_severity_counts_to_0
+  it 'statistics initializes all severity counts to 0' do
     empty_aggregate = Yard::Lint::Results::Aggregate.new([], @config)
     stats = empty_aggregate.statistics
     assert_equal(0, stats[:error])
@@ -102,7 +104,7 @@ class YardLintResultsAggregateTest < Minitest::Test
     assert_equal(0, stats[:convention])
   end
 
-  def test_statistics_handles_multiple_offenses_of_same_severity
+  it 'statistics handles multiple offenses of same severity' do
     result_with_multiple = stub(
       offenses: [
         { severity: 'error', type: 'line', name: 'Error1', message: 'msg',
@@ -117,19 +119,19 @@ class YardLintResultsAggregateTest < Minitest::Test
 
   # exit_code tests with fail_on_severity = "error"
 
-  def test_exit_code_when_fail_on_severity_is_error_returns_1_if_errors_exist
+  it 'exit code when fail on severity is error returns 1 if errors exist' do
     error_config = stub(fail_on_severity: 'error', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([@result1, @result2, @result3], error_config)
     assert_equal(1, agg.exit_code)
   end
 
-  def test_exit_code_when_fail_on_severity_is_error_returns_0_if_only_warnings_exist
+  it 'exit code when fail on severity is error returns 0 if only warnings exist' do
     error_config = stub(fail_on_severity: 'error', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([@result2], error_config)
     assert_equal(0, agg.exit_code)
   end
 
-  def test_exit_code_when_fail_on_severity_is_error_returns_0_if_no_offenses
+  it 'exit code when fail on severity is error returns 0 if no offenses' do
     error_config = stub(fail_on_severity: 'error', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([], error_config)
     assert_equal(0, agg.exit_code)
@@ -137,13 +139,13 @@ class YardLintResultsAggregateTest < Minitest::Test
 
   # exit_code tests with fail_on_severity = "warning"
 
-  def test_exit_code_when_fail_on_severity_is_warning_returns_1_if_errors_exist
+  it 'exit code when fail on severity is warning returns 1 if errors exist' do
     warning_config = stub(fail_on_severity: 'warning', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([@result1, @result2, @result3], warning_config)
     assert_equal(1, agg.exit_code)
   end
 
-  def test_exit_code_when_fail_on_severity_is_warning_returns_1_if_warnings_exist
+  it 'exit code when fail on severity is warning returns 1 if warnings exist' do
     warning_config = stub(fail_on_severity: 'warning', min_coverage: nil)
     warning_result = stub(
       offenses: [
@@ -155,7 +157,7 @@ class YardLintResultsAggregateTest < Minitest::Test
     assert_equal(1, agg.exit_code)
   end
 
-  def test_exit_code_when_fail_on_severity_is_warning_returns_0_if_only_conventions_exist
+  it 'exit code when fail on severity is warning returns 0 if only conventions exist' do
     warning_config = stub(fail_on_severity: 'warning', min_coverage: nil)
     convention_result = stub(
       offenses: [
@@ -173,7 +175,7 @@ class YardLintResultsAggregateTest < Minitest::Test
     assert_equal(0, agg.exit_code)
   end
 
-  def test_exit_code_when_fail_on_severity_is_warning_returns_0_if_no_offenses
+  it 'exit code when fail on severity is warning returns 0 if no offenses' do
     warning_config = stub(fail_on_severity: 'warning', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([], warning_config)
     assert_equal(0, agg.exit_code)
@@ -181,13 +183,13 @@ class YardLintResultsAggregateTest < Minitest::Test
 
   # exit_code tests with fail_on_severity = "convention"
 
-  def test_exit_code_when_fail_on_severity_is_convention_returns_1_if_any_offenses_exist
+  it 'exit code when fail on severity is convention returns 1 if any offenses exist' do
     convention_config = stub(fail_on_severity: 'convention', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([@result1, @result2, @result3], convention_config)
     assert_equal(1, agg.exit_code)
   end
 
-  def test_exit_code_when_fail_on_severity_is_convention_returns_0_if_no_offenses
+  it 'exit code when fail on severity is convention returns 0 if no offenses' do
     convention_config = stub(fail_on_severity: 'convention', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([], convention_config)
     assert_equal(0, agg.exit_code)
@@ -195,7 +197,7 @@ class YardLintResultsAggregateTest < Minitest::Test
 
   # exit_code tests with fail_on_severity = "unknown"
 
-  def test_exit_code_when_fail_on_severity_is_unknown_returns_0
+  it 'exit code when fail on severity is unknown returns 0' do
     unknown_config = stub(fail_on_severity: 'unknown', min_coverage: nil)
     agg = Yard::Lint::Results::Aggregate.new([@result1, @result2, @result3], unknown_config)
     assert_equal(0, agg.exit_code)

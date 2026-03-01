@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class InformalNotationIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Informal Notation' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/informal_notation_examples.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/InformalNotation', 'Enabled', true)
+      c.set_validator_config('Tags/InformalNotation', 'Enabled', true)
     end
   end
 
-  def test_detecting_informal_notation_patterns_finds_note_patterns
+  it 'detecting informal notation patterns finds note patterns' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     note_offenses = result.offenses.select do |o|
@@ -24,7 +26,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_includes(note_offenses.first[:message], '@note')
   end
 
-  def test_detecting_informal_notation_patterns_finds_todo_patterns
+  it 'detecting informal notation patterns finds todo patterns' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     todo_offenses = result.offenses.select do |o|
@@ -36,7 +38,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_includes(todo_offenses.first[:message], '@todo')
   end
 
-  def test_detecting_informal_notation_patterns_finds_see_patterns
+  it 'detecting informal notation patterns finds see patterns' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     see_offenses = result.offenses.select do |o|
@@ -48,7 +50,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_includes(see_offenses.first[:message], '@see')
   end
 
-  def test_detecting_informal_notation_patterns_finds_warning_patterns
+  it 'detecting informal notation patterns finds warning patterns' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     warning_offenses = result.offenses.select do |o|
@@ -60,7 +62,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_includes(warning_offenses.first[:message], '@deprecated')
   end
 
-  def test_detecting_informal_notation_patterns_finds_deprecated_patterns
+  it 'detecting informal notation patterns finds deprecated patterns' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     deprecated_offenses = result.offenses.select do |o|
@@ -72,7 +74,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_includes(deprecated_offenses.first[:message], '@deprecated')
   end
 
-  def test_detecting_informal_notation_patterns_finds_fixme_patterns
+  it 'detecting informal notation patterns finds fixme patterns' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     fixme_offenses = result.offenses.select do |o|
@@ -84,7 +86,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_includes(fixme_offenses.first[:message], '@todo')
   end
 
-  def test_detecting_informal_notation_patterns_finds_important_patterns
+  it 'detecting informal notation patterns finds important patterns' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     important_offenses = result.offenses.select do |o|
@@ -96,7 +98,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_includes(important_offenses.first[:message], '@note')
   end
 
-  def test_detecting_informal_notation_patterns_does_not_flag_patterns_inside_code_blocks
+  it 'detecting informal notation patterns does not flag patterns inside code blocks' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # The with_code_block method has patterns inside ```, should not be flagged
@@ -108,7 +110,7 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_empty(code_block_method_offenses)
   end
 
-  def test_detecting_informal_notation_patterns_does_not_flag_proper_yard_tags
+  it 'detecting informal notation patterns does not flag proper yard tags' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # Methods with proper @note and @todo tags should not be flagged for those
@@ -121,9 +123,9 @@ class InformalNotationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_when_disabled_does_not_run_validation
+  it 'when disabled does not run validation' do
     disabled_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/InformalNotation', 'Enabled', false)
+      c.set_validator_config('Tags/InformalNotation', 'Enabled', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: disabled_config, progress: false)
@@ -132,10 +134,10 @@ class InformalNotationIntegrationTest < Minitest::Test
     assert_empty(informal_notation_offenses)
   end
 
-  def test_case_sensitivity_configuration_matches_patterns_case_insensitively_by_default
+  it 'case sensitivity configuration matches patterns case insensitively by default' do
     case_insensitive_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/InformalNotation', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/InformalNotation', 'CaseSensitive', false)
+      c.set_validator_config('Tags/InformalNotation', 'Enabled', true)
+      c.set_validator_config('Tags/InformalNotation', 'CaseSensitive', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: case_insensitive_config, progress: false)

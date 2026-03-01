@@ -2,47 +2,49 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector' do
   attr_reader :temp_dir
 
-  def setup
+
+  before do
     @temp_dir = Dir.mktmpdir
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(temp_dir)
   end
 
-  def test_detect_when_linter_is_explicitly_set_to_none_returns_none
+  it 'detect when linter is explicitly set to none returns none' do
     result = Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.detect('none', project_root: temp_dir)
     assert_equal(:none, result)
   end
 
-  def test_detect_when_linter_is_explicitly_set_to_rubocop_returns_rubocop_if_rubocop_is_available
+  it 'detect when linter is explicitly set to rubocop returns rubocop if rubocop is available' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(true)
     result = Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.detect('rubocop', project_root: temp_dir)
     assert_equal(:rubocop, result)
   end
 
-  def test_detect_when_linter_is_explicitly_set_to_rubocop_returns_none_if_rubocop_is_not_available
+  it 'detect when linter is explicitly set to rubocop returns none if rubocop is not available' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(false)
     result = Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.detect('rubocop', project_root: temp_dir)
     assert_equal(:none, result)
   end
 
-  def test_detect_when_linter_is_explicitly_set_to_standard_returns_standard_if_standard_is_available
+  it 'detect when linter is explicitly set to standard returns standard if standard is available' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(true)
     result = Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.detect('standard', project_root: temp_dir)
     assert_equal(:standard, result)
   end
 
-  def test_detect_when_linter_is_explicitly_set_to_standard_returns_none_if_standard_is_not_available
+  it 'detect when linter is explicitly set to standard returns none if standard is not available' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(false)
     result = Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.detect('standard', project_root: temp_dir)
     assert_equal(:none, result)
   end
 
-  def test_detect_with_auto_detection_detects_standard_from_standard_yml
+  it 'detect with auto detection detects standard from standard yml' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(false)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(true)
     File.write(File.join(temp_dir, '.standard.yml'), 'parallel: true')
@@ -51,7 +53,7 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:standard, result)
   end
 
-  def test_detect_with_auto_detection_detects_rubocop_from_rubocop_yml
+  it 'detect with auto detection detects rubocop from rubocop yml' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(true)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(false)
     File.write(File.join(temp_dir, '.rubocop.yml'), 'AllCops:')
@@ -60,7 +62,7 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:rubocop, result)
   end
 
-  def test_detect_with_auto_detection_prefers_standard_over_rubocop_when_both_configs_exist
+  it 'detect with auto detection prefers standard over rubocop when both configs exist' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(true)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(true)
     File.write(File.join(temp_dir, '.standard.yml'), 'parallel: true')
@@ -70,7 +72,7 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:standard, result)
   end
 
-  def test_detect_with_auto_detection_detects_standard_from_gemfile
+  it 'detect with auto detection detects standard from gemfile' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(false)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(true)
     File.write(File.join(temp_dir, 'Gemfile'), "gem 'standard'")
@@ -79,7 +81,7 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:standard, result)
   end
 
-  def test_detect_with_auto_detection_detects_rubocop_from_gemfile
+  it 'detect with auto detection detects rubocop from gemfile' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(true)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(false)
     File.write(File.join(temp_dir, 'Gemfile'), "gem 'rubocop'")
@@ -88,7 +90,7 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:rubocop, result)
   end
 
-  def test_detect_with_auto_detection_detects_standard_from_gemfile_lock
+  it 'detect with auto detection detects standard from gemfile lock' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(false)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(true)
     File.write(File.join(temp_dir, 'Gemfile.lock'), "  standard (1.0.0)")
@@ -97,7 +99,7 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:standard, result)
   end
 
-  def test_detect_with_auto_detection_detects_rubocop_from_gemfile_lock
+  it 'detect with auto detection detects rubocop from gemfile lock' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(true)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(false)
     File.write(File.join(temp_dir, 'Gemfile.lock'), "  rubocop (1.0.0)")
@@ -106,7 +108,7 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:rubocop, result)
   end
 
-  def test_detect_with_auto_detection_returns_none_when_no_linter_is_detected
+  it 'detect with auto detection returns none when no linter is detected' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(false)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(false)
 
@@ -114,22 +116,22 @@ class YardLintValidatorsTagsExampleStyleLinterDetectorTest < Minitest::Test
     assert_equal(:none, result)
   end
 
-  def test_rubocop_available_returns_true_if_rubocop_can_be_required
+  it 'rubocop available returns true if rubocop can be required' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:require).with('rubocop').returns(true)
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.rubocop_available?)
   end
 
-  def test_rubocop_available_returns_false_if_rubocop_cannot_be_required
+  it 'rubocop available returns false if rubocop cannot be required' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:require).with('rubocop').raises(LoadError)
     assert_equal(false, Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.rubocop_available?)
   end
 
-  def test_standard_available_returns_true_if_standard_can_be_required
+  it 'standard available returns true if standard can be required' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:require).with('standard').returns(true)
     assert_equal(true, Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.standard_available?)
   end
 
-  def test_standard_available_returns_false_if_standard_cannot_be_required
+  it 'standard available returns false if standard cannot be required' do
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:require).with('standard').raises(LoadError)
     assert_equal(false, Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.standard_available?)
   end

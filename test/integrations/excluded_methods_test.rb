@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
-require 'tempfile'
 require 'test_helper'
 
-class ExcludedMethodsConfigurationTest < Minitest::Test
-  attr_reader :db, :temp_file
+require 'tempfile'
 
-  def setup
+describe 'Excluded Methods' do
+  attr_reader :temp_file
+
+
+  before do
     @temp_file = Tempfile.new(['test', '.rb'])
   end
 
-  def teardown
+  after do
     temp_file.unlink
   end
 
@@ -21,9 +23,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Exact name matching: excluding to_s ---
 
-  def test_exact_name_excluding_to_s_does_not_flag_undocumented_to_s
+  it 'exact name excluding to s does not flag undocumented to s' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['to_s'])
     end
 
@@ -42,9 +44,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_exact_name_excluding_to_s_still_flags_other_undocumented_methods
+  it 'exact name excluding to s still flags other undocumented methods' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['to_s'])
     end
 
@@ -65,9 +67,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Exact name matching: excluding multiple methods ---
 
-  def test_exact_name_excluding_multiple_methods_excludes_all
+  it 'exact name excluding multiple methods excludes all' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', %w[to_s inspect hash eql?])
     end
 
@@ -103,9 +105,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Arity notation ---
 
-  def test_arity_excludes_initialize_with_0_parameters
+  it 'arity excludes initialize with 0 parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize/0', 'call/1'])
     end
 
@@ -124,9 +126,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_flags_initialize_with_1_parameter
+  it 'arity flags initialize with 1 parameter' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize/0', 'call/1'])
     end
 
@@ -145,9 +147,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_flags_initialize_with_2_parameters
+  it 'arity flags initialize with 2 parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize/0', 'call/1'])
     end
 
@@ -167,9 +169,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_excludes_call_with_exactly_1_parameter
+  it 'arity excludes call with exactly 1 parameter' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize/0', 'call/1'])
     end
 
@@ -188,9 +190,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_flags_call_with_0_parameters
+  it 'arity flags call with 0 parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize/0', 'call/1'])
     end
 
@@ -209,9 +211,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_flags_call_with_2_parameters
+  it 'arity flags call with 2 parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize/0', 'call/1'])
     end
 
@@ -232,19 +234,19 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Arity: setup/teardown test framework pattern ---
 
-  def test_arity_excludes_parameterless_setup_and_teardown
+  it 'arity excludes parameterless setup and teardown' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['setup/0', 'teardown/0'])
     end
 
     temp_file.write(<<~RUBY)
       class TestCase
-        def setup
+        before do
           @db = Database.new
         end
 
-        def teardown
+        after do
           @db.close
         end
       end
@@ -257,9 +259,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_flags_setup_with_parameters
+  it 'arity flags setup with parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['setup/0', 'teardown/0'])
     end
 
@@ -280,9 +282,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Arity: counting optional parameters ---
 
-  def test_arity_counts_optional_parameters
+  it 'arity counts optional parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/2'])
     end
 
@@ -302,9 +304,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_does_not_count_splat_parameters
+  it 'arity does not count splat parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/2'])
     end
 
@@ -324,9 +326,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_arity_does_not_count_block_parameters
+  it 'arity does not count block parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/2'])
     end
 
@@ -348,9 +350,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Regex patterns ---
 
-  def test_regex_excludes_methods_starting_with_underscore
+  it 'regex excludes methods starting with underscore' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['/^_/'])
     end
 
@@ -373,9 +375,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_regex_still_flags_methods_not_matching_pattern
+  it 'regex still flags methods not matching pattern' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['/^_/'])
     end
 
@@ -396,19 +398,19 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Regex: test method patterns ---
 
-  def test_regex_excludes_test_pattern_methods
+  it 'regex excludes test pattern methods' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['/^test_/', '/^should_/'])
     end
 
     temp_file.write(<<~RUBY)
       class TestCase
-        def test_user_creation
+        it 'user creation' do
           assert true
         end
 
-        def test_validation
+        it 'validation' do
           assert true
         end
 
@@ -430,9 +432,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_regex_still_flags_non_test_methods
+  it 'regex still flags non test methods' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['/^test_/', '/^should_/'])
     end
 
@@ -453,9 +455,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Regex: suffix patterns ---
 
-  def test_regex_excludes_methods_ending_with_helper_or_util
+  it 'regex excludes methods ending with helper or util' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['/_(helper|util)$/'])
     end
 
@@ -478,9 +480,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_regex_flags_methods_not_matching_suffix_pattern
+  it 'regex flags methods not matching suffix pattern' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['/_(helper|util)$/'])
     end
 
@@ -501,9 +503,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Combined patterns ---
 
-  def test_combined_patterns_applies_all_exclusion_patterns_correctly
+  it 'combined patterns applies all exclusion patterns correctly' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', [
           'to_s',           # Exact name
           'initialize/0',   # Arity notation
@@ -549,9 +551,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     })
   end
 
-  def test_combined_common_ruby_and_rails_patterns_excludes_all
+  it 'combined common ruby and rails patterns excludes all' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', [
           'initialize/0',
           'to_s',
@@ -564,7 +566,6 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
     temp_file.write(<<~RUBY)
       class User
-        attr_reader :name
 
         def initialize
           @name = 'John'
@@ -604,9 +605,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Edge cases: special regex characters ---
 
-  def test_edge_case_special_regex_characters_excludes_operator_methods
+  it 'edge case special regex characters excludes operator methods' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['<<', '[]', '[]='])
     end
 
@@ -637,9 +638,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Edge cases: empty exclusion list ---
 
-  def test_edge_case_empty_exclusion_list_flags_all_including_initialize
+  it 'edge case empty exclusion list flags all including initialize' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', [])
     end
 
@@ -667,9 +668,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Defensive programming: invalid regex ---
 
-  def test_defensive_invalid_regex_handles_gracefully
+  it 'defensive invalid regex handles gracefully' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['/[/', '/(unclosed', 'to_s'])
     end
 
@@ -698,9 +699,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Defensive programming: empty regex ---
 
-  def test_defensive_empty_regex_does_not_exclude_all_methods
+  it 'defensive empty regex does not exclude all methods' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['//', 'inspect'])
     end
 
@@ -727,9 +728,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Defensive programming: non-array ExcludedMethods ---
 
-  def test_defensive_string_instead_of_array_handles_gracefully
+  it 'defensive string instead of array handles gracefully' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', 'to_s') # String instead of Array
     end
 
@@ -755,9 +756,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Defensive programming: whitespace in patterns ---
 
-  def test_defensive_whitespace_in_patterns_trims_and_matches
+  it 'defensive whitespace in patterns trims and matches' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', [' to_s ', '  initialize/0  ', ' /^_/ '])
     end
 
@@ -796,9 +797,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Defensive programming: invalid arity values ---
 
-  def test_defensive_invalid_arity_values_does_not_match
+  it 'defensive invalid arity values does not match' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize/abc', 'call/-1', 'setup/', 'method/999'])
     end
 
@@ -833,9 +834,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Defensive programming: nil and empty strings ---
 
-  def test_defensive_nil_and_empty_patterns_ignores_them
+  it 'defensive nil and empty patterns ignores them' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['', nil, 'to_s', '', nil])
     end
 
@@ -861,9 +862,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Advanced edge cases: keyword arguments with positional args ---
 
-  def test_advanced_positional_args_correctly_excludes_matching_arity
+  it 'advanced positional args correctly excludes matching arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/2'])
     end
 
@@ -885,9 +886,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     refute(undoc_objects.any? { |o| o[:message].match?(/\bmethod\b/) })
   end
 
-  def test_advanced_positional_args_does_not_exclude_different_arity
+  it 'advanced positional args does not exclude different arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/2'])
     end
 
@@ -907,9 +908,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Advanced: splat and block parameters with arity ---
 
-  def test_advanced_splat_not_counted_in_arity
+  it 'advanced splat not counted in arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/2'])
     end
 
@@ -932,9 +933,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     refute(undoc_objects.any? { |o| o[:message].match?(/\bmethod\b/) })
   end
 
-  def test_advanced_block_not_counted_in_arity
+  it 'advanced block not counted in arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/2'])
     end
 
@@ -959,9 +960,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Advanced: operator methods ---
 
-  def test_advanced_excludes_binary_operators
+  it 'advanced excludes binary operators' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['+', '-', '==', '===', '<=>', '+@', '-@', '!', '~'])
     end
 
@@ -991,9 +992,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     refute(result.offenses.any? { |o| o[:element]&.match?(operator_pattern) })
   end
 
-  def test_advanced_excludes_unary_operators
+  it 'advanced excludes unary operators' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['+', '-', '==', '===', '<=>', '+@', '-@', '!', '~'])
     end
 
@@ -1024,9 +1025,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Advanced: ASCII method names with combined patterns ---
 
-  def test_advanced_ascii_method_names_handled_normally
+  it 'advanced ascii method names handled normally' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['to_s', '/^test/'])
     end
 
@@ -1036,7 +1037,7 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
           'example'
         end
 
-        def test_method
+        it 'method' do
           'test'
         end
 
@@ -1054,9 +1055,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Advanced: complex parameter signatures ---
 
-  def test_advanced_counts_optional_parameters_in_arity
+  it 'advanced counts optional parameters in arity' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/3'])
     end
 
@@ -1079,9 +1080,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
     refute(undoc_objects.any? { |o| o[:message].match?(/\bmethod\b/) })
   end
 
-  def test_advanced_distinguishes_different_arities
+  it 'advanced distinguishes different arities' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['method/3'])
     end
 
@@ -1101,9 +1102,9 @@ class ExcludedMethodsConfigurationTest < Minitest::Test
 
   # --- Advanced: pattern precedence ---
 
-  def test_advanced_pattern_precedence_excludes_when_any_pattern_matches
+  it 'advanced pattern precedence excludes when any pattern matches' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', ['initialize', 'initialize/0', '/^init/'])
     end
 

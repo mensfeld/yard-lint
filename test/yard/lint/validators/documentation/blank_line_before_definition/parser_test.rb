@@ -2,14 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationBlankLineBeforeDefinitionParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Parser.new
   end
 
-  def test_call_with_single_blank_line_violation_parses_single_blank_line_violation
+  it 'call with single blank line violation parses single blank line violation' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         single:1
@@ -31,7 +33,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionParserTest < Minit
       )
   end
 
-  def test_call_with_orphaned_documentation_violation_parses_orphaned_docs_violation_with_2_blank_lines
+  it 'call with orphaned documentation violation parses orphaned docs violation with 2 blank lines' do
       output = <<~OUTPUT
         lib/example.rb:15: MyClass#execute
         orphaned:2
@@ -53,7 +55,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionParserTest < Minit
       )
   end
 
-  def test_call_with_orphaned_documentation_violation_parses_orphaned_docs_violation_with_3_blank_lines
+  it 'call with orphaned documentation violation parses orphaned docs violation with 3 blank lines' do
       output = <<~OUTPUT
         lib/example.rb:20: MyClass#run
         orphaned:3
@@ -75,7 +77,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionParserTest < Minit
       )
   end
 
-  def test_call_with_multiple_violations_parses_violations_for_multiple_objects
+  it 'call with multiple violations parses violations for multiple objects' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         single:1
@@ -106,12 +108,12 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionParserTest < Minit
       )
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_empty_string
+  it 'call with empty output returns empty array for empty string' do
       result = parser.call('')
       assert_equal([], result)
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_nil
+  it 'call with empty output returns empty array for nil' do
       result = parser.call(nil)
       assert_equal([], result)
   end

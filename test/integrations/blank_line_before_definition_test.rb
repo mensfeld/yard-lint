@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Blank Line Before Definition' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/blank_line_before_definition.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
     end
   end
 
-  def test_detecting_blank_lines_before_definitions_finds_single_blank_line_violations_public_methods_only
+  it 'detecting blank lines before definitions finds single blank line violations public methods only' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     single_offenses = result.offenses.select do |o|
@@ -26,7 +28,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(4, single_offenses.size)
   end
 
-  def test_detecting_blank_lines_before_definitions_finds_orphaned_documentation_violations_public_methods
+  it 'detecting blank lines before definitions finds orphaned documentation violations public methods' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     orphaned_offenses = result.offenses.select do |o|
@@ -40,7 +42,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(4, orphaned_offenses.size)
   end
 
-  def test_detecting_blank_lines_before_definitions_does_not_flag_methods_with_no_blank_lines
+  it 'detecting blank lines before definitions does not flag methods with no blank lines' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     valid_offenses = result.offenses.select do |o|
@@ -54,7 +56,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_empty(valid_offenses)
   end
 
-  def test_detecting_blank_lines_before_definitions_provides_helpful_error_messages_for_single_blank_line
+  it 'detecting blank lines before definitions provides helpful error messages for single blank line' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find do |o|
@@ -66,7 +68,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_includes(offense[:message], 'Blank line between documentation and definition')
   end
 
-  def test_detecting_blank_lines_before_definitions_provides_helpful_error_messages_for_orphaned_docs
+  it 'detecting blank lines before definitions provides helpful error messages for orphaned docs' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find do |o|
@@ -79,7 +81,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '2 blank lines')
   end
 
-  def test_detecting_blank_lines_before_definitions_includes_blank_line_count_for_orphaned_docs_with_3_lines
+  it 'detecting blank lines before definitions includes blank line count for orphaned docs with 3 lines' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find do |o|
@@ -91,12 +93,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '3 blank lines')
   end
 
-  def test_configuration_options_when_only_checking_single_blank_lines_only_finds_single_blank_line_violations
+  it 'configuration options when only checking single blank lines only finds single blank line violations' do
     single_only_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/BlankLineBeforeDefinition',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition',
         'EnabledPatterns',
         { 'SingleBlankLine' => true, 'OrphanedDocs' => false }
       )
@@ -111,12 +111,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     end
   end
 
-  def test_configuration_options_when_only_checking_orphaned_docs_only_finds_orphaned_documentation_violations
+  it 'configuration options when only checking orphaned docs only finds orphaned documentation violations' do
     orphaned_only_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/BlankLineBeforeDefinition',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition',
         'EnabledPatterns',
         { 'SingleBlankLine' => false, 'OrphanedDocs' => true }
       )
@@ -131,11 +129,11 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     end
   end
 
-  def test_configuration_options_when_configuring_custom_severities_uses_configured_severity_for_single_blank_line
+  it 'configuration options when configuring custom severities uses configured severity for single blank line' do
     custom_severity_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Severity', 'warning')
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'OrphanedSeverity', 'error')
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Severity', 'warning')
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'OrphanedSeverity', 'error')
     end
 
     result = Yard::Lint.run(path: fixture_path, config: custom_severity_config, progress: false)
@@ -148,11 +146,11 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal('warning', single_offense[:severity])
   end
 
-  def test_configuration_options_when_configuring_custom_severities_uses_orphanedseverity_for_orphaned_docs
+  it 'configuration options when configuring custom severities uses orphanedseverity for orphaned docs' do
     custom_severity_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Severity', 'warning')
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'OrphanedSeverity', 'error')
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Severity', 'warning')
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'OrphanedSeverity', 'error')
     end
 
     result = Yard::Lint.run(path: fixture_path, config: custom_severity_config, progress: false)
@@ -165,9 +163,9 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal('error', orphaned_offense[:severity])
   end
 
-  def test_when_disabled_does_not_run_validation
+  it 'when disabled does not run validation' do
     disabled_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', false)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: disabled_config, progress: false)
@@ -176,7 +174,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_empty(blank_line_offenses)
   end
 
-  def test_valid_documentation_is_not_flagged_does_not_flag_properly_formatted_docs
+  it 'valid documentation is not flagged does not flag properly formatted docs' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     valid_offenses = result.offenses.select do |o|
@@ -188,12 +186,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_empty(valid_offenses)
   end
 
-  def test_visibility_configuration_when_checking_private_methods_finds_violations
+  it 'visibility configuration when checking private methods finds violations' do
     private_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/BlankLineBeforeDefinition',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition',
         'YardOptions',
         ['--private']
       )
@@ -209,12 +205,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(true, offense_methods.any? { |m| m&.include?('private_orphaned_docs') })
   end
 
-  def test_visibility_configuration_when_checking_private_methods_still_finds_public_violations
+  it 'visibility configuration when checking private methods still finds public violations' do
     private_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/BlankLineBeforeDefinition',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition',
         'YardOptions',
         ['--private']
       )
@@ -228,12 +222,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(true, offense_methods.any? { |m| m&.include?('single_blank_line') })
   end
 
-  def test_visibility_configuration_when_checking_protected_methods_finds_violations
+  it 'visibility configuration when checking protected methods finds violations' do
     protected_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/BlankLineBeforeDefinition',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition',
         'YardOptions',
         ['--protected']
       )
@@ -249,12 +241,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(true, offense_methods.any? { |m| m&.include?('protected_orphaned_docs') })
   end
 
-  def test_visibility_configuration_when_checking_all_visibility_levels_finds_violations
+  it 'visibility configuration when checking all visibility levels finds violations' do
     all_visibility_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/BlankLineBeforeDefinition',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition',
         'YardOptions',
         ['--private', '--protected']
       )
@@ -273,12 +263,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(true, offense_methods.any? { |m| m&.include?('private_orphaned_docs') })
   end
 
-  def test_visibility_configuration_all_visibility_includes_more_violations_than_public_only
+  it 'visibility configuration all visibility includes more violations than public only' do
     all_visibility_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/BlankLineBeforeDefinition',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition',
         'YardOptions',
         ['--private', '--protected']
       )
@@ -294,7 +282,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_operator(all_offenses.size, :>, public_offenses.size)
   end
 
-  def test_visibility_configuration_global_yardoptions_overridden_by_validator
+  it 'visibility configuration global yardoptions overridden by validator' do
     files = [File.expand_path(fixture_path)]
 
     override_config = Yard::Lint::Config.new(
@@ -321,7 +309,7 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(true, offense_methods.none? { |m| m&.include?('private_orphaned_docs') })
   end
 
-  def test_visibility_configuration_validator_inherits_global_private_yardoptions
+  it 'visibility configuration validator inherits global private yardoptions' do
     files = [File.expand_path(fixture_path)]
 
     inherit_config = Yard::Lint::Config.new(
@@ -348,10 +336,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_equal(true, offense_methods.any? { |m| m&.include?('private_orphaned_docs') })
   end
 
-  def test_does_not_flag_valid_private_methods_with_no_blank_lines
+  it 'does not flag valid private methods with no blank lines' do
     all_visibility_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'YardOptions',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'YardOptions',
              ['--private', '--protected'])
     end
 
@@ -365,10 +353,10 @@ class BlankLineBeforeDefinitionIntegrationTest < Minitest::Test
     assert_empty(valid_offenses)
   end
 
-  def test_does_not_flag_valid_protected_methods_with_no_blank_lines
+  it 'does not flag valid protected methods with no blank lines' do
     all_visibility_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'YardOptions',
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'YardOptions',
              ['--private', '--protected'])
     end
 

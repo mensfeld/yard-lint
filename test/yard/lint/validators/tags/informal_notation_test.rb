@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsInformalNotationTest < Minitest::Test
 
-  def test_has_all_required_components
+describe 'Yard::Lint::Validators::Tags::InformalNotation' do
+  it 'has all required components' do
   assert(defined?(Yard::Lint::Validators::Tags::InformalNotation))
   assert(defined?(Yard::Lint::Validators::Tags::InformalNotation::Config))
   assert(defined?(Yard::Lint::Validators::Tags::InformalNotation::Parser))

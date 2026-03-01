@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationMarkdownSyntaxMessagesBuilderTest < Minitest::Test
 
-  def test_call_formats_unclosed_backtick_error
+describe 'Yard::Lint::Validators::Documentation::MarkdownSyntax::MessagesBuilder' do
+  it 'call formats unclosed backtick error' do
     offense = {
       object_name: 'MyClass#process',
       errors: ['unclosed_backtick']
@@ -19,7 +19,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxMessagesBuilderTest < Minites
     )
   end
 
-  def test_call_formats_unclosed_code_block_error
+  it 'call formats unclosed code block error' do
     offense = {
       object_name: 'MyClass#execute',
       errors: ['unclosed_code_block']
@@ -34,7 +34,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxMessagesBuilderTest < Minites
     )
   end
 
-  def test_call_formats_unclosed_bold_error
+  it 'call formats unclosed bold error' do
     offense = {
       object_name: 'MyClass#configure',
       errors: ['unclosed_bold']
@@ -49,7 +49,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxMessagesBuilderTest < Minites
     )
   end
 
-  def test_call_formats_invalid_list_marker_error_with_line_number
+  it 'call formats invalid list marker error with line number' do
     offense = {
       object_name: 'MyClass#setup',
       errors: ['invalid_list_marker:3']
@@ -64,7 +64,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxMessagesBuilderTest < Minites
     )
   end
 
-  def test_call_formats_multiple_errors
+  it 'call formats multiple errors' do
     offense = {
       object_name: 'MyClass#process',
       errors: %w[unclosed_backtick unclosed_bold]

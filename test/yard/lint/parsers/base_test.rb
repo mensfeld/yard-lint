@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class YardLintParsersBaseTest < Minitest::Test
-  attr_reader :parser, :parser_class
 
-  def setup
+describe 'Yard::Lint::Parsers::Base' do
+  attr_reader :parser_class, :parser
+
+
+  before do
     @parser_class = Class.new(Yard::Lint::Parsers::Base) do
     self.regexps = {
     test: /(?<value>\d+)/
@@ -14,26 +16,26 @@ class YardLintParsersBaseTest < Minitest::Test
     @parser = parser_class.new
   end
 
-  def test_regexps_allows_setting_class_level_regexps
+  it 'regexps allows setting class level regexps' do
     assert(parser_class.regexps.key?(:test))
   end
 
-  def test_regexps_can_be_accessed_via_instance
+  it 'regexps can be accessed via instance' do
   end
 
-  def test_match_extracts_captures_using_named_regexp
+  it 'match extracts captures using named regexp' do
     result = parser.match('Value: 123', :test)
   end
 
-  def test_match_returns_empty_array_when_no_match
+  it 'match returns empty array when no match' do
     result = parser.match('No numbers here', :test)
   end
 
-  def test_match_returns_captures_from_matched_groups
+  it 'match returns captures from matched groups' do
     result = parser.match('42', :test)
   end
 
-  def test_inheritance_can_be_subclassed
+  it 'inheritance can be subclassed' do
     subclass = Class.new(Yard::Lint::Parsers::Base)
     assert_kind_of(Yard::Lint::Parsers::Base, subclass.new)
   end

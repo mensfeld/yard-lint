@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsNonAsciiTypeMessagesBuilderTest < Minitest::Test
 
-  def test_call_formats_non_ascii_type_violation_message_with_ellipsis
+describe 'Yard::Lint::Validators::Tags::NonAsciiType::MessagesBuilder' do
+  it 'call formats non ascii type violation message with ellipsis' do
     offense = {
       tag_name: 'param',
       type_string: 'Symbol, …',
@@ -21,7 +21,7 @@ class YardLintValidatorsTagsNonAsciiTypeMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_non_ascii_type_violation_message_with_arrow
+  it 'call formats non ascii type violation message with arrow' do
     offense = {
       tag_name: 'return',
       type_string: 'String→Integer',
@@ -38,7 +38,7 @@ class YardLintValidatorsTagsNonAsciiTypeMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_non_ascii_type_violation_message_with_em_dash
+  it 'call formats non ascii type violation message with em dash' do
     offense = {
       tag_name: 'option',
       type_string: 'String—Integer',
@@ -55,7 +55,7 @@ class YardLintValidatorsTagsNonAsciiTypeMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_handles_yieldreturn_tag_violations
+  it 'call handles yieldreturn tag violations' do
     offense = {
       tag_name: 'yieldreturn',
       type_string: 'Résult',

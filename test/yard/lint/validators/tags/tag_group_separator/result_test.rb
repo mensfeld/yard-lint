@@ -2,45 +2,46 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTagGroupSeparatorResultTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Result' do
   attr_reader :config, :parsed_data, :result
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @parsed_data = []
     @result = Yard::Lint::Validators::Tags::TagGroupSeparator::Result.new(@parsed_data, @config)
   end
 
-  def test_initialize_inherits_from_results_base
+  it 'initialize inherits from results base' do
     assert_kind_of(Yard::Lint::Results::Base, result)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(config, result.instance_variable_get(:@config))
   end
 
-  def test_offenses_returns_an_array
+  it 'offenses returns an array' do
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_offenses_handles_empty_parsed_data
+  it 'offenses handles empty parsed data' do
     assert_equal([], result.offenses)
   end
 
-  def test_class_methods_defines_default_severity_as_convention
+  it 'class methods defines default severity as convention' do
     assert_equal('convention', Yard::Lint::Validators::Tags::TagGroupSeparator::Result.default_severity)
   end
 
-  def test_class_methods_defines_offense_type_as_method
+  it 'class methods defines offense type as method' do
     assert_equal('method', Yard::Lint::Validators::Tags::TagGroupSeparator::Result.offense_type)
   end
 
-  def test_class_methods_defines_offense_name_as_missingtaggroupseparator
+  it 'class methods defines offense name as missingtaggroupseparator' do
     assert_equal('MissingTagGroupSeparator', Yard::Lint::Validators::Tags::TagGroupSeparator::Result.offense_name)
   end
 
-  def test_build_message_generates_human_readable_message
+  it 'build message generates human readable message' do
     parsed_data = [
       {
         location: 'lib/example.rb',

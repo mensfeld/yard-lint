@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsOptionTagsMessagesBuilderTest < Minitest::Test
 
-  def test_call_builds_message_for_missing_option_tags
+describe 'Yard::Lint::Validators::Tags::OptionTags::MessagesBuilder' do
+  it 'call builds message for missing option tags' do
     offense = { method_name: 'initialize' }
 
     message = Yard::Lint::Validators::Tags::OptionTags::MessagesBuilder.call(offense)
@@ -16,7 +16,7 @@ class YardLintValidatorsTagsOptionTagsMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_builds_message_for_instance_method
+  it 'call builds message for instance method' do
     offense = { method_name: 'MyClass#configure' }
 
     message = Yard::Lint::Validators::Tags::OptionTags::MessagesBuilder.call(offense)

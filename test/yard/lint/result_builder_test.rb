@@ -2,19 +2,21 @@
 
 require 'test_helper'
 
-class YardLintResultBuilderTest < Minitest::Test
+
+describe 'Yard::Lint::ResultBuilder' do
   attr_reader :config, :builder
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @builder = Yard::Lint::ResultBuilder.new(@config)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(@config, @builder.config)
   end
 
-  def test_build_with_composite_validator_combines_results_from_parent_and_child_validators
+  it 'build with composite validator combines results from parent and child validators' do
     validator_name = 'Documentation/UndocumentedObjects'
     raw_results = {
       undocumented_objects: {
@@ -36,7 +38,7 @@ class YardLintResultBuilderTest < Minitest::Test
     assert_equal(3, result.offenses.size)
   end
 
-  def test_build_with_composite_validator_returns_nil_when_all_validators_have_no_output
+  it 'build with composite validator returns nil when all validators have no output' do
     validator_name = 'Documentation/UndocumentedObjects'
     empty_results = {
       undocumented_objects: { stdout: '', stderr: '', exit_code: 0 },
@@ -47,7 +49,7 @@ class YardLintResultBuilderTest < Minitest::Test
     assert_nil(result)
   end
 
-  def test_build_with_composite_validator_includes_partial_results_when_only_one_child_has_output
+  it 'build with composite validator includes partial results when only one child has output' do
     validator_name = 'Documentation/UndocumentedObjects'
     partial_results = {
       undocumented_objects: { stdout: '', stderr: '', exit_code: 0 },
@@ -63,7 +65,7 @@ class YardLintResultBuilderTest < Minitest::Test
     assert_equal(1, result.offenses.size)
   end
 
-  def test_build_with_composite_child_validator_returns_nil
+  it 'build with composite child validator returns nil' do
     validator_name = 'Documentation/UndocumentedBooleanMethods'
     raw_results = {
       undocumented_boolean_methods: {
@@ -78,7 +80,7 @@ class YardLintResultBuilderTest < Minitest::Test
     assert_nil(result)
   end
 
-  def test_build_with_warnings_unknowntag_discovers_and_uses_parser
+  it 'build with warnings unknowntag discovers and uses parser' do
     validator_name = 'Warnings/UnknownTag'
     raw_results = {
       unknown_tag: {
@@ -95,27 +97,27 @@ class YardLintResultBuilderTest < Minitest::Test
     assert_operator(result.offenses.size, :>=, 1)
   end
 
-  def test_build_with_warnings_unknowntag_returns_nil_when_no_warnings
+  it 'build with warnings unknowntag returns nil when no warnings' do
     empty_results = { unknown_tag: { stdout: '', stderr: '', exit_code: 0 } }
     result = @builder.build('Warnings/UnknownTag', empty_results)
 
     assert_nil(result)
   end
 
-  def test_build_with_standard_validator_returns_nil_when_no_output
+  it 'build with standard validator returns nil when no output' do
     result = @builder.build('Tags/Order', {})
 
     assert_nil(result)
   end
 
-  def test_build_with_standard_validator_returns_nil_when_output_is_empty
+  it 'build with standard validator returns nil when output is empty' do
     empty_results = { tags_order: { stdout: '', stderr: '', exit_code: 0 } }
     result = @builder.build('Tags/Order', empty_results)
 
     assert_nil(result)
   end
 
-  def test_parser_discovery_discovers_parser_for_unknowntag_validator
+  it 'parser discovery discovers parser for unknowntag validator' do
     result = @builder.build(
       'Warnings/UnknownTag',
       {
@@ -132,7 +134,7 @@ class YardLintResultBuilderTest < Minitest::Test
     assert_operator(result.offenses.size, :>=, 1)
   end
 
-  def test_composite_detection_skips_composite_children_automatically
+  it 'composite detection skips composite children automatically' do
     # UndocumentedBooleanMethods is a child of UndocumentedObjects composite
     result = @builder.build(
       'Documentation/UndocumentedBooleanMethods',
@@ -148,7 +150,7 @@ class YardLintResultBuilderTest < Minitest::Test
     assert_nil(result)
   end
 
-  def test_composite_detection_processes_parent_composites
+  it 'composite detection processes parent composites' do
     # UndocumentedObjects is the parent composite
     result = @builder.build(
       'Documentation/UndocumentedObjects',

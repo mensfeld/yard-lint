@@ -1,20 +1,22 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-require 'fileutils'
 require 'test_helper'
 
-class UndocumentedOptionsValidatorTest < Minitest::Test
-  attr_reader :config, :test_dir
+require 'tmpdir'
+require 'fileutils'
 
-  def setup
+describe 'Undocumented Options' do
+  attr_reader :config
+
+
+  before do
     @config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedOptions', 'Enabled', true)
+      c.set_validator_config('Documentation/UndocumentedOptions', 'Enabled', true)
     end
     @test_dir = Dir.mktmpdir
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(@test_dir) if @test_dir && File.exist?(@test_dir)
   end
 
@@ -25,7 +27,7 @@ class UndocumentedOptionsValidatorTest < Minitest::Test
     path
   end
 
-  def test_detects_options_hash_parameter_without_option_tags
+  it 'detects options hash parameter without option tags' do
     file = create_test_file('process.rb', <<~RUBY)
       # Process data
       def process(data, options = {})
@@ -41,7 +43,7 @@ class UndocumentedOptionsValidatorTest < Minitest::Test
     assert_includes(undocumented_options.first[:message], 'options')
   end
 
-  def test_detects_opts_hash_parameter_without_option_tags
+  it 'detects opts hash parameter without option tags' do
     file = create_test_file('execute.rb', <<~RUBY)
       # Execute task
       def execute(data, opts = {})
@@ -56,7 +58,7 @@ class UndocumentedOptionsValidatorTest < Minitest::Test
     assert_includes(undocumented_options.first[:message], 'opts')
   end
 
-  def test_detects_kwargs_without_option_tags
+  it 'detects kwargs without option tags' do
     file = create_test_file('configure.rb', <<~RUBY)
       # Configure settings
       def configure(**options)
@@ -71,7 +73,7 @@ class UndocumentedOptionsValidatorTest < Minitest::Test
     assert_includes(undocumented_options.first[:message], '**options')
   end
 
-  def test_does_not_flag_method_with_option_tags
+  it 'does not flag method with option tags' do
     file = create_test_file('process_with_options.rb', <<~RUBY)
       # Process data
       # @param data [Hash] the data
@@ -88,7 +90,7 @@ class UndocumentedOptionsValidatorTest < Minitest::Test
     assert_empty(undocumented_options)
   end
 
-  def test_does_not_flag_method_without_options_parameter
+  it 'does not flag method without options parameter' do
     file = create_test_file('process_simple.rb', <<~RUBY)
       # Process data
       # @param data [Hash] the data

@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 
-require 'tempfile'
 require 'test_helper'
 
-class UnknownTagIntegrationTest < Minitest::Test
-  attr_reader :config, :temp_file
+require 'tempfile'
 
-  def setup
+describe 'Unknown Tag' do
+  attr_reader :temp_file, :config
+
+
+  before do
     @temp_file = Tempfile.new(['test', '.rb'])
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Warnings/UnknownTag', 'Enabled', true)
+      c.set_validator_config('Warnings/UnknownTag', 'Enabled', true)
     end
   end
 
-  def teardown
+  after do
     temp_file.unlink
   end
 
-  def test_when_using_non_existent_yard_tag_reports_offense
+  it 'when using non existent yard tag reports offense' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -41,7 +43,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '@returns')
   end
 
-  def test_when_using_standard_yard_tags_does_not_report_any_offense
+  it 'when using standard yard tags does not report any offense' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -66,7 +68,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_did_you_mean_when_tag_name_is_a_common_typo_suggests_the_correct_tag_name
+  it 'did you mean when tag name is a common typo suggests the correct tag name' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -90,7 +92,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean '@return'?")
   end
 
-  def test_did_you_mean_when_using_raises_instead_of_raise_suggests_raise
+  it 'did you mean when using raises instead of raise suggests raise' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -115,7 +117,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean '@raise'?")
   end
 
-  def test_did_you_mean_when_using_params_instead_of_param_suggests_param
+  it 'did you mean when using params instead of param suggests param' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -138,7 +140,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean '@param'?")
   end
 
-  def test_did_you_mean_when_tag_name_has_minor_typo_suggests_example
+  it 'did you mean when tag name has minor typo suggests example' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -162,7 +164,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean '@example'?")
   end
 
-  def test_did_you_mean_when_tag_name_is_completely_wrong_does_not_suggest
+  it 'did you mean when tag name is completely wrong does not suggest' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -186,7 +188,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     refute_includes(offense[:message], 'did you mean')
   end
 
-  def test_did_you_mean_when_multiple_unknown_tags_exist_provides_suggestions_for_all_typos
+  it 'did you mean when multiple unknown tags exist provides suggestions for all typos' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -218,7 +220,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(raises_offense[:message], "did you mean '@raise'?")
   end
 
-  def test_did_you_mean_with_common_misspellings_suggests_correct_spelling_for_auhtor
+  it 'did you mean with common misspellings suggests correct spelling for auhtor' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -242,7 +244,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean '@author'?")
   end
 
-  def test_did_you_mean_with_common_misspellings_suggests_correct_spelling_for_deprected
+  it 'did you mean with common misspellings suggests correct spelling for deprected' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -266,7 +268,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean '@deprecated'?")
   end
 
-  def test_did_you_mean_with_directive_typos_suggests_attribute_for_attribut
+  it 'did you mean with directive typos suggests attribute for attribut' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -274,7 +276,6 @@ class UnknownTagIntegrationTest < Minitest::Test
       class TestClass
         # @!attribut [r] name
         #   @return [String] the name
-        attr_reader :name
       end
     RUBY
     temp_file.rewind
@@ -289,7 +290,7 @@ class UnknownTagIntegrationTest < Minitest::Test
     end
   end
 
-  def test_location_reporting_reports_all_offenses_with_correct_file_paths
+  it 'location reporting reports all offenses with correct file paths' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 

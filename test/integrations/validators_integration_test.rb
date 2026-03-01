@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
+
 # Helper to convert relative paths to absolute paths from project root
-class YardLintValidatorsTest < Minitest::Test
+describe 'Validators Integration' do
   attr_reader :config
 
   def project_path(relative_path)
@@ -19,7 +20,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_api_tags_validation_when_require_api_tags_is_enabled_detects_api_tag_issues
+  it 'api tags validation when require api tags is enabled detects api tag issues' do
     setup_api_tags_enabled
 
     result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config)
@@ -36,7 +37,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_api_tags_validation_when_require_api_tags_is_disabled_does_not_run_api_tag_validation
+  it 'api tags validation when require api tags is disabled does not run api tag validation' do
     setup_api_tags_disabled
 
     result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config)
@@ -53,7 +54,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_api_tags_validation_with_custom_allowed_apis_uses_custom_allowed_apis_configuration
+  it 'api tags validation with custom allowed apis uses custom allowed apis configuration' do
     setup_api_tags_custom
 
     result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config)
@@ -69,7 +70,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_abstract_methods_validation_when_validate_abstract_methods_is_enabled_runs_abstract_method_validation
+  it 'abstract methods validation when validate abstract methods is enabled runs abstract method validation' do
     setup_abstract_methods_enabled
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -86,7 +87,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_abstract_methods_validation_when_validate_abstract_methods_is_disabled_does_not_run_abstract_method_validation
+  it 'abstract methods validation when validate abstract methods is disabled does not run abstract method validation' do
     setup_abstract_methods_disabled
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -102,7 +103,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_option_tags_validation_when_validate_option_tags_is_enabled_runs_option_tags_validation
+  it 'option tags validation when validate option tags is enabled runs option tags validation' do
     setup_option_tags_enabled
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -120,7 +121,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_option_tags_validation_when_validate_option_tags_is_disabled_does_not_run_option_tags_validation
+  it 'option tags validation when validate option tags is disabled does not run option tags validation' do
     setup_option_tags_disabled
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -138,7 +139,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_combined_validators_runs_all_validators_when_enabled
+  it 'combined validators runs all validators when enabled' do
     setup_combined_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -148,7 +149,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_kind_of(Array, result.offenses.select { |o| o[:name].to_s.include?('Option') })
   end
 
-  def test_combined_validators_includes_all_offense_types_in_the_offenses_array
+  it 'combined validators includes all offense types in the offenses array' do
     setup_combined_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -169,7 +170,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_documentation_category_validators_together_runs_all_documentation_validators_simultaneously
+  it 'documentation category validators together runs all documentation validators simultaneously' do
     setup_documentation_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -181,7 +182,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_respond_to(result, :count)
   end
 
-  def test_documentation_category_validators_together_can_detect_multiple_documentation_issues_in_the_same_file
+  it 'documentation category validators together can detect multiple documentation issues in the same file' do
     setup_documentation_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -211,7 +212,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_tags_category_validators_together_runs_all_tag_validators_simultaneously
+  it 'tags category validators together runs all tag validators simultaneously' do
     setup_tags_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -222,7 +223,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_tags_category_validators_together_handles_type_validation_interactions_correctly
+  it 'tags category validators together handles type validation interactions correctly' do
     setup_tags_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -245,7 +246,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_warnings_category_validators_together_runs_all_warning_validators_simultaneously
+  it 'warnings category validators together runs all warning validators simultaneously' do
     setup_warnings_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -258,7 +259,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_kind_of(Array, warning_offenses)
   end
 
-  def test_warnings_category_validators_together_detects_parameter_related_warnings_together
+  it 'warnings category validators together detects parameter related warnings together' do
     setup_warnings_validators
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -280,7 +281,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_cross_category_combinations_runs_validators_from_different_categories_together
+  it 'cross category combinations runs validators from different categories together' do
     setup_cross_category
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -292,7 +293,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_cross_category_combinations_handles_multiple_categories_on_the_same_method
+  it 'cross category combinations handles multiple categories on the same method' do
     setup_cross_category
 
     result = Yard::Lint.run(path: project_path('lib'), config: config)
@@ -315,7 +316,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_example_syntax_validation_when_example_syntax_is_enabled_runs_example_syntax_validation
+  it 'example syntax validation when example syntax is enabled runs example syntax validation' do
     setup_example_syntax_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/example_syntax.rb'), config: config)
@@ -325,7 +326,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_example_syntax_validation_when_example_syntax_is_enabled_detects_syntax_errors_in_example_code_blocks
+  it 'example syntax validation when example syntax is enabled detects syntax errors in example code blocks' do
     setup_example_syntax_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/example_syntax.rb'), config: config)
@@ -339,7 +340,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_example_syntax_validation_when_example_syntax_is_enabled_provides_detailed_error_messages_with_line_numbers
+  it 'example syntax validation when example syntax is enabled provides detailed error messages with line numbers' do
     setup_example_syntax_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/example_syntax.rb'), config: config)
@@ -354,7 +355,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_example_syntax_validation_when_example_syntax_is_enabled_skips_incomplete_single_line_snippets
+  it 'example syntax validation when example syntax is enabled skips incomplete single line snippets' do
     setup_example_syntax_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/example_syntax.rb'), config: config)
@@ -370,7 +371,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Example Syntax: disabled --
 
-  def test_example_syntax_validation_when_example_syntax_is_disabled_does_not_run_example_syntax_validation
+  it 'example syntax validation when example syntax is disabled does not run example syntax validation' do
     @config = test_config do |c|
       c.set_validator_config('Tags/ExampleSyntax', 'Enabled', false)
     end
@@ -383,7 +384,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Example Syntax: with valid examples --
 
-  def test_example_syntax_validation_with_valid_examples_does_not_report_errors_for_files_without_examples
+  it 'example syntax validation with valid examples does not report errors for files without examples' do
     @config = test_config do |c|
       c.set_validator_config('Tags/ExampleSyntax', 'Enabled', true)
       c.set_validator_config('Tags/Order', 'Enabled', false)
@@ -406,7 +407,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_redundant_param_description_validation_when_enabled_runs_redundant_param_description_validation
+  it 'redundant param description validation when enabled runs redundant param description validation' do
     setup_redundant_param_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/redundant_param_descriptions.rb'), config: config)
@@ -416,7 +417,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_redundant_param_description_validation_when_enabled_detects_article_plus_param_pattern
+  it 'redundant param description validation when enabled detects article plus param pattern' do
     setup_redundant_param_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/redundant_param_descriptions.rb'), config: config)
@@ -430,7 +431,7 @@ class YardLintValidatorsTest < Minitest::Test
     refute_empty(article_pattern_offenses)
   end
 
-  def test_redundant_param_description_validation_when_enabled_detects_possessive_plus_param_pattern
+  it 'redundant param description validation when enabled detects possessive plus param pattern' do
     setup_redundant_param_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/redundant_param_descriptions.rb'), config: config)
@@ -444,7 +445,7 @@ class YardLintValidatorsTest < Minitest::Test
     refute_empty(possessive_offenses)
   end
 
-  def test_redundant_param_description_validation_when_enabled_detects_type_restatement_pattern
+  it 'redundant param description validation when enabled detects type restatement pattern' do
     setup_redundant_param_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/redundant_param_descriptions.rb'), config: config)
@@ -458,7 +459,7 @@ class YardLintValidatorsTest < Minitest::Test
     refute_empty(type_restatement_offenses)
   end
 
-  def test_redundant_param_description_validation_when_enabled_does_not_flag_long_meaningful_descriptions
+  it 'redundant param description validation when enabled does not flag long meaningful descriptions' do
     setup_redundant_param_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/redundant_param_descriptions.rb'), config: config)
@@ -472,7 +473,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_empty(long_desc_method_offenses)
   end
 
-  def test_redundant_param_description_validation_when_enabled_provides_detailed_error_messages_with_suggestions
+  it 'redundant param description validation when enabled provides detailed error messages with suggestions' do
     setup_redundant_param_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/redundant_param_descriptions.rb'), config: config)
@@ -491,7 +492,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Redundant Param Description: disabled --
 
-  def test_redundant_param_description_validation_when_disabled_does_not_run_redundant_param_description_validation
+  it 'redundant param description validation when disabled does not run redundant param description validation' do
     @config = test_config do |c|
       c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', false)
     end
@@ -504,7 +505,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Redundant Param Description: custom MaxRedundantWords --
 
-  def test_redundant_param_description_validation_with_custom_configuration_respects_custom_maxredundantwords_threshold
+  it 'redundant param description validation with custom configuration respects custom maxredundantwords threshold' do
     @config = test_config do |c|
       c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
       c.set_validator_config('Tags/RedundantParamDescription', 'MaxRedundantWords', 4)
@@ -519,7 +520,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Redundant Param Description: pattern toggles --
 
-  def test_redundant_param_description_validation_with_pattern_toggles_only_detects_enabled_patterns
+  it 'redundant param description validation with pattern toggles only detects enabled patterns' do
     @config = test_config do |c|
       c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
       c.set_validator_config('Tags/RedundantParamDescription', 'EnabledPatterns', {
@@ -547,7 +548,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Redundant Param Description: ArticleParamPhrase pattern --
 
-  def test_redundant_param_description_validation_with_articleparamphrase_pattern_enabled_detects_filler_phrase_patterns
+  it 'redundant param description validation with articleparamphrase pattern enabled detects filler phrase patterns' do
     @config = test_config do |c|
       c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
       c.set_validator_config('Tags/RedundantParamDescription', 'EnabledPatterns', {
@@ -582,7 +583,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_tag_group_separator_validation_when_enabled_runs_tag_group_separator_validation
+  it 'tag group separator validation when enabled runs tag group separator validation' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -592,7 +593,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_tag_group_separator_validation_when_enabled_detects_missing_separator_between_param_and_return
+  it 'tag group separator validation when enabled detects missing separator between param and return' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -606,7 +607,7 @@ class YardLintValidatorsTest < Minitest::Test
     refute_empty(param_return_offenses)
   end
 
-  def test_tag_group_separator_validation_when_enabled_detects_multiple_missing_separators_in_same_method
+  it 'tag group separator validation when enabled detects multiple missing separators in same method' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -620,7 +621,7 @@ class YardLintValidatorsTest < Minitest::Test
     refute_empty(multiple_offenses)
   end
 
-  def test_tag_group_separator_validation_when_enabled_does_not_flag_properly_separated_tag_groups
+  it 'tag group separator validation when enabled does not flag properly separated tag groups' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -634,7 +635,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_empty(proper_offenses)
   end
 
-  def test_tag_group_separator_validation_when_enabled_does_not_flag_same_group_consecutive_tags
+  it 'tag group separator validation when enabled does not flag same group consecutive tags' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -648,7 +649,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_empty(same_group_offenses)
   end
 
-  def test_tag_group_separator_validation_when_enabled_does_not_flag_methods_with_single_tag_group
+  it 'tag group separator validation when enabled does not flag methods with single tag group' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -662,7 +663,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_empty(single_group_offenses)
   end
 
-  def test_tag_group_separator_validation_when_enabled_provides_detailed_error_messages
+  it 'tag group separator validation when enabled provides detailed error messages' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -680,7 +681,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Tag Group Separator: disabled --
 
-  def test_tag_group_separator_validation_when_disabled_does_not_run_tag_group_separator_validation
+  it 'tag group separator validation when disabled does not run tag group separator validation' do
     @config = test_config do |c|
       c.set_validator_config('Tags/TagGroupSeparator', 'Enabled', false)
     end
@@ -693,7 +694,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Tag Group Separator: custom tag groups --
 
-  def test_tag_group_separator_validation_with_custom_tag_groups_respects_custom_tag_group_configuration
+  it 'tag group separator validation with custom tag groups respects custom tag group configuration' do
     @config = test_config do |c|
       c.set_validator_config('Tags/TagGroupSeparator', 'Enabled', true)
       c.set_validator_config('Tags/TagGroupSeparator', 'TagGroups', {
@@ -723,7 +724,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_tag_group_separator_validation_with_requireafterdescription_enabled_detects_missing_separator_after_description
+  it 'tag group separator validation with requireafterdescription enabled detects missing separator after description' do
     setup_tag_group_separator_require_after_description
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -737,7 +738,7 @@ class YardLintValidatorsTest < Minitest::Test
     refute_empty(description_offenses)
   end
 
-  def test_tag_group_separator_validation_with_requireafterdescription_enabled_does_not_flag_description_with_proper_separator
+  it 'tag group separator validation with requireafterdescription enabled does not flag description with proper separator' do
     setup_tag_group_separator_require_after_description
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -754,7 +755,7 @@ class YardLintValidatorsTest < Minitest::Test
 
   # -- Tag Group Separator: complex documentation --
 
-  def test_tag_group_separator_validation_with_complex_documentation_validates_complex_documentation_with_all_separators
+  it 'tag group separator validation with complex documentation validates complex documentation with all separators' do
     setup_tag_group_separator_enabled
 
     result = Yard::Lint.run(path: project_path('test/fixtures/tag_group_separators.rb'), config: config)
@@ -778,7 +779,7 @@ class YardLintValidatorsTest < Minitest::Test
     end
   end
 
-  def test_all_validators_enabled_successfully_runs_with_all_validators_enabled
+  it 'all validators enabled successfully runs with all validators enabled' do
     setup_all_validators
 
     result = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config, progress: false)
@@ -788,7 +789,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_all_validators_enabled_completes_analysis_in_reasonable_time_with_all_validators
+  it 'all validators enabled completes analysis in reasonable time with all validators' do
     setup_all_validators
 
     start_time = Time.now
@@ -799,7 +800,7 @@ class YardLintValidatorsTest < Minitest::Test
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_all_validators_enabled_produces_consistent_results_across_multiple_runs
+  it 'all validators enabled produces consistent results across multiple runs' do
     setup_all_validators
 
     result1 = Yard::Lint.run(path: project_path('lib/yard/lint/version.rb'), config: config, progress: false)

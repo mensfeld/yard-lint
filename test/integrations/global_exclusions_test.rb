@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class GlobalExclusionPatternsTest < Minitest::Test
+
+describe 'Global Exclusions' do
   attr_reader :test_dir, :vendor_dir, :lib_dir, :vendor_file, :lib_file
 
-  def setup
+
+  before do
     @test_dir = Dir.mktmpdir('yard-lint-test')
     @vendor_dir = File.join(test_dir, 'vendor', 'bundle')
     @lib_dir = File.join(test_dir, 'lib')
@@ -36,11 +38,11 @@ class GlobalExclusionPatternsTest < Minitest::Test
     RUBY
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(test_dir)
   end
 
-  def test_excludes_vendor_when_scanning_a_directory_with_absolute_path
+  it 'excludes vendor when scanning a directory with absolute path' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['vendor/**/*']
     end
@@ -52,7 +54,7 @@ class GlobalExclusionPatternsTest < Minitest::Test
     assert_includes(file_paths, lib_file)
   end
 
-  def test_excludes_vendor_when_scanning_with_dot_from_the_target_directory
+  it 'excludes vendor when scanning with dot from the target directory' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['vendor/**/*']
     end
@@ -70,7 +72,7 @@ class GlobalExclusionPatternsTest < Minitest::Test
     end
   end
 
-  def test_excludes_deeply_nested_vendor_paths
+  it 'excludes deeply nested vendor paths' do
     deep_vendor_dir = File.join(test_dir, 'vendor', 'bundle', 'ruby', '3.4.0', 'gems', 'ffi')
     FileUtils.mkdir_p(deep_vendor_dir)
     deep_file = File.join(deep_vendor_dir, 'library.rb')
@@ -95,7 +97,7 @@ class GlobalExclusionPatternsTest < Minitest::Test
     refute_includes(file_paths, deep_file)
   end
 
-  def test_absolute_exclusion_patterns_work
+  it 'absolute exclusion patterns work' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ["#{test_dir}/vendor/**/*"]
     end
@@ -107,7 +109,7 @@ class GlobalExclusionPatternsTest < Minitest::Test
     assert_includes(file_paths, lib_file)
   end
 
-  def test_multiple_exclusion_patterns_excludes_files_matching_any_pattern
+  it 'multiple exclusion patterns excludes files matching any pattern' do
     spec_dir = File.join(test_dir, 'spec')
     spec_file = File.join(spec_dir, 'my_spec.rb')
     FileUtils.mkdir_p(spec_dir)
@@ -115,7 +117,7 @@ class GlobalExclusionPatternsTest < Minitest::Test
       # Spec file
       class MySpec
         # Method with undocumented params
-        def test_something(expected, actual)
+        it 'something' do(expected, actual)
           expected == actual
         end
       end
@@ -133,7 +135,7 @@ class GlobalExclusionPatternsTest < Minitest::Test
     assert_includes(file_paths, lib_file)
   end
 
-  def test_handles_patterns_with_curly_braces_extglob
+  it 'handles patterns with curly braces extglob' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['{vendor,spec}/**/*']
     end
@@ -145,7 +147,7 @@ class GlobalExclusionPatternsTest < Minitest::Test
     assert_includes(file_paths, lib_file)
   end
 
-  def test_handles_single_file_exclusion_by_relative_path
+  it 'handles single file exclusion by relative path' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['lib/my_code.rb']
     end

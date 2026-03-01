@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class EmptyCommentLineIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Empty Comment Line' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/empty_comment_lines.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/EmptyCommentLine', 'Enabled', true)
+      c.set_validator_config('Documentation/EmptyCommentLine', 'Enabled', true)
     end
   end
 
-  def test_detecting_empty_comment_lines_finds_leading_empty_comment_lines
+  it 'detecting empty comment lines finds leading empty comment lines' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     leading_offenses = result.offenses.select do |o|
@@ -24,7 +26,7 @@ class EmptyCommentLineIntegrationTest < Minitest::Test
     assert_equal(3, leading_offenses.size)
   end
 
-  def test_detecting_empty_comment_lines_finds_trailing_empty_comment_lines
+  it 'detecting empty comment lines finds trailing empty comment lines' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     trailing_offenses = result.offenses.select do |o|
@@ -37,7 +39,7 @@ class EmptyCommentLineIntegrationTest < Minitest::Test
     assert_equal(5, trailing_offenses.size)
   end
 
-  def test_detecting_empty_comment_lines_does_not_flag_empty_lines_between_sections
+  it 'detecting empty comment lines does not flag empty lines between sections' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # valid_with_spacing has empty lines between description and @param
@@ -50,7 +52,7 @@ class EmptyCommentLineIntegrationTest < Minitest::Test
     assert_empty(valid_spacing_offenses)
   end
 
-  def test_detecting_empty_comment_lines_provides_helpful_error_messages
+  it 'detecting empty comment lines provides helpful error messages' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find { |o| o[:name] == 'EmptyCommentLine' }
@@ -60,10 +62,10 @@ class EmptyCommentLineIntegrationTest < Minitest::Test
     assert_includes(offense[:message], 'line')
   end
 
-  def test_configuration_options_when_only_checking_leading_only_finds_leading_empty_lines
+  it 'configuration options when only checking leading only finds leading empty lines' do
     leading_only_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/EmptyCommentLine', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/EmptyCommentLine', 'EnabledPatterns', {
+      c.set_validator_config('Documentation/EmptyCommentLine', 'Enabled', true)
+      c.set_validator_config('Documentation/EmptyCommentLine', 'EnabledPatterns', {
                'Leading' => true,
                'Trailing' => false
              })
@@ -79,10 +81,10 @@ class EmptyCommentLineIntegrationTest < Minitest::Test
     end
   end
 
-  def test_configuration_options_when_only_checking_trailing_only_finds_trailing_empty_lines
+  it 'configuration options when only checking trailing only finds trailing empty lines' do
     trailing_only_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/EmptyCommentLine', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/EmptyCommentLine', 'EnabledPatterns', {
+      c.set_validator_config('Documentation/EmptyCommentLine', 'Enabled', true)
+      c.set_validator_config('Documentation/EmptyCommentLine', 'EnabledPatterns', {
                'Leading' => false,
                'Trailing' => true
              })
@@ -98,9 +100,9 @@ class EmptyCommentLineIntegrationTest < Minitest::Test
     end
   end
 
-  def test_when_disabled_does_not_run_validation
+  it 'when disabled does not run validation' do
     disabled_config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/EmptyCommentLine', 'Enabled', false)
+      c.set_validator_config('Documentation/EmptyCommentLine', 'Enabled', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: disabled_config, progress: false)
@@ -109,7 +111,7 @@ class EmptyCommentLineIntegrationTest < Minitest::Test
     assert_empty(empty_comment_offenses)
   end
 
-  def test_valid_documentation_is_not_flagged_does_not_flag_properly_formatted_docs
+  it 'valid documentation is not flagged does not flag properly formatted docs' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # ValidClass and valid_method have proper formatting

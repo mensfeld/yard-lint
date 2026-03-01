@@ -2,15 +2,15 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationUndocumentedObjectsMessagesBuilderTest < Minitest::Test
 
-  def test_call_builds_message_for_undocumented_object
+describe 'Yard::Lint::Validators::Documentation::UndocumentedObjects::MessagesBuilder' do
+  it 'call builds message for undocumented object' do
     offense = { element: 'MyClass' }
 
     message = Yard::Lint::Validators::Documentation::UndocumentedObjects::MessagesBuilder.call(offense)
 
     end
-  def test_call_builds_message_for_undocumented_module
+  it 'call builds message for undocumented module' do
     offense = { element: 'MyModule::MyClass' }
 
     message = Yard::Lint::Validators::Documentation::UndocumentedObjects::MessagesBuilder.call(offense)

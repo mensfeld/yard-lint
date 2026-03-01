@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsOrderMessagesBuilderTest < Minitest::Test
 
-  def test_call_builds_message_for_invalid_tag_order
+describe 'Yard::Lint::Validators::Tags::Order::MessagesBuilder' do
+  it 'call builds message for invalid tag order' do
     offense = {
       method_name: 'calculate',
       order: 'param,return,raise'
@@ -19,7 +19,7 @@ class YardLintValidatorsTagsOrderMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_builds_message_with_single_tag
+  it 'call builds message with single tag' do
     offense = {
       method_name: 'process',
       order: 'param'

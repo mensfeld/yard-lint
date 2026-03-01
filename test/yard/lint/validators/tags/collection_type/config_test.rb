@@ -2,12 +2,13 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsCollectionTypeConfigTest < Minitest::Test
-  def test_class_attributes_has_id_set_to_collection_type
+
+describe 'Yard::Lint::Validators::Tags::CollectionType::Config' do
+  it 'class attributes has id set to collection type' do
     assert_equal(:collection_type, Yard::Lint::Validators::Tags::CollectionType::Config.id)
   end
 
-  def test_class_attributes_has_defaults_configured
+  it 'class attributes has defaults configured' do
     assert_kind_of(Hash, Yard::Lint::Validators::Tags::CollectionType::Config.defaults)
     assert_equal(true, Yard::Lint::Validators::Tags::CollectionType::Config.defaults['Enabled'])
     assert_equal('convention', Yard::Lint::Validators::Tags::CollectionType::Config.defaults['Severity'])
@@ -17,7 +18,7 @@ class YardLintValidatorsTagsCollectionTypeConfigTest < Minitest::Test
     )
   end
 
-  def test_inheritance_inherits_from_validators_config
+  it 'inheritance inherits from validators config' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Tags::CollectionType::Config.superclass

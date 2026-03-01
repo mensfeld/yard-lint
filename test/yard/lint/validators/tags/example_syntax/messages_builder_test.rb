@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleSyntaxMessagesBuilderTest < Minitest::Test
 
-  def test_call_builds_message_for_syntax_error_in_example
+describe 'Yard::Lint::Validators::Tags::ExampleSyntax::MessagesBuilder' do
+  it 'call builds message for syntax error in example' do
     offense = {
       object_name: 'MyClass#method',
       example_name: 'Basic usage',
@@ -20,7 +20,7 @@ class YardLintValidatorsTagsExampleSyntaxMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_builds_message_with_numbered_example_name
+  it 'call builds message with numbered example name' do
     offense = {
       object_name: 'Calculator#add',
       example_name: 'Example 2',

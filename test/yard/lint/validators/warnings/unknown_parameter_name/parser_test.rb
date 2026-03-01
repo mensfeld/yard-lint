@@ -2,18 +2,20 @@
 
 require 'test_helper'
 
-class YardLintValidatorsWarningsUnknownParameterNameParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Warnings::UnknownParameterName::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Warnings::UnknownParameterName::Parser.new
   end
 
-  def test_initialize_inherits_from_twolinebase_parser
+  it 'initialize inherits from twolinebase parser' do
     assert_kind_of(Yard::Lint::Parsers::TwoLineBase, parser)
   end
 
-  def test_regexps_defines_required_regexps
+  it 'regexps defines required regexps' do
     assert_kind_of(Hash, Yard::Lint::Validators::Warnings::UnknownParameterName::Parser.regexps)
     assert(Yard::Lint::Validators::Warnings::UnknownParameterName::Parser.regexps.key?(:general))
     assert(Yard::Lint::Validators::Warnings::UnknownParameterName::Parser.regexps.key?(:message))
@@ -21,12 +23,12 @@ class YardLintValidatorsWarningsUnknownParameterNameParserTest < Minitest::Test
     assert(Yard::Lint::Validators::Warnings::UnknownParameterName::Parser.regexps.key?(:line))
   end
 
-  def test_call_parses_input_and_returns_array
+  it 'call parses input and returns array' do
     result = parser.call('')
     assert_kind_of(Array, result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
   end
 end

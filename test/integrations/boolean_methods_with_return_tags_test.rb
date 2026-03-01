@@ -1,21 +1,23 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-require 'fileutils'
 require 'test_helper'
 
-class BooleanMethodsWithReturnTagsTest < Minitest::Test
-  attr_reader :config, :test_dir
+require 'tmpdir'
+require 'fileutils'
 
-  def setup
+describe 'Boolean Methods With Return Tags' do
+  attr_reader :config
+
+
+  before do
     @config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/UndocumentedBooleanMethods', 'Enabled', true)
+      c.set_validator_config('Documentation/UndocumentedObjects', 'Enabled', true)
+      c.set_validator_config('Documentation/UndocumentedBooleanMethods', 'Enabled', true)
     end
     @test_dir = Dir.mktmpdir
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(@test_dir) if @test_dir && File.exist?(@test_dir)
   end
 
@@ -26,7 +28,7 @@ class BooleanMethodsWithReturnTagsTest < Minitest::Test
     path
   end
 
-  def test_complete_documentation_with_comment_and_return_boolean_tag_does_not_report
+  it 'complete documentation with comment and return boolean tag does not report' do
     file = create_test_file('markable.rb', <<~RUBY)
       # VirtualOffsetManager manages virtual offsets
       class VirtualOffsetManager
@@ -47,7 +49,7 @@ class BooleanMethodsWithReturnTagsTest < Minitest::Test
       "Expected markable? method not to be flagged, but got: #{method_offenses.inspect}")
   end
 
-  def test_only_return_boolean_tag_without_description_does_not_report
+  it 'only return boolean tag without description does not report' do
     file = create_test_file('success.rb', <<~RUBY)
       # Result class
       class Result
@@ -67,7 +69,7 @@ class BooleanMethodsWithReturnTagsTest < Minitest::Test
       "Expected success? method not to be flagged, but got: #{method_offenses.inspect}")
   end
 
-  def test_description_and_return_with_parameters_does_not_report
+  it 'description and return with parameters does not report' do
     file = create_test_file('respond_to.rb', <<~RUBY)
       # Proxy class
       class Proxy
@@ -92,7 +94,7 @@ class BooleanMethodsWithReturnTagsTest < Minitest::Test
       "Expected respond_to_missing? not to be flagged, got: #{method_offenses.inspect}")
   end
 
-  def test_multi_line_description_does_not_report
+  it 'multi line description does not report' do
     file = create_test_file('supervised.rb', <<~RUBY)
       # Process class
       class Process
@@ -114,7 +116,7 @@ class BooleanMethodsWithReturnTagsTest < Minitest::Test
       "Expected supervised? method not to be flagged, but got: #{method_offenses.inspect}")
   end
 
-  def test_no_documentation_at_all_reports_as_undocumented
+  it 'no documentation at all reports as undocumented' do
     file = create_test_file('no_docs.rb', <<~RUBY)
       # Example class
       class Example
@@ -133,7 +135,7 @@ class BooleanMethodsWithReturnTagsTest < Minitest::Test
       'Expected valid? method to be flagged as undocumented')
   end
 
-  def test_comment_but_no_explicit_return_tag_does_not_report
+  it 'comment but no explicit return tag does not report' do
     file = create_test_file('no_return.rb', <<~RUBY)
       # Example class
       class Example
@@ -155,7 +157,7 @@ class BooleanMethodsWithReturnTagsTest < Minitest::Test
       'Method with comment should not be flagged as undocumented')
   end
 
-  def test_karafka_examples_handles_all_correctly
+  it 'karafka examples handles all correctly' do
     file = create_test_file('karafka_examples.rb', <<~RUBY)
       # Karafka module
       module Karafka

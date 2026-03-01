@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-require 'open3'
 require 'test_helper'
 
-class InvalidConfigurationIntegrationTest < Minitest::Test
+require 'tmpdir'
+require 'open3'
+
+describe 'Invalid Config' do
   def run_in_tmpdir
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -19,7 +20,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_non_hash_validator_config_fails_with_clear_error_message
+  it 'with non hash validator config fails with clear error message' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)
@@ -35,7 +36,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_non_hash_allvalidators_fails_with_clear_error_message
+  it 'with non hash allvalidators fails with clear error message' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)
@@ -50,7 +51,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_invalid_per_validator_yardoptions_type_fails_with_clear_error_message
+  it 'with invalid per validator yardoptions type fails with clear error message' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)
@@ -67,7 +68,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_invalid_severity_typo_fails_with_did_you_mean_suggestion
+  it 'with invalid severity typo fails with did you mean suggestion' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)
@@ -84,7 +85,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_unknown_validator_name_fails_with_did_you_mean_suggestion
+  it 'with unknown validator name fails with did you mean suggestion' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)
@@ -100,7 +101,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_invalid_enabled_boolean_fails_with_clear_error_message
+  it 'with invalid enabled boolean fails with clear error message' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)
@@ -117,7 +118,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_valid_configuration_runs_successfully
+  it 'with valid configuration runs successfully' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)
@@ -135,7 +136,7 @@ class InvalidConfigurationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_auto_gen_config_and_invalid_config_fails_with_clear_error_message
+  it 'with auto gen config and invalid config fails with clear error message' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
       File.write('.yard-lint.yml', <<~YAML)

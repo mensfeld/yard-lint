@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minitest::Test
 
-  def test_call_with_article_param_pattern_returns_message_about_restating_parameter_name
+describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::MessagesBuilder' do
+  it 'call with article param pattern returns message about restating parameter name' do
     offense = {
       tag_name: 'param',
       param_name: 'appointment',
@@ -18,7 +18,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, '@param appointment [Type]')
   end
 
-  def test_call_with_article_param_pattern_includes_tag_name_in_message
+  it 'call with article param pattern includes tag name in message' do
     offense = {
       tag_name: 'param',
       param_name: 'appointment',
@@ -29,7 +29,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, '@param')
   end
 
-  def test_call_with_possessive_param_pattern_returns_message_about_no_meaningful_information
+  it 'call with possessive param pattern returns message about no meaningful information' do
     offense = {
       tag_name: 'param',
       param_name: 'appointment',
@@ -42,7 +42,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, "parameter's specific purpose")
   end
 
-  def test_call_with_type_restatement_pattern_returns_message_about_repeating_type_name
+  it 'call with type restatement pattern returns message about repeating type name' do
     offense = {
       tag_name: 'param',
       param_name: 'user',
@@ -55,7 +55,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'removing the description or explaining what makes this user significant')
   end
 
-  def test_call_with_param_to_verb_pattern_returns_message_about_being_too_generic
+  it 'call with param to verb pattern returns message about being too generic' do
     offense = {
       tag_name: 'param',
       param_name: 'payments',
@@ -68,7 +68,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'what the payments is used for in detail')
   end
 
-  def test_call_with_id_pattern_pattern_returns_message_about_self_explanatory_parameter_name
+  it 'call with id pattern pattern returns message about self explanatory parameter name' do
     offense = {
       tag_name: 'param',
       param_name: 'treatment_id',
@@ -81,7 +81,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, '@param treatment_id [Type]')
   end
 
-  def test_call_with_directional_date_pattern_returns_message_about_parameter_name_already_indicating_meaning
+  it 'call with directional date pattern returns message about parameter name already indicating meaning' do
     offense = {
       tag_name: 'param',
       param_name: 'from',
@@ -95,7 +95,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, "date's specific meaning")
   end
 
-  def test_call_with_type_generic_pattern_returns_message_about_combining_type_and_generic_terms
+  it 'call with type generic pattern returns message about combining type and generic terms' do
     offense = {
       tag_name: 'param',
       param_name: 'payment',
@@ -108,7 +108,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'specific details about this payment')
   end
 
-  def test_call_with_article_param_phrase_pattern_returns_message_about_filler_phrase
+  it 'call with article param phrase pattern returns message about filler phrase' do
     offense = {
       tag_name: 'param',
       param_name: 'action',
@@ -122,7 +122,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'specific purpose of action')
   end
 
-  def test_call_with_unknown_pattern_type_returns_generic_redundant_message
+  it 'call with unknown pattern type returns generic redundant message' do
     offense = {
       tag_name: 'param',
       param_name: 'data',
@@ -135,7 +135,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'meaningful description or omitting it')
   end
 
-  def test_call_with_option_tag_uses_option_in_message
+  it 'call with option tag uses option in message' do
     offense = {
       tag_name: 'option',
       param_name: 'name',
@@ -147,7 +147,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, '@option name [Type]')
   end
 
-  def test_call_when_validating_message_content_article_param_suggests_removing_description
+  it 'call when validating message content article param suggests removing description' do
     offense = {
       tag_name: 'param',
       param_name: 'user',
@@ -158,7 +158,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'Consider removing the description')
   end
 
-  def test_call_when_validating_message_content_possessive_param_suggests_explaining_purpose
+  it 'call when validating message content possessive param suggests explaining purpose' do
     offense = {
       tag_name: 'param',
       param_name: 'user',
@@ -169,7 +169,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'removing it or explaining')
   end
 
-  def test_call_when_validating_message_content_type_restatement_suggests_explanation
+  it 'call when validating message content type restatement suggests explanation' do
     offense = {
       tag_name: 'param',
       param_name: 'value',
@@ -180,7 +180,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     assert_includes(message, 'removing the description or explaining')
   end
 
-  def test_call_when_checking_all_messages_include_the_original_description
+  it 'call when checking all messages include the original description' do
     patterns = %w[
       article_param possessive_param type_restatement
       param_to_verb id_pattern directional_date type_generic
@@ -199,7 +199,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionMessagesBuilderTest < Minit
     end
   end
 
-  def test_call_when_checking_all_messages_provide_actionable_suggestions
+  it 'call when checking all messages provide actionable suggestions' do
     patterns = %w[
       article_param possessive_param type_restatement
       param_to_verb id_pattern directional_date type_generic

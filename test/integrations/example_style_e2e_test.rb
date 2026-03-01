@@ -2,18 +2,20 @@
 
 require 'test_helper'
 
-class ExampleStyleE2eIntegrationTest < Minitest::Test
+
+describe 'Example Style E2e' do
   attr_reader :config
 
-  def setup
+
+  before do
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleStyle', 'Enabled', true)
       # Explicitly set linter to avoid non-deterministic auto-detection
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Linter', 'rubocop')
+      c.set_validator_config('Tags/ExampleStyle', 'Linter', 'rubocop')
     end
   end
 
-  def test_with_rubocop_installed_detects_actual_style_violations_using_real_rubocop
+  it 'with rubocop installed detects actual style violations using real rubocop' do
     skip 'RuboCop not available' unless Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.rubocop_available?
 
     fixture_content = <<~RUBY
@@ -46,13 +48,13 @@ class ExampleStyleE2eIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_rubocop_installed_does_not_report_offenses_for_clean_code
+  it 'with rubocop installed does not report offenses for clean code' do
     skip 'RuboCop not available' unless Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.rubocop_available?
 
     # Use a config that disables most cops to ensure clean code
     config_with_minimal = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'DisabledCops', [
+      c.set_validator_config('Tags/ExampleStyle', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleStyle', 'DisabledCops', [
         'Style/FrozenStringLiteralComment',
         'Layout/TrailingWhitespace',
         'Layout/EndOfLine',
@@ -97,12 +99,12 @@ class ExampleStyleE2eIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_rubocop_installed_respects_skip_patterns
+  it 'with rubocop installed respects skip patterns' do
     skip 'RuboCop not available' unless Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.rubocop_available?
 
     config_with_skip = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'SkipPatterns', ['/skip-lint/i'])
+      c.set_validator_config('Tags/ExampleStyle', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleStyle', 'SkipPatterns', ['/skip-lint/i'])
     end
 
     fixture_content = <<~RUBY
@@ -140,7 +142,7 @@ class ExampleStyleE2eIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_rubocop_installed_handles_multiple_examples_in_one_method
+  it 'with rubocop installed handles multiple examples in one method' do
     skip 'RuboCop not available' unless Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.rubocop_available?
 
     fixture_content = <<~RUBY
@@ -175,13 +177,13 @@ class ExampleStyleE2eIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_rubocop_installed_respects_disabled_cops_configuration
+  it 'with rubocop installed respects disabled cops configuration' do
     skip 'RuboCop not available' unless Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.rubocop_available?
 
     config_with_disabled = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleStyle', 'Enabled', true)
       # Disable cops that would normally flag this code
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'DisabledCops', [
+      c.set_validator_config('Tags/ExampleStyle', 'DisabledCops', [
         'Style/FrozenStringLiteralComment',
         'Layout/TrailingWhitespace',
         'Layout/EndOfLine',
@@ -224,13 +226,13 @@ class ExampleStyleE2eIntegrationTest < Minitest::Test
     end
   end
 
-  def test_with_standardrb_installed_detects_actual_style_violations_using_real_standardrb
+  it 'with standardrb installed detects actual style violations using real standardrb' do
     skip 'StandardRB not available' unless Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.standard_available?
 
     # Explicitly configure StandardRB linter
     standard_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Linter', 'standard')
+      c.set_validator_config('Tags/ExampleStyle', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleStyle', 'Linter', 'standard')
     end
 
     fixture_content = <<~RUBY
@@ -261,7 +263,7 @@ class ExampleStyleE2eIntegrationTest < Minitest::Test
     end
   end
 
-  def test_graceful_degradation_does_not_crash_when_no_linter_is_available
+  it 'graceful degradation does not crash when no linter is available' do
     # Temporarily stub both linter checks to return false
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(false)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(false)
@@ -292,7 +294,7 @@ class ExampleStyleE2eIntegrationTest < Minitest::Test
     end
   end
 
-  def test_disabled_by_default_does_not_run_when_not_explicitly_enabled
+  it 'disabled by default does not run when not explicitly enabled' do
     default_config = test_config
 
     fixture_content = <<~RUBY

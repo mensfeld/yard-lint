@@ -1,19 +1,23 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 require 'tmpdir'
 require 'fileutils'
 require 'open3'
-require 'test_helper'
 
-class ConfigUpdateIntegrationTest < Minitest::Test
-  def setup
+describe 'Config Update' do
+  attr_reader :test_dir, :bin_path, :original_dir
+
+  before do
+    @original_dir = Dir.pwd
     @test_dir = Dir.mktmpdir
     @bin_path = File.expand_path('../../bin/yard-lint', __dir__)
     Dir.chdir(@test_dir)
   end
 
-  def teardown
-    Dir.chdir('/')
+  after do
+    Dir.chdir(@original_dir)
     FileUtils.rm_rf(@test_dir)
   end
 
@@ -24,13 +28,13 @@ class ConfigUpdateIntegrationTest < Minitest::Test
 
   # -- update when config file does not exist --
 
-  def test_update_when_config_does_not_exist_exits_with_error_code_1
+  it 'update when config does not exist exits with error code 1' do
     result = run_yard_lint('--update')
 
     assert_equal(1, result[:exit_code])
   end
 
-  def test_update_when_config_does_not_exist_displays_helpful_error_message
+  it 'update when config does not exist displays helpful error message' do
     result = run_yard_lint('--update')
 
     assert_includes(result[:stdout], 'Config file not found')
@@ -39,14 +43,14 @@ class ConfigUpdateIntegrationTest < Minitest::Test
 
   # -- update when config file exists and is up to date --
 
-  def test_update_when_config_exists_and_is_up_to_date_exits_with_success_code_0
+  it 'update when config exists and is up to date exits with success code 0' do
     run_yard_lint('--init')
     result = run_yard_lint('--update')
 
     assert_equal(0, result[:exit_code])
   end
 
-  def test_update_when_config_exists_and_is_up_to_date_reports_config_is_up_to_date
+  it 'update when config exists and is up to date reports config is up to date' do
     run_yard_lint('--init')
     result = run_yard_lint('--update')
 
@@ -67,14 +71,14 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     YAML
   end
 
-  def test_update_when_missing_validators_exits_with_success_code_0
+  it 'update when missing validators exits with success code 0' do
     write_partial_config
     result = run_yard_lint('--update')
 
     assert_equal(0, result[:exit_code])
   end
 
-  def test_update_when_missing_validators_reports_added_validators
+  it 'update when missing validators reports added validators' do
     write_partial_config
     result = run_yard_lint('--update')
 
@@ -83,14 +87,14 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     assert_includes(result[:stdout], 'new validator')
   end
 
-  def test_update_when_missing_validators_reports_preserved_validators
+  it 'update when missing validators reports preserved validators' do
     write_partial_config
     result = run_yard_lint('--update')
 
     assert_includes(result[:stdout], 'Preserved 1 existing validator')
   end
 
-  def test_update_when_missing_validators_preserves_user_settings_in_the_file
+  it 'update when missing validators preserves user settings in the file' do
     write_partial_config
     run_yard_lint('--update')
 
@@ -98,7 +102,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     assert_equal('error', updated_config['Documentation/UndocumentedObjects']['Severity'])
   end
 
-  def test_update_when_missing_validators_adds_missing_validators_to_the_file
+  it 'update when missing validators adds missing validators to the file' do
     write_partial_config
     run_yard_lint('--update')
 
@@ -108,7 +112,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     assert(updated_config.key?('Warnings/UnknownTag'))
   end
 
-  def test_update_when_missing_validators_produces_valid_yaml
+  it 'update when missing validators produces valid yaml' do
     write_partial_config
     run_yard_lint('--update')
 
@@ -130,7 +134,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     File.write('.yard-lint.yml', content)
   end
 
-  def test_update_when_obsolete_validators_reports_removed_validators
+  it 'update when obsolete validators reports removed validators' do
     write_config_with_obsolete_validator
     result = run_yard_lint('--update')
 
@@ -138,7 +142,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     assert_includes(result[:stdout], 'Obsolete/FakeValidator')
   end
 
-  def test_update_when_obsolete_validators_removes_obsolete_validators_from_the_file
+  it 'update when obsolete validators removes obsolete validators from the file' do
     write_config_with_obsolete_validator
     run_yard_lint('--update')
 
@@ -148,7 +152,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
 
   # -- update with --strict flag --
 
-  def test_update_with_strict_flag_uses_strict_template_defaults_for_new_validators
+  it 'update with strict flag uses strict template defaults for new validators' do
     File.write('.yard-lint.yml', <<~YAML)
       AllValidators:
         Exclude: []
@@ -171,7 +175,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     File.write('.yard-lint.yml', 'AllValidators: {}')
   end
 
-  def test_update_yaml_formatting_includes_header_comment
+  it 'update yaml formatting includes header comment' do
     write_minimal_config
     run_yard_lint('--update')
 
@@ -179,7 +183,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     assert_includes(content, '# YARD-Lint Configuration')
   end
 
-  def test_update_yaml_formatting_includes_category_comments
+  it 'update yaml formatting includes category comments' do
     write_minimal_config
     run_yard_lint('--update')
 
@@ -190,7 +194,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
     assert_includes(content, '# Semantic validators')
   end
 
-  def test_update_yaml_formatting_maintains_proper_category_ordering
+  it 'update yaml formatting maintains proper category ordering' do
     write_minimal_config
     run_yard_lint('--update')
 
@@ -209,14 +213,14 @@ class ConfigUpdateIntegrationTest < Minitest::Test
 
   # -- help --
 
-  def test_help_includes_update_in_the_help_text
+  it 'help includes update in the help text' do
     result = run_yard_lint('--help')
 
     assert_includes(result[:stdout], '--update')
     assert_includes(result[:stdout], 'add new validators')
   end
 
-  def test_help_includes_update_in_the_examples
+  it 'help includes update in the examples' do
     result = run_yard_lint('--help')
 
     assert_includes(result[:stdout], 'yard-lint --update')
@@ -224,7 +228,7 @@ class ConfigUpdateIntegrationTest < Minitest::Test
 
   # -- workflow: init then update --
 
-  def test_workflow_init_then_update_works_correctly
+  it 'workflow init then update works correctly' do
     init_result = run_yard_lint('--init')
     assert_equal(0, init_result[:exit_code])
 

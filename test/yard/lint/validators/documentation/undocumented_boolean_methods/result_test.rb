@@ -2,40 +2,42 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationUndocumentedBooleanMethodsResultTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Result' do
   attr_reader :config, :parsed_data, :result
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @parsed_data = []
     @result = Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Result.new(@parsed_data, @config)
   end
 
-  def test_initialize_inherits_from_results_base
+  it 'initialize inherits from results base' do
     assert_kind_of(Yard::Lint::Results::Base, result)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(config, result.instance_variable_get(:@config))
   end
 
-  def test_offenses_returns_an_array
+  it 'offenses returns an array' do
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_offenses_handles_empty_parsed_data
+  it 'offenses handles empty parsed data' do
     assert_equal([], result.offenses)
   end
 
-  def test_class_methods_defines_default_severity
+  it 'class methods defines default severity' do
     assert_respond_to(Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Result, :default_severity)
   end
 
-  def test_class_methods_defines_offense_type
+  it 'class methods defines offense type' do
     assert_respond_to(Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Result, :offense_type)
   end
 
-  def test_class_methods_defines_offense_name
+  it 'class methods defines offense name' do
     assert_respond_to(Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Result, :offense_name)
   end
 end

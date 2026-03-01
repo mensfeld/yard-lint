@@ -2,12 +2,13 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsInformalNotationConfigTest < Minitest::Test
-  def test_class_attributes_has_id_set_to_informal_notation
+
+describe 'Yard::Lint::Validators::Tags::InformalNotation::Config' do
+  it 'class attributes has id set to informal notation' do
     assert_equal(:informal_notation, Yard::Lint::Validators::Tags::InformalNotation::Config.id)
   end
 
-  def test_class_attributes_has_defaults_configured
+  it 'class attributes has defaults configured' do
     assert_kind_of(Hash, Yard::Lint::Validators::Tags::InformalNotation::Config.defaults)
     assert_equal(true, Yard::Lint::Validators::Tags::InformalNotation::Config.defaults['Enabled'])
     assert_equal('warning', Yard::Lint::Validators::Tags::InformalNotation::Config.defaults['Severity'])
@@ -15,7 +16,7 @@ class YardLintValidatorsTagsInformalNotationConfigTest < Minitest::Test
     assert_equal(true, Yard::Lint::Validators::Tags::InformalNotation::Config.defaults['RequireStartOfLine'])
   end
 
-  def test_class_attributes_has_default_patterns_configured
+  it 'class attributes has default patterns configured' do
     patterns = Yard::Lint::Validators::Tags::InformalNotation::Config.defaults['Patterns']
     assert_kind_of(Hash, patterns)
     assert_equal('@note', patterns['Note'])
@@ -34,7 +35,7 @@ class YardLintValidatorsTagsInformalNotationConfigTest < Minitest::Test
     assert_equal('@example', patterns['Example'])
   end
 
-  def test_inheritance_inherits_from_validators_config
+  it 'inheritance inherits from validators config' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Tags::InformalNotation::Config.superclass

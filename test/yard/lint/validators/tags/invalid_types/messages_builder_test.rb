@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsInvalidTypesMessagesBuilderTest < Minitest::Test
 
-  def test_call_builds_message_for_invalid_tag_types
+describe 'Yard::Lint::Validators::Tags::InvalidTypes::MessagesBuilder' do
+  it 'call builds message for invalid tag types' do
     offense = { method_name: 'calculate' }
 
     message = Yard::Lint::Validators::Tags::InvalidTypes::MessagesBuilder.call(offense)
@@ -12,7 +12,7 @@ class YardLintValidatorsTagsInvalidTypesMessagesBuilderTest < Minitest::Test
     assert_equal('The `calculate` has at least one tag with an invalid type definition.', message)
   end
 
-  def test_call_builds_message_for_class_method
+  it 'call builds message for class method' do
     offense = { method_name: 'MyClass.validate' }
 
     message = Yard::Lint::Validators::Tags::InvalidTypes::MessagesBuilder.call(offense)

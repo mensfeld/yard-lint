@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTagTypePositionConfigTest < Minitest::Test
-  def test_has_correct_defaults
+
+describe 'Yard::Lint::Validators::Tags::TagTypePosition::Config' do
+  it 'has correct defaults' do
     assert_equal(:tag_type_position, Yard::Lint::Validators::Tags::TagTypePosition::Config.id)
     assert_equal('convention', Yard::Lint::Validators::Tags::TagTypePosition::Config.defaults['Severity'])
     assert_equal(%w[param option], Yard::Lint::Validators::Tags::TagTypePosition::Config.defaults['CheckedTags'])

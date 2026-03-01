@@ -1,32 +1,32 @@
 # frozen_string_literal: true
 
-  require 'yard-lint'
 require 'test_helper'
 
-class YardLintTest < Minitest::Test
+  require 'yard-lint'
 
-  def test_gem_loading_loads_without_errors
+describe 'Yard-Lint' do
+  it 'gem loading loads without errors' do
   end
 
-  def test_gem_loading_defines_yard_module
+  it 'gem loading defines yard module' do
   end
 
-  def test_gem_loading_defines_yard_lint_module
+  it 'gem loading defines yard lint module' do
   end
 
-  def test_zeitwerk_loader_auto_loads_validators
+  it 'zeitwerk loader auto loads validators' do
   end
 
-  def test_zeitwerk_loader_auto_loads_results
+  it 'zeitwerk loader auto loads results' do
   end
 
-  def test_zeitwerk_loader_auto_loads_config
+  it 'zeitwerk loader auto loads config' do
   end
 
-  def test_manual_requires_loads_base_config_class
+  it 'manual requires loads base config class' do
   end
 
-  def test_manual_requires_loads_main_yard_lint_module
+  it 'manual requires loads main yard lint module' do
     assert_respond_to(Yard::Lint, :run)
   end
 end

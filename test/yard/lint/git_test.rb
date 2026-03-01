@@ -2,29 +2,31 @@
 
 require 'test_helper'
 
-class YardLintGitTest < Minitest::Test
+
+describe 'Yard::Lint::Git' do
   attr_reader :path
 
-  def setup
+
+  before do
     @path = '/home/user/project/lib'
   end
 
   # .default_branch
 
-  def test_default_branch_when_main_branch_exists_returns_main
+  it 'default branch when main branch exists returns main' do
     Yard::Lint::Git.stubs(:branch_exists?).with('main').returns(true)
 
     assert_equal('main', Yard::Lint::Git.default_branch)
   end
 
-  def test_default_branch_when_only_master_branch_exists_returns_master
+  it 'default branch when only master branch exists returns master' do
     Yard::Lint::Git.stubs(:branch_exists?).with('main').returns(false)
     Yard::Lint::Git.stubs(:branch_exists?).with('master').returns(true)
 
     assert_equal('master', Yard::Lint::Git.default_branch)
   end
 
-  def test_default_branch_when_neither_main_nor_master_exists_returns_nil
+  it 'default branch when neither main nor master exists returns nil' do
     Yard::Lint::Git.stubs(:branch_exists?).with('main').returns(false)
     Yard::Lint::Git.stubs(:branch_exists?).with('master').returns(false)
 
@@ -33,7 +35,7 @@ class YardLintGitTest < Minitest::Test
 
   # .branch_exists?
 
-  def test_branch_exists_returns_true_when_branch_exists
+  it 'branch exists returns true when branch exists' do
     Open3.stubs(:capture3)
       .with('git', 'rev-parse', '--verify', '--quiet', 'main')
       .returns(['', '', stub(success?: true)])
@@ -41,7 +43,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(true, Yard::Lint::Git.branch_exists?('main'))
   end
 
-  def test_branch_exists_returns_false_when_branch_does_not_exist
+  it 'branch exists returns false when branch does not exist' do
     Open3.stubs(:capture3)
       .with('git', 'rev-parse', '--verify', '--quiet', 'nonexistent')
       .returns(['', '', stub(success?: false)])
@@ -51,7 +53,7 @@ class YardLintGitTest < Minitest::Test
 
   # .changed_files
 
-  def test_changed_files_when_base_ref_is_provided_uses_the_provided_base_ref
+  it 'changed files when base ref is provided uses the provided base ref' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
 
     Open3.stubs(:capture3)
@@ -67,7 +69,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(['/home/user/project/lib/foo.rb'], result)
   end
 
-  def test_changed_files_when_base_ref_is_nil_auto_detects_default_branch
+  it 'changed files when base ref is nil auto detects default branch' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     Yard::Lint::Git.stubs(:default_branch).returns('main')
 
@@ -84,7 +86,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(['/home/user/project/lib/foo.rb'], result)
   end
 
-  def test_changed_files_when_base_ref_is_nil_raises_error_when_default_branch_cannot_be_detected
+  it 'changed files when base ref is nil raises error when default branch cannot be detected' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     Yard::Lint::Git.stubs(:default_branch).returns(nil)
 
@@ -93,7 +95,7 @@ class YardLintGitTest < Minitest::Test
     end
   end
 
-  def test_changed_files_when_git_diff_succeeds_returns_ruby_files_only
+  it 'changed files when git diff succeeds returns ruby files only' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     git_output = "lib/foo.rb\nlib/bar.js\nlib/baz.rb\n"
 
@@ -113,7 +115,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(2, result.size)
   end
 
-  def test_changed_files_when_git_diff_succeeds_filters_out_deleted_files
+  it 'changed files when git diff succeeds filters out deleted files' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     git_output = "lib/existing.rb\nlib/deleted.rb\n"
 
@@ -132,7 +134,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(['/home/user/project/lib/existing.rb'], result)
   end
 
-  def test_changed_files_when_git_diff_succeeds_filters_files_within_specified_path
+  it 'changed files when git diff succeeds filters files within specified path' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     git_output = "lib/foo.rb\nspec/bar.rb\n"
 
@@ -150,7 +152,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(['/home/user/project/lib/foo.rb'], result)
   end
 
-  def test_changed_files_when_git_diff_fails_raises_an_error
+  it 'changed files when git diff fails raises an error' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
 
     Open3.stubs(:capture3)
@@ -164,7 +166,7 @@ class YardLintGitTest < Minitest::Test
 
   # .staged_files
 
-  def test_staged_files_returns_staged_ruby_files
+  it 'staged files returns staged ruby files' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     git_output = "lib/staged.rb\nlib/another.rb\n"
 
@@ -184,7 +186,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(2, result.size)
   end
 
-  def test_staged_files_excludes_deleted_files_diff_filter_acm
+  it 'staged files excludes deleted files diff filter acm' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     git_output = "lib/modified.rb\n"
 
@@ -201,7 +203,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(['/home/user/project/lib/modified.rb'], result)
   end
 
-  def test_staged_files_when_git_diff_fails_raises_an_error
+  it 'staged files when git diff fails raises an error' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
 
     Open3.stubs(:capture3)
@@ -215,7 +217,7 @@ class YardLintGitTest < Minitest::Test
 
   # .uncommitted_files
 
-  def test_uncommitted_files_returns_uncommitted_ruby_files
+  it 'uncommitted files returns uncommitted ruby files' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
     git_output = "lib/modified.rb\nlib/unstaged.rb\n"
 
@@ -235,7 +237,7 @@ class YardLintGitTest < Minitest::Test
     assert_equal(2, result.size)
   end
 
-  def test_uncommitted_files_when_git_diff_fails_raises_an_error
+  it 'uncommitted files when git diff fails raises an error' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
 
     Open3.stubs(:capture3)
@@ -249,7 +251,7 @@ class YardLintGitTest < Minitest::Test
 
   # .ensure_git_repository!
 
-  def test_ensure_git_repository_does_not_raise_when_in_git_repository
+  it 'ensure git repository does not raise when in git repository' do
     Open3.stubs(:capture3)
       .with('git', 'rev-parse', '--git-dir')
       .returns(['.git', '', stub(success?: true)])
@@ -257,7 +259,7 @@ class YardLintGitTest < Minitest::Test
     Yard::Lint::Git.send(:ensure_git_repository!)
   end
 
-  def test_ensure_git_repository_raises_error_when_not_in_git_repository
+  it 'ensure git repository raises error when not in git repository' do
     Open3.stubs(:capture3)
       .with('git', 'rev-parse', '--git-dir')
       .returns(['', 'fatal: not a git repository', stub(success?: false)])
@@ -269,28 +271,28 @@ class YardLintGitTest < Minitest::Test
 
   # .file_within_path?
 
-  def test_file_within_path_when_base_path_is_a_directory_returns_true_for_files_within_directory
+  it 'file within path when base path is a directory returns true for files within directory' do
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
     result = Yard::Lint::Git.send(:file_within_path?, '/home/user/project/lib/foo.rb', '/home/user/project/lib')
     assert_equal(true, result)
   end
 
-  def test_file_within_path_when_base_path_is_a_directory_returns_false_for_files_outside_directory
+  it 'file within path when base path is a directory returns false for files outside directory' do
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
     result = Yard::Lint::Git.send(:file_within_path?, '/home/user/project/spec/foo.rb', '/home/user/project/lib')
     assert_equal(false, result)
   end
 
-  def test_file_within_path_when_base_path_is_a_file_returns_true_only_for_exact_match
+  it 'file within path when base path is a file returns true only for exact match' do
     File.stubs(:directory?).with('/home/user/project/lib/foo.rb').returns(false)
 
     result = Yard::Lint::Git.send(:file_within_path?, '/home/user/project/lib/foo.rb', '/home/user/project/lib/foo.rb')
     assert_equal(true, result)
   end
 
-  def test_file_within_path_when_base_path_is_a_file_returns_false_for_different_file
+  it 'file within path when base path is a file returns false for different file' do
     File.stubs(:directory?).with('/home/user/project/lib/foo.rb').returns(false)
 
     result = Yard::Lint::Git.send(:file_within_path?, '/home/user/project/lib/bar.rb', '/home/user/project/lib/foo.rb')

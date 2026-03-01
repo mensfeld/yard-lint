@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsMeaninglessTagMessagesBuilderTest < Minitest::Test
 
-  def test_call_formats_message_for_param_on_class
+describe 'Yard::Lint::Validators::Tags::MeaninglessTag::MessagesBuilder' do
+  it 'call formats message for param on class' do
     offense = {
       object_type: 'class',
       tag_name: 'param',
@@ -20,7 +20,7 @@ class YardLintValidatorsTagsMeaninglessTagMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_message_for_option_on_module
+  it 'call formats message for option on module' do
     offense = {
       object_type: 'module',
       tag_name: 'option',
@@ -36,7 +36,7 @@ class YardLintValidatorsTagsMeaninglessTagMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_message_for_param_on_constant
+  it 'call formats message for param on constant' do
     offense = {
       object_type: 'constant',
       tag_name: 'param',

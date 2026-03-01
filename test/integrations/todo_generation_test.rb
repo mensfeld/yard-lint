@@ -1,19 +1,23 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 require 'tmpdir'
 require 'fileutils'
 require 'open3'
-require 'test_helper'
 
-class TodoGenerationIntegrationTest < Minitest::Test
-  def setup
+describe 'Todo Generation' do
+  attr_reader :test_dir, :bin_path, :original_dir
+
+  before do
+    @original_dir = Dir.pwd
     @test_dir = Dir.mktmpdir('yard-lint-todo-test')
     @bin_path = File.expand_path('../../bin/yard-lint', __dir__)
     Dir.chdir(@test_dir)
   end
 
-  def teardown
-    Dir.chdir('/')
+  after do
+    Dir.chdir(@original_dir)
     FileUtils.rm_rf(@test_dir)
   end
 
@@ -55,7 +59,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- auto-gen-config with violations --
 
-  def test_auto_gen_config_with_violations_creates_yard_lint_todo_yml
+  it 'auto gen config with violations creates yard lint todo yml' do
     create_file_with_violations
     result = run_yard_lint('--auto-gen-config')
 
@@ -63,7 +67,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert(File.exist?('.yard-lint-todo.yml'))
   end
 
-  def test_auto_gen_config_with_violations_displays_success_message
+  it 'auto gen config with violations displays success message' do
     create_file_with_violations
     result = run_yard_lint('--auto-gen-config')
 
@@ -72,7 +76,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_includes(result[:stdout], 'offense(s)')
   end
 
-  def test_auto_gen_config_with_violations_creates_valid_yaml_with_proper_structure
+  it 'auto gen config with violations creates valid yaml with proper structure' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -84,7 +88,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_includes(content, 'Exclude:')
   end
 
-  def test_auto_gen_config_with_violations_includes_validator_exclusions
+  it 'auto gen config with violations includes validator exclusions' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -100,7 +104,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
       end
   end
 
-  def test_auto_gen_config_with_violations_creates_or_updates_yard_lint_yml_to_inherit_from_todo_file
+  it 'auto gen config with violations creates or updates yard lint yml to inherit from todo file' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -110,7 +114,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_includes(config['inherit_from'], '.yard-lint-todo.yml')
   end
 
-  def test_auto_gen_config_with_violations_uses_relative_paths_in_exclusions
+  it 'auto gen config with violations uses relative paths in exclusions' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -125,7 +129,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     end
   end
 
-  def test_auto_gen_config_with_violations_results_in_clean_run_after_generation
+  it 'auto gen config with violations results in clean run after generation' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -138,7 +142,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- auto-gen-config with clean codebase --
 
-  def test_auto_gen_config_with_clean_codebase_does_not_create_todo_file
+  it 'auto gen config with clean codebase does not create todo file' do
     create_clean_file
     result = run_yard_lint('--auto-gen-config')
 
@@ -146,7 +150,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     refute(File.exist?('.yard-lint-todo.yml'))
   end
 
-  def test_auto_gen_config_with_clean_codebase_displays_appropriate_message
+  it 'auto gen config with clean codebase displays appropriate message' do
     create_clean_file
     result = run_yard_lint('--auto-gen-config')
 
@@ -156,7 +160,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- auto-gen-config when todo file already exists --
 
-  def test_auto_gen_config_when_todo_already_exists_exits_with_error_code_1
+  it 'auto gen config when todo already exists exits with error code 1' do
     create_file_with_violations
     File.write('.yard-lint-todo.yml', '# existing content')
 
@@ -165,7 +169,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_equal(1, result[:exit_code])
   end
 
-  def test_auto_gen_config_when_todo_already_exists_displays_error_message
+  it 'auto gen config when todo already exists displays error message' do
     create_file_with_violations
     File.write('.yard-lint-todo.yml', '# existing content')
 
@@ -176,7 +180,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_includes(result[:stdout], '--regenerate-todo')
   end
 
-  def test_auto_gen_config_when_todo_already_exists_does_not_overwrite_existing_file
+  it 'auto gen config when todo already exists does not overwrite existing file' do
     create_file_with_violations
     File.write('.yard-lint-todo.yml', '# existing content')
 
@@ -188,7 +192,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- auto-gen-config when .yard-lint.yml already exists --
 
-  def test_auto_gen_config_adds_inherit_from_to_existing_config
+  it 'auto gen config adds inherit from to existing config' do
     create_file_with_violations
     File.write('.yard-lint.yml', <<~YAML)
       AllValidators:
@@ -202,7 +206,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_equal({ 'Severity' => 'warning' }, config['AllValidators'])
   end
 
-  def test_auto_gen_config_does_not_duplicate_inherit_from_entry_on_multiple_runs
+  it 'auto gen config does not duplicate inherit from entry on multiple runs' do
     create_file_with_violations
     File.write('.yard-lint.yml', <<~YAML)
       AllValidators:
@@ -220,7 +224,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- auto-gen-config with multiple violations across validators --
 
-  def test_auto_gen_config_with_multiple_violations_creates_separate_exclusions_for_each_validator
+  it 'auto gen config with multiple violations creates separate exclusions for each validator' do
     FileUtils.mkdir_p('lib')
     File.write('lib/multi.rb', <<~RUBY)
       class Multi
@@ -241,7 +245,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_operator(yaml.keys.size, :>, 1)
   end
 
-  def test_auto_gen_config_with_multiple_violations_groups_validators_by_category
+  it 'auto gen config with multiple violations groups validators by category' do
     FileUtils.mkdir_p('lib')
     File.write('lib/multi.rb', <<~RUBY)
       class Multi
@@ -264,7 +268,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- auto-gen-config with path argument --
 
-  def test_auto_gen_config_with_path_argument_generates_todo_file_for_specified_path_only
+  it 'auto gen config with path argument generates todo file for specified path only' do
     FileUtils.mkdir_p('lib')
     FileUtils.mkdir_p('app')
 
@@ -286,7 +290,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- regenerate-todo --
 
-  def test_regenerate_todo_overwrites_existing_todo_file
+  it 'regenerate todo overwrites existing todo file' do
     create_file_with_violations
     File.write('.yard-lint-todo.yml', '# existing content')
 
@@ -298,7 +302,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_includes(content, '# This file was auto-generated')
   end
 
-  def test_regenerate_todo_displays_success_message
+  it 'regenerate todo displays success message' do
     create_file_with_violations
     File.write('.yard-lint-todo.yml', '# existing content')
 
@@ -309,7 +313,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- exclude-limit --
 
-  def test_exclude_limit_accepts_custom_exclude_limit
+  it 'exclude limit accepts custom exclude limit' do
     create_multiple_files_with_violations
     result = run_yard_lint('--auto-gen-config', '--exclude-limit', '3')
 
@@ -317,7 +321,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert(File.exist?('.yard-lint-todo.yml'))
   end
 
-  def test_exclude_limit_affects_grouping_behavior
+  it 'exclude limit affects grouping behavior' do
     create_multiple_files_with_violations
     # With high limit, should keep individual files
     run_yard_lint('--auto-gen-config', '--exclude-limit', '100')
@@ -331,26 +335,26 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- help --
 
-  def test_help_includes_auto_gen_config_in_the_help_text
+  it 'help includes auto gen config in the help text' do
     result = run_yard_lint('--help')
 
     assert_includes(result[:stdout], '--auto-gen-config')
     assert_includes(result[:stdout], 'silence existing violations')
   end
 
-  def test_help_includes_regenerate_todo_in_the_help_text
+  it 'help includes regenerate todo in the help text' do
     result = run_yard_lint('--help')
 
     assert_includes(result[:stdout], '--regenerate-todo')
   end
 
-  def test_help_includes_exclude_limit_in_the_help_text
+  it 'help includes exclude limit in the help text' do
     result = run_yard_lint('--help')
 
     assert_includes(result[:stdout], '--exclude-limit')
   end
 
-  def test_help_includes_examples_in_the_help_text
+  it 'help includes examples in the help text' do
     result = run_yard_lint('--help')
 
     assert_includes(result[:stdout], 'yard-lint --auto-gen-config')
@@ -359,7 +363,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- incremental workflow --
 
-  def test_incremental_workflow_allows_removing_entries_to_re_expose_violations
+  it 'incremental workflow allows removing entries to re expose violations' do
     create_file_with_violations
 
     # Generate todo file
@@ -383,7 +387,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- YAML formatting --
 
-  def test_yaml_formatting_includes_header_with_generation_timestamp
+  it 'yaml formatting includes header with generation timestamp' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -391,7 +395,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_match(/# This file was auto-generated by yard-lint --auto-gen-config on \d{4}-\d{2}-\d{2}/, content)
   end
 
-  def test_yaml_formatting_includes_helpful_comments
+  it 'yaml formatting includes helpful comments' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -400,7 +404,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
     assert_includes(content, 'yard-lint --regenerate-todo')
   end
 
-  def test_yaml_formatting_maintains_proper_category_ordering
+  it 'yaml formatting maintains proper category ordering' do
     create_file_with_violations
     run_yard_lint('--auto-gen-config')
 
@@ -420,7 +424,7 @@ class TodoGenerationIntegrationTest < Minitest::Test
 
   # -- error handling --
 
-  def test_error_handling_handles_non_existent_paths_gracefully
+  it 'error handling handles non existent paths gracefully' do
     result = run_yard_lint('--auto-gen-config', 'non_existent/')
 
     assert_equal(1, result[:exit_code])

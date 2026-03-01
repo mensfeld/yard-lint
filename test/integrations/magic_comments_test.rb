@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Magic Comments' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/magic_comments.rb', __dir__)
     @config = test_config do |c|
-    c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+    c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
     end
   end
 
-  def test_handling_ruby_magic_comments_does_not_treat_frozen_string_literal_as_yard_documentation
+  it 'handling ruby magic comments does not treat frozen string literal as yard documentation' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -23,7 +25,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_handling_ruby_magic_comments_does_not_treat_encoding_comments_as_yard_documentation
+  it 'handling ruby magic comments does not treat encoding comments as yard documentation' do
     encoding_fixture = Tempfile.new(['encoding_test', '.rb'])
     encoding_fixture.write(<<~RUBY)
       # encoding: utf-8
@@ -47,7 +49,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     encoding_fixture.unlink
   end
 
-  def test_handling_ruby_magic_comments_does_not_treat_warn_indent_comments_as_yard_documentation
+  it 'handling ruby magic comments does not treat warn indent comments as yard documentation' do
     warn_indent_fixture = Tempfile.new(['warn_indent_test', '.rb'])
     warn_indent_fixture.write(<<~RUBY)
       # warn_indent: true
@@ -71,7 +73,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     warn_indent_fixture.unlink
   end
 
-  def test_handling_ruby_magic_comments_does_not_treat_shareable_constant_value_comments_as_yard_documenta
+  it 'handling ruby magic comments does not treat shareable constant value comments as yard documenta' do
     shareable_fixture = Tempfile.new(['shareable_test', '.rb'])
     shareable_fixture.write(<<~RUBY)
       # shareable_constant_value: literal
@@ -95,7 +97,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     shareable_fixture.unlink
   end
 
-  def test_handling_ruby_magic_comments_still_detects_real_yard_docs_with_blank_lines_even_when_magic_comm
+  it 'handling ruby magic comments still detects real yard docs with blank lines even when magic comm' do
     yard_with_magic_fixture = Tempfile.new(['yard_with_magic', '.rb'])
     yard_with_magic_fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -122,7 +124,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     yard_with_magic_fixture.unlink
   end
 
-  def test_handling_ruby_magic_comments_correctly_handles_multiple_magic_comments
+  it 'handling ruby magic comments correctly handles multiple magic comments' do
     multiple_magic_fixture = Tempfile.new(['multiple_magic', '.rb'])
     multiple_magic_fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -148,7 +150,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     multiple_magic_fixture.unlink
   end
 
-  def test_handling_ruby_magic_comments_handles_magic_comments_with_different_spacing_variations
+  it 'handling ruby magic comments handles magic comments with different spacing variations' do
     spacing_variations_fixture = Tempfile.new(['spacing_variations', '.rb'])
     spacing_variations_fixture.write(<<~RUBY)
       #frozen_string_literal:true
@@ -173,7 +175,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     spacing_variations_fixture.unlink
   end
 
-  def test_real_world_migration_file_example_does_not_flag_migration_files_with_only_magic_comments
+  it 'real world migration file example does not flag migration files with only magic comments' do
     migration_fixture = Tempfile.new(['migration_test', '.rb'])
     migration_fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -200,7 +202,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     migration_fixture.unlink
   end
 
-  def test_magic_comments_with_yard_documentation_detects_blank_line_between_yard_docs_and_code_when_magic
+  it 'magic comments with yard documentation detects blank line between yard docs and code when magic' do
     combined_fixture = Tempfile.new(['combined_test', '.rb'])
     combined_fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -238,7 +240,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     combined_fixture.unlink
   end
 
-  def test_magic_comments_with_yard_documentation_does_not_flag_when_magic_comment_yard_docs_and_code_are_
+  it 'magic comments with yard documentation does not flag when magic comment yard docs and code are ' do
     proper_fixture = Tempfile.new(['proper_test', '.rb'])
     proper_fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -268,7 +270,7 @@ class BlanklinebeforedefinitionWithMagicCommentsTest < Minitest::Test
     proper_fixture.unlink
   end
 
-  def test_magic_comments_with_yard_documentation_handles_orphaned_docs_2_blank_lines_with_magic_comments_
+  it 'magic comments with yard documentation handles orphaned docs 2 blank lines with magic comments ' do
     orphaned_fixture = Tempfile.new(['orphaned_test', '.rb'])
     orphaned_fixture.write(<<~RUBY)
       # frozen_string_literal: true

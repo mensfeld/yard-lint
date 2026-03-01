@@ -2,50 +2,52 @@
 
 require 'test_helper'
 
-class YardLintRunnerTest < Minitest::Test
-  attr_reader :config, :runner, :selection
 
-  def setup
+describe 'Yard::Lint::Runner' do
+  attr_reader :selection, :config, :runner
+
+
+  before do
     @selection = ['lib/example.rb']
     @config = Yard::Lint::Config.new
     @runner = Yard::Lint::Runner.new(selection, config)
   end
 
-  def test_initialize_stores_selection_as_array
+  it 'initialize stores selection as array' do
     assert_equal(['lib/example.rb'], runner.selection)
   end
 
-  def test_initialize_flattens_nested_arrays_in_selection
+  it 'initialize flattens nested arrays in selection' do
     nested_runner = Yard::Lint::Runner.new([['file1.rb'], 'file2.rb'], config)
     assert_equal(['file1.rb', 'file2.rb'], nested_runner.selection)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(config, runner.config)
   end
 
-  def test_initialize_uses_default_config_when_none_provided
+  it 'initialize uses default config when none provided' do
     default_runner = Yard::Lint::Runner.new(selection)
     assert_kind_of(Yard::Lint::Config, default_runner.config)
   end
 
-  def test_initialize_creates_result_builder_with_config
+  it 'initialize creates result builder with config' do
     assert_kind_of(Yard::Lint::ResultBuilder, runner.instance_variable_get(:@result_builder))
   end
 
-  def test_run_returns_an_aggregate_result_object
+  it 'run returns an aggregate result object' do
     result = runner.run
     assert_kind_of(Yard::Lint::Results::Aggregate, result)
   end
 
-  def test_run_orchestrates_the_validation_process
+  it 'run orchestrates the validation process' do
     runner.expects(:run_validators).once.returns([])
     runner.expects(:parse_results).once.returns([])
     runner.expects(:build_result).once.returns(Yard::Lint::Results::Aggregate.new([], config))
     runner.run
   end
 
-  def test_filter_files_for_validator_returns_all_files_when_validator_has_no_exclusions
+  it 'filter files for validator returns all files when validator has no exclusions' do
     files = %w[lib/foo.rb lib/bar.rb lib/baz/qux.rb spec/foo_spec.rb app/models/user.rb]
     config.stubs(:validator_exclude).with('Some/Validator').returns([])
 
@@ -54,7 +56,7 @@ class YardLintRunnerTest < Minitest::Test
     assert_equal(files, result)
   end
 
-  def test_filter_files_for_validator_filters_files_matching_validator_exclude_patterns
+  it 'filter files for validator filters files matching validator exclude patterns' do
     files = %w[lib/foo.rb lib/bar.rb lib/baz/qux.rb spec/foo_spec.rb app/models/user.rb]
     config.stubs(:validator_exclude).with('Some/Validator').returns(['spec/**/*'])
 
@@ -66,7 +68,7 @@ class YardLintRunnerTest < Minitest::Test
     )
   end
 
-  def test_filter_files_for_validator_supports_glob_patterns_with_and
+  it 'filter files for validator supports glob patterns with and' do
     files = %w[lib/foo.rb lib/bar.rb lib/baz/qux.rb spec/foo_spec.rb app/models/user.rb]
     config.stubs(:validator_exclude).with('Some/Validator').returns(['lib/**/*.rb'])
 
@@ -75,7 +77,7 @@ class YardLintRunnerTest < Minitest::Test
     assert_equal(%w[spec/foo_spec.rb app/models/user.rb], result)
   end
 
-  def test_filter_files_for_validator_handles_multiple_exclusion_patterns
+  it 'filter files for validator handles multiple exclusion patterns' do
     files = %w[lib/foo.rb lib/bar.rb lib/baz/qux.rb spec/foo_spec.rb app/models/user.rb]
     config.stubs(:validator_exclude).with('Some/Validator').returns(['spec/**/*', 'app/**/*'])
 
@@ -87,7 +89,7 @@ class YardLintRunnerTest < Minitest::Test
     )
   end
 
-  def test_filter_files_for_validator_supports_simple_wildcard_patterns
+  it 'filter files for validator supports simple wildcard patterns' do
     files = %w[lib/foo.rb lib/bar.rb lib/baz/qux.rb spec/foo_spec.rb app/models/user.rb]
     config.stubs(:validator_exclude).with('Some/Validator').returns(['lib/ba*.rb'])
 
@@ -99,7 +101,7 @@ class YardLintRunnerTest < Minitest::Test
     )
   end
 
-  def test_filter_files_for_validator_returns_empty_array_when_all_files_are_excluded
+  it 'filter files for validator returns empty array when all files are excluded' do
     files = %w[lib/foo.rb lib/bar.rb lib/baz/qux.rb spec/foo_spec.rb app/models/user.rb]
     config.stubs(:validator_exclude).with('Some/Validator').returns(['**/*'])
 
@@ -108,7 +110,7 @@ class YardLintRunnerTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_integration_processes_enabled_validators_only
+  it 'integration processes enabled validators only' do
     custom_config = Yard::Lint::Config.new
     custom_config.stubs(:validator_enabled?).returns(false)
     custom_runner = Yard::Lint::Runner.new(selection, custom_config)

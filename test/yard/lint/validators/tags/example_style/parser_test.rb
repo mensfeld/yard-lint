@@ -2,29 +2,30 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::ExampleStyle::Parser.new
   end
 
-  def test_initialize_inherits_from_parser_base_class
+  it 'initialize inherits from parser base class' do
     assert_kind_of(Yard::Lint::Parsers::Base, parser)
   end
 
-  def test_call_parses_input_and_returns_array
+  it 'call parses input and returns array' do
     result = parser.call('')
     assert_kind_of(Array, result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
     assert_equal([], result)
   end
 
-  def test_call_parses_style_offense_output_correctly
+  it 'call parses style offense output correctly' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       style_offense
@@ -50,7 +51,7 @@ class YardLintValidatorsTagsExampleStyleParserTest < Minitest::Test
     )
   end
 
-  def test_call_parses_multiple_offenses_correctly
+  it 'call parses multiple offenses correctly' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       style_offense
@@ -70,12 +71,12 @@ class YardLintValidatorsTagsExampleStyleParserTest < Minitest::Test
     assert_equal('Layout/SpaceInsideParens', result[1][:cop_name])
   end
 
-  def test_call_handles_nil_input
+  it 'call handles nil input' do
     result = parser.call(nil)
     assert_equal([], result)
   end
 
-  def test_call_ignores_lines_that_do_not_match_location_pattern
+  it 'call ignores lines that do not match location pattern' do
     output = <<~OUTPUT
       random text
       more random text
@@ -91,7 +92,7 @@ class YardLintValidatorsTagsExampleStyleParserTest < Minitest::Test
     assert_equal('Example#method', result[0][:object_name])
   end
 
-  def test_call_skips_non_style_offense_entries
+  it 'call skips non style offense entries' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       other_offense
@@ -104,7 +105,7 @@ class YardLintValidatorsTagsExampleStyleParserTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_call_handles_file_paths_starting_with_dot
+  it 'call handles file paths starting with dot' do
     output = <<~OUTPUT
       ./lib/example.rb:10: Example#method
       style_offense
@@ -118,7 +119,7 @@ class YardLintValidatorsTagsExampleStyleParserTest < Minitest::Test
     assert_equal('./lib/example.rb', result[0][:location])
   end
 
-  def test_call_handles_file_paths_starting_with_slash
+  it 'call handles file paths starting with slash' do
     output = <<~OUTPUT
       /home/user/lib/example.rb:10: Example#method
       style_offense
@@ -132,7 +133,7 @@ class YardLintValidatorsTagsExampleStyleParserTest < Minitest::Test
     assert_equal('/home/user/lib/example.rb', result[0][:location])
   end
 
-  def test_call_handles_incomplete_output_gracefully
+  it 'call handles incomplete output gracefully' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       style_offense

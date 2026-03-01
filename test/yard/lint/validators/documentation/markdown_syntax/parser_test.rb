@@ -2,14 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationMarkdownSyntaxParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::MarkdownSyntax::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Documentation::MarkdownSyntax::Parser.new
   end
 
-  def test_call_with_valid_violations_parses_single_error
+  it 'call with valid violations parses single error' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         unclosed_backtick
@@ -30,7 +32,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_valid_violations_parses_multiple_errors_for_same_object
+  it 'call with valid violations parses multiple errors for same object' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         unclosed_backtick|unclosed_bold
@@ -51,7 +53,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_valid_violations_parses_multiple_violations
+  it 'call with valid violations parses multiple violations' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         unclosed_backtick
@@ -80,7 +82,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_valid_violations_parses_invalid_list_marker_with_line_number
+  it 'call with valid violations parses invalid list marker with line number' do
       output = <<~OUTPUT
         lib/example.rb:15: MyClass#configure
         invalid_list_marker:3
@@ -101,7 +103,7 @@ class YardLintValidatorsDocumentationMarkdownSyntaxParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_empty_output_returns_empty_array
+  it 'call with empty output returns empty array' do
       result = parser.call('')
       assert_equal([], result)
   end

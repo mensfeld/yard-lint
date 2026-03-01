@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class TagsOrderIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Tag Order' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/tag_order_examples.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/Order', 'Enabled', true)
+      c.set_validator_config('Tags/Order', 'Enabled', true)
     end
   end
 
-  def test_detecting_invalid_tag_order_detects_return_before_param
+  it 'detecting invalid tag order detects return before param' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -25,7 +27,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     assert_includes(offenses.first[:message], 'return')
   end
 
-  def test_detecting_invalid_tag_order_detects_note_before_return
+  it 'detecting invalid tag order detects note before return' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -36,7 +38,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     refute_empty(offenses)
   end
 
-  def test_detecting_invalid_tag_order_detects_note_before_example
+  it 'detecting invalid tag order detects note before example' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -47,7 +49,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     refute_empty(offenses)
   end
 
-  def test_detecting_invalid_tag_order_detects_see_before_return
+  it 'detecting invalid tag order detects see before return' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -58,7 +60,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     refute_empty(offenses)
   end
 
-  def test_detecting_invalid_tag_order_detects_todo_before_note
+  it 'detecting invalid tag order detects todo before note' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -69,7 +71,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     refute_empty(offenses)
   end
 
-  def test_detecting_invalid_tag_order_detects_yield_tags_in_wrong_order
+  it 'detecting invalid tag order detects yield tags in wrong order' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -80,7 +82,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     refute_empty(offenses)
   end
 
-  def test_detecting_invalid_tag_order_detects_raise_before_return
+  it 'detecting invalid tag order detects raise before return' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -91,7 +93,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     refute_empty(offenses)
   end
 
-  def test_correct_tag_order_does_not_flag_methods_with_correct_full_tag_order
+  it 'correct tag order does not flag methods with correct full tag order' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -102,7 +104,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_correct_tag_order_does_not_flag_methods_with_correct_partial_tag_order
+  it 'correct tag order does not flag methods with correct partial tag order' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -113,7 +115,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_correct_tag_order_does_not_flag_simple_param_return_order
+  it 'correct tag order does not flag simple param return order' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -124,7 +126,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_consecutive_same_tags_does_not_flag_multiple_consecutive_param_tags
+  it 'consecutive same tags does not flag multiple consecutive param tags' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -135,7 +137,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_consecutive_same_tags_does_not_flag_multiple_consecutive_note_tags
+  it 'consecutive same tags does not flag multiple consecutive note tags' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -146,7 +148,7 @@ class TagsOrderIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_consecutive_same_tags_does_not_flag_multiple_consecutive_example_tags
+  it 'consecutive same tags does not flag multiple consecutive example tags' do
     result = Yard::Lint.run(path: fixture_path, config:, progress: false)
 
     offenses = result.offenses.select do |o|
@@ -157,16 +159,16 @@ class TagsOrderIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_enforced_order_configuration_uses_the_full_default_order_from_config
+  it 'enforced order configuration uses the full default order from config' do
     defaults = Yard::Lint::Validators::Tags::Order::Config.defaults
     expected_order = %w[param option yield yieldparam yieldreturn return raise see example note todo]
 
     assert_equal(expected_order, defaults['EnforcedOrder'])
   end
 
-  def test_when_disabled_does_not_run_validation
+  it 'when disabled does not run validation' do
     disabled_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/Order', 'Enabled', false)
+      c.set_validator_config('Tags/Order', 'Enabled', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: disabled_config, progress: false)

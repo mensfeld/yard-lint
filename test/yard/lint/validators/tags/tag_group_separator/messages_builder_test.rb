@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTagGroupSeparatorMessagesBuilderTest < Minitest::Test
 
-  def test_call_with_single_missing_separator_generates_message_for_single_transition
+describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::MessagesBuilder' do
+  it 'call with single missing separator generates message for single transition' do
     offense = {
       method_name: 'call',
       separators: 'param->return'
@@ -16,7 +16,7 @@ class YardLintValidatorsTagsTagGroupSeparatorMessagesBuilderTest < Minitest::Tes
     )
   end
 
-  def test_call_with_multiple_missing_separators_generates_message_listing_all_transitions
+  it 'call with multiple missing separators generates message listing all transitions' do
     offense = {
       method_name: 'process',
       separators: 'param->return,return->error'
@@ -29,7 +29,7 @@ class YardLintValidatorsTagsTagGroupSeparatorMessagesBuilderTest < Minitest::Tes
     )
   end
 
-  def test_call_with_description_to_tag_transition_handles_description_group_in_message
+  it 'call with description to tag transition handles description group in message' do
     offense = {
       method_name: 'initialize',
       separators: 'description->param'

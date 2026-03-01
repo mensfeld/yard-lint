@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-require 'fileutils'
 require 'test_helper'
 
-class DiffModeIntegrationTest < Minitest::Test
-  attr_reader :config, :lib_dir, :test_dir
+require 'tmpdir'
+require 'fileutils'
 
-  def setup
+describe 'Diff Mode' do
+  attr_reader :test_dir, :lib_dir, :config
+
+
+  before do
     @test_dir = Dir.mktmpdir
     @lib_dir = File.join(test_dir, 'lib')
     @config = Yard::Lint::Config.new
@@ -20,11 +22,11 @@ class DiffModeIntegrationTest < Minitest::Test
     end
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(test_dir)
   end
 
-  def test_diff_mode_lints_only_changed_files
+  it 'diff mode lints only changed files' do
     # Create initial file and commit
     create_file('lib/old.rb', <<~RUBY)
       # Documented class
@@ -60,7 +62,7 @@ class DiffModeIntegrationTest < Minitest::Test
     assert(result.offenses.any? { |o| o[:location].include?('new.rb') })
   end
 
-  def test_diff_mode_auto_detects_main_branch_when_base_ref_is_nil
+  it 'diff mode auto detects main branch when base ref is nil' do
     create_file('lib/test.rb', 'class Test; end')
     git_commit('Initial commit')
 
@@ -77,7 +79,7 @@ class DiffModeIntegrationTest < Minitest::Test
     )
   end
 
-  def test_diff_mode_returns_clean_result_when_no_files_have_changed
+  it 'diff mode returns clean result when no files have changed' do
     create_file('lib/test.rb', <<~RUBY)
       # Documented class
       class Test
@@ -101,7 +103,7 @@ class DiffModeIntegrationTest < Minitest::Test
     assert_equal(0, result.count)
   end
 
-  def test_diff_mode_raises_git_error_when_git_command_fails
+  it 'diff mode raises git error when git command fails' do
     Yard::Lint::Git.stubs(:changed_files).raises(Yard::Lint::Git::Error, 'Not a git repository')
 
     assert_raises(Yard::Lint::Git::Error) do
@@ -114,7 +116,7 @@ class DiffModeIntegrationTest < Minitest::Test
     end
   end
 
-  def test_staged_mode_lints_only_staged_files
+  it 'staged mode lints only staged files' do
     # Create file but don't stage it
     create_file('lib/unstaged.rb', 'class Unstaged; end')
 
@@ -137,7 +139,7 @@ class DiffModeIntegrationTest < Minitest::Test
     assert(result.offenses.none? { |o| o[:location].include?('unstaged.rb') })
   end
 
-  def test_staged_mode_returns_clean_result_when_no_files_are_staged
+  it 'staged mode returns clean result when no files are staged' do
     create_file('lib/test.rb', 'class Test; end')
 
     # Mock empty staged files
@@ -154,7 +156,7 @@ class DiffModeIntegrationTest < Minitest::Test
     assert_equal(0, result.count)
   end
 
-  def test_changed_mode_lints_only_uncommitted_files
+  it 'changed mode lints only uncommitted files' do
     # Create and commit initial file
     create_file('lib/committed.rb', <<~RUBY)
       # Documented class
@@ -180,7 +182,7 @@ class DiffModeIntegrationTest < Minitest::Test
     assert(result.offenses.any? { |o| o[:location].include?('modified.rb') })
   end
 
-  def test_exclusion_patterns_with_diff_mode_applies_global_exclusions
+  it 'exclusion patterns with diff mode applies global exclusions' do
     create_file('lib/included.rb', 'class Included; end')
     create_file('spec/excluded.rb', 'class Excluded; end')
 
@@ -211,7 +213,7 @@ class DiffModeIntegrationTest < Minitest::Test
     assert(result.offenses.none? { |o| o[:location].include?('excluded.rb') })
   end
 
-  def test_path_filtering_with_diff_mode_only_lints_files_within_specified_path
+  it 'path filtering with diff mode only lints files within specified path' do
     create_file('lib/in_scope.rb', 'class InScope; end')
     create_file('app/out_of_scope.rb', 'class OutOfScope; end')
 
@@ -230,7 +232,7 @@ class DiffModeIntegrationTest < Minitest::Test
     )
   end
 
-  def test_invalid_diff_mode_raises_argumenterror_for_unknown_mode
+  it 'invalid diff mode raises argumenterror for unknown mode' do
     assert_raises(ArgumentError) do
       Yard::Lint.run(
         path: lib_dir,

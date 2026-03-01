@@ -2,30 +2,31 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleValidatorClassConfigTest < Minitest::Test
-  def test_enables_in_process_execution
+
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::Validator' do
+  it 'enables in process execution' do
     assert(Yard::Lint::Validators::Tags::ExampleStyle::Validator.in_process?)
   end
 
-  def test_uses_all_visibility
+  it 'uses all visibility' do
     assert_equal(:all, Yard::Lint::Validators::Tags::ExampleStyle::Validator.in_process_visibility)
   end
 
-  def test_inherits_from_base_validator
+  it 'inherits from base validator' do
     assert_equal(Yard::Lint::Validators::Base, Yard::Lint::Validators::Tags::ExampleStyle::Validator.superclass)
   end
 end
 
-class YardLintValidatorsTagsExampleStyleValidatorNoTagsTest < Minitest::Test
+describe 'YardLintValidatorsTagsExampleStyleValidatorNoTags' do
   attr_reader :config, :validator, :collector
 
-  def setup
+  before do
     @config = Yard::Lint::Config.new
     @validator = Yard::Lint::Validators::Tags::ExampleStyle::Validator.new(config, [])
     @collector = stub('collector')
   end
 
-  def test_does_not_output_anything_when_object_has_no_example_tags
+  it 'does not output anything when object has no example tags' do
     object = stub('object', has_tag?: false)
 
     collector.expects(:puts).never
@@ -33,16 +34,16 @@ class YardLintValidatorsTagsExampleStyleValidatorNoTagsTest < Minitest::Test
   end
 end
 
-class YardLintValidatorsTagsExampleStyleValidatorNoLinterTest < Minitest::Test
+describe 'YardLintValidatorsTagsExampleStyleValidatorNoLinter' do
   attr_reader :config, :validator, :collector
 
-  def setup
+  before do
     @config = Yard::Lint::Config.new
     @validator = Yard::Lint::Validators::Tags::ExampleStyle::Validator.new(config, [])
     @collector = stub('collector')
   end
 
-  def test_returns_early_without_processing_when_no_linter_is_available
+  it 'returns early without processing when no linter is available' do
     object = stub('object', has_tag?: true, tags: [])
 
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:detect).returns(:none)
@@ -52,10 +53,10 @@ class YardLintValidatorsTagsExampleStyleValidatorNoLinterTest < Minitest::Test
   end
 end
 
-class YardLintValidatorsTagsExampleStyleValidatorWithLinterTest < Minitest::Test
+describe 'YardLintValidatorsTagsExampleStyleValidatorWithLinter' do
   attr_reader :config, :validator, :collector, :example_tag, :object
 
-  def setup
+  before do
     @config = Yard::Lint::Config.new
     @validator = Yard::Lint::Validators::Tags::ExampleStyle::Validator.new(config, [])
     @collector = stub('collector', puts: nil)
@@ -71,7 +72,7 @@ class YardLintValidatorsTagsExampleStyleValidatorWithLinterTest < Minitest::Test
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:detect).returns(:rubocop)
   end
 
-  def test_processes_examples_and_outputs_offenses
+  it 'processes examples and outputs offenses' do
     runner = stub('runner')
     offenses = [
       {
@@ -95,7 +96,7 @@ class YardLintValidatorsTagsExampleStyleValidatorWithLinterTest < Minitest::Test
     validator.in_process_query(object, collector)
   end
 
-  def test_uses_default_example_name_when_name_is_nil
+  it 'uses default example name when name is nil' do
     unnamed_example = stub('example', text: 'user = User.new', name: nil)
     obj = stub(
       'object',
@@ -113,7 +114,7 @@ class YardLintValidatorsTagsExampleStyleValidatorWithLinterTest < Minitest::Test
     validator.in_process_query(obj, collector)
   end
 
-  def test_skips_examples_with_nil_or_empty_code
+  it 'skips examples with nil or empty code' do
     nil_example = stub('example', text: nil, name: 'Nil example')
     empty_example = stub('example', text: '', name: 'Empty example')
     obj = stub(
@@ -132,7 +133,7 @@ class YardLintValidatorsTagsExampleStyleValidatorWithLinterTest < Minitest::Test
     validator.in_process_query(obj, collector)
   end
 
-  def test_passes_configuration_to_runner
+  it 'passes configuration to runner' do
     config_hash = {
       'Tags/ExampleStyle' => {
         'DisabledCops' => ['Style/FrozenStringLiteralComment'],

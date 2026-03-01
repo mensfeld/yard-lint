@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsCollectionTypeParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::CollectionType::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::CollectionType::Parser.new
   end
 
-  def test_call_with_valid_yard_output_parses_violations_correctly_with_short_style_detected
+  it 'call with valid yard output parses violations correctly with short style detected' do
     output = <<~OUTPUT
       spec/fixtures/collection_type_examples.rb:25: InvalidHashSyntax#process
       param|Hash<Symbol, String>|short
@@ -38,7 +39,7 @@ class YardLintValidatorsTagsCollectionTypeParserTest < Minitest::Test
     assert_equal('short', result[1][:detected_style])
   end
 
-  def test_call_with_valid_yard_output_parses_violations_correctly_with_long_style_detected
+  it 'call with valid yard output parses violations correctly with long style detected' do
     output = <<~OUTPUT
       spec/fixtures/collection_type_examples.rb:42: ValidHashSyntax#process
       param|Hash{Symbol => String}|long
@@ -57,19 +58,19 @@ class YardLintValidatorsTagsCollectionTypeParserTest < Minitest::Test
     assert_equal('long', result[0][:detected_style])
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_nil
+  it 'call with empty output returns empty array for nil' do
     assert_equal([], parser.call(nil))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_empty_string
+  it 'call with empty output returns empty array for empty string' do
     assert_equal([], parser.call(''))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_whitespace_only
+  it 'call with empty output returns empty array for whitespace only' do
     assert_equal([], parser.call("  \n  \t  "))
   end
 
-  def test_call_with_malformed_output_skips_lines_without_proper_format
+  it 'call with malformed output skips lines without proper format' do
     output = <<~OUTPUT
       spec/fixtures/test.rb:10: Test#method
       param|Hash<K, V>|short
@@ -81,7 +82,7 @@ class YardLintValidatorsTagsCollectionTypeParserTest < Minitest::Test
     assert_equal(1, result.size)
   end
 
-  def test_call_with_malformed_output_skips_incomplete_violation_pairs
+  it 'call with malformed output skips incomplete violation pairs' do
     output = "spec/fixtures/test.rb:10: Test#method\n"
     result = parser.call(output)
     assert_equal([], result)

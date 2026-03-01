@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class TypeSyntaxValidationIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Type Syntax' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/type_syntax_examples.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
+      c.set_validator_config('Tags/TypeSyntax', 'Enabled', true)
     end
   end
 
-  def test_detecting_type_syntax_errors_detects_unclosed_bracket_in_param_tag
+  it 'detecting type syntax errors detects unclosed bracket in param tag' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find do |o|
@@ -26,7 +28,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '@param')
   end
 
-  def test_detecting_type_syntax_errors_detects_empty_generic_in_return_tag
+  it 'detecting type syntax errors detects empty generic in return tag' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find do |o|
@@ -37,7 +39,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '@return')
   end
 
-  def test_detecting_type_syntax_errors_detects_unclosed_hash_syntax
+  it 'detecting type syntax errors detects unclosed hash syntax' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find do |o|
@@ -48,7 +50,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_includes(offense[:message], 'Invalid type syntax')
   end
 
-  def test_detecting_type_syntax_errors_detects_malformed_hash_syntax
+  it 'detecting type syntax errors detects malformed hash syntax' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find do |o|
@@ -58,7 +60,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     refute_nil(offense)
   end
 
-  def test_detecting_type_syntax_errors_does_not_flag_valid_type_syntax
+  it 'detecting type syntax errors does not flag valid type syntax' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # Should not flag valid_types method
@@ -69,7 +71,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_nil(valid_offense)
   end
 
-  def test_detecting_type_syntax_errors_does_not_flag_multiple_types_union_syntax
+  it 'detecting type syntax errors does not flag multiple types union syntax' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # Should not flag multiple_types method
@@ -80,7 +82,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_nil(union_offense)
   end
 
-  def test_detecting_type_syntax_errors_does_not_flag_nested_generics
+  it 'detecting type syntax errors does not flag nested generics' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # Should not flag nested_generics method
@@ -91,9 +93,9 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_nil(nested_offense)
   end
 
-  def test_validator_configuration_when_typesyntax_validator_is_disabled_does_not_report_type_syntax_violations
+  it 'validator configuration when typesyntax validator is disabled does not report type syntax violations' do
     disabled_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', false)
+      c.set_validator_config('Tags/TypeSyntax', 'Enabled', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: disabled_config, progress: false)
@@ -103,10 +105,10 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_empty(type_syntax_offenses)
   end
 
-  def test_validator_configuration_when_validatedtags_is_customized_only_validates_specified_tags
+  it 'validator configuration when validatedtags is customized only validates specified tags' do
     custom_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/TypeSyntax', 'ValidatedTags', ['return'])
+      c.set_validator_config('Tags/TypeSyntax', 'Enabled', true)
+      c.set_validator_config('Tags/TypeSyntax', 'ValidatedTags', ['return'])
     end
 
     result = Yard::Lint.run(path: fixture_path, config: custom_config, progress: false)
@@ -121,7 +123,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_empty(param_offenses)
   end
 
-  def test_offense_details_includes_file_path_in_location
+  it 'offense details includes file path in location' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find { |o| o[:name] == 'InvalidTypeSyntax' }
@@ -130,7 +132,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     refute_empty(offense[:location])
   end
 
-  def test_offense_details_includes_line_number
+  it 'offense details includes line number' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find { |o| o[:name] == 'InvalidTypeSyntax' }
@@ -138,7 +140,7 @@ class TypeSyntaxValidationIntegrationTest < Minitest::Test
     assert_operator(offense[:location_line], :>, 0)
   end
 
-  def test_offense_details_includes_descriptive_message_with_error_details
+  it 'offense details includes descriptive message with error details' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find { |o| o[:name] == 'InvalidTypeSyntax' }

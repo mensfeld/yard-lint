@@ -1,23 +1,25 @@
 # frozen_string_literal: true
 
-require 'tempfile'
 require 'test_helper'
 
-class UnknownParameterNameIntegrationTest < Minitest::Test
-  attr_reader :config, :temp_file
+require 'tempfile'
 
-  def setup
+describe 'Unknown Parameter Name' do
+  attr_reader :temp_file, :config
+
+
+  before do
     @temp_file = Tempfile.new(['test', '.rb'])
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Warnings/UnknownParameterName', 'Enabled', true)
+      c.set_validator_config('Warnings/UnknownParameterName', 'Enabled', true)
     end
   end
 
-  def teardown
+  after do
     temp_file.unlink
   end
 
-  def test_when_param_documents_non_existent_parameter_reports_offense
+  it 'when param documents non existent parameter reports offense' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -42,7 +44,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(offense[:message], 'current')
   end
 
-  def test_when_param_documents_splat_parameter_reports_offense_for_dots
+  it 'when param documents splat parameter reports offense for dots' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -70,7 +72,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '...')
   end
 
-  def test_when_method_has_correct_param_tags_does_not_report_any_offense
+  it 'when method has correct param tags does not report any offense' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -92,7 +94,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_empty(offenses)
   end
 
-  def test_when_documenting_star_args_parameter_reports_offense
+  it 'when documenting star args parameter reports offense' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -119,7 +121,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(offense[:message], '*args')
   end
 
-  def test_location_reporting_reports_all_offenses_with_correct_file_paths
+  it 'location reporting reports all offenses with correct file paths' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -163,7 +165,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_equal([7, 13, 19], offenses.map { |o| o[:location_line] }.sort)
   end
 
-  def test_did_you_mean_when_parameter_name_is_a_typo_suggests_the_correct_parameter_name
+  it 'did you mean when parameter name is a typo suggests the correct parameter name' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -187,7 +189,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean 'user_name'?")
   end
 
-  def test_did_you_mean_when_parameter_name_changed_during_refactoring_suggests_similar_for_first
+  it 'did you mean when parameter name changed during refactoring suggests similar for first' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -213,7 +215,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(old_value_offense[:message], "did you mean 'new_value'?")
   end
 
-  def test_did_you_mean_when_parameter_name_changed_during_refactoring_suggests_similar_for_second
+  it 'did you mean when parameter name changed during refactoring suggests similar for second' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -237,7 +239,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(old_count_offense[:message], "did you mean 'new_count'?")
   end
 
-  def test_did_you_mean_when_parameter_name_is_completely_different_does_not_suggest
+  it 'did you mean when parameter name is completely different does not suggest' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -261,7 +263,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     refute_includes(offense[:message], 'did you mean')
   end
 
-  def test_did_you_mean_when_method_has_multiple_parameters_suggests_closest_matching
+  it 'did you mean when method has multiple parameters suggests closest matching' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -287,7 +289,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(offense[:message], "did you mean 'user'?")
   end
 
-  def test_did_you_mean_with_keyword_arguments_suggests_correct_keyword_parameter_names
+  it 'did you mean with keyword arguments suggests correct keyword parameter names' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 
@@ -316,7 +318,7 @@ class UnknownParameterNameIntegrationTest < Minitest::Test
     assert_includes(emai_offense[:message], "did you mean 'email'?")
   end
 
-  def test_did_you_mean_with_splat_and_block_parameters_suggests_names_without_special_chars
+  it 'did you mean with splat and block parameters suggests names without special chars' do
     temp_file.write(<<~RUBY)
       # frozen_string_literal: true
 

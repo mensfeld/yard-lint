@@ -2,29 +2,30 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::ExampleSyntax::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::ExampleSyntax::Parser.new
   end
 
-  def test_initialize_inherits_from_parser_base_class
+  it 'initialize inherits from parser base class' do
     assert_kind_of(Yard::Lint::Parsers::Base, parser)
   end
 
-  def test_call_parses_input_and_returns_array
+  it 'call parses input and returns array' do
     result = parser.call('')
     assert_kind_of(Array, result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
     assert_equal([], result)
   end
 
-  def test_call_parses_syntax_error_output_correctly
+  it 'call parses syntax error output correctly' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       syntax_error
@@ -48,7 +49,7 @@ class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
     )
   end
 
-  def test_call_parses_multi_line_syntax_error_output_correctly
+  it 'call parses multi line syntax error output correctly' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       syntax_error
@@ -75,7 +76,7 @@ class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
     )
   end
 
-  def test_call_parses_multiple_errors_correctly
+  it 'call parses multiple errors correctly' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method1
       syntax_error
@@ -94,12 +95,12 @@ class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
     assert_equal('another error', result[1][:error_message])
   end
 
-  def test_call_handles_nil_input
+  it 'call handles nil input' do
     result = parser.call(nil)
     assert_equal([], result)
   end
 
-  def test_call_ignores_lines_that_do_not_match_location_pattern
+  it 'call ignores lines that do not match location pattern' do
     output = <<~OUTPUT
       random text
       more random text
@@ -114,7 +115,7 @@ class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
     assert_equal('Example#method', result[0][:object_name])
   end
 
-  def test_call_skips_errors_without_syntax_error_status
+  it 'call skips errors without syntax error status' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       other_error
@@ -126,7 +127,7 @@ class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_call_handles_file_paths_starting_with_dot
+  it 'call handles file paths starting with dot' do
     output = <<~OUTPUT
       ./lib/example.rb:10: Example#method
       syntax_error
@@ -139,7 +140,7 @@ class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
     assert_equal('./lib/example.rb', result[0][:location])
   end
 
-  def test_call_handles_file_paths_starting_with_slash
+  it 'call handles file paths starting with slash' do
     output = <<~OUTPUT
       /home/user/lib/example.rb:10: Example#method
       syntax_error
@@ -152,7 +153,7 @@ class YardLintValidatorsTagsExampleSyntaxParserTest < Minitest::Test
     assert_equal('/home/user/lib/example.rb', result[0][:location])
   end
 
-  def test_call_does_not_match_compiled_as_file_path
+  it 'call does not match compiled as file path' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       syntax_error

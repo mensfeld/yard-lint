@@ -2,15 +2,17 @@
 
 require 'test_helper'
 
-class DocumentationCoverageIntegrationTest < Minitest::Test
+
+describe 'Yard::Lint::StatsCoverageIntegration' do
   attr_reader :temp_dir, :config_file
 
-  def setup
+
+  before do
     @temp_dir = Dir.mktmpdir('yard-lint-coverage-test')
     @config_file = File.join(@temp_dir, '.yard-lint.yml')
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(@temp_dir)
   end
 
@@ -36,7 +38,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     file_path
   end
 
-  def test_basic_coverage_calculates_100_percent_for_fully_documented_code
+  it 'basic coverage calculates 100 percent for fully documented code' do
     file = create_test_file('documented.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -65,7 +67,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(100.0, coverage[:coverage])
   end
 
-  def test_basic_coverage_calculates_partial_coverage_for_mixed_documentation
+  it 'basic coverage calculates partial coverage for mixed documentation' do
     file = create_test_file('mixed.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -96,7 +98,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_in_delta(50.0, coverage[:coverage], 0.01)
   end
 
-  def test_basic_coverage_calculates_0_percent_for_undocumented_code
+  it 'basic coverage calculates 0 percent for undocumented code' do
     file = create_test_file('undocumented.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -116,7 +118,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(0.0, coverage[:coverage])
   end
 
-  def test_excluded_methods_respects_config
+  it 'excluded methods respects config' do
     # Create config with ExcludedMethods
     config_content = <<~YAML
       AllValidators:
@@ -160,7 +162,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(1, coverage[:documented]) # Just the class
   end
 
-  def test_min_coverage_passes_when_meets_minimum_threshold
+  it 'min coverage passes when meets minimum threshold' do
     test_file = create_test_file('coverage_test.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -186,7 +188,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     # Since we have 1 undocumented method but meet coverage threshold
   end
 
-  def test_min_coverage_fails_when_below_minimum_threshold
+  it 'min coverage fails when below minimum threshold' do
     test_file = create_test_file('coverage_test.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -211,7 +213,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(1, result.exit_code)
   end
 
-  def test_min_coverage_uses_config_file_setting
+  it 'min coverage uses config file setting' do
     test_file = create_test_file('coverage_test.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -244,7 +246,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(1, result.exit_code)
   end
 
-  def test_min_coverage_cli_overrides_config_file
+  it 'min coverage cli overrides config file' do
     test_file = create_test_file('coverage_test.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -281,7 +283,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     # Still fails due to offenses, but not due to coverage
   end
 
-  def test_empty_file_handling_returns_nil_for_empty_file_list
+  it 'empty file handling returns nil for empty file list' do
     result = Yard::Lint.run(
       path: [],
       config: Yard::Lint::Config.new,
@@ -292,7 +294,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_nil(coverage) # No files means no coverage to calculate
   end
 
-  def test_empty_file_handling_handles_files_with_no_documentable_objects
+  it 'empty file handling handles files with no documentable objects' do
     file = create_test_file('empty.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -308,7 +310,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(100.0, coverage[:coverage]) # Empty = 100% by convention
   end
 
-  def test_multiple_files_calculates_aggregate_coverage
+  it 'multiple files calculates aggregate coverage' do
     file1 = create_test_file('file1.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -344,7 +346,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(50.0, coverage[:coverage])
   end
 
-  def test_module_coverage_includes_modules_in_calculation
+  it 'module coverage includes modules in calculation' do
     file = create_test_file('modules.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -371,7 +373,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(100.0, coverage[:coverage])
   end
 
-  def test_module_coverage_handles_nested_undocumented_structures
+  it 'module coverage handles nested undocumented structures' do
     file = create_test_file('nested.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -398,7 +400,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(0.0, coverage[:coverage])
   end
 
-  def test_exit_code_exits_0_when_coverage_meets_threshold_and_no_offenses
+  it 'exit code exits 0 when coverage meets threshold and no offenses' do
     clean_file = create_test_file('clean.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -425,7 +427,7 @@ class DocumentationCoverageIntegrationTest < Minitest::Test
     assert_equal(100.0, coverage[:coverage])
   end
 
-  def test_exit_code_exits_1_when_coverage_below_threshold
+  it 'exit code exits 1 when coverage below threshold' do
     undoc_file = create_test_file('undoc.rb', <<~RUBY)
       # frozen_string_literal: true
 

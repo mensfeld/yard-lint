@@ -2,32 +2,34 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationMissingReturnResultTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::MissingReturn::Result' do
   attr_reader :config, :parsed_data, :result
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @parsed_data = []
     @result = Yard::Lint::Validators::Documentation::MissingReturn::Result.new(@parsed_data, @config)
   end
 
-  def test_initialize_inherits_from_results_base
+  it 'initialize inherits from results base' do
     assert_kind_of(Yard::Lint::Results::Base, result)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(config, result.instance_variable_get(:@config))
   end
 
-  def test_offenses_returns_an_array
+  it 'offenses returns an array' do
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_offenses_handles_empty_parsed_data
+  it 'offenses handles empty parsed data' do
     assert_equal([], result.offenses)
   end
 
-  def test_offenses_with_parsed_data_builds_offenses_from_parsed_data
+  it 'offenses with parsed data builds offenses from parsed data' do
     parsed_data = [
       {
         location: 'lib/example.rb',
@@ -44,7 +46,7 @@ class YardLintValidatorsDocumentationMissingReturnResultTest < Minitest::Test
     assert_equal('MissingReturnTag', offenses.first[:name])
   end
 
-  def test_offenses_with_parsed_data_includes_message_from_messagesbuilder
+  it 'offenses with parsed data includes message from messagesbuilder' do
     parsed_data = [
       {
         location: 'lib/example.rb',
@@ -58,7 +60,7 @@ class YardLintValidatorsDocumentationMissingReturnResultTest < Minitest::Test
     assert_includes(offenses.first[:message], 'Missing @return tag for `Calculator#add`')
   end
 
-  def test_offenses_with_parsed_data_sets_offense_type_to_line
+  it 'offenses with parsed data sets offense type to line' do
     parsed_data = [
       {
         location: 'lib/example.rb',
@@ -72,7 +74,7 @@ class YardLintValidatorsDocumentationMissingReturnResultTest < Minitest::Test
     assert_equal('line', offenses.first[:type])
   end
 
-  def test_offenses_with_parsed_data_sets_default_severity_to_warning
+  it 'offenses with parsed data sets default severity to warning' do
     parsed_data = [
       {
         location: 'lib/example.rb',
@@ -86,31 +88,31 @@ class YardLintValidatorsDocumentationMissingReturnResultTest < Minitest::Test
     assert_equal('warning', offenses.first[:severity])
   end
 
-  def test_class_methods_defines_default_severity
+  it 'class methods defines default severity' do
     assert_respond_to(Yard::Lint::Validators::Documentation::MissingReturn::Result, :default_severity)
   end
 
-  def test_class_methods_defines_offense_type
+  it 'class methods defines offense type' do
     assert_respond_to(Yard::Lint::Validators::Documentation::MissingReturn::Result, :offense_type)
   end
 
-  def test_class_methods_defines_offense_name
+  it 'class methods defines offense name' do
     assert_respond_to(Yard::Lint::Validators::Documentation::MissingReturn::Result, :offense_name)
   end
 
-  def test_class_methods_returns_warning_as_default_severity
+  it 'class methods returns warning as default severity' do
     assert_equal('warning', Yard::Lint::Validators::Documentation::MissingReturn::Result.default_severity)
   end
 
-  def test_class_methods_returns_line_as_offense_type
+  it 'class methods returns line as offense type' do
     assert_equal('line', Yard::Lint::Validators::Documentation::MissingReturn::Result.offense_type)
   end
 
-  def test_class_methods_returns_missingreturntag_as_offense_name
+  it 'class methods returns missingreturntag as offense name' do
     assert_equal('MissingReturnTag', Yard::Lint::Validators::Documentation::MissingReturn::Result.offense_name)
   end
 
-  def test_build_message_delegates_to_messagesbuilder
+  it 'build message delegates to messagesbuilder' do
     offense = { element: 'Example#method' }
 
     Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder

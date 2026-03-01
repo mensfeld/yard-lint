@@ -2,34 +2,35 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTagGroupSeparatorParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::TagGroupSeparator::Parser.new
   end
 
-  def test_initialize_inherits_from_parser_base_class
+  it 'initialize inherits from parser base class' do
     assert_kind_of(Yard::Lint::Parsers::Base, parser)
   end
 
-  def test_call_parses_input_and_returns_array
+  it 'call parses input and returns array' do
     result = parser.call('')
     assert_kind_of(Array, result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
     assert_equal([], result)
   end
 
-  def test_call_handles_nil_input
+  it 'call handles nil input' do
     result = parser.call(nil)
     assert_equal([], result)
   end
 
-  def test_call_with_valid_entries_filters_out_valid_entries
+  it 'call with valid entries filters out valid entries' do
     input = <<~OUTPUT
       lib/example.rb:10: Example#method
       valid
@@ -39,7 +40,7 @@ class YardLintValidatorsTagsTagGroupSeparatorParserTest < Minitest::Test
     assert_empty(result)
   end
 
-  def test_call_with_offense_entries_parses_offense_entries
+  it 'call with offense entries parses offense entries' do
     input = <<~OUTPUT
       lib/example.rb:10: Example#method
       param->return
@@ -53,7 +54,7 @@ class YardLintValidatorsTagsTagGroupSeparatorParserTest < Minitest::Test
     assert_equal('param->return', result.first[:separators])
   end
 
-  def test_call_with_multiple_offenses_parses_all_offense_entries
+  it 'call with multiple offenses parses all offense entries' do
     input = <<~OUTPUT
       lib/example.rb:10: Example#method1
       param->return

@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationMissingReturnConfigTest < Minitest::Test
-  def test_id_returns_the_validator_identifier
+
+describe 'Yard::Lint::Validators::Documentation::MissingReturn::Config' do
+  it 'id returns the validator identifier' do
     assert_equal(
       :missing_return,
       Yard::Lint::Validators::Documentation::MissingReturn::Config.id
     )
   end
 
-  def test_defaults_returns_default_configuration
+  it 'defaults returns default configuration' do
     assert_equal(
       {
         'Enabled' => false,
@@ -21,26 +22,26 @@ class YardLintValidatorsDocumentationMissingReturnConfigTest < Minitest::Test
     )
   end
 
-  def test_defaults_returns_frozen_hash
+  it 'defaults returns frozen hash' do
     assert_predicate(Yard::Lint::Validators::Documentation::MissingReturn::Config.defaults, :frozen?)
   end
 
-  def test_defaults_disables_validator_by_default_opt_in
+  it 'defaults disables validator by default opt in' do
     assert_equal(false, Yard::Lint::Validators::Documentation::MissingReturn::Config.defaults['Enabled'])
   end
 
-  def test_defaults_excludes_initialize_methods_by_default
+  it 'defaults excludes initialize methods by default' do
     assert_includes(
       Yard::Lint::Validators::Documentation::MissingReturn::Config.defaults['ExcludedMethods'],
       'initialize'
     )
   end
 
-  def test_combines_with_returns_empty_array_for_standalone_validator
+  it 'combines with returns empty array for standalone validator' do
     assert_equal([], Yard::Lint::Validators::Documentation::MissingReturn::Config.combines_with)
   end
 
-  def test_inheritance_inherits_from_base_config_class
+  it 'inheritance inherits from base config class' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Documentation::MissingReturn::Config.superclass

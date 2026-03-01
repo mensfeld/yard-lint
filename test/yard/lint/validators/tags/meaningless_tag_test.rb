@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsMeaninglessTagTest < Minitest::Test
 
-  def test_has_all_required_components
+describe 'Yard::Lint::Validators::Tags::MeaninglessTag' do
+  it 'has all required components' do
   assert(defined?(Yard::Lint::Validators::Tags::MeaninglessTag))
   assert(defined?(Yard::Lint::Validators::Tags::MeaninglessTag::Config))
   assert(defined?(Yard::Lint::Validators::Tags::MeaninglessTag::Parser))

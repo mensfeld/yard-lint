@@ -2,43 +2,44 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationMissingReturnMessagesBuilderTest < Minitest::Test
-  def test_call_builds_message_for_instance_method
+
+describe 'Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder' do
+  it 'call builds message for instance method' do
     offense = { element: 'Calculator#add' }
     message = Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder.call(offense)
 
     assert_equal('Missing @return tag for `Calculator#add`', message)
   end
 
-  def test_call_builds_message_for_class_method
+  it 'call builds message for class method' do
     offense = { element: 'Calculator.new' }
     message = Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder.call(offense)
 
     assert_equal('Missing @return tag for `Calculator.new`', message)
   end
 
-  def test_call_builds_message_for_namespaced_class_instance_method
+  it 'call builds message for namespaced class instance method' do
     offense = { element: 'Foo::Bar::Baz#method' }
     message = Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder.call(offense)
 
     assert_equal('Missing @return tag for `Foo::Bar::Baz#method`', message)
   end
 
-  def test_call_builds_message_for_method_with_special_characters
+  it 'call builds message for method with special characters' do
     offense = { element: 'Example#valid?' }
     message = Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder.call(offense)
 
     assert_equal('Missing @return tag for `Example#valid?`', message)
   end
 
-  def test_call_includes_element_name_in_backticks
+  it 'call includes element name in backticks' do
     offense = { element: 'MyClass#my_method' }
     message = Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder.call(offense)
 
     assert_includes(message, '`MyClass#my_method`')
   end
 
-  def test_call_starts_with_missing_return_tag_for
+  it 'call starts with missing return tag for' do
     offense = { element: 'AnyClass#any_method' }
     message = Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder.call(offense)
 

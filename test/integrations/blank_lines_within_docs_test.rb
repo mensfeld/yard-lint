@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
-require 'tempfile'
 require 'test_helper'
 
-class BlankLinesWithinDocsTest < Minitest::Test
+require 'tempfile'
+
+describe 'Blank Lines Within Docs' do
   attr_reader :config
 
-  def setup
+
+  before do
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
     end
   end
 
-  def test_correctly_counts_only_blank_lines_after_the_last_doc_comment
+  it 'correctly counts only blank lines after the last doc comment' do
     fixture = Tempfile.new(['method_internal_blanks', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -93,7 +95,7 @@ class BlankLinesWithinDocsTest < Minitest::Test
     fixture.unlink
   end
 
-  def test_handles_multiple_consecutive_blank_lines_within_documentation
+  it 'handles multiple consecutive blank lines within documentation' do
     fixture = Tempfile.new(['multi_internal_blanks', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -127,7 +129,7 @@ class BlankLinesWithinDocsTest < Minitest::Test
     fixture.unlink
   end
 
-  def test_detects_blank_lines_after_class_documentation
+  it 'detects blank lines after class documentation' do
     fixture = Tempfile.new(['class_blanks', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -178,7 +180,7 @@ class BlankLinesWithinDocsTest < Minitest::Test
     fixture.unlink
   end
 
-  def test_detects_blank_lines_after_module_documentation
+  it 'detects blank lines after module documentation' do
     fixture = Tempfile.new(['module_blanks', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -231,7 +233,7 @@ class BlankLinesWithinDocsTest < Minitest::Test
     fixture.unlink
   end
 
-  def test_detects_blank_lines_after_constant_documentation
+  it 'detects blank lines after constant documentation' do
     fixture = Tempfile.new(['constant_blanks', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -281,7 +283,7 @@ class BlankLinesWithinDocsTest < Minitest::Test
     fixture.unlink
   end
 
-  def test_handles_magic_comments_with_blank_lines_in_docs_correctly
+  it 'handles magic comments with blank lines in docs correctly' do
     fixture = Tempfile.new(['magic_with_doc_blanks', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -325,7 +327,7 @@ class BlankLinesWithinDocsTest < Minitest::Test
     fixture.unlink
   end
 
-  def test_handles_documentation_with_only_blank_lines_no_tags
+  it 'handles documentation with only blank lines no tags' do
     fixture = Tempfile.new(['simple_doc_blanks', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true
@@ -361,7 +363,7 @@ class BlankLinesWithinDocsTest < Minitest::Test
     fixture.unlink
   end
 
-  def test_does_not_count_comment_only_lines_within_docs_as_blanks
+  it 'does not count comment only lines within docs as blanks' do
     fixture = Tempfile.new(['comment_separator', '.rb'])
     fixture.write(<<~RUBY)
       # frozen_string_literal: true

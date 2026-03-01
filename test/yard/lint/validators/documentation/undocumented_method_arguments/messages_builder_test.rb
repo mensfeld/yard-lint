@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationUndocumentedMethodArgumentsMessagesBuilderTest < Minitest::Test
-  def test_call_builds_message_for_undocumented_method_arguments
+
+describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::MessagesBuilder' do
+  it 'call builds message for undocumented method arguments' do
     offense = { method_name: 'calculate' }
 
     message = Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::MessagesBuilder.call(offense)
@@ -14,7 +15,7 @@ class YardLintValidatorsDocumentationUndocumentedMethodArgumentsMessagesBuilderT
     )
   end
 
-  def test_call_builds_message_for_instance_method
+  it 'call builds message for instance method' do
     offense = { method_name: 'MyClass#process' }
 
     message = Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::MessagesBuilder.call(offense)

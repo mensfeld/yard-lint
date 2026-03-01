@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleMessagesBuilderTest < Minitest::Test
 
-  def test_call_builds_message_with_all_offense_details
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::MessagesBuilder' do
+  it 'call builds message with all offense details' do
     offense = {
       object_name: 'User#initialize',
       example_name: 'Basic usage',
@@ -20,7 +20,7 @@ class YardLintValidatorsTagsExampleStyleMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_handles_different_cop_names
+  it 'call handles different cop names' do
     offense = {
       object_name: 'User#save',
       example_name: 'Saving user',
@@ -33,7 +33,7 @@ class YardLintValidatorsTagsExampleStyleMessagesBuilderTest < Minitest::Test
     assert_includes(message, 'Space inside parentheses detected')
   end
 
-  def test_call_handles_example_names_with_special_characters
+  it 'call handles example names with special characters' do
     offense = {
       object_name: 'User#find',
       example_name: 'Finding user (with options)',

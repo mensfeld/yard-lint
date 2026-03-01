@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Multi Validator Comprehensive' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('fixtures/multi_validator_comprehensive.rb', __dir__)
   end
 
@@ -15,7 +17,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     @config = test_config
   end
 
-  def test_with_default_configuration_detects_multiple_types_of_offenses_simultaneously
+  it 'with default configuration detects multiple types of offenses simultaneously' do
     setup_default_config
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -28,7 +30,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     assert_operator(result.count, :>, 5)
   end
 
-  def test_with_default_configuration_finds_offenses_across_multiple_scenarios_in_the_fixture
+  it 'with default configuration finds offenses across multiple scenarios in the fixture' do
     setup_default_config
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -38,7 +40,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     assert_operator(lines_with_issues.size, :>=, 5)
   end
 
-  def test_with_default_configuration_handles_kitchen_sink_method_with_many_issues
+  it 'with default configuration handles kitchen sink method with many issues' do
     setup_default_config
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -55,15 +57,15 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
 
   def setup_multiple_validators
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/Order', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
-      c.send(:set_validator_config, 'Warnings/UnknownParameterName', 'Enabled', true)
-      c.send(:set_validator_config, 'Warnings/DuplicatedParameterName', 'Enabled', true)
-      c.send(:set_validator_config, 'Warnings/UnknownTag', 'Enabled', true)
+      c.set_validator_config('Tags/Order', 'Enabled', true)
+      c.set_validator_config('Tags/TypeSyntax', 'Enabled', true)
+      c.set_validator_config('Warnings/UnknownParameterName', 'Enabled', true)
+      c.set_validator_config('Warnings/DuplicatedParameterName', 'Enabled', true)
+      c.set_validator_config('Warnings/UnknownTag', 'Enabled', true)
     end
   end
 
-  def test_multiple_validators_enabled_together_runs_all_enabled_validators_and_finds_multiple_issue_types
+  it 'multiple validators enabled together runs all enabled validators and finds multiple issue types' do
     setup_multiple_validators
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -75,7 +77,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     assert_includes(offense_names, 'UnknownParameterName')
   end
 
-  def test_multiple_validators_enabled_together_detects_duplicate_parameter_names
+  it 'multiple validators enabled together detects duplicate parameter names' do
     setup_multiple_validators
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -84,7 +86,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     refute_empty(duplicated)
   end
 
-  def test_multiple_validators_enabled_together_detects_unknown_tags
+  it 'multiple validators enabled together detects unknown tags' do
     setup_multiple_validators
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -97,12 +99,12 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
 
   def setup_type_validators
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/InvalidTypes', 'Enabled', true)
+      c.set_validator_config('Tags/TypeSyntax', 'Enabled', true)
+      c.set_validator_config('Tags/InvalidTypes', 'Enabled', true)
     end
   end
 
-  def test_type_validation_validators_together_runs_both_type_validators_without_conflicts
+  it 'type validation validators together runs both type validators without conflicts' do
     setup_type_validators
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -116,7 +118,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     assert_kind_of(Array, invalid_types)
   end
 
-  def test_type_validation_validators_together_finds_multiple_type_syntax_errors
+  it 'type validation validators together finds multiple type syntax errors' do
     setup_type_validators
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -128,9 +130,9 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
 
   # -- Documentation validators together --
 
-  def test_documentation_validators_together_detects_missing_method_argument_documentation
+  it 'documentation validators together detects missing method argument documentation' do
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedMethodArguments', 'Enabled', true)
+      c.set_validator_config('Documentation/UndocumentedMethodArguments', 'Enabled', true)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -144,18 +146,18 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
 
   def setup_many_validators
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/Order', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/TypeSyntax', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/InvalidTypes', 'Enabled', true)
-      c.send(:set_validator_config, 'Warnings/UnknownParameterName', 'Enabled', true)
-      c.send(:set_validator_config, 'Warnings/DuplicatedParameterName', 'Enabled', true)
-      c.send(:set_validator_config, 'Warnings/UnknownTag', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects', 'Enabled', true)
-      c.send(:set_validator_config, 'Documentation/UndocumentedMethodArguments', 'Enabled', true)
+      c.set_validator_config('Tags/Order', 'Enabled', true)
+      c.set_validator_config('Tags/TypeSyntax', 'Enabled', true)
+      c.set_validator_config('Tags/InvalidTypes', 'Enabled', true)
+      c.set_validator_config('Warnings/UnknownParameterName', 'Enabled', true)
+      c.set_validator_config('Warnings/DuplicatedParameterName', 'Enabled', true)
+      c.set_validator_config('Warnings/UnknownTag', 'Enabled', true)
+      c.set_validator_config('Documentation/UndocumentedObjects', 'Enabled', true)
+      c.set_validator_config('Documentation/UndocumentedMethodArguments', 'Enabled', true)
     end
   end
 
-  def test_performance_with_many_validators_completes_analysis_in_reasonable_time
+  it 'performance with many validators completes analysis in reasonable time' do
     setup_many_validators
 
     start_time = Time.now
@@ -166,7 +168,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     assert_operator(result.count, :>, 5)
   end
 
-  def test_performance_with_many_validators_finds_offenses_from_multiple_validator_categories
+  it 'performance with many validators finds offenses from multiple validator categories' do
     setup_many_validators
 
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -184,7 +186,7 @@ class MultiValidatorComprehensiveIntegrationTest < Minitest::Test
     assert_equal(true, has_documentation)
   end
 
-  def test_performance_with_many_validators_produces_consistent_results_across_runs
+  it 'performance with many validators produces consistent results across runs' do
     setup_many_validators
 
     result1 = Yard::Lint.run(path: fixture_path, config: config, progress: false)

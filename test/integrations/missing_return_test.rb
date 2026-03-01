@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-require 'fileutils'
 require 'test_helper'
 
-class MissingReturnValidatorTest < Minitest::Test
-  def setup
+require 'tmpdir'
+require 'fileutils'
+
+describe 'Missing Return' do
+  attr_reader :test_dir
+
+  before do
     @test_dir = Dir.mktmpdir
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(@test_dir) if @test_dir && File.exist?(@test_dir)
   end
 
@@ -22,11 +25,11 @@ class MissingReturnValidatorTest < Minitest::Test
 
   def enabled_config
     @enabled_config ||= Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'Enabled', true)
+      c.set_validator_config('Documentation/MissingReturn', 'Enabled', true)
       end
   end
 
-  def test_when_validator_is_disabled_by_default_does_not_report_missing_return_tags
+  it 'when validator is disabled by default does not report missing return tags' do
     config = Yard::Lint::Config.new
 
     file = create_test_file('example.rb', <<~RUBY)
@@ -47,7 +50,7 @@ class MissingReturnValidatorTest < Minitest::Test
       'Validator should be disabled by default')
   end
 
-  def test_methods_with_return_tag_does_not_report_methods_that_have_return_tags
+  it 'methods with return tag does not report methods that have return tags' do
     file = create_test_file('with_return.rb', <<~RUBY)
       # Calculator class
       class Calculator
@@ -74,7 +77,7 @@ class MissingReturnValidatorTest < Minitest::Test
       'Methods with @return tags should not be flagged')
   end
 
-  def test_methods_without_return_tag_reports_methods_missing_return_tags
+  it 'methods without return tag reports methods missing return tags' do
     file = create_test_file('no_return.rb', <<~RUBY)
       # Calculator class
       class Calculator
@@ -98,7 +101,7 @@ class MissingReturnValidatorTest < Minitest::Test
     assert_includes(offense[:message], 'Missing @return tag for `Calculator#multiply`')
   end
 
-  def test_initialize_methods_does_not_report_initialize_methods
+  it 'initialize methods does not report initialize methods' do
     file = create_test_file('init.rb', <<~RUBY)
       # Example class
       class Example
@@ -118,7 +121,7 @@ class MissingReturnValidatorTest < Minitest::Test
       'Initialize methods should be excluded by default')
   end
 
-  def test_boolean_methods_does_not_report_boolean_methods
+  it 'boolean methods does not report boolean methods' do
     file = create_test_file('boolean.rb', <<~RUBY)
       # Checker class
       class Checker
@@ -137,12 +140,10 @@ class MissingReturnValidatorTest < Minitest::Test
       'Boolean methods have @return added automatically by YARD')
   end
 
-  def test_custom_exclusions_excludes_methods_matching_regex_pattern
+  it 'custom exclusions excludes methods matching regex pattern' do
     config_with_exclusions = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/MissingReturn',
+      c.set_validator_config('Documentation/MissingReturn', 'Enabled', true)
+      c.set_validator_config('Documentation/MissingReturn',
         'ExcludedMethods',
         ['initialize', '/^_/']
       )
@@ -179,12 +180,10 @@ class MissingReturnValidatorTest < Minitest::Test
       'Public method without @return should be flagged')
   end
 
-  def test_custom_exclusions_excludes_methods_matching_arity_pattern
+  it 'custom exclusions excludes methods matching arity pattern' do
     config_with_arity = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MissingReturn', 'Enabled', true)
-      c.send(
-        :set_validator_config,
-        'Documentation/MissingReturn',
+      c.set_validator_config('Documentation/MissingReturn', 'Enabled', true)
+      c.set_validator_config('Documentation/MissingReturn',
         'ExcludedMethods',
         ['initialize', 'fetch/1']
       )
@@ -220,7 +219,7 @@ class MissingReturnValidatorTest < Minitest::Test
       'Only the 2-parameter fetch should be flagged')
   end
 
-  def test_comprehensive_handles_mixed_scenarios_correctly
+  it 'comprehensive handles mixed scenarios correctly' do
     file = create_test_file('comprehensive.rb', <<~RUBY)
       # Comprehensive test class
       class ComprehensiveTest

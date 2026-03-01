@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationUndocumentedObjectsConfigTest < Minitest::Test
-  def test_id_returns_the_validator_identifier
+
+describe 'Yard::Lint::Validators::Documentation::UndocumentedObjects::Config' do
+  it 'id returns the validator identifier' do
     assert_equal(
       :undocumented_objects,
       Yard::Lint::Validators::Documentation::UndocumentedObjects::Config.id
     )
   end
 
-  def test_defaults_returns_default_configuration
+  it 'defaults returns default configuration' do
     assert_equal(
       {
         'Enabled' => true,
@@ -21,22 +22,22 @@ class YardLintValidatorsDocumentationUndocumentedObjectsConfigTest < Minitest::T
     )
   end
 
-  def test_defaults_returns_frozen_hash
+  it 'defaults returns frozen hash' do
     assert_predicate(Yard::Lint::Validators::Documentation::UndocumentedObjects::Config.defaults, :frozen?)
   end
 
-  def test_combines_with_combines_with_undocumented_boolean_methods_validator
+  it 'combines with combines with undocumented boolean methods validator' do
     assert_equal(
       ['Documentation/UndocumentedBooleanMethods'],
       Yard::Lint::Validators::Documentation::UndocumentedObjects::Config.combines_with
     )
   end
 
-  def test_combines_with_returns_frozen_array
+  it 'combines with returns frozen array' do
     assert_predicate(Yard::Lint::Validators::Documentation::UndocumentedObjects::Config.combines_with, :frozen?)
   end
 
-  def test_inheritance_inherits_from_base_config_class
+  it 'inheritance inherits from base config class' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Documentation::UndocumentedObjects::Config.superclass

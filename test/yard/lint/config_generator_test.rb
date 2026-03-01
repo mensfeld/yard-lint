@@ -2,21 +2,23 @@
 
 require 'test_helper'
 
-class YardLintConfigGeneratorTest < Minitest::Test
 
-  def setup
+describe 'Yard::Lint::ConfigGenerator' do
+  attr_reader :temp_dir, :config_path, :original_dir
+
+  before do
     @temp_dir = Dir.mktmpdir
     @config_path = File.join(@temp_dir, '.yard-lint.yml')
     @original_dir = Dir.pwd
     Dir.chdir(@temp_dir)
   end
 
-  def teardown
+  after do
     Dir.chdir(@original_dir)
     FileUtils.rm_rf(@temp_dir)
   end
 
-  def test_creates_yard_lint_yml_file
+  it 'creates yard lint yml file' do
     assert_equal(false, File.exist?(@config_path))
 
     result = Yard::Lint::ConfigGenerator.generate
@@ -25,7 +27,7 @@ class YardLintConfigGeneratorTest < Minitest::Test
     assert_equal(true, File.exist?(@config_path))
   end
 
-  def test_creates_file_with_yard_lint_configuration_header
+  it 'creates file with yard lint configuration header' do
     Yard::Lint::ConfigGenerator.generate
 
     content = File.read(@config_path)
@@ -33,7 +35,7 @@ class YardLintConfigGeneratorTest < Minitest::Test
     assert_includes(content, '# See https://github.com/mensfeld/yard-lint for documentation')
   end
 
-  def test_creates_file_with_allvalidators_section
+  it 'creates file with allvalidators section' do
     Yard::Lint::ConfigGenerator.generate
 
     content = File.read(@config_path)
@@ -43,7 +45,7 @@ class YardLintConfigGeneratorTest < Minitest::Test
     assert_includes(content, 'FailOnSeverity: warning')
   end
 
-  def test_creates_file_with_all_discovered_validator_configurations
+  it 'creates file with all discovered validator configurations' do
     Yard::Lint::ConfigGenerator.generate
 
     content = File.read(@config_path)
@@ -55,7 +57,7 @@ class YardLintConfigGeneratorTest < Minitest::Test
         end
   end
 
-  def test_creates_file_with_default_exclusions
+  it 'creates file with default exclusions' do
     Yard::Lint::ConfigGenerator.generate
 
     content = File.read(@config_path)
@@ -66,7 +68,7 @@ class YardLintConfigGeneratorTest < Minitest::Test
     assert_includes(content, "- 'test/**/*'")
   end
 
-  def test_creates_file_with_yard_options
+  it 'creates file with yard options' do
     Yard::Lint::ConfigGenerator.generate
 
     content = File.read(@config_path)
@@ -74,7 +76,7 @@ class YardLintConfigGeneratorTest < Minitest::Test
     assert_includes(content, '- --protected')
   end
 
-  def test_when_config_file_already_exists_returns_false_without_overwriting
+  it 'when config file already exists returns false without overwriting' do
     File.write(@config_path, '# Existing config')
 
     result = Yard::Lint::ConfigGenerator.generate
@@ -83,7 +85,7 @@ class YardLintConfigGeneratorTest < Minitest::Test
     assert_equal('# Existing config', File.read(@config_path))
   end
 
-  def test_when_config_file_already_exists_with_force_overwrites_existing_file
+  it 'when config file already exists with force overwrites existing file' do
     File.write(@config_path, '# Existing config')
 
     result = Yard::Lint::ConfigGenerator.generate(force: true)
@@ -94,13 +96,13 @@ class YardLintConfigGeneratorTest < Minitest::Test
     refute_equal('# Existing config', content)
   end
 
-  def test_generates_valid_yaml
+  it 'generates valid yaml' do
     Yard::Lint::ConfigGenerator.generate
 
     YAML.load_file(@config_path)
   end
 
-  def test_generates_parseable_config
+  it 'generates parseable config' do
     Yard::Lint::ConfigGenerator.generate
 
     config_hash = YAML.load_file(@config_path)

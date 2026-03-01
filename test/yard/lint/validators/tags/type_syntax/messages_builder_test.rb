@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTypeSyntaxMessagesBuilderTest < Minitest::Test
 
-  def test_call_formats_type_syntax_violation_message
+describe 'Yard::Lint::Validators::Tags::TypeSyntax::MessagesBuilder' do
+  it 'call formats type syntax violation message' do
     offense = {
       tag_name: 'param',
       type_string: 'Array<',
@@ -19,7 +19,7 @@ class YardLintValidatorsTagsTypeSyntaxMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_handles_return_tag_violations
+  it 'call handles return tag violations' do
     offense = {
       tag_name: 'return',
       type_string: 'Hash{Symbol =>',
@@ -34,7 +34,7 @@ class YardLintValidatorsTagsTypeSyntaxMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_handles_option_tag_violations
+  it 'call handles option tag violations' do
     offense = {
       tag_name: 'option',
       type_string: 'Array<>',

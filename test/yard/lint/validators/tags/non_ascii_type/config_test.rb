@@ -2,29 +2,30 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsNonAsciiTypeConfigTest < Minitest::Test
-  def test_id_returns_non_ascii_type
+
+describe 'Yard::Lint::Validators::Tags::NonAsciiType::Config' do
+  it 'id returns non ascii type' do
     assert_equal(:non_ascii_type, Yard::Lint::Validators::Tags::NonAsciiType::Config.id)
   end
 
-  def test_defaults_has_enabled_set_to_true
+  it 'defaults has enabled set to true' do
     assert_equal(true, Yard::Lint::Validators::Tags::NonAsciiType::Config.defaults['Enabled'])
   end
 
-  def test_defaults_has_severity_set_to_warning
+  it 'defaults has severity set to warning' do
     assert_equal('warning', Yard::Lint::Validators::Tags::NonAsciiType::Config.defaults['Severity'])
   end
 
-  def test_defaults_has_validatedtags_with_param_option_return_yieldreturn_yieldparam
+  it 'defaults has validatedtags with param option return yieldreturn yieldparam' do
     expected_tags = %w[param option return yieldreturn yieldparam]
     assert_equal(expected_tags, Yard::Lint::Validators::Tags::NonAsciiType::Config.defaults['ValidatedTags'])
   end
 
-  def test_defaults_is_frozen
+  it 'defaults is frozen' do
     assert_predicate(Yard::Lint::Validators::Tags::NonAsciiType::Config.defaults, :frozen?)
   end
 
-  def test_inheritance_inherits_from_validators_config
+  it 'inheritance inherits from validators config' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Tags::NonAsciiType::Config.superclass

@@ -2,19 +2,21 @@
 
 require 'test_helper'
 
-class YardLintTodoGeneratorTest < Minitest::Test
+
+describe 'Yard::Lint::TodoGenerator' do
   attr_reader :test_dir, :config
 
-  def setup
+
+  before do
     @test_dir = Dir.mktmpdir('todo-generator-test')
     @config = Yard::Lint::Config.new
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(@test_dir)
   end
 
-  def test_generate_with_no_violations_returns_appropriate_message
+  it 'generate with no violations returns appropriate message' do
     Dir.chdir(@test_dir) do
       # Create a clean Ruby file
       FileUtils.mkdir_p('lib')
@@ -38,7 +40,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_with_violations_creates_todo_yml
+  it 'generate with violations creates todo yml' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/undocumented.rb', <<~RUBY)
@@ -61,7 +63,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_with_violations_returns_result_with_message_and_counts
+  it 'generate with violations returns result with message and counts' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/undocumented.rb', <<~RUBY)
@@ -86,7 +88,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_with_violations_creates_proper_yaml_structure
+  it 'generate with violations creates proper yaml structure' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/undocumented.rb', <<~RUBY)
@@ -125,7 +127,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_with_violations_creates_main_config_with_inherit_from
+  it 'generate with violations creates main config with inherit from' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/undocumented.rb', <<~RUBY)
@@ -149,7 +151,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_when_config_exists_adds_inherit_from
+  it 'generate when config exists adds inherit from' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/undocumented.rb', <<~RUBY)
@@ -177,7 +179,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_when_config_exists_does_not_duplicate_inherit_from
+  it 'generate when config exists does not duplicate inherit from' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/undocumented.rb', <<~RUBY)
@@ -213,7 +215,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_raises_todo_file_exists_error_without_force
+  it 'generate raises todo file exists error without force' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/test.rb', <<~RUBY)
@@ -233,7 +235,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_overwrites_with_force_flag
+  it 'generate overwrites with force flag' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/test.rb', <<~RUBY)
@@ -256,7 +258,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_with_custom_exclude_limit_passes_limit_to_path_grouper
+  it 'generate with custom exclude limit passes limit to path grouper' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
 
@@ -280,7 +282,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_generate_with_multiple_validators_groups_violations
+  it 'generate with multiple validators groups violations' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
       File.write('lib/multi.rb', <<~RUBY)
@@ -314,7 +316,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_make_relative_path_converts_absolute_path_to_relative
+  it 'make relative path converts absolute path to relative' do
     Dir.chdir(@test_dir) do
       generator = Yard::Lint::TodoGenerator.new(
         path: '.',
@@ -330,7 +332,7 @@ class YardLintTodoGeneratorTest < Minitest::Test
     end
   end
 
-  def test_make_relative_path_keeps_relative_path_unchanged
+  it 'make relative path keeps relative path unchanged' do
     Dir.chdir(@test_dir) do
       generator = Yard::Lint::TodoGenerator.new(
         path: '.',

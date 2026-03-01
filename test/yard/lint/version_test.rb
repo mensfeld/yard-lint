@@ -2,21 +2,21 @@
 
 require 'test_helper'
 
-class YardLintVersionTest < Minitest::Test
 
-  def test_version_has_a_version_number
+describe 'Yard::Lint::Version' do
+  it 'version has a version number' do
     refute_nil(Yard::Lint::VERSION)
   end
 
-  def test_version_version_is_a_string
+  it 'version version is a string' do
     assert_kind_of(String, Yard::Lint::VERSION)
   end
 
-  def test_version_version_follows_semantic_versioning_format
+  it 'version version follows semantic versioning format' do
     assert_match(/\A\d+\.\d+\.\d+/, Yard::Lint::VERSION)
   end
 
-  def test_version_version_is_frozen
+  it 'version version is frozen' do
     assert_predicate(Yard::Lint::VERSION, :frozen?)
   end
 end

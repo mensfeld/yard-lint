@@ -2,10 +2,12 @@
 
 require 'test_helper'
 
-class YardLintParsersOneLineBaseTest < Minitest::Test
-  attr_reader :parser, :parser_class
 
-  def setup
+describe 'Yard::Lint::Parsers::OneLineBase' do
+  attr_reader :parser_class, :parser
+
+
+  before do
     @parser_class = Class.new(Yard::Lint::Parsers::OneLineBase) do
       self.regexps = {
         general: /^Error:/,
@@ -17,7 +19,7 @@ class YardLintParsersOneLineBaseTest < Minitest::Test
     @parser = parser_class.new
   end
 
-  def test_call_parses_matching_lines
+  it 'call parses matching lines' do
     stdout = "Error: Something wrong in file.rb at line 10\n"
     result = parser.call(stdout)
 
@@ -28,28 +30,28 @@ class YardLintParsersOneLineBaseTest < Minitest::Test
     assert_equal('Something wrong', result.first[:message])
   end
 
-  def test_call_ignores_non_matching_lines
+  it 'call ignores non matching lines' do
     stdout = "Random text\nNot matching\n"
     result = parser.call(stdout)
 
     assert_equal([], result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     stdout = ''
     result = parser.call(stdout)
 
     assert_equal([], result)
   end
 
-  def test_call_handles_multiple_matching_lines
+  it 'call handles multiple matching lines' do
     stdout = "Error: First in file1.rb at line 5\nError: Second in file2.rb at line 10\n"
     result = parser.call(stdout)
 
     assert_equal(2, result.size)
   end
 
-  def test_inheritance_can_be_subclassed
+  it 'inheritance can be subclassed' do
     assert_kind_of(Yard::Lint::Parsers::OneLineBase, parser)
   end
 end

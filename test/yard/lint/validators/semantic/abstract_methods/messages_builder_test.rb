@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsSemanticAbstractMethodsMessagesBuilderTest < Minitest::Test
-  def test_call_builds_message_for_abstract_method_with_implementation
+
+describe 'Yard::Lint::Validators::Semantic::AbstractMethods::MessagesBuilder' do
+  it 'call builds message for abstract method with implementation' do
     offense = { method_name: 'MyClass#abstract_method' }
 
     message = Yard::Lint::Validators::Semantic::AbstractMethods::MessagesBuilder.call(offense)
@@ -15,7 +16,7 @@ class YardLintValidatorsSemanticAbstractMethodsMessagesBuilderTest < Minitest::T
     )
   end
 
-  def test_call_builds_message_for_class_method
+  it 'call builds message for class method' do
     offense = { method_name: 'MyModule.abstract_factory' }
 
     message = Yard::Lint::Validators::Semantic::AbstractMethods::MessagesBuilder.call(offense)

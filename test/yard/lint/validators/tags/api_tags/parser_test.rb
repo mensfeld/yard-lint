@@ -2,23 +2,25 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsApiTagsParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Tags::ApiTags::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::ApiTags::Parser.new
   end
 
-  def test_initialize_inherits_from_parser_base_class
+  it 'initialize inherits from parser base class' do
     assert_kind_of(Yard::Lint::Parsers::Base, parser)
   end
 
-  def test_call_parses_input_and_returns_array
+  it 'call parses input and returns array' do
     result = parser.call('')
     assert_kind_of(Array, result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
   end
 end

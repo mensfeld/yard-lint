@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsForbiddenTagsParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::ForbiddenTags::Parser.new
   end
 
-  def test_call_with_valid_yard_output_parses_violations_correctly
+  it 'call with valid yard output parses violations correctly' do
     yard_output = <<~OUTPUT
       lib/example.rb:10: void_return
       return|void|void
@@ -40,7 +41,7 @@ class YardLintValidatorsTagsForbiddenTagsParserTest < Minitest::Test
     assert_equal('Object', second[:pattern_types])
   end
 
-  def test_call_with_tag_only_pattern_no_types_parses_violations_with_empty_types
+  it 'call with tag only pattern no types parses violations with empty types' do
     yard_output = <<~OUTPUT
       lib/example.rb:15: ApiClass
       api||
@@ -54,19 +55,19 @@ class YardLintValidatorsTagsForbiddenTagsParserTest < Minitest::Test
     assert_equal('', result[0][:pattern_types])
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_nil
+  it 'call with empty output returns empty array for nil' do
     assert_equal([], parser.call(nil))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_empty_string
+  it 'call with empty output returns empty array for empty string' do
     assert_equal([], parser.call(''))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_whitespace_only
+  it 'call with empty output returns empty array for whitespace only' do
     assert_equal([], parser.call("  \n  \t  "))
   end
 
-  def test_call_with_malformed_output_skips_lines_without_proper_format
+  it 'call with malformed output skips lines without proper format' do
     yard_output = <<~OUTPUT
       malformed line
       another bad line
@@ -76,7 +77,7 @@ class YardLintValidatorsTagsForbiddenTagsParserTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_call_with_malformed_output_skips_incomplete_violation_pairs
+  it 'call with malformed output skips incomplete violation pairs' do
     yard_output = <<~OUTPUT
       lib/example.rb:10: void_return
     OUTPUT

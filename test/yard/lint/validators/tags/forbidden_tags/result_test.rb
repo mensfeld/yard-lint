@@ -2,21 +2,21 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsForbiddenTagsResultTest < Minitest::Test
 
-  def test_class_attributes_has_default_severity_set_to_convention
+describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Result' do
+  it 'class attributes has default severity set to convention' do
     assert_equal('convention', Yard::Lint::Validators::Tags::ForbiddenTags::Result.default_severity)
   end
 
-  def test_class_attributes_has_offense_type_set_to_tag
+  it 'class attributes has offense type set to tag' do
     assert_equal('tag', Yard::Lint::Validators::Tags::ForbiddenTags::Result.offense_type)
   end
 
-  def test_class_attributes_has_offense_name_set_to_forbiddentags
+  it 'class attributes has offense name set to forbiddentags' do
     assert_equal('ForbiddenTags', Yard::Lint::Validators::Tags::ForbiddenTags::Result.offense_name)
   end
 
-  def test_build_message_delegates_to_messagesbuilder
+  it 'build message delegates to messagesbuilder' do
     offense = {
       tag_name: 'return',
       types_text: 'void',
@@ -34,7 +34,7 @@ class YardLintValidatorsTagsForbiddenTagsResultTest < Minitest::Test
     assert_equal('formatted message', message)
   end
 
-  def test_inheritance_inherits_from_results_base
+  it 'inheritance inherits from results base' do
     assert_equal(Yard::Lint::Results::Base, Yard::Lint::Validators::Tags::ForbiddenTags::Result.superclass)
   end
 end

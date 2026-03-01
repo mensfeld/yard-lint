@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTypeSyntaxParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::TypeSyntax::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::TypeSyntax::Parser.new
   end
 
-  def test_call_with_valid_yard_output_parses_violations_correctly
+  it 'call with valid yard output parses violations correctly' do
     yard_output = <<~OUTPUT
       lib/example.rb:10: Example#method
       param|Array<|expecting name, got ''
@@ -40,19 +41,19 @@ class YardLintValidatorsTagsTypeSyntaxParserTest < Minitest::Test
     assert_equal("expecting name, got '>'", second[:error_message])
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_nil
+  it 'call with empty output returns empty array for nil' do
     assert_equal([], parser.call(nil))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_empty_string
+  it 'call with empty output returns empty array for empty string' do
     assert_equal([], parser.call(''))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_whitespace_only
+  it 'call with empty output returns empty array for whitespace only' do
     assert_equal([], parser.call("  \n  \t  "))
   end
 
-  def test_call_with_malformed_output_skips_lines_that_do_not_match_expected_format
+  it 'call with malformed output skips lines that do not match expected format' do
     malformed = <<~OUTPUT
       invalid line without colon
       also invalid
@@ -65,7 +66,7 @@ class YardLintValidatorsTagsTypeSyntaxParserTest < Minitest::Test
     assert_equal('lib/example.rb', result[0][:location])
   end
 
-  def test_call_with_malformed_output_skips_details_lines_without_enough_pipe_separated_parts
+  it 'call with malformed output skips details lines without enough pipe separated parts' do
     incomplete = <<~OUTPUT
       lib/example.rb:10: Example#method
       param|Array<
@@ -75,7 +76,7 @@ class YardLintValidatorsTagsTypeSyntaxParserTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_inheritance_inherits_from_parsers_base
+  it 'inheritance inherits from parsers base' do
     assert_equal(Yard::Lint::Parsers::Base, Yard::Lint::Validators::Tags::TypeSyntax::Parser.superclass)
   end
 end

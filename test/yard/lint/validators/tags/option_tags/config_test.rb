@@ -2,12 +2,13 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsOptionTagsConfigTest < Minitest::Test
-  def test_id_returns_the_validator_identifier
+
+describe 'Yard::Lint::Validators::Tags::OptionTags::Config' do
+  it 'id returns the validator identifier' do
     assert_equal(:option_tags, Yard::Lint::Validators::Tags::OptionTags::Config.id)
   end
 
-  def test_defaults_returns_default_configuration
+  it 'defaults returns default configuration' do
     assert_equal(
       {
         'Enabled' => true,
@@ -18,15 +19,15 @@ class YardLintValidatorsTagsOptionTagsConfigTest < Minitest::Test
     )
   end
 
-  def test_defaults_returns_frozen_hash
+  it 'defaults returns frozen hash' do
     assert_predicate(Yard::Lint::Validators::Tags::OptionTags::Config.defaults, :frozen?)
   end
 
-  def test_combines_with_returns_empty_array_for_standalone_validator
+  it 'combines with returns empty array for standalone validator' do
     assert_equal([], Yard::Lint::Validators::Tags::OptionTags::Config.combines_with)
   end
 
-  def test_inheritance_inherits_from_base_config_class
+  it 'inheritance inherits from base config class' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Tags::OptionTags::Config.superclass

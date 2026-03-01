@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsRedundantParamDescriptionConfigTest < Minitest::Test
-  def test_id_returns_the_validator_identifier
+
+describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::Config' do
+  it 'id returns the validator identifier' do
     assert_equal(
       :redundant_param_description,
       Yard::Lint::Validators::Tags::RedundantParamDescription::Config.id
     )
   end
 
-  def test_defaults_returns_default_configuration
+  it 'defaults returns default configuration' do
     defaults = Yard::Lint::Validators::Tags::RedundantParamDescription::Config.defaults
 
     assert_equal(true, defaults['Enabled'])
@@ -28,7 +29,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionConfigTest < Minitest::Test
     assert_includes(defaults['LowValueVerbs'], 'invoking')
   end
 
-  def test_defaults_includes_all_pattern_toggles
+  it 'defaults includes all pattern toggles' do
     patterns = Yard::Lint::Validators::Tags::RedundantParamDescription::Config.defaults['EnabledPatterns']
 
     assert_equal(true, patterns['ArticleParam'])
@@ -41,15 +42,15 @@ class YardLintValidatorsTagsRedundantParamDescriptionConfigTest < Minitest::Test
     assert_equal(true, patterns['ArticleParamPhrase'])
   end
 
-  def test_defaults_returns_frozen_hash
+  it 'defaults returns frozen hash' do
     assert_predicate(Yard::Lint::Validators::Tags::RedundantParamDescription::Config.defaults, :frozen?)
   end
 
-  def test_combines_with_returns_empty_array_for_standalone_validator
+  it 'combines with returns empty array for standalone validator' do
     assert_equal([], Yard::Lint::Validators::Tags::RedundantParamDescription::Config.combines_with)
   end
 
-  def test_inheritance_inherits_from_base_config_class
+  it 'inheritance inherits from base config class' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Tags::RedundantParamDescription::Config.superclass

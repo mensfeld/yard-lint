@@ -2,28 +2,30 @@
 
 require 'test_helper'
 
-class YardLintValidatorsWarningsInvalidDirectiveFormatResultTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Warnings::InvalidDirectiveFormat::Result' do
   attr_reader :config, :parsed_data, :result
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @parsed_data = []
     @result = Yard::Lint::Validators::Warnings::InvalidDirectiveFormat::Result.new(parsed_data, config)
   end
 
-  def test_initialize_inherits_from_base_result
+  it 'initialize inherits from base result' do
     assert_kind_of(Yard::Lint::Results::Base, result)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(config, result.instance_variable_get(:@config))
   end
 
-  def test_offenses_returns_an_array
+  it 'offenses returns an array' do
     assert_kind_of(Array, result.offenses)
   end
 
-  def test_offenses_returns_empty_array_for_empty_parsed_data
+  it 'offenses returns empty array for empty parsed data' do
     assert_equal([], result.offenses)
   end
 end

@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationBlankLineBeforeDefinitionMessagesBuilderTest < Minitest::Test
-  def test_call_with_single_blank_line_returns_message
+
+describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::MessagesBuilder' do
+  it 'call with single blank line returns message' do
     offense = {
       location: 'lib/example.rb',
       line: 10,
@@ -17,7 +18,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionMessagesBuilderTes
     assert_equal("Blank line between documentation and definition for 'MyClass#process'", message)
   end
 
-  def test_call_with_orphaned_documentation_returns_message
+  it 'call with orphaned documentation returns message' do
     offense = {
       location: 'lib/example.rb',
       line: 15,
@@ -34,7 +35,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionMessagesBuilderTes
     )
   end
 
-  def test_call_with_orphaned_documentation_and_3_blank_lines_includes_count
+  it 'call with orphaned documentation and 3 blank lines includes count' do
     offense = {
       location: 'lib/example.rb',
       line: 20,
@@ -48,7 +49,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionMessagesBuilderTes
     assert_includes(message, '3 blank lines')
   end
 
-  def test_call_with_unknown_violation_type_returns_generic_message
+  it 'call with unknown violation type returns generic message' do
     offense = {
       location: 'lib/example.rb',
       line: 5,
@@ -62,15 +63,15 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionMessagesBuilderTes
     assert_equal("Blank line before definition for 'MyClass#unknown'", message)
   end
 
-  def test_error_descriptions_contains_single_description
+  it 'error descriptions contains single description' do
     assert(Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::MessagesBuilder::ERROR_DESCRIPTIONS.key?('single'))
   end
 
-  def test_error_descriptions_contains_orphaned_description
+  it 'error descriptions contains orphaned description' do
     assert(Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::MessagesBuilder::ERROR_DESCRIPTIONS.key?('orphaned'))
   end
 
-  def test_error_descriptions_is_frozen
+  it 'error descriptions is frozen' do
     assert_equal(true, Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::MessagesBuilder::ERROR_DESCRIPTIONS.frozen?)
   end
 end

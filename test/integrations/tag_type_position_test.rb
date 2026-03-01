@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class TagTypePositionIntegrationTest < Minitest::Test
-  attr_reader :config
 
-  def setup
+describe 'Tag Type Position' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/tag_type_position_examples.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/TagTypePosition', 'Enabled', true)
+      c.set_validator_config('Tags/TagTypePosition', 'Enabled', true)
       end
   end
 
-  def test_detects_type_before_parameter_name_violates_yard_standard
+  it 'detects type before parameter name violates yard standard' do
     result = Yard::Lint.run(path: @fixture_path, config: @config, progress: false)
     offenses = result.offenses.select { |o| o[:name] == 'TagTypePosition' }
 
@@ -22,7 +24,7 @@ class TagTypePositionIntegrationTest < Minitest::Test
     assert_equal(3, offenses.size)
   end
 
-  def test_provides_helpful_messages
+  it 'provides helpful messages' do
     result = Yard::Lint.run(path: @fixture_path, config: @config, progress: false)
     offense = result.offenses.find { |o| o[:name] == 'TagTypePosition' }
 

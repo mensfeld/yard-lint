@@ -1,20 +1,22 @@
 # frozen_string_literal: true
 
-require 'tmpdir'
-require 'fileutils'
 require 'test_helper'
 
-class MarkdownSyntaxValidatorTest < Minitest::Test
-  attr_reader :config, :test_dir
+require 'tmpdir'
+require 'fileutils'
 
-  def setup
+describe 'Markdown Syntax' do
+  attr_reader :config
+
+
+  before do
     @config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/MarkdownSyntax', 'Enabled', true)
+      c.set_validator_config('Documentation/MarkdownSyntax', 'Enabled', true)
     end
     @test_dir = Dir.mktmpdir
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(@test_dir) if @test_dir && File.exist?(@test_dir)
   end
 
@@ -25,7 +27,7 @@ class MarkdownSyntaxValidatorTest < Minitest::Test
     path
   end
 
-  def test_when_documentation_has_unclosed_backtick_detects_the_error
+  it 'when documentation has unclosed backtick detects the error' do
     file = create_test_file('unclosed_backtick.rb', <<~RUBY)
       # Process data with `unclosed backtick
       def process(data)
@@ -40,7 +42,7 @@ class MarkdownSyntaxValidatorTest < Minitest::Test
     assert_includes(markdown_errors.first[:message], 'Unclosed backtick')
   end
 
-  def test_when_documentation_has_unclosed_bold_detects_the_error
+  it 'when documentation has unclosed bold detects the error' do
     file = create_test_file('unclosed_bold.rb', <<~RUBY)
       # Process data with **bold text that is not closed
       def process(data)
@@ -55,7 +57,7 @@ class MarkdownSyntaxValidatorTest < Minitest::Test
     assert_includes(markdown_errors.first[:message], 'Unclosed bold formatting')
   end
 
-  def test_when_documentation_has_invalid_list_marker_detects_the_error
+  it 'when documentation has invalid list marker detects the error' do
     file = create_test_file('invalid_list.rb', <<~RUBY)
       # Process data
       # \u2022 Invalid bullet point
@@ -71,7 +73,7 @@ class MarkdownSyntaxValidatorTest < Minitest::Test
     assert_includes(markdown_errors.first[:message], 'Invalid list marker')
   end
 
-  def test_when_documentation_has_valid_markdown_does_not_flag_the_method
+  it 'when documentation has valid markdown does not flag the method' do
     file = create_test_file('valid_markdown.rb', <<~RUBY)
       # Process data with `proper code` and **bold** text
       # - Valid list item
@@ -87,7 +89,7 @@ class MarkdownSyntaxValidatorTest < Minitest::Test
     assert_empty(markdown_errors)
   end
 
-  def test_when_documentation_has_multiple_errors_detects_all_errors
+  it 'when documentation has multiple errors detects all errors' do
     file = create_test_file('multiple_errors.rb', <<~RUBY)
       # Process data with `unclosed backtick and **unclosed bold
       def process(data)

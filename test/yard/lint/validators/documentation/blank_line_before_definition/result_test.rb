@@ -2,44 +2,46 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationBlankLineBeforeDefinitionResultTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result' do
   attr_reader :config, :parsed_data, :result
 
-  def setup
+
+  before do
     @config = Yard::Lint::Config.new
     @parsed_data = []
     @result = Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result.new(@parsed_data, @config)
   end
 
-  def test_initialize_inherits_from_results_base
+  it 'initialize inherits from results base' do
     assert_kind_of(Yard::Lint::Results::Base, @result)
   end
 
-  def test_initialize_stores_config
+  it 'initialize stores config' do
     assert_equal(@config, @result.instance_variable_get(:@config))
   end
 
-  def test_offenses_returns_an_array
+  it 'offenses returns an array' do
     assert_kind_of(Array, @result.offenses)
   end
 
-  def test_offenses_handles_empty_parsed_data
+  it 'offenses handles empty parsed data' do
     assert_equal([], @result.offenses)
   end
 
-  def test_class_defines_default_severity_as_convention
+  it 'class defines default severity as convention' do
     assert_equal('convention', Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result.default_severity)
   end
 
-  def test_class_defines_offense_type_as_line
+  it 'class defines offense type as line' do
     assert_equal('line', Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result.offense_type)
   end
 
-  def test_class_defines_offense_name_as_blank_line_before_definition
+  it 'class defines offense name as blank line before definition' do
     assert_equal('BlankLineBeforeDefinition', Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result.offense_name)
   end
 
-  def test_build_message_delegates_to_messages_builder
+  it 'build message delegates to messages builder' do
     offense = {
       location: 'lib/example.rb',
       line: 10,
@@ -52,7 +54,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionResultTest < Minit
     assert_includes(@result.build_message(offense), 'MyClass#process')
   end
 
-  def test_severity_for_single_blank_line_uses_default
+  it 'severity for single blank line uses default' do
     parsed_data = [
       {
         location: 'lib/example.rb',
@@ -67,7 +69,7 @@ class YardLintValidatorsDocumentationBlankLineBeforeDefinitionResultTest < Minit
     assert_equal('convention', result.offenses.first[:severity])
   end
 
-  def test_severity_for_orphaned_documentation_uses_orphaned_severity
+  it 'severity for orphaned documentation uses orphaned severity' do
     parsed_data = [
       {
         location: 'lib/example.rb',

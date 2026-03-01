@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsNonAsciiTypeParserTest < Minitest::Test
 
+describe 'Yard::Lint::Validators::Tags::NonAsciiType::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::NonAsciiType::Parser.new
   end
 
-  def test_call_with_valid_output_parses_violations_correctly
+  it 'call with valid output parses violations correctly' do
     output = <<~OUTPUT
       lib/example.rb:10: Example#method
       param|Symbol, …|…|U+2026
@@ -42,7 +43,7 @@ class YardLintValidatorsTagsNonAsciiTypeParserTest < Minitest::Test
     assert_equal('U+2192', second[:codepoint])
   end
 
-  def test_call_with_em_dash_character_parses_em_dash_violations_correctly
+  it 'call with em dash character parses em dash violations correctly' do
     output = <<~OUTPUT
       lib/example.rb:15: Example#method
       param|String—Integer|—|U+2014
@@ -55,19 +56,19 @@ class YardLintValidatorsTagsNonAsciiTypeParserTest < Minitest::Test
     assert_equal('U+2014', result[0][:codepoint])
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_nil
+  it 'call with empty output returns empty array for nil' do
     assert_equal([], parser.call(nil))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_empty_string
+  it 'call with empty output returns empty array for empty string' do
     assert_equal([], parser.call(''))
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_whitespace_only
+  it 'call with empty output returns empty array for whitespace only' do
     assert_equal([], parser.call("  \n  \t  "))
   end
 
-  def test_call_with_malformed_output_skips_lines_that_do_not_match_expected_format
+  it 'call with malformed output skips lines that do not match expected format' do
     malformed = <<~OUTPUT
       invalid line without colon
       also invalid
@@ -80,7 +81,7 @@ class YardLintValidatorsTagsNonAsciiTypeParserTest < Minitest::Test
     assert_equal('lib/example.rb', result[0][:location])
   end
 
-  def test_call_with_malformed_output_skips_details_lines_without_enough_pipe_separated_parts
+  it 'call with malformed output skips details lines without enough pipe separated parts' do
     incomplete = <<~OUTPUT
       lib/example.rb:10: Example#method
       param|Symbol, …|…
@@ -90,7 +91,7 @@ class YardLintValidatorsTagsNonAsciiTypeParserTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_call_with_encoding_issues_handles_strings_with_invalid_utf_8_sequences
+  it 'call with encoding issues handles strings with invalid utf 8 sequences' do
     # Create a string with invalid UTF-8 byte sequence
     invalid_utf8 = +"lib/example.rb:10: Example#method\nparam|test|x|\xFF\xFE"
     invalid_utf8.force_encoding('UTF-8')
@@ -99,7 +100,7 @@ class YardLintValidatorsTagsNonAsciiTypeParserTest < Minitest::Test
     parser.call(invalid_utf8)
   end
 
-  def test_inheritance_inherits_from_parsers_base
+  it 'inheritance inherits from parsers base' do
     assert_equal(Yard::Lint::Parsers::Base, Yard::Lint::Validators::Tags::NonAsciiType::Parser.superclass)
   end
 end

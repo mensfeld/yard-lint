@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsTagTypePositionMessagesBuilderTest < Minitest::Test
 
-  def test_call_when_enforcing_type_first_but_found_type_after_name_formats_message_correctly_for_param_ta
+describe 'Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder' do
+  it 'call when enforcing type first but found type after name formats message correctly for param ta' do
       offense = {
         tag_name: 'param',
         param_name: 'user',
@@ -15,7 +15,7 @@ class YardLintValidatorsTagsTagTypePositionMessagesBuilderTest < Minitest::Test
       message = Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder.call(offense)
 
       end
-  def test_call_when_enforcing_type_first_but_found_type_after_name_formats_message_correctly_for_option_t
+  it 'call when enforcing type first but found type after name formats message correctly for option t' do
       offense = {
         tag_name: 'option',
         param_name: 'opts',
@@ -26,7 +26,7 @@ class YardLintValidatorsTagsTagTypePositionMessagesBuilderTest < Minitest::Test
       message = Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder.call(offense)
 
       end
-  def test_call_when_enforcing_type_after_name_but_found_type_first_formats_message_correctly_for_param_ta
+  it 'call when enforcing type after name but found type first formats message correctly for param ta' do
       offense = {
         tag_name: 'param',
         param_name: 'name',
@@ -37,7 +37,7 @@ class YardLintValidatorsTagsTagTypePositionMessagesBuilderTest < Minitest::Test
       message = Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder.call(offense)
 
       end
-  def test_call_when_enforcing_type_after_name_but_found_type_first_formats_message_correctly_for_option_t
+  it 'call when enforcing type after name but found type first formats message correctly for option t' do
       offense = {
         tag_name: 'option',
         param_name: 'config',
@@ -48,7 +48,7 @@ class YardLintValidatorsTagsTagTypePositionMessagesBuilderTest < Minitest::Test
       message = Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder.call(offense)
 
       end
-  def test_call_with_complex_type_annotations_handles_nested_types_correctly
+  it 'call with complex type annotations handles nested types correctly' do
       offense = {
         tag_name: 'param',
         param_name: 'options',

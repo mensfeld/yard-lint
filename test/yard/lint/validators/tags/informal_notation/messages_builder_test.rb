@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsInformalNotationMessagesBuilderTest < Minitest::Test
 
-  def test_call_formats_message_for_note_pattern
+describe 'Yard::Lint::Validators::Tags::InformalNotation::MessagesBuilder' do
+  it 'call formats message for note pattern' do
     offense = {
       pattern: 'Note',
       replacement: '@note',
@@ -19,7 +19,7 @@ class YardLintValidatorsTagsInformalNotationMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_message_for_todo_pattern
+  it 'call formats message for todo pattern' do
     offense = {
       pattern: 'TODO',
       replacement: '@todo',
@@ -34,7 +34,7 @@ class YardLintValidatorsTagsInformalNotationMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_message_for_deprecated_pattern
+  it 'call formats message for deprecated pattern' do
     offense = {
       pattern: 'Deprecated',
       replacement: '@deprecated',
@@ -50,7 +50,7 @@ class YardLintValidatorsTagsInformalNotationMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_handles_empty_line_text
+  it 'call handles empty line text' do
     offense = {
       pattern: 'Note',
       replacement: '@note',
@@ -62,7 +62,7 @@ class YardLintValidatorsTagsInformalNotationMessagesBuilderTest < Minitest::Test
     assert_equal("Use @note tag instead of 'Note:' notation", message)
   end
 
-  def test_call_handles_nil_line_text
+  it 'call handles nil line text' do
     offense = {
       pattern: 'Note',
       replacement: '@note',
@@ -73,7 +73,7 @@ class YardLintValidatorsTagsInformalNotationMessagesBuilderTest < Minitest::Test
 
     assert_equal("Use @note tag instead of 'Note:' notation", message)
   end
-  def test_call_truncates_long_line_text
+  it 'call truncates long line text' do
     long_text = 'Note: ' + ('x' * 100)
     offense = {
       pattern: 'Note',

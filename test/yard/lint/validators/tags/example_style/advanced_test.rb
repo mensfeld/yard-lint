@@ -2,24 +2,26 @@
 
 require 'test_helper'
 
-class ExampleStyleAdvancedFileExclusionTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::Advanced' do
   attr_reader :config
 
-  def setup
+
+  before do
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Exclude', ['**/spec/**/*', '**/test/**/*'])
+      c.set_validator_config('Tags/ExampleStyle', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleStyle', 'Exclude', ['**/spec/**/*', '**/test/**/*'])
     end
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:detect).returns(:rubocop)
   end
 
-  def test_validates_that_per_validator_exclude_config_exists_in_defaults
+  it 'validates that per validator exclude config exists in defaults' do
     config_instance = Yard::Lint::Validators::Tags::ExampleStyle::Config.new
     # Verify the config supports Exclude key (it's added by base Config class)
     assert_includes(config_instance.class.defaults.keys, 'Enabled')
   end
 
-  def test_processes_files_when_validator_is_enabled
+  it 'processes files when validator is enabled' do
     fixture_content = <<~RUBY
       # frozen_string_literal: true
 
@@ -64,18 +66,18 @@ class ExampleStyleAdvancedFileExclusionTest < Minitest::Test
   end
 end
 
-class ExampleStyleAdvancedLinterDetectionTest < Minitest::Test
+describe 'ExampleStyleAdvancedLinterDetection' do
   attr_reader :temp_dir
 
-  def setup
+  before do
     @temp_dir = Dir.mktmpdir
   end
 
-  def teardown
+  after do
     FileUtils.rm_rf(temp_dir)
   end
 
-  def test_detects_linter_from_gemfile_with_double_quotes
+  it 'detects linter from gemfile with double quotes' do
     File.write(File.join(temp_dir, 'Gemfile'), 'gem "rubocop"')
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(true)
 
@@ -83,7 +85,7 @@ class ExampleStyleAdvancedLinterDetectionTest < Minitest::Test
     assert_equal(:rubocop, result)
   end
 
-  def test_detects_linter_from_gemfile_with_group
+  it 'detects linter from gemfile with group' do
     File.write(File.join(temp_dir, 'Gemfile'), "group :development do\n  gem 'standard'\nend")
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(true)
 
@@ -91,7 +93,7 @@ class ExampleStyleAdvancedLinterDetectionTest < Minitest::Test
     assert_equal(:standard, result)
   end
 
-  def test_handles_gemfile_lock_with_version_constraints
+  it 'handles gemfile lock with version constraints' do
     gemfile_lock = <<~LOCK
       GEM
         remote: https://rubygems.org/
@@ -106,7 +108,7 @@ class ExampleStyleAdvancedLinterDetectionTest < Minitest::Test
     assert_equal(:rubocop, result)
   end
 
-  def test_returns_none_when_config_files_exist_but_gems_not_available
+  it 'returns none when config files exist but gems not available' do
     File.write(File.join(temp_dir, '.rubocop.yml'), 'AllCops:')
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:rubocop_available?).returns(false)
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:standard_available?).returns(false)
@@ -116,14 +118,14 @@ class ExampleStyleAdvancedLinterDetectionTest < Minitest::Test
   end
 end
 
-class ExampleStyleAdvancedRunnerErrorHandlingTest < Minitest::Test
+describe 'ExampleStyleAdvancedRunnerErrorHandling' do
   attr_reader :runner
 
-  def setup
+  before do
     @runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(linter: :rubocop, disabled_cops: [], skip_patterns: [])
   end
 
-  def test_handles_invalid_regex_in_skip_patterns_gracefully
+  it 'handles invalid regex in skip patterns gracefully' do
     runner_with_invalid = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
       disabled_cops: [],
@@ -134,7 +136,7 @@ class ExampleStyleAdvancedRunnerErrorHandlingTest < Minitest::Test
     runner_with_invalid.run('code', 'Example')
   end
 
-  def test_handles_code_with_only_comments
+  it 'handles code with only comments' do
     code = <<~RUBY
       # This is a comment
       # Another comment
@@ -147,7 +149,7 @@ class ExampleStyleAdvancedRunnerErrorHandlingTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_handles_code_with_multiple_output_indicators
+  it 'handles code with multiple output indicators' do
     code = <<~RUBY
       result = calculate  # => 42
       another = result + 1  # => 43
@@ -165,7 +167,7 @@ class ExampleStyleAdvancedRunnerErrorHandlingTest < Minitest::Test
     runner.run(code, 'Example')
   end
 
-  def test_handles_malformed_json_from_linter
+  it 'handles malformed json from linter' do
     code = 'user = User.new'
 
     status = stub('status', success?: true)
@@ -175,7 +177,7 @@ class ExampleStyleAdvancedRunnerErrorHandlingTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_handles_empty_offenses_array_from_linter
+  it 'handles empty offenses array from linter' do
     code = 'user = User.new'
 
     rubocop_output = {
@@ -194,7 +196,7 @@ class ExampleStyleAdvancedRunnerErrorHandlingTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_handles_linter_output_without_files_key
+  it 'handles linter output without files key' do
     code = 'user = User.new'
 
     rubocop_output = {
@@ -211,14 +213,14 @@ class ExampleStyleAdvancedRunnerErrorHandlingTest < Minitest::Test
   end
 end
 
-class ExampleStyleAdvancedParserEdgeCasesTest < Minitest::Test
+describe 'ExampleStyleAdvancedParserEdgeCases' do
   attr_reader :parser
 
-  def setup
+  before do
     @parser = Yard::Lint::Validators::Tags::ExampleStyle::Parser.new
   end
 
-  def test_handles_output_with_windows_line_endings
+  it 'handles output with windows line endings' do
     output = "lib/user.rb:10: User#init\r\nstyle_offense\r\nExample 1\r\nStyle/StringLiterals\r\nPrefer single quotes\r\n"
 
     result = parser.call(output)
@@ -226,14 +228,14 @@ class ExampleStyleAdvancedParserEdgeCasesTest < Minitest::Test
     assert_equal('Style/StringLiterals', result.first[:cop_name])
   end
 
-  def test_handles_output_with_mixed_line_endings
+  it 'handles output with mixed line endings' do
     output = "lib/user.rb:10: User#init\r\nstyle_offense\nExample 1\r\nStyle/StringLiterals\nPrefer single quotes"
 
     result = parser.call(output)
     assert_equal(1, result.length)
   end
 
-  def test_handles_very_long_offense_messages
+  it 'handles very long offense messages' do
     long_message = 'A' * 1000
     output = <<~OUTPUT
       lib/user.rb:10: User#init
@@ -248,7 +250,7 @@ class ExampleStyleAdvancedParserEdgeCasesTest < Minitest::Test
     assert_equal(long_message, result.first[:message])
   end
 
-  def test_handles_special_characters_in_example_names
+  it 'handles special characters in example names' do
     output = <<~OUTPUT
       lib/user.rb:10: User#init
       style_offense
@@ -262,7 +264,7 @@ class ExampleStyleAdvancedParserEdgeCasesTest < Minitest::Test
     assert_equal("Example with \"quotes\" and 'apostrophes'", result.first[:example_name])
   end
 
-  def test_handles_unicode_characters_in_messages
+  it 'handles unicode characters in messages' do
     output = <<~OUTPUT
       lib/user.rb:10: User#init
       style_offense
@@ -277,8 +279,8 @@ class ExampleStyleAdvancedParserEdgeCasesTest < Minitest::Test
   end
 end
 
-class ExampleStyleAdvancedConfigurationValidationTest < Minitest::Test
-  def test_accepts_valid_linter_configuration_values
+describe 'ExampleStyleAdvancedConfigurationValidation' do
+  it 'accepts valid linter configuration values' do
     %w[auto rubocop standard none].each do |_linter|
       config = Yard::Lint::Validators::Tags::ExampleStyle::Config.new
       assert_equal('auto', config.class.defaults['Linter'])
@@ -286,17 +288,17 @@ class ExampleStyleAdvancedConfigurationValidationTest < Minitest::Test
     end
   end
 
-  def test_uses_convention_severity_by_default
+  it 'uses convention severity by default' do
     config = Yard::Lint::Validators::Tags::ExampleStyle::Config.new
     assert_equal('convention', config.class.defaults['Severity'])
   end
 
-  def test_is_disabled_by_default
+  it 'is disabled by default' do
     config = Yard::Lint::Validators::Tags::ExampleStyle::Config.new
     assert_equal(false, config.class.defaults['Enabled'])
   end
 
-  def test_includes_all_expected_disabled_cops_by_default
+  it 'includes all expected disabled cops by default' do
     config = Yard::Lint::Validators::Tags::ExampleStyle::Config.new
     disabled_cops = config.class.defaults['DisabledCops']
 
@@ -309,17 +311,17 @@ class ExampleStyleAdvancedConfigurationValidationTest < Minitest::Test
   end
 end
 
-class ExampleStyleAdvancedMultipleExamplesTest < Minitest::Test
+describe 'ExampleStyleAdvancedMultipleExamples' do
   attr_reader :config
 
-  def setup
+  before do
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleStyle', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleStyle', 'Enabled', true)
     end
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:detect).returns(:rubocop)
   end
 
-  def test_handles_class_with_multiple_methods_each_having_examples
+  it 'handles class with multiple methods each having examples' do
     fixture_content = <<~RUBY
       # frozen_string_literal: true
 
@@ -354,7 +356,7 @@ class ExampleStyleAdvancedMultipleExamplesTest < Minitest::Test
     end
   end
 
-  def test_reports_offenses_from_all_examples_across_multiple_methods
+  it 'reports offenses from all examples across multiple methods' do
     fixture_content = <<~RUBY
       # frozen_string_literal: true
 
@@ -395,8 +397,8 @@ class ExampleStyleAdvancedMultipleExamplesTest < Minitest::Test
   end
 end
 
-class ExampleStyleAdvancedSkipPatternsTest < Minitest::Test
-  def test_handles_skip_patterns_without_regex_delimiters
+describe 'ExampleStyleAdvancedSkipPatterns' do
+  it 'handles skip patterns without regex delimiters' do
     runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
       disabled_cops: [],
@@ -407,7 +409,7 @@ class ExampleStyleAdvancedSkipPatternsTest < Minitest::Test
     assert_equal([], runner.run('code', 'Example with anti-pattern'))
   end
 
-  def test_handles_case_sensitive_skip_patterns
+  it 'handles case sensitive skip patterns' do
     runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
       disabled_cops: [],
@@ -422,7 +424,7 @@ class ExampleStyleAdvancedSkipPatternsTest < Minitest::Test
     assert_equal([], result)
   end
 
-  def test_handles_multiple_skip_patterns_matching_same_example
+  it 'handles multiple skip patterns matching same example' do
     runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
       disabled_cops: [],
@@ -434,8 +436,8 @@ class ExampleStyleAdvancedSkipPatternsTest < Minitest::Test
   end
 end
 
-class ExampleStyleAdvancedDisabledCopsTest < Minitest::Test
-  def test_passes_all_disabled_cops_to_rubocop_command
+describe 'ExampleStyleAdvancedDisabledCops' do
+  it 'passes all disabled cops to rubocop command' do
     disabled_cops = %w[Cop1 Cop2 Cop3 Cop4 Cop5]
     runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
@@ -453,7 +455,7 @@ class ExampleStyleAdvancedDisabledCopsTest < Minitest::Test
     runner.run('code', 'Example')
   end
 
-  def test_handles_empty_disabled_cops_array
+  it 'handles empty disabled cops array' do
     runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
       linter: :rubocop,
       disabled_cops: [],

@@ -2,25 +2,25 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationUndocumentedMethodArgumentsTest < Minitest::Test
 
-  def test_module_structure_is_defined_as_a_module
+describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments' do
+  it 'module structure is defined as a module' do
     assert_kind_of(Module, Yard::Lint::Validators::Documentation::UndocumentedMethodArguments)
   end
 
-  def test_module_structure_has_config_class
+  it 'module structure has config class' do
     assert_equal(true, Yard::Lint::Validators::Documentation::UndocumentedMethodArguments.const_defined?(:Config))
   end
 
-  def test_module_structure_has_validator_class
+  it 'module structure has validator class' do
     assert_equal(true, Yard::Lint::Validators::Documentation::UndocumentedMethodArguments.const_defined?(:Validator))
   end
 
-  def test_module_structure_has_parser_class
+  it 'module structure has parser class' do
     assert_equal(true, Yard::Lint::Validators::Documentation::UndocumentedMethodArguments.const_defined?(:Parser))
   end
 
-  def test_module_structure_has_result_class
+  it 'module structure has result class' do
     assert_equal(true, Yard::Lint::Validators::Documentation::UndocumentedMethodArguments.const_defined?(:Result))
   end
 end

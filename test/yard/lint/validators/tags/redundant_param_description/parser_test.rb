@@ -2,33 +2,35 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Tags::RedundantParamDescription::Parser.new
   end
 
-  def test_initialize_inherits_from_parser_base_class
+  it 'initialize inherits from parser base class' do
     assert_kind_of(Yard::Lint::Parsers::Base, parser)
   end
 
-  def test_call_parses_input_and_returns_array
+  it 'call parses input and returns array' do
     result = parser.call('')
     assert_kind_of(Array, result)
   end
 
-  def test_call_handles_empty_input
+  it 'call handles empty input' do
     result = parser.call('')
     assert_equal([], result)
   end
 
-  def test_call_handles_nil_input
+  it 'call handles nil input' do
     result = parser.call(nil)
     assert_equal([], result)
   end
 
-  def test_call_parses_article_param_pattern_correctly
+  it 'call parses article param pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:10: MyClass#method
       param|appointment|The appointment|Appointment|article_param|2
@@ -54,7 +56,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     )
   end
 
-  def test_call_parses_possessive_param_pattern_correctly
+  it 'call parses possessive param pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:15: MyClass#process
       param|appointment|The event's appointment|Appointment|possessive_param|3
@@ -66,7 +68,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal("The event's appointment", result[0][:description])
   end
 
-  def test_call_parses_type_restatement_pattern_correctly
+  it 'call parses type restatement pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:20: MyClass#execute
       param|user|User object|User|type_restatement|2
@@ -78,7 +80,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal('User object', result[0][:description])
   end
 
-  def test_call_parses_param_to_verb_pattern_correctly
+  it 'call parses param to verb pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:25: MyClass#run
       param|payments|Payments to count|Array|param_to_verb|3
@@ -89,7 +91,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal('param_to_verb', result[0][:pattern_type])
   end
 
-  def test_call_parses_id_pattern_correctly
+  it 'call parses id pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:30: MyClass#find
       param|treatment_id|ID of the treatment|String|id_pattern|4
@@ -100,7 +102,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal('id_pattern', result[0][:pattern_type])
   end
 
-  def test_call_parses_directional_date_pattern_correctly
+  it 'call parses directional date pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:35: MyClass#filter
       param|from|from this date|Date|directional_date|3
@@ -111,7 +113,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal('directional_date', result[0][:pattern_type])
   end
 
-  def test_call_parses_type_generic_pattern_correctly
+  it 'call parses type generic pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:40: MyClass#create
       param|payment|Payment object|Payment|type_generic|2
@@ -122,7 +124,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal('type_generic', result[0][:pattern_type])
   end
 
-  def test_call_parses_article_param_phrase_pattern_correctly
+  it 'call parses article param phrase pattern correctly' do
     output = <<~OUTPUT
       lib/example.rb:45: MyClass#perform
       param|action|The action being performed|Symbol|article_param_phrase|4
@@ -134,7 +136,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal('The action being performed', result[0][:description])
   end
 
-  def test_call_parses_multiple_violations
+  it 'call parses multiple violations' do
     output = <<~OUTPUT
       lib/example.rb:10: MyClass#method1
       param|user|The user|User|article_param|2
@@ -148,7 +150,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_equal('data', result[1][:param_name])
   end
 
-  def test_call_handles_violations_without_type_name
+  it 'call handles violations without type name' do
     output = <<~OUTPUT
       lib/example.rb:10: MyClass#method
       param|data|The data||article_param|2
@@ -159,7 +161,7 @@ class YardLintValidatorsTagsRedundantParamDescriptionParserTest < Minitest::Test
     assert_nil(result[0][:type_name])
   end
 
-  def test_call_ignores_lines_that_do_not_match_location_pattern
+  it 'call ignores lines that do not match location pattern' do
     output = <<~OUTPUT
       random text
       lib/example.rb:10: MyClass#method

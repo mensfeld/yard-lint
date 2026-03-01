@@ -2,14 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationEmptyCommentLineParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::EmptyCommentLine::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Documentation::EmptyCommentLine::Parser.new
   end
 
-  def test_call_with_leading_violations_parses_single_leading_violation
+  it 'call with leading violations parses single leading violation' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         leading:5
@@ -31,7 +33,7 @@ class YardLintValidatorsDocumentationEmptyCommentLineParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_trailing_violations_parses_single_trailing_violation
+  it 'call with trailing violations parses single trailing violation' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         trailing:9
@@ -53,7 +55,7 @@ class YardLintValidatorsDocumentationEmptyCommentLineParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_both_leading_and_trailing_violations_parses_multiple_violations_for_same_object
+  it 'call with both leading and trailing violations parses multiple violations for same object' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         leading:5|trailing:9
@@ -82,7 +84,7 @@ class YardLintValidatorsDocumentationEmptyCommentLineParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_multiple_objects_parses_violations_for_multiple_objects
+  it 'call with multiple objects parses violations for multiple objects' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         leading:5
@@ -113,7 +115,7 @@ class YardLintValidatorsDocumentationEmptyCommentLineParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_multiple_leading_empty_lines_parses_multiple_leading_violations
+  it 'call with multiple leading empty lines parses multiple leading violations' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         leading:5|leading:6
@@ -142,12 +144,12 @@ class YardLintValidatorsDocumentationEmptyCommentLineParserTest < Minitest::Test
       )
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_empty_string
+  it 'call with empty output returns empty array for empty string' do
       result = parser.call('')
       assert_equal([], result)
   end
 
-  def test_call_with_empty_output_returns_empty_array_for_nil
+  it 'call with empty output returns empty array for nil' do
       result = parser.call(nil)
       assert_equal([], result)
   end

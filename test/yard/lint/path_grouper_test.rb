@@ -2,15 +2,16 @@
 
 require 'test_helper'
 
-class YardLintPathGrouperTest < Minitest::Test
-  def test_group_when_files_count_is_below_limit_returns_files_sorted
+
+describe 'Yard::Lint::PathGrouper' do
+  it 'group when files count is below limit returns files sorted' do
     files = ['lib/foo.rb', 'lib/bar.rb', 'lib/baz.rb']
     result = Yard::Lint::PathGrouper.group(files, limit: 15)
 
     assert_equal(files.sort, result)
   end
 
-  def test_group_when_files_count_equals_limit_returns_files_unchanged
+  it 'group when files count equals limit returns files unchanged' do
     files = Array.new(15) { |i| "lib/file_#{i}.rb" }
     result = Yard::Lint::PathGrouper.group(files, limit: 15)
 
@@ -19,7 +20,7 @@ class YardLintPathGrouperTest < Minitest::Test
     assert_kind_of(Array, result)
   end
 
-  def test_group_when_files_are_in_same_directory_and_meet_coverage_threshold_groups_files_into_pattern
+  it 'group when files are in same directory and meet coverage threshold groups files into pattern' do
     test_dir = Dir.mktmpdir('path-grouper-test')
 
     begin
@@ -47,7 +48,7 @@ class YardLintPathGrouperTest < Minitest::Test
     end
   end
 
-  def test_group_when_files_are_in_same_directory_but_do_not_meet_coverage_threshold_keeps_individual_files
+  it 'group when files are in same directory but do not meet coverage threshold keeps individual files' do
     test_dir = Dir.mktmpdir('path-grouper-test')
 
     begin
@@ -77,7 +78,7 @@ class YardLintPathGrouperTest < Minitest::Test
     end
   end
 
-  def test_group_when_files_are_in_different_directories_keeps_files_separate
+  it 'group when files are in different directories keeps files separate' do
     files = [
       'lib/foo.rb',
       'app/bar.rb',
@@ -90,7 +91,7 @@ class YardLintPathGrouperTest < Minitest::Test
     assert_equal(files.sort, result.sort)
   end
 
-  def test_group_when_some_directories_can_be_grouped_and_others_cannot_groups_eligible_directories_only
+  it 'group when some directories can be grouped and others cannot groups eligible directories only' do
     test_dir = Dir.mktmpdir('path-grouper-test')
 
     begin
@@ -132,7 +133,7 @@ class YardLintPathGrouperTest < Minitest::Test
     end
   end
 
-  def test_group_with_custom_limit_uses_the_provided_limit
+  it 'group with custom limit uses the provided limit' do
     files = ['lib/a.rb', 'lib/b.rb', 'lib/c.rb']
 
     # With limit of 3, should not group (need > limit)
@@ -144,14 +145,14 @@ class YardLintPathGrouperTest < Minitest::Test
     assert_kind_of(Array, result)
   end
 
-  def test_group_returns_sorted_results
+  it 'group returns sorted results' do
     files = ['z.rb', 'a.rb', 'm.rb']
     result = Yard::Lint::PathGrouper.group(files, limit: 100)
 
     assert_equal(files.sort, result)
   end
 
-  def test_group_handles_duplicate_files
+  it 'group handles duplicate files' do
     files = ['lib/a.rb', 'lib/a.rb', 'lib/b.rb']
     result = Yard::Lint::PathGrouper.group(files, limit: 100)
 

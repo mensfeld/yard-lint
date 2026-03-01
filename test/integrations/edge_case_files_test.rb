@@ -1,16 +1,17 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'test_helper'
 
-class EdgeCaseFileHandlingTest < Minitest::Test
+
+describe 'Edge Case Files' do
   attr_reader :fixtures_dir
 
-  def setup
+
+  before do
     @fixtures_dir = File.expand_path('../fixtures', __dir__)
   end
 
-  def test_empty_file_handles_files_with_no_code_gracefully
+  it 'empty file handles files with no code gracefully' do
     files = [File.join(fixtures_dir, 'empty_file.rb')]
 
     config = Yard::Lint::Config.new(
@@ -36,7 +37,7 @@ class EdgeCaseFileHandlingTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_file_with_only_comments_handles_files_with_no_executable_code
+  it 'file with only comments handles files with no executable code' do
     files = [File.join(fixtures_dir, 'only_comments.rb')]
 
     config = Yard::Lint::Config.new(
@@ -62,7 +63,7 @@ class EdgeCaseFileHandlingTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_file_with_only_require_statements_handles_files_with_only_requires
+  it 'file with only require statements handles files with only requires' do
     files = [File.join(fixtures_dir, 'only_requires.rb')]
 
     config = Yard::Lint::Config.new(
@@ -88,7 +89,7 @@ class EdgeCaseFileHandlingTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_file_with_only_constants_handles_files_with_only_constant_definitions
+  it 'file with only constants handles files with only constant definitions' do
     files = [File.join(fixtures_dir, 'only_constants.rb')]
 
     config = Yard::Lint::Config.new(
@@ -111,7 +112,7 @@ class EdgeCaseFileHandlingTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_processing_multiple_edge_case_files_together_handles_a_batch_of_edge_case_files_without_errors
+  it 'processing multiple edge case files together handles a batch of edge case files without errors' do
     files = [
       File.join(fixtures_dir, 'empty_file.rb'),
       File.join(fixtures_dir, 'only_comments.rb'),
@@ -141,7 +142,7 @@ class EdgeCaseFileHandlingTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_edge_case_files_with_exclusions_correctly_applies_exclusions_to_edge_case_files
+  it 'edge case files with exclusions correctly applies exclusions to edge case files' do
     files = [
       File.join(fixtures_dir, 'empty_file.rb'),
       File.join(fixtures_dir, 'only_comments.rb')
@@ -167,7 +168,7 @@ class EdgeCaseFileHandlingTest < Minitest::Test
     assert_respond_to(result, :offenses)
   end
 
-  def test_edge_case_files_with_all_validators_enabled_runs_all_validators_against_edge_case_files_without
+  it 'edge case files with all validators enabled runs all validators against edge case files without' do
     files = [
       File.join(fixtures_dir, 'empty_file.rb'),
       File.join(fixtures_dir, 'only_comments.rb'),

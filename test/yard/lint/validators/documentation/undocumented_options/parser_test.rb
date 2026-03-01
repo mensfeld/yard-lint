@@ -2,14 +2,16 @@
 
 require 'test_helper'
 
-class YardLintValidatorsDocumentationUndocumentedOptionsParserTest < Minitest::Test
+
+describe 'Yard::Lint::Validators::Documentation::UndocumentedOptions::Parser' do
   attr_reader :parser
 
-  def setup
+
+  before do
     @parser = Yard::Lint::Validators::Documentation::UndocumentedOptions::Parser.new
   end
 
-  def test_call_with_valid_violations_parses_single_violation
+  it 'call with valid violations parses single violation' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         data, options = {}
@@ -30,7 +32,7 @@ class YardLintValidatorsDocumentationUndocumentedOptionsParserTest < Minitest::T
       )
   end
 
-  def test_call_with_valid_violations_parses_multiple_violations
+  it 'call with valid violations parses multiple violations' do
       output = <<~OUTPUT
         lib/example.rb:10: MyClass#process
         data, options = {}
@@ -59,7 +61,7 @@ class YardLintValidatorsDocumentationUndocumentedOptionsParserTest < Minitest::T
       )
   end
 
-  def test_call_with_valid_violations_parses_violation_with_kwargs
+  it 'call with valid violations parses violation with kwargs' do
       output = <<~OUTPUT
         lib/example.rb:15: MyClass#configure
         **options
@@ -80,7 +82,7 @@ class YardLintValidatorsDocumentationUndocumentedOptionsParserTest < Minitest::T
       )
   end
 
-  def test_call_with_empty_output_returns_empty_array
+  it 'call with empty output returns empty array' do
       result = parser.call('')
       assert_equal([], result)
   end

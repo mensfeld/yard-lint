@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
-class YardLintConfigValidatorTest < Minitest::Test
-  def test_validate_with_valid_configuration_does_not_raise_error_for_valid_config
+
+describe 'Yard::Lint::ConfigValidator' do
+  it 'validate with valid configuration does not raise error for valid config' do
     config = {
       'AllValidators' => {
         'Exclude' => ['vendor/**/*'],
@@ -18,11 +19,11 @@ class YardLintConfigValidatorTest < Minitest::Test
     Yard::Lint::ConfigValidator.validate!(config)
   end
 
-  def test_validate_with_valid_configuration_does_not_raise_error_for_empty_config
+  it 'validate with valid configuration does not raise error for empty config' do
     Yard::Lint::ConfigValidator.validate!({})
   end
 
-  def test_validate_with_invalid_validator_names_raises_error_for_non_existent_validator
+  it 'validate with invalid validator names raises error for non existent validator' do
     config = {
       'UndocumentedMethod' => {
         'Enabled' => true
@@ -35,7 +36,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_match(/Unknown validator: 'UndocumentedMethod'/, error.message)
   end
 
-  def test_validate_with_invalid_validator_names_raises_error_for_multiple_non_existent_validators
+  it 'validate with invalid validator names raises error for multiple non existent validators' do
     config = {
       'UndocumentedMethod' => { 'Enabled' => true },
       'UndocumentedClass' => { 'Enabled' => true }
@@ -48,7 +49,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, "Unknown validator: 'UndocumentedClass'")
   end
 
-  def test_validate_with_invalid_validator_names_suggests_similar_validator_name
+  it 'validate with invalid validator names suggests similar validator name' do
     config = {
       'Documentation/UndocumentedObject' => { 'Enabled' => true }
     }
@@ -59,7 +60,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_match(/Did you mean: Documentation\/UndocumentedObjects\?/, error.message)
   end
 
-  def test_validate_with_invalid_severity_values_raises_error_for_typo_in_severity
+  it 'validate with invalid severity values raises error for typo in severity' do
     config = {
       'Documentation/UndocumentedObjects' => {
         'Enabled' => true,
@@ -75,7 +76,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Did you mean: error?')
   end
 
-  def test_validate_with_invalid_severity_values_raises_error_for_invalid_global_failonseverity
+  it 'validate with invalid severity values raises error for invalid global failonseverity' do
     config = {
       'AllValidators' => {
         'FailOnSeverity' => 'critical'
@@ -89,7 +90,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Valid values: error, warning, convention, never')
   end
 
-  def test_validate_with_invalid_enabled_values_raises_error_for_non_boolean_enabled_value
+  it 'validate with invalid enabled values raises error for non boolean enabled value' do
     config = {
       'Documentation/UndocumentedObjects' => {
         'Enabled' => 'yes'
@@ -103,7 +104,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Must be true or false')
   end
 
-  def test_validate_with_invalid_global_settings_allows_unknown_allvalidators_keys_for_user_flexibility
+  it 'validate with invalid global settings allows unknown allvalidators keys for user flexibility' do
     config = {
       'AllValidators' => {
         'UnknownSetting' => 'value',
@@ -115,7 +116,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     Yard::Lint::ConfigValidator.validate!(config)
   end
 
-  def test_validate_with_invalid_global_settings_raises_error_for_invalid_mincoverage_value
+  it 'validate with invalid global settings raises error for invalid mincoverage value' do
     config = {
       'AllValidators' => {
         'MinCoverage' => 150
@@ -129,7 +130,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Must be a number between 0 and 100')
   end
 
-  def test_validate_with_invalid_global_settings_raises_error_for_non_numeric_mincoverage
+  it 'validate with invalid global settings raises error for non numeric mincoverage' do
     config = {
       'AllValidators' => {
         'MinCoverage' => 'high'
@@ -142,7 +143,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_match(/Invalid MinCoverage/, error.message)
   end
 
-  def test_validate_with_invalid_global_settings_raises_error_for_non_array_exclude
+  it 'validate with invalid global settings raises error for non array exclude' do
     config = {
       'AllValidators' => {
         'Exclude' => 'vendor/**/*'
@@ -155,7 +156,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Invalid Exclude in AllValidators: must be an array')
   end
 
-  def test_validate_with_invalid_validator_specific_settings_raises_error_for_non_array_exclude_in_validator_config
+  it 'validate with invalid validator specific settings raises error for non array exclude in validator config' do
     config = {
       'Documentation/UndocumentedObjects' => {
         'Exclude' => 'vendor/**/*'
@@ -168,7 +169,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Invalid Exclude for Documentation/UndocumentedObjects: must be an array')
   end
 
-  def test_validate_with_invalid_validator_specific_settings_raises_error_for_unknown_validator_specific_key
+  it 'validate with invalid validator specific settings raises error for unknown validator specific key' do
     config = {
       'Tags/Order' => {
         'UnknownKey' => 'value'
@@ -182,7 +183,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Valid keys:')
   end
 
-  def test_validate_with_multiple_errors_reports_all_errors_at_once
+  it 'validate with multiple errors reports all errors at once' do
     config = {
       'UndocumentedMethod' => { 'Enabled' => true },
       'Documentation/UndocumentedObjects' => {
@@ -199,7 +200,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Invalid Enabled value')
   end
 
-  def test_validate_with_special_keys_allows_inherit_from
+  it 'validate with special keys allows inherit from' do
     config = {
       'inherit_from' => '.base-config.yml'
     }
@@ -207,7 +208,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     Yard::Lint::ConfigValidator.validate!(config)
   end
 
-  def test_validate_with_special_keys_allows_inherit_gem
+  it 'validate with special keys allows inherit gem' do
     config = {
       'inherit_gem' => {
         'rubocop-rspec' => '.rubocop.yml'
@@ -217,7 +218,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     Yard::Lint::ConfigValidator.validate!(config)
   end
 
-  def test_validate_with_metadata_keys_allows_description_in_validator_config
+  it 'validate with metadata keys allows description in validator config' do
     config = {
       'Documentation/UndocumentedObjects' => {
         'Description' => 'Custom description',
@@ -228,7 +229,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     Yard::Lint::ConfigValidator.validate!(config)
   end
 
-  def test_validate_with_type_validation_raises_error_when_allvalidators_is_not_a_hash
+  it 'validate with type validation raises error when allvalidators is not a hash' do
     config = {
       'AllValidators' => true
     }
@@ -239,7 +240,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, 'Invalid AllValidators: must be a Hash, got TrueClass')
   end
 
-  def test_validate_with_type_validation_raises_error_when_validator_config_is_not_a_hash
+  it 'validate with type validation raises error when validator config is not a hash' do
     config = {
       'Tags/Order' => true
     }
@@ -250,7 +251,7 @@ class YardLintConfigValidatorTest < Minitest::Test
     assert_includes(error.message, "Invalid configuration for validator 'Tags/Order': expected a Hash, got TrueClass")
   end
 
-  def test_validate_with_type_validation_raises_error_when_per_validator_yardoptions_is_not_an_array
+  it 'validate with type validation raises error when per validator yardoptions is not an array' do
     config = {
       'Documentation/UndocumentedObjects' => {
         'YardOptions' => '--private'

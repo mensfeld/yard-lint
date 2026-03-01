@@ -2,12 +2,13 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsExampleStyleConfigTest < Minitest::Test
-  def test_id_returns_the_validator_identifier
+
+describe 'Yard::Lint::Validators::Tags::ExampleStyle::Config' do
+  it 'id returns the validator identifier' do
     assert_equal(:example_style, Yard::Lint::Validators::Tags::ExampleStyle::Config.id)
   end
 
-  def test_defaults_returns_default_configuration
+  it 'defaults returns default configuration' do
     assert_equal(
       {
         'Enabled' => false,
@@ -29,23 +30,23 @@ class YardLintValidatorsTagsExampleStyleConfigTest < Minitest::Test
     )
   end
 
-  def test_defaults_returns_frozen_hash
+  it 'defaults returns frozen hash' do
     assert_predicate(Yard::Lint::Validators::Tags::ExampleStyle::Config.defaults, :frozen?)
   end
 
-  def test_defaults_is_disabled_by_default_opt_in
+  it 'defaults is disabled by default opt in' do
     assert_equal(false, Yard::Lint::Validators::Tags::ExampleStyle::Config.defaults['Enabled'])
   end
 
-  def test_defaults_has_convention_severity_by_default
+  it 'defaults has convention severity by default' do
     assert_equal('convention', Yard::Lint::Validators::Tags::ExampleStyle::Config.defaults['Severity'])
   end
 
-  def test_combines_with_returns_empty_array_for_standalone_validator
+  it 'combines with returns empty array for standalone validator' do
     assert_equal([], Yard::Lint::Validators::Tags::ExampleStyle::Config.combines_with)
   end
 
-  def test_inheritance_inherits_from_base_config_class
+  it 'inheritance inherits from base config class' do
     assert_equal(
       Yard::Lint::Validators::Config,
       Yard::Lint::Validators::Tags::ExampleStyle::Config.superclass

@@ -2,17 +2,19 @@
 
 require 'test_helper'
 
-class MeaninglessTagIntegrationTest < Minitest::Test
-  attr_reader :config, :fixture_path
 
-  def setup
+describe 'Meaningless Tag' do
+  attr_reader :fixture_path, :config
+
+
+  before do
     @fixture_path = File.expand_path('../fixtures/meaningless_tag_examples.rb', __dir__)
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/MeaninglessTag', 'Enabled', true)
+      c.set_validator_config('Tags/MeaninglessTag', 'Enabled', true)
     end
   end
 
-  def test_detecting_meaningless_tags_finds_param_tags_on_classes
+  it 'detecting meaningless tags finds param tags on classes' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     param_on_class = result.offenses.select do |o|
@@ -24,7 +26,7 @@ class MeaninglessTagIntegrationTest < Minitest::Test
     refute_empty(param_on_class)
   end
 
-  def test_detecting_meaningless_tags_finds_option_tags_on_modules
+  it 'detecting meaningless tags finds option tags on modules' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     option_on_module = result.offenses.select do |o|
@@ -36,7 +38,7 @@ class MeaninglessTagIntegrationTest < Minitest::Test
     refute_empty(option_on_module)
   end
 
-  def test_detecting_meaningless_tags_finds_param_tags_on_constants
+  it 'detecting meaningless tags finds param tags on constants' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     param_on_constant = result.offenses.select do |o|
@@ -48,7 +50,7 @@ class MeaninglessTagIntegrationTest < Minitest::Test
     refute_empty(param_on_constant)
   end
 
-  def test_detecting_meaningless_tags_does_not_flag_valid_param_tags_on_methods
+  it 'detecting meaningless tags does not flag valid param tags on methods' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     # All offenses should be on classes/modules/constants, not methods
@@ -60,7 +62,7 @@ class MeaninglessTagIntegrationTest < Minitest::Test
     end
   end
 
-  def test_detecting_meaningless_tags_provides_helpful_error_messages
+  it 'detecting meaningless tags provides helpful error messages' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
     offense = result.offenses.find { |o| o[:name] == 'MeaninglessTag' }
@@ -69,9 +71,9 @@ class MeaninglessTagIntegrationTest < Minitest::Test
     assert_includes(offense[:message], 'only makes sense on methods')
   end
 
-  def test_when_disabled_does_not_run_validation
+  it 'when disabled does not run validation' do
     disabled_config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/MeaninglessTag', 'Enabled', false)
+      c.set_validator_config('Tags/MeaninglessTag', 'Enabled', false)
     end
 
     result = Yard::Lint.run(path: fixture_path, config: disabled_config, progress: false)

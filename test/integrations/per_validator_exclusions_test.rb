@@ -2,14 +2,16 @@
 
 require 'test_helper'
 
-class PerValidatorExclusionsTest < Minitest::Test
+
+describe 'Per Validator Exclusions' do
   attr_reader :fixtures_dir
 
-  def setup
+
+  before do
     @fixtures_dir = File.expand_path('fixtures', __dir__)
   end
 
-  def test_filtering_files_per_validator_excludes_files_only_for_specific_validators
+  it 'filtering files per validator excludes files only for specific validators' do
     files = [
       File.join(fixtures_dir, 'missing_param_docs.rb'),
       File.join(fixtures_dir, 'undocumented_objects.rb')
@@ -45,7 +47,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert(undoc_arg_locations.none? { |loc| loc =~ /undocumented_objects\.rb/ })
   end
 
-  def test_with_glob_patterns_supports_wildcard_and_recursive_patterns
+  it 'with glob patterns supports wildcard and recursive patterns' do
     files = [
       File.join(fixtures_dir, 'yard_warnings.rb')
     ]
@@ -68,7 +70,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_empty(unknown_tag_offenses)
   end
 
-  def test_combining_global_and_per_validator_exclusions_applies_validator_specific_exclusions_independently
+  it 'combining global and per validator exclusions applies validator specific exclusions independently' do
     files = [
       File.join(fixtures_dir, 'missing_param_docs.rb'),
       File.join(fixtures_dir, 'undocumented_objects.rb')
@@ -95,7 +97,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_empty(undoc_arg_offenses)
   end
 
-  def test_combining_global_and_per_validator_exclusions_merges_global_exclusions_with_per_validator_exclusions
+  it 'combining global and per validator exclusions merges global exclusions with per validator exclusions' do
     files = [
       File.join(fixtures_dir, 'private_methods.rb'),
       File.join(fixtures_dir, 'protected_methods.rb')
@@ -127,7 +129,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_equal(true, undoc_arg_files.none? { |f| f.include?('protected_methods.rb') })
   end
 
-  def test_per_validator_exclusions_do_not_affect_other_validators_allows_other_validators_to_still_process
+  it 'per validator exclusions do not affect other validators allows other validators to still process' do
     files = [
       File.join(fixtures_dir, 'undocumented_class.rb')
     ]
@@ -160,7 +162,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     refute_empty(undoc_object_offenses)
   end
 
-  def test_private_methods_enforce_tag_order_but_allow_undocumented
+  it 'private methods enforce tag order but allow undocumented' do
     files = [
       File.join(fixtures_dir, 'private_methods.rb')
     ]
@@ -218,7 +220,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_includes(private_methods_offense[:method_name], 'documented_private_wrong_order')
   end
 
-  def test_private_constants_enforce_tag_order_but_allow_undocumented
+  it 'private constants enforce tag order but allow undocumented' do
     files = [
       File.join(fixtures_dir, 'private_constants.rb')
     ]
@@ -279,7 +281,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_equal('colorize', private_methods_offense[:method_name])
   end
 
-  def test_protected_methods_enforce_tag_order_but_allow_undocumented
+  it 'protected methods enforce tag order but allow undocumented' do
     files = [
       File.join(fixtures_dir, 'protected_methods.rb')
     ]
@@ -327,7 +329,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     refute_nil(protected_offense)
   end
 
-  def test_module_functions_with_selective_exclusions
+  it 'module functions with selective exclusions' do
     files = [
       File.join(fixtures_dir, 'module_functions.rb')
     ]
@@ -364,7 +366,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_equal(true, undoc_methods.any? { |m| m&.include?('undocumented') })
   end
 
-  def test_class_methods_with_separate_exclusions_validates_both
+  it 'class methods with separate exclusions validates both' do
     files = [
       File.join(fixtures_dir, 'class_methods.rb')
     ]
@@ -408,7 +410,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     refute_nil(class_method_offense)
   end
 
-  def test_attribute_methods_with_exclusions_validates
+  it 'attribute methods with exclusions validates' do
     files = [
       File.join(fixtures_dir, 'attribute_methods.rb')
     ]
@@ -456,7 +458,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_empty(excluded_offenses)
   end
 
-  def test_complex_method_signatures_with_missing_parameter_documentation
+  it 'complex method signatures with missing parameter documentation' do
     files = [
       File.join(fixtures_dir, 'complex_signatures.rb')
     ]
@@ -485,7 +487,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_equal(true, undoc_methods.any? { |m| m&.include?('process') })
   end
 
-  def test_mixed_visibility_in_single_file_with_selective_exclusions
+  it 'mixed visibility in single file with selective exclusions' do
     files = [
       File.join(fixtures_dir, 'mixed_visibility.rb')
     ]
@@ -530,7 +532,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_equal(true, wrong_order_methods.any? { |m| m&.include?('public_wrong_order') })
   end
 
-  def test_multiple_validators_with_overlapping_file_exclusions
+  it 'multiple validators with overlapping file exclusions' do
     files = [
       File.join(fixtures_dir, 'missing_param_docs.rb')
     ]
@@ -563,7 +565,7 @@ class PerValidatorExclusionsTest < Minitest::Test
     assert_empty(undoc_arg_offenses)
   end
 
-  def test_per_validator_exclusions_with_cross_validator_scenarios
+  it 'per validator exclusions with cross validator scenarios' do
     files = [
       File.join(fixtures_dir, 'protected_methods.rb'),
       File.join(fixtures_dir, 'private_methods.rb')

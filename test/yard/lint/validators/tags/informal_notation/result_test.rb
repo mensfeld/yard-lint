@@ -2,21 +2,21 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsInformalNotationResultTest < Minitest::Test
 
-  def test_class_attributes_has_default_severity_set_to_warning
+describe 'Yard::Lint::Validators::Tags::InformalNotation::Result' do
+  it 'class attributes has default severity set to warning' do
     assert_equal('warning', Yard::Lint::Validators::Tags::InformalNotation::Result.default_severity)
   end
 
-  def test_class_attributes_has_offense_type_set_to_line
+  it 'class attributes has offense type set to line' do
     assert_equal('line', Yard::Lint::Validators::Tags::InformalNotation::Result.offense_type)
   end
 
-  def test_class_attributes_has_offense_name_set_to_informalnotation
+  it 'class attributes has offense name set to informalnotation' do
     assert_equal('InformalNotation', Yard::Lint::Validators::Tags::InformalNotation::Result.offense_name)
   end
 
-  def test_build_message_delegates_to_messagesbuilder
+  it 'build message delegates to messagesbuilder' do
     offense = {
       pattern: 'Note',
       replacement: '@note',
@@ -33,7 +33,7 @@ class YardLintValidatorsTagsInformalNotationResultTest < Minitest::Test
     assert_equal('formatted message', message)
   end
 
-  def test_inheritance_inherits_from_results_base
+  it 'inheritance inherits from results base' do
     assert_equal(Yard::Lint::Results::Base, Yard::Lint::Validators::Tags::InformalNotation::Result.superclass)
   end
 end

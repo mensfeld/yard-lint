@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
-require 'tempfile'
 require 'test_helper'
 
-class EmptyInitializeMethodsTest < Minitest::Test
+require 'tempfile'
+
+describe 'Empty Initialize Methods' do
   attr_reader :temp_file
 
-  def setup
+
+  before do
     @temp_file = Tempfile.new(['test', '.rb'])
   end
 
-  def teardown
+  after do
     temp_file.unlink
   end
 
@@ -21,7 +23,7 @@ class EmptyInitializeMethodsTest < Minitest::Test
 
   # --- Default config (ExcludedMethods includes initialize/0) ---
 
-  def test_default_does_not_flag_initialize_with_no_parameters
+  it 'default does not flag initialize with no parameters' do
     temp_file.write(<<~RUBY)
       class Example
         def initialize
@@ -37,7 +39,7 @@ class EmptyInitializeMethodsTest < Minitest::Test
     })
   end
 
-  def test_default_still_flags_initialize_with_parameters_when_undocumented
+  it 'default still flags initialize with parameters when undocumented' do
     temp_file.write(<<~RUBY)
       class Example
         def initialize(value)
@@ -53,7 +55,7 @@ class EmptyInitializeMethodsTest < Minitest::Test
     })
   end
 
-  def test_default_does_not_flag_documented_initialize_with_parameters
+  it 'default does not flag documented initialize with parameters' do
     temp_file.write(<<~RUBY)
       class Example
         # @param value [Integer] the value
@@ -70,7 +72,7 @@ class EmptyInitializeMethodsTest < Minitest::Test
     })
   end
 
-  def test_default_still_flags_initialize_with_optional_parameters_and_no_docs
+  it 'default still flags initialize with optional parameters and no docs' do
     temp_file.write(<<~RUBY)
       class Example
         def initialize(value = nil)
@@ -87,7 +89,7 @@ class EmptyInitializeMethodsTest < Minitest::Test
     })
   end
 
-  def test_default_still_flags_initialize_with_keyword_arguments_and_no_docs
+  it 'default still flags initialize with keyword arguments and no docs' do
     temp_file.write(<<~RUBY)
       class Example
         def initialize(value:)
@@ -106,9 +108,9 @@ class EmptyInitializeMethodsTest < Minitest::Test
 
   # --- Empty ExcludedMethods config ---
 
-  def test_empty_excluded_methods_flags_initialize_with_no_parameters_when_undocumented
+  it 'empty excluded methods flags initialize with no parameters when undocumented' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', [])
     end
 
@@ -127,9 +129,9 @@ class EmptyInitializeMethodsTest < Minitest::Test
     })
   end
 
-  def test_empty_excluded_methods_does_not_flag_documented_initialize_with_no_parameters
+  it 'empty excluded methods does not flag documented initialize with no parameters' do
     config = Yard::Lint::Config.new do |c|
-      c.send(:set_validator_config, 'Documentation/UndocumentedObjects',
+      c.set_validator_config('Documentation/UndocumentedObjects',
         'ExcludedMethods', [])
     end
 

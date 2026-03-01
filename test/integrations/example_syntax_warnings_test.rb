@@ -2,14 +2,17 @@
 
 require 'test_helper'
 
-class ExampleSyntaxWarningSuppressionTest < Minitest::Test
-  def setup
+
+describe 'Example Syntax Warnings' do
+  attr_reader :config
+
+  before do
     @config = test_config do |c|
-      c.send(:set_validator_config, 'Tags/ExampleSyntax', 'Enabled', true)
+      c.set_validator_config('Tags/ExampleSyntax', 'Enabled', true)
       end
   end
 
-  def test_suppresses_at_eol_warnings_for_argument_forwarding_syntax
+  it 'suppresses at eol warnings for argument forwarding syntax' do
     fixture_content = <<~RUBY
       # frozen_string_literal: true
 
@@ -45,7 +48,7 @@ class ExampleSyntaxWarningSuppressionTest < Minitest::Test
       end
   end
 
-  def test_suppresses_warnings_for_endless_ranges_in_example_code
+  it 'suppresses warnings for endless ranges in example code' do
     fixture_content = <<~RUBY
       # frozen_string_literal: true
 
@@ -81,7 +84,7 @@ class ExampleSyntaxWarningSuppressionTest < Minitest::Test
     end
   end
 
-  def test_still_detects_actual_syntax_errors_in_example_code
+  it 'still detects actual syntax errors in example code' do
     fixture_content = <<~RUBY
       # frozen_string_literal: true
 

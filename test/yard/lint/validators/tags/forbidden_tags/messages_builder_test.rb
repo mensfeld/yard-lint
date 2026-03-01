@@ -2,9 +2,9 @@
 
 require 'test_helper'
 
-class YardLintValidatorsTagsForbiddenTagsMessagesBuilderTest < Minitest::Test
 
-  def test_call_formats_message_for_tag_with_specific_types_forbidden
+describe 'Yard::Lint::Validators::Tags::ForbiddenTags::MessagesBuilder' do
+  it 'call formats message for tag with specific types forbidden' do
     offense = {
       tag_name: 'return',
       types_text: 'void',
@@ -19,7 +19,7 @@ class YardLintValidatorsTagsForbiddenTagsMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_message_for_tag_only_pattern_no_types
+  it 'call formats message for tag only pattern no types' do
     offense = {
       tag_name: 'api',
       types_text: '',
@@ -35,7 +35,7 @@ class YardLintValidatorsTagsForbiddenTagsMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_message_with_multiple_types
+  it 'call formats message with multiple types' do
     offense = {
       tag_name: 'param',
       types_text: 'Object,Hash',
@@ -51,7 +51,7 @@ class YardLintValidatorsTagsForbiddenTagsMessagesBuilderTest < Minitest::Test
     )
   end
 
-  def test_call_formats_message_when_types_text_is_nil
+  it 'call formats message when types text is nil' do
     offense = {
       tag_name: 'api',
       types_text: nil,

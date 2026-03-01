@@ -2,22 +2,24 @@
 
 require 'test_helper'
 
-class YardLintConfigLoaderTest < Minitest::Test
+
+describe 'Yard::Lint::ConfigLoader' do
   attr_reader :config_dir, :config_path
 
-  def setup
+
+  before do
     @config_dir = File.expand_path('../../../fixtures', __dir__)
     @config_path = File.join(config_dir, 'test_config.yml')
     FileUtils.mkdir_p(config_dir)
   end
 
-  def teardown
+  after do
     FileUtils.rm_f(config_path)
   end
 
   # .load (class method)
 
-  def test_load_loads_a_configuration_file
+  it 'load loads a configuration file' do
     config_path_local = File.join(config_dir, 'basic_config.yml')
     File.write(config_path_local, "AllValidators:\n  Exclude:\n    - 'vendor/**/*'")
 
@@ -31,53 +33,53 @@ class YardLintConfigLoaderTest < Minitest::Test
 
   # .validator_module
 
-  def test_validator_module_returns_the_correct_module_for_tags_order
+  it 'validator module returns the correct module for tags order' do
     assert_equal(Yard::Lint::Validators::Tags::Order, Yard::Lint::ConfigLoader.validator_module('Tags/Order'))
   end
 
-  def test_validator_module_returns_the_correct_module_for_tags_invalidtypes
+  it 'validator module returns the correct module for tags invalidtypes' do
     assert_equal(Yard::Lint::Validators::Tags::InvalidTypes, Yard::Lint::ConfigLoader.validator_module('Tags/InvalidTypes'))
   end
 
-  def test_validator_module_returns_the_correct_module_for_tags_apitags
+  it 'validator module returns the correct module for tags apitags' do
     assert_equal(Yard::Lint::Validators::Tags::ApiTags, Yard::Lint::ConfigLoader.validator_module('Tags/ApiTags'))
   end
 
-  def test_validator_module_returns_the_correct_module_for_documentation_undocumentedmethodarguments
+  it 'validator module returns the correct module for documentation undocumentedmethodarguments' do
     assert_equal(
       Yard::Lint::Validators::Documentation::UndocumentedMethodArguments,
       Yard::Lint::ConfigLoader.validator_module('Documentation/UndocumentedMethodArguments')
     )
   end
 
-  def test_validator_module_returns_the_correct_module_for_semantic_abstractmethods
+  it 'validator module returns the correct module for semantic abstractmethods' do
     assert_equal(
       Yard::Lint::Validators::Semantic::AbstractMethods,
       Yard::Lint::ConfigLoader.validator_module('Semantic/AbstractMethods')
     )
   end
 
-  def test_validator_module_returns_the_correct_module_for_warnings_unknowntag
+  it 'validator module returns the correct module for warnings unknowntag' do
     assert_equal(
       Yard::Lint::Validators::Warnings::UnknownTag,
       Yard::Lint::ConfigLoader.validator_module('Warnings/UnknownTag')
     )
   end
 
-  def test_validator_module_returns_the_correct_module_for_documentation_undocumentedobjects
+  it 'validator module returns the correct module for documentation undocumentedobjects' do
     assert_equal(
       Yard::Lint::Validators::Documentation::UndocumentedObjects,
       Yard::Lint::ConfigLoader.validator_module('Documentation/UndocumentedObjects')
     )
   end
 
-  def test_validator_module_returns_nil_for_non_existent_validators
+  it 'validator module returns nil for non existent validators' do
     assert_nil(Yard::Lint::ConfigLoader.validator_module('Tags/NonExistent'))
   end
 
   # #load (instance method)
 
-  def test_load_loads_a_simple_configuration
+  it 'load loads a simple configuration' do
     File.write(config_path, <<~YAML)
       AllValidators:
         Exclude:
@@ -90,7 +92,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     assert_equal(['test/**/*'], config['AllValidators']['Exclude'])
   end
 
-  def test_load_handles_empty_configuration_files
+  it 'load handles empty configuration files' do
     File.write(config_path, '')
 
     loader = Yard::Lint::ConfigLoader.new(config_path)
@@ -99,7 +101,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     assert_equal({}, config)
   end
 
-  def test_load_merges_inherited_configurations_with_inherit_from
+  it 'load merges inherited configurations with inherit from' do
     base_config_path = File.join(config_dir, 'base_config.yml')
     File.write(base_config_path, <<~YAML)
       AllValidators:
@@ -122,7 +124,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     FileUtils.rm_f(base_config_path)
   end
 
-  def test_load_handles_multiple_inherited_files_with_inherit_from
+  it 'load handles multiple inherited files with inherit from' do
     base1_path = File.join(config_dir, 'base1.yml')
     base2_path = File.join(config_dir, 'base2.yml')
 
@@ -151,7 +153,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     FileUtils.rm_f([base1_path, base2_path])
   end
 
-  def test_load_raises_error_on_circular_dependencies
+  it 'load raises error on circular dependencies' do
     circular1_path = File.join(config_dir, 'circular1.yml')
     circular2_path = File.join(config_dir, 'circular2.yml')
 
@@ -170,7 +172,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     FileUtils.rm_f([circular1_path, circular2_path])
   end
 
-  def test_load_overrides_inherited_array_values_completely
+  it 'load overrides inherited array values completely' do
     base_config_path = File.join(config_dir, 'base_config.yml')
     File.write(base_config_path, <<~YAML)
       AllValidators:
@@ -195,7 +197,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     FileUtils.rm_f(base_config_path)
   end
 
-  def test_load_merges_hash_values_deeply
+  it 'load merges hash values deeply' do
     base_config_path = File.join(config_dir, 'base_config.yml')
     File.write(base_config_path, <<~YAML)
       Tags/Order:
@@ -218,7 +220,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     FileUtils.rm_f(base_config_path)
   end
 
-  def test_load_skips_non_existent_inherited_files
+  it 'load skips non existent inherited files' do
     File.write(config_path, <<~YAML)
       inherit_from: non_existent.yml
       AllValidators:
@@ -233,7 +235,7 @@ class YardLintConfigLoaderTest < Minitest::Test
 
   # gem inheritance
 
-  def test_gem_inheritance_handles_missing_gems_gracefully
+  it 'gem inheritance handles missing gems gracefully' do
     gem_config_path = File.join(config_dir, 'test_gem_config.yml')
     File.write(gem_config_path, <<~YAML)
       inherit_gem:
@@ -249,7 +251,7 @@ class YardLintConfigLoaderTest < Minitest::Test
 
   # merge behavior
 
-  def test_merge_behavior_does_not_include_inherit_from_in_merged_config
+  it 'merge behavior does not include inherit from in merged config' do
     merge_config_path = File.join(config_dir, 'merge_test.yml')
     File.write(merge_config_path, <<~YAML)
       inherit_from: base.yml
@@ -266,7 +268,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     FileUtils.rm_f(merge_config_path)
   end
 
-  def test_merge_behavior_does_not_include_inherit_gem_in_merged_config
+  it 'merge behavior does not include inherit gem in merged config' do
     merge_config_path = File.join(config_dir, 'merge_test.yml')
     File.write(merge_config_path, <<~YAML)
       inherit_gem:
@@ -284,7 +286,7 @@ class YardLintConfigLoaderTest < Minitest::Test
     FileUtils.rm_f(merge_config_path)
   end
 
-  def test_merge_behavior_merges_scalar_values_by_overriding
+  it 'merge behavior merges scalar values by overriding' do
     base_config_path = File.join(config_dir, 'scalar_base.yml')
     merge_config_path = File.join(config_dir, 'merge_test.yml')
 
