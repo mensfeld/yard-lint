@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::StatsCalculator' do
   attr_reader :config, :files, :calculator
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -175,3 +171,4 @@ describe 'Yard::Lint::StatsCalculator' do
     assert_includes(query, 'undoc')
   end
 end
+

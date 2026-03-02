@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tempfile'
 
 describe 'Unknown Parameter Name' do
   attr_reader :temp_file, :config
-
 
   before do
     @temp_file = Tempfile.new(['test', '.rb'])
@@ -348,3 +345,4 @@ describe 'Unknown Parameter Name' do
     assert_includes(kwarg_offense[:message], "did you mean 'kwargs'?")
   end
 end
+

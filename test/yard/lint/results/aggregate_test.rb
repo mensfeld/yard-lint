@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Results::Aggregate' do
   attr_reader :result1, :result2, :result3, :config, :aggregate
-
 
   before do
     @result1 = stub(
@@ -203,3 +199,4 @@ describe 'Yard::Lint::Results::Aggregate' do
     assert_equal(0, agg.exit_code)
   end
 end
+

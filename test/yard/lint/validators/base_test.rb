@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Base' do
   attr_reader :config, :selection, :validator
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -142,3 +138,4 @@ describe 'YardLintValidatorsBaseConfigOrDefault' do
     assert_nil(result)
   end
 end
+

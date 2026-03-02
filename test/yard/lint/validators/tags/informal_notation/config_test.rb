@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::InformalNotation::Config' do
   it 'class attributes has id set to informal notation' do
     assert_equal(:informal_notation, Yard::Lint::Validators::Tags::InformalNotation::Config.id)
@@ -42,3 +39,4 @@ describe 'Yard::Lint::Validators::Tags::InformalNotation::Config' do
     )
   end
 end
+

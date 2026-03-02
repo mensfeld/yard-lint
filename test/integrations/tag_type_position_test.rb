@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Tag Type Position' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/tag_type_position_examples.rb', __dir__)
@@ -34,3 +30,4 @@ describe 'Tag Type Position' do
       end
   end
 end
+

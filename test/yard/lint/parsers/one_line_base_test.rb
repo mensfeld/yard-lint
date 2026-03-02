@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Parsers::OneLineBase' do
   attr_reader :parser_class, :parser
-
 
   before do
     @parser_class = Class.new(Yard::Lint::Parsers::OneLineBase) do
@@ -55,3 +51,4 @@ describe 'Yard::Lint::Parsers::OneLineBase' do
     assert_kind_of(Yard::Lint::Parsers::OneLineBase, parser)
   end
 end
+

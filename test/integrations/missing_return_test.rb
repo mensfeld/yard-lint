@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'fileutils'
 
@@ -263,3 +261,4 @@ describe 'Missing Return' do
     flagged_methods.each { |e| assert_match(/without_return/, e) }
   end
 end
+

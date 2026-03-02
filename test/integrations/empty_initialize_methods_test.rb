@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tempfile'
 
 describe 'Empty Initialize Methods' do
   attr_reader :temp_file
-
 
   before do
     @temp_file = Tempfile.new(['test', '.rb'])
@@ -151,3 +148,4 @@ describe 'Empty Initialize Methods' do
     })
   end
 end
+

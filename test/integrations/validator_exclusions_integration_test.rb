@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Validator Exclusions Integration' do
   attr_reader :config
 
@@ -165,3 +162,4 @@ describe 'Validator Exclusions Integration' do
     assert_empty(config_offenses)
   end
 end
+

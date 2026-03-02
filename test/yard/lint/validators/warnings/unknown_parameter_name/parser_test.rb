@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Warnings::UnknownParameterName::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Warnings::UnknownParameterName::Parser.new

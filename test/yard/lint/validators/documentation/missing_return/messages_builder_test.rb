@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder' do
   it 'call builds message for instance method' do
     offense = { element: 'Calculator#add' }
@@ -46,3 +43,4 @@ describe 'Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder'
     assert(message.start_with?('Missing @return tag for'))
   end
 end
+

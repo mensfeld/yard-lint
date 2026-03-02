@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::ResultBuilder' do
   attr_reader :config, :builder
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -166,3 +162,4 @@ describe 'Yard::Lint::ResultBuilder' do
     refute_nil(result)
   end
 end
+

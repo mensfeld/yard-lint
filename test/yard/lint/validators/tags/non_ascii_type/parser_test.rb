@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::NonAsciiType::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Tags::NonAsciiType::Parser.new
@@ -104,3 +100,4 @@ describe 'Yard::Lint::Validators::Tags::NonAsciiType::Parser' do
     assert_equal(Yard::Lint::Parsers::Base, Yard::Lint::Validators::Tags::NonAsciiType::Parser.superclass)
   end
 end
+

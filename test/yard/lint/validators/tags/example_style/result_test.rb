@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::Result' do
   it 'class attributes has convention default severity' do
     assert_equal('convention', Yard::Lint::Validators::Tags::ExampleStyle::Result.default_severity)
@@ -81,3 +78,4 @@ describe 'Yard::Lint::Validators::Tags::ExampleStyle::Result' do
     assert_includes(offense[:message], 'Prefer single-quoted strings')
   end
 end
+

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::TodoGenerator' do
   attr_reader :test_dir, :config
-
 
   before do
     @test_dir = Dir.mktmpdir('todo-generator-test')
@@ -348,3 +344,4 @@ describe 'Yard::Lint::TodoGenerator' do
     end
   end
 end
+

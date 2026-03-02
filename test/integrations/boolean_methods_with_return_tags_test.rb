@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'fileutils'
 
 describe 'Boolean Methods With Return Tags' do
   attr_reader :config
-
 
   before do
     @config = Yard::Lint::Config.new do |c|
@@ -254,3 +251,4 @@ describe 'Boolean Methods With Return Tags' do
       "Method 'to' with complete docs should not be flagged")
   end
 end
+

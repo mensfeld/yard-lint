@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ExampleSyntax::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Tags::ExampleSyntax::Parser.new
@@ -167,3 +163,4 @@ describe 'Yard::Lint::Validators::Tags::ExampleSyntax::Parser' do
     assert_includes(result[0][:error_message], '<compiled>:1: syntax error')
   end
 end
+

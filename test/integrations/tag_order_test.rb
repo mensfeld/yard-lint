@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Tag Order' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/tag_order_examples.rb', __dir__)
@@ -177,3 +173,4 @@ describe 'Tag Order' do
     assert_empty(order_offenses)
   end
 end
+

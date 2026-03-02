@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Results::Base' do
   attr_reader :test_result_class
-
 
   before do
     @test_result_class = Class.new(Yard::Lint::Results::Base) do
@@ -173,3 +169,4 @@ describe 'Yard::Lint::Results::Base' do
     assert_equal('warning', result.offenses.first[:severity])
   end
 end
+

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::MessagesBuilder' do
   it 'call with single blank line returns message' do
     offense = {
@@ -75,3 +72,4 @@ describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Mess
     assert_equal(true, Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::MessagesBuilder::ERROR_DESCRIPTIONS.frozen?)
   end
 end
+

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'fileutils'
 require 'open3'
@@ -431,3 +429,4 @@ describe 'Todo Generation' do
     assert_includes(result[:stdout], 'Error')
   end
 end
+

@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tempfile'
 
 describe 'Unknown Tag' do
   attr_reader :temp_file, :config
-
 
   before do
     @temp_file = Tempfile.new(['test', '.rb'])
@@ -330,3 +327,4 @@ describe 'Unknown Tag' do
     end
   end
 end
+

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 
 describe 'Yard::Lint::Config' do
@@ -307,3 +305,4 @@ describe 'Yard::Lint::Config' do
     assert_equal(true, config.validator_enabled?('Tags/Order'))
   end
 end
+

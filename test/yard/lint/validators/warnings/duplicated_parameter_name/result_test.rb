@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Warnings::DuplicatedParameterName::Result' do
   attr_reader :config, :parsed_data, :result
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -29,3 +25,4 @@ describe 'Yard::Lint::Validators::Warnings::DuplicatedParameterName::Result' do
     assert_equal([], result.offenses)
   end
 end
+

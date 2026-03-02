@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::UndocumentedObjects::Config' do
   it 'id returns the validator identifier' do
     assert_equal(
@@ -44,3 +41,4 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedObjects::Config' do
     )
   end
 end
+

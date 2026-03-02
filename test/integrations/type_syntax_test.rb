@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Type Syntax' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/type_syntax_examples.rb', __dir__)
@@ -149,3 +145,4 @@ describe 'Type Syntax' do
     assert_match(/@(param|return|option)/, offense[:message])
   end
 end
+

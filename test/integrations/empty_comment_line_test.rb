@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Empty Comment Line' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/empty_comment_lines.rb', __dir__)
@@ -130,3 +126,4 @@ describe 'Empty Comment Line' do
     assert_empty(valid_method_offenses)
   end
 end
+

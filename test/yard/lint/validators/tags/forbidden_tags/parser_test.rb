@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Tags::ForbiddenTags::Parser.new
@@ -86,3 +82,4 @@ describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Parser' do
     assert_equal([], result)
   end
 end
+

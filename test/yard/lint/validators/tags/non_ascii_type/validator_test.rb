@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::NonAsciiType::Validator' do
   attr_reader :config, :selection, :validator, :pattern
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -49,3 +45,4 @@ describe 'Yard::Lint::Validators::Tags::NonAsciiType::Validator' do
     refute_match(pattern, hash_type)
   end
 end
+

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Runner' do
   attr_reader :selection, :config, :runner
-
 
   before do
     @selection = ['lib/example.rb']
@@ -119,3 +115,4 @@ describe 'Yard::Lint::Runner' do
     assert_equal(0, result.count)
   end
 end
+

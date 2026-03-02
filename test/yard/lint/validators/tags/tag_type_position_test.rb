@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::TagTypePosition' do
   it 'has all required components' do
   assert(defined?(Yard::Lint::Validators::Tags::TagTypePosition::Validator))

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Multi Validator Comprehensive' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('fixtures/multi_validator_comprehensive.rb', __dir__)
@@ -195,3 +191,4 @@ describe 'Multi Validator Comprehensive' do
     assert_equal(result1.count, result2.count)
   end
 end
+

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::ConfigValidator' do
   it 'validate with valid configuration does not raise error for valid config' do
     config = {
@@ -264,3 +261,4 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_includes(error.message, 'Invalid YardOptions for Documentation/UndocumentedObjects: must be an array')
   end
 end
+

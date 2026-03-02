@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::MessagesBuilder' do
   it 'call with single missing separator generates message for single transition' do
     offense = {
@@ -41,3 +38,4 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::MessagesBuilder' do
     )
   end
 end
+

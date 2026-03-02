@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner' do
   attr_reader :runner
-
 
   before do
     @runner = Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner.new(
@@ -232,3 +228,4 @@ describe 'YardLintValidatorsTagsExampleStyleRubocopRunnerErrorHandling' do
     assert_equal([], result)
   end
 end
+

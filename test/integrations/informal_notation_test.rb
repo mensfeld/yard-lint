@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Informal Notation' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/informal_notation_examples.rb', __dir__)
@@ -147,3 +143,4 @@ describe 'Informal Notation' do
     refute_empty(offenses)
   end
 end
+

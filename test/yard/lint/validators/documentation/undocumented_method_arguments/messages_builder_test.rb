@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::MessagesBuilder' do
   it 'call builds message for undocumented method arguments' do
     offense = { method_name: 'calculate' }
@@ -26,3 +23,4 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Me
     )
   end
 end
+

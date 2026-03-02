@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Git' do
   attr_reader :path
-
 
   before do
     @path = '/home/user/project/lib'
@@ -299,3 +295,4 @@ describe 'Yard::Lint::Git' do
     assert_equal(false, result)
   end
 end
+

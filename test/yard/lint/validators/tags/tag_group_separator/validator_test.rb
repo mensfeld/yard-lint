@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
   attr_reader :config, :selection, :validator, :collector
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -140,3 +136,4 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
     object
   end
 end
+

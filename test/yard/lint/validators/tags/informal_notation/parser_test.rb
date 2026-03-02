@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::InformalNotation::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Tags::InformalNotation::Parser.new
@@ -85,3 +81,4 @@ describe 'Yard::Lint::Validators::Tags::InformalNotation::Parser' do
     assert_equal('', result[0][:line_text])
   end
 end
+

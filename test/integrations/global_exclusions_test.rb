@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Global Exclusions' do
   attr_reader :test_dir, :vendor_dir, :lib_dir, :vendor_file, :lib_file
-
 
   before do
     @test_dir = Dir.mktmpdir('yard-lint-test')
@@ -158,3 +154,4 @@ describe 'Global Exclusions' do
     refute_includes(file_paths, lib_file)
   end
 end
+

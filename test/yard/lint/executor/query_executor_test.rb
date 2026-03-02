@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Executor::QueryExecutor' do
   attr_reader :registry, :executor
-
 
   before do
     @registry = stub('registry')
@@ -576,3 +572,4 @@ describe 'Yard::Lint::Executor::QueryExecutor' do
     assert_equal(0, result[:exit_code])
   end
 end
+

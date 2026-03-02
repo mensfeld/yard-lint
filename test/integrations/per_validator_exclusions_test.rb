@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Per Validator Exclusions' do
   attr_reader :fixtures_dir
-
 
   before do
     @fixtures_dir = File.expand_path('fixtures', __dir__)
@@ -607,3 +603,4 @@ describe 'Per Validator Exclusions' do
     refute_empty(tag_order_offenses)
   end
 end
+

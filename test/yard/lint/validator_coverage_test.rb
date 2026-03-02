@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::ValidatorCoverage' do
   attr_reader :all_validators, :project_root
-
 
   before do
     @all_validators = Yard::Lint::ConfigLoader::ALL_VALIDATORS
@@ -41,3 +37,4 @@ describe 'Yard::Lint::ValidatorCoverage' do
     end
   end
 end
+

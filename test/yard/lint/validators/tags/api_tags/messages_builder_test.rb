@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ApiTags::MessagesBuilder' do
   it 'call builds message for missing api tag' do
     offense = {
@@ -38,3 +35,4 @@ describe 'Yard::Lint::Validators::Tags::ApiTags::MessagesBuilder' do
     assert_equal("Object `MyClass` has invalid @api tag value: 'deprecated'", message)
   end
 end
+

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::EmptyCommentLine::Result' do
   attr_reader :config, :parsed_data, :result
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -54,3 +50,4 @@ describe 'Yard::Lint::Validators::Documentation::EmptyCommentLine::Result' do
     assert_includes(result.build_message(offense), 'MyClass#process')
   end
 end
+

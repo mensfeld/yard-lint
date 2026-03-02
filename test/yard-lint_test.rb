@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-  require 'yard-lint'
-
 describe 'Yard-Lint' do
   it 'gem loading loads without errors' do
   end

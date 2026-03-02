@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::MissingReturn::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Documentation::MissingReturn::Parser.new
@@ -317,3 +313,4 @@ describe 'Yard::Lint::Validators::Documentation::MissingReturn::Parser' do
     assert_empty(result)
   end
 end
+

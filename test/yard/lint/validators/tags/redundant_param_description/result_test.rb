@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::Result' do
   attr_reader :config
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -311,3 +307,4 @@ describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::Result' do
     assert_equal('RedundantParamDescription', result.offenses.first[:name])
   end
 end
+

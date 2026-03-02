@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'English'
 
 describe 'Cli' do
@@ -35,3 +33,4 @@ describe 'Cli' do
     assert_equal(0, $CHILD_STATUS.exitstatus)
   end
 end
+

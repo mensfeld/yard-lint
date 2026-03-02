@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Tags::TagGroupSeparator::Parser.new
@@ -70,3 +66,4 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Parser' do
     assert_equal('return->error,error->example', result[1][:separators])
   end
 end
+

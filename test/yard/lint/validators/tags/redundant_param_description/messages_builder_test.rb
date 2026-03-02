@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::MessagesBuilder' do
   it 'call with article param pattern returns message about restating parameter name' do
     offense = {
@@ -218,3 +215,4 @@ describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::MessagesBuild
     end
   end
 end
+

@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::ConfigGenerator' do
   attr_reader :temp_dir, :config_path, :original_dir
 
@@ -113,3 +110,4 @@ describe 'Yard::Lint::ConfigGenerator' do
     assert(config_hash['AllValidators'].key?('FailOnSeverity'))
   end
 end
+

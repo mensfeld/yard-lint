@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Parser.new

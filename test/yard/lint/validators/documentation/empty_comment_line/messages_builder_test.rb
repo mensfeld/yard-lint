@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::EmptyCommentLine::MessagesBuilder' do
   it 'call with leading violation returns message' do
     offense = {
@@ -58,3 +55,4 @@ describe 'Yard::Lint::Validators::Documentation::EmptyCommentLine::MessagesBuild
     assert_equal(true, Yard::Lint::Validators::Documentation::EmptyCommentLine::MessagesBuilder::ERROR_DESCRIPTIONS.frozen?)
   end
 end
+

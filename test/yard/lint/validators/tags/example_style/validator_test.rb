@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::Validator' do
   it 'enables in process execution' do
     assert(Yard::Lint::Validators::Tags::ExampleStyle::Validator.in_process?)
@@ -154,3 +151,4 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorWithLinter' do
     local_validator.in_process_query(object, collector)
   end
 end
+

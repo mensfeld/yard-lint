@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Blank Line Before Definition' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/blank_line_before_definition.rb', __dir__)
@@ -370,3 +366,4 @@ describe 'Blank Line Before Definition' do
     assert_empty(valid_offenses)
   end
 end
+

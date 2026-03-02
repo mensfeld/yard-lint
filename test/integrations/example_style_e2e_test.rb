@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Example Style E2e' do
   attr_reader :config
-
 
   before do
     @config = test_config do |c|
@@ -322,3 +318,4 @@ describe 'Example Style E2e' do
     end
   end
 end
+

@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'fileutils'
 
 describe 'Markdown Syntax' do
   attr_reader :config
-
 
   before do
     @config = Yard::Lint::Config.new do |c|
@@ -106,3 +103,4 @@ describe 'Markdown Syntax' do
     assert_includes(message, 'Unclosed bold formatting')
   end
 end
+

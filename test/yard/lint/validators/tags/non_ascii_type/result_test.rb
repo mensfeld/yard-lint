@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::NonAsciiType::Result' do
   it 'class attributes has default severity set to warning' do
     assert_equal('warning', Yard::Lint::Validators::Tags::NonAsciiType::Result.default_severity)
@@ -39,3 +36,4 @@ describe 'Yard::Lint::Validators::Tags::NonAsciiType::Result' do
     assert_equal(Yard::Lint::Results::Base, Yard::Lint::Validators::Tags::NonAsciiType::Result.superclass)
   end
 end
+

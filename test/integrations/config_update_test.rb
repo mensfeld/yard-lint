@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'fileutils'
 require 'open3'
@@ -237,3 +235,4 @@ describe 'Config Update' do
     assert_includes(update_result[:stdout], 'already up to date')
   end
 end
+

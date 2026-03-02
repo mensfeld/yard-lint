@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard Lint Integration' do
   attr_reader :fixtures_dir, :config
-
 
   before do
     @fixtures_dir = File.expand_path('fixtures', __dir__)
@@ -357,3 +353,4 @@ describe 'Yard Lint Integration' do
     File.delete(invalid_file) if File.exist?(invalid_file)
   end
 end
+

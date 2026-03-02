@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Forbidden Tags' do
   attr_reader :fixture_path
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/forbidden_tags_examples.rb', __dir__)
@@ -225,3 +221,4 @@ describe 'Forbidden Tags' do
     assert_includes(offense[:message], 'not allowed')
   end
 end
+

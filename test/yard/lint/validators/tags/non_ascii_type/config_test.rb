@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::NonAsciiType::Config' do
   it 'id returns non ascii type' do
     assert_equal(:non_ascii_type, Yard::Lint::Validators::Tags::NonAsciiType::Config.id)
@@ -32,3 +29,4 @@ describe 'Yard::Lint::Validators::Tags::NonAsciiType::Config' do
     )
   end
 end
+

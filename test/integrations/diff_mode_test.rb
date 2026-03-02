@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'fileutils'
 
 describe 'Diff Mode' do
   attr_reader :test_dir, :lib_dir, :config
-
 
   before do
     @test_dir = Dir.mktmpdir
@@ -259,3 +256,4 @@ describe 'Diff Mode' do
     end
   end
 end
+

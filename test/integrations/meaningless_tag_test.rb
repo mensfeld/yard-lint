@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Meaningless Tag' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/meaningless_tag_examples.rb', __dir__)
@@ -82,3 +78,4 @@ describe 'Meaningless Tag' do
     assert_empty(meaningless_tag_offenses)
   end
 end
+

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Warnings::UnknownParameterName::MessagesBuilder' do
   attr_reader :messages_builder
-
 
   before do
     @messages_builder = Yard::Lint::Validators::Warnings::UnknownParameterName::MessagesBuilder
@@ -210,3 +206,4 @@ describe 'Yard::Lint::Validators::Warnings::UnknownParameterName::MessagesBuilde
     refute_nil(suggestion)
   end
 end
+

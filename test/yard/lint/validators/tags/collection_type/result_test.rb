@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::CollectionType::Result' do
   it 'class attributes has default severity set to convention' do
     assert_equal('convention', Yard::Lint::Validators::Tags::CollectionType::Result.default_severity)
@@ -37,3 +34,4 @@ describe 'Yard::Lint::Validators::Tags::CollectionType::Result' do
     assert_equal(Yard::Lint::Results::Base, Yard::Lint::Validators::Tags::CollectionType::Result.superclass)
   end
 end
+

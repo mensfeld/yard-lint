@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Config' do
   it 'class attributes has id set to forbidden tags' do
     assert_equal(:forbidden_tags, Yard::Lint::Validators::Tags::ForbiddenTags::Config.id)
@@ -22,3 +19,4 @@ describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Config' do
     )
   end
 end
+

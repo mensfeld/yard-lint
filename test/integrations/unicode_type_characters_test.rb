@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Unicode Type Characters' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/unicode_type_characters.rb', __dir__)
@@ -216,3 +212,4 @@ describe 'Unicode Type Characters' do
     assert_operator(non_ascii_offenses.size, :<=, 1)
   end
 end
+

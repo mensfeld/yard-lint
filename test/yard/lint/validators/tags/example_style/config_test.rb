@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::Config' do
   it 'id returns the validator identifier' do
     assert_equal(:example_style, Yard::Lint::Validators::Tags::ExampleStyle::Config.id)
@@ -53,3 +50,4 @@ describe 'Yard::Lint::Validators::Tags::ExampleStyle::Config' do
     )
   end
 end
+

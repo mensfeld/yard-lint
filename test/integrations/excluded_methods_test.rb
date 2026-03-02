@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tempfile'
 
 describe 'Excluded Methods' do
   attr_reader :temp_file
-
 
   before do
     @temp_file = Tempfile.new(['test', '.rb'])
@@ -1127,3 +1124,4 @@ describe 'Excluded Methods' do
     refute(result.offenses.any? { |o| o[:message].match?(/initialize/) })
   end
 end
+

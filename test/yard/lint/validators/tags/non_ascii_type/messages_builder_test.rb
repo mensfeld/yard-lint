@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::NonAsciiType::MessagesBuilder' do
   it 'call formats non ascii type violation message with ellipsis' do
     offense = {
@@ -70,3 +67,4 @@ describe 'Yard::Lint::Validators::Tags::NonAsciiType::MessagesBuilder' do
     assert_includes(message, 'U+00E9')
   end
 end
+

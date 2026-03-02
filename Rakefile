@@ -8,6 +8,7 @@ require 'rake/testtask'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
   t.test_files = FileList['test/**/*_test.rb']
+  t.ruby_opts << '-r test_helper'
 end
 
 namespace :test do
@@ -20,6 +21,6 @@ namespace :test do
 
   desc 'Run all tests in parallel'
   task :parallel do
-    sh "bundle exec parallel_test -n #{parallel_process_count} test/"
+    sh "TESTOPTS='-r test_helper' bundle exec parallel_test -n #{parallel_process_count} test/"
   end
 end

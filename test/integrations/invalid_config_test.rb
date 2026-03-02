@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'open3'
 
@@ -151,3 +149,4 @@ describe 'Invalid Config' do
     end
   end
 end
+

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Collection Type' do
   attr_reader :fixture_path, :config
-
 
   before do
     @fixture_path = File.expand_path('../fixtures/collection_type_examples.rb', __dir__)
@@ -156,3 +152,4 @@ describe 'Collection Type' do
     assert_empty(collection_type_offenses)
   end
 end
+

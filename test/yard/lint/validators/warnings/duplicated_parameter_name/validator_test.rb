@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Warnings::DuplicatedParameterName::Validator' do
   attr_reader :config, :selection, :validator
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -22,3 +18,4 @@ describe 'Yard::Lint::Validators::Warnings::DuplicatedParameterName::Validator' 
     assert_equal(selection, validator.selection)
   end
 end
+

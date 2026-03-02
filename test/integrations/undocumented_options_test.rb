@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tmpdir'
 require 'fileutils'
 
 describe 'Undocumented Options' do
   attr_reader :config
-
 
   before do
     @config = Yard::Lint::Config.new do |c|
@@ -105,3 +102,4 @@ describe 'Undocumented Options' do
     assert_empty(undocumented_options)
   end
 end
+

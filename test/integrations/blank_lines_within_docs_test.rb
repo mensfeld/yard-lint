@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tempfile'
 
 describe 'Blank Lines Within Docs' do
   attr_reader :config
-
 
   before do
     @config = test_config do |c|
@@ -390,3 +387,4 @@ describe 'Blank Lines Within Docs' do
     fixture.unlink
   end
 end
+

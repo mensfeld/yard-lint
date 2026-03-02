@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::TypeSyntax::Parser' do
   attr_reader :parser
-
 
   before do
     @parser = Yard::Lint::Validators::Tags::TypeSyntax::Parser.new
@@ -80,3 +76,4 @@ describe 'Yard::Lint::Validators::Tags::TypeSyntax::Parser' do
     assert_equal(Yard::Lint::Parsers::Base, Yard::Lint::Validators::Tags::TypeSyntax::Parser.superclass)
   end
 end
+

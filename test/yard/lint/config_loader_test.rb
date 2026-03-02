@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::ConfigLoader' do
   attr_reader :config_dir, :config_path
-
 
   before do
     @config_dir = File.expand_path('../../../fixtures', __dir__)
@@ -309,3 +305,4 @@ describe 'Yard::Lint::ConfigLoader' do
     FileUtils.rm_f([base_config_path, merge_config_path])
   end
 end
+

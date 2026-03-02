@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ExampleSyntax::Result' do
   attr_reader :config, :parsed_data, :result
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -41,3 +37,4 @@ describe 'Yard::Lint::Validators::Tags::ExampleSyntax::Result' do
     assert_respond_to(Yard::Lint::Validators::Tags::ExampleSyntax::Result, :offense_name)
   end
 end
+

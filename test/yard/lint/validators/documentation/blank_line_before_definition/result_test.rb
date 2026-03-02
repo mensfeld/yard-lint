@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result' do
   attr_reader :config, :parsed_data, :result
-
 
   before do
     @config = Yard::Lint::Config.new
@@ -84,3 +80,4 @@ describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Resu
     assert_equal('convention', result.offenses.first[:severity])
   end
 end
+

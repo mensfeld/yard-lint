@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::Advanced' do
   attr_reader :config
-
 
   before do
     @config = test_config do |c|
@@ -470,3 +466,4 @@ describe 'ExampleStyleAdvancedDisabledCops' do
     runner.run('code', 'Example')
   end
 end
+

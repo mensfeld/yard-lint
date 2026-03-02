@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Macro' do
   attr_reader :fixtures_path, :config
-
 
   before do
     @fixtures_path = [
@@ -27,3 +23,4 @@ describe 'Macro' do
     assert_operator(result.count, :==, 0)
   end
 end
+

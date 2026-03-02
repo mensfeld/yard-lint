@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Validators::Tags::InformalNotation::Validator' do
   attr_reader :config, :selection, :validator
-
 
   before do
     @config = Yard::Lint::Config.new

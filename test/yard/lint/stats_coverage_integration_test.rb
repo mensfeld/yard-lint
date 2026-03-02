@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::StatsCoverageIntegration' do
   attr_reader :temp_dir, :config_file
-
 
   before do
     @temp_dir = Dir.mktmpdir('yard-lint-coverage-test')
@@ -446,3 +442,4 @@ describe 'Yard::Lint::StatsCoverageIntegration' do
     assert_equal(1, result.exit_code)
   end
 end
+

@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
-
 describe 'Yard::Lint::Parsers::Base' do
   attr_reader :parser_class, :parser
-
 
   before do
     @parser_class = Class.new(Yard::Lint::Parsers::Base) do
