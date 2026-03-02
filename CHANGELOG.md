@@ -96,7 +96,7 @@
   - Now matches patterns against both relative and absolute paths (similar to RuboCop's `PathUtil#match_path?`)
   - Extracted `discover_ruby_files` method for better separation of concerns
   - Added `determine_base_dir`, `excluded_file?`, `relative_path_from`, and `match_path?` helper methods
-  - Comprehensive integration tests in `spec/integrations/global_exclusions_spec.rb`
+  - Comprehensive integration tests in `test/integrations/global_exclusions_test.rb`
 - **[Enhancement]** Make PATH argument optional, defaulting to current directory (like RuboCop)
   - Running `yard-lint` without arguments now lints the current directory
   - Maintains backward compatibility with explicit path arguments
@@ -223,9 +223,9 @@
   - Ensures any documentation issue triggers exit code 1 for CI/CD pipelines
   - Provides consistent behavior across all validation rules
 - **[Fix]** Fix integration tests failing due to fixture files being filtered by global exclusions
-  - Added `test_config` helper in spec_helper.rb that clears default exclusions for tests
+  - Added `test_config` helper in test_helper.rb that clears default exclusions for tests
   - Updated all integration test files to use `test_config` instead of `Yard::Lint::Config.new`
-  - Prevents test fixtures in `spec/fixtures/` from being filtered out by `spec/**/*` exclusion pattern
+  - Prevents test fixtures in `test/fixtures/` from being filtered out by `test/**/*` exclusion pattern
   - Ensures integration tests can properly validate linter behavior on fixture files
 - **[Fix]** Remove not needed `bin/` files.
 

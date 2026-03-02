@@ -9,11 +9,16 @@ GEM
   remote: https://rubygems.org/
   specs:
     ast (2.4.3)
-    diff-lcs (1.6.2)
     docile (1.4.1)
+    drb (2.2.3)
     json (2.18.1)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
+    minitest (6.0.2)
+      drb (~> 2.0)
+      prism (~> 1.5)
+    mocha (3.0.2)
+      ruby2_keywords (>= 0.0.5)
     parallel (1.27.0)
     parallel_tests (5.6.0)
       parallel
@@ -25,19 +30,6 @@ GEM
     rainbow (3.1.1)
     rake (13.3.1)
     regexp_parser (2.11.3)
-    rspec (3.13.2)
-      rspec-core (~> 3.13.0)
-      rspec-expectations (~> 3.13.0)
-      rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.6)
-      rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.5)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.7)
-      diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.13.0)
-    rspec-support (3.13.6)
     rubocop (1.84.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -57,6 +49,7 @@ GEM
       rubocop (>= 1.75.0, < 2.0)
       rubocop-ast (>= 1.47.1, < 2.0)
     ruby-progressbar (1.13.0)
+    ruby2_keywords (0.0.5)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -86,9 +79,10 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  minitest
+  mocha
   parallel_tests
   rake
-  rspec
   rubocop
   simplecov
   standard
