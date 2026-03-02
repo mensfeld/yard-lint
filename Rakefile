@@ -21,6 +21,8 @@ namespace :test do
 
   desc 'Run all tests in parallel'
   task :parallel do
-    sh "TESTOPTS='-r test_helper' bundle exec parallel_test -n #{parallel_process_count} test/"
+    rubyopt = "#{ENV.fetch('RUBYOPT', '')} -Itest -r test_helper".strip
+    sh({ 'RUBYOPT' => rubyopt },
+       "bundle exec parallel_test -n #{parallel_process_count} test/")
   end
 end
