@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::Validator' do
   it 'enables in process execution' do
     assert(Yard::Lint::Validators::Tags::ExampleStyle::Validator.in_process?)

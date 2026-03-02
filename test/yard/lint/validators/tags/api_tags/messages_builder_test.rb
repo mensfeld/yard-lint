@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::ApiTags::MessagesBuilder' do
   it 'call builds message for missing api tag' do
     offense = {

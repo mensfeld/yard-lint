@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Forbidden Tags' do
   attr_reader :fixture_path
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::StatsCoverageIntegration' do
   attr_reader :temp_dir, :config_file
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Documentation::MissingReturn::MessagesBuilder' do
   it 'call builds message for instance method' do
     offense = { element: 'Calculator#add' }

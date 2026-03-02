@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::OptionTags::Result' do
   attr_reader :config, :parsed_data, :result
 

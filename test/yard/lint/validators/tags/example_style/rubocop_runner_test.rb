@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::RubocopRunner' do
   attr_reader :runner
 

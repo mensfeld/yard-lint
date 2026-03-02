@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::ExampleSyntax::Config' do
   it 'id returns the validator identifier' do
     assert_equal(:example_syntax, Yard::Lint::Validators::Tags::ExampleSyntax::Config.id)

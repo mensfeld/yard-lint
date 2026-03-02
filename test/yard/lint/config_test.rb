@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 require 'tmpdir'
 
 describe 'Yard::Lint::Config' do

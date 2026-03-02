@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::ConfigUpdater' do
   attr_reader :fixtures_dir, :config_path
 

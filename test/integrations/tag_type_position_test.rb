@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Tag Type Position' do
   attr_reader :fixture_path, :config
 

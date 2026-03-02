@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Result' do
   it 'class attributes has default severity set to convention' do
     assert_equal('convention', Yard::Lint::Validators::Tags::ForbiddenTags::Result.default_severity)

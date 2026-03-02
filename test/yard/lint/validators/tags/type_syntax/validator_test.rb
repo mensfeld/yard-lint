@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::TypeSyntax::Validator' do
   attr_reader :config, :selection, :validator
 

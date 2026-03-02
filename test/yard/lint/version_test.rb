@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Version' do
   it 'version has a version number' do
     refute_nil(Yard::Lint::VERSION)

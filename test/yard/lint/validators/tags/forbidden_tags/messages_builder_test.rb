@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::ForbiddenTags::MessagesBuilder' do
   it 'call formats message for tag with specific types forbidden' do
     offense = {

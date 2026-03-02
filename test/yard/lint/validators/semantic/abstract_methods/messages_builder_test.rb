@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Semantic::AbstractMethods::MessagesBuilder' do
   it 'call builds message for abstract method with implementation' do
     offense = { method_name: 'MyClass#abstract_method' }

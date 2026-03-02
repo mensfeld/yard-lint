@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Results::Aggregate' do
   attr_reader :result1, :result2, :result3, :config, :aggregate
 

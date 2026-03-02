@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::Order::MessagesBuilder' do
   it 'call builds message for invalid tag order' do
     offense = {

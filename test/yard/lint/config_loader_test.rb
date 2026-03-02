@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::ConfigLoader' do
   attr_reader :config_dir, :config_path
 

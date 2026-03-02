@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::TypeSyntax::Result' do
   it 'class attributes has default severity set to warning' do
     assert_equal('warning', Yard::Lint::Validators::Tags::TypeSyntax::Result.default_severity)

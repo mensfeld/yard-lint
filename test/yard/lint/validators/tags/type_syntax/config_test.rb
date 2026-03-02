@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::TypeSyntax::Config' do
   it 'id returns type syntax' do
     assert_equal(:type_syntax, Yard::Lint::Validators::Tags::TypeSyntax::Config.id)

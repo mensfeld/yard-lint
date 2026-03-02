@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 require 'tempfile'
 
 describe 'Empty Initialize Methods' do

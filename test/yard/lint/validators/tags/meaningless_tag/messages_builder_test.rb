@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::MeaninglessTag::MessagesBuilder' do
   it 'call formats message for param on class' do
     offense = {

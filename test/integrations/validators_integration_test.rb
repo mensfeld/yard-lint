@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 # Helper to convert relative paths to absolute paths from project root
 describe 'Validators Integration' do
   attr_reader :config

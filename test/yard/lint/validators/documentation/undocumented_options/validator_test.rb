@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Documentation::UndocumentedOptions::Validator' do
   attr_reader :config, :selection, :validator
 

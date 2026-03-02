@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Warnings::UnknownTag::MessagesBuilder' do
   attr_reader :messages_builder
 

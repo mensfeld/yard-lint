@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Documentation::MarkdownSyntax::MessagesBuilder' do
   it 'call formats unclosed backtick error' do
     offense = {

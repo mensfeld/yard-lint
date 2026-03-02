@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Validator Exclusions Integration' do
   attr_reader :config
 

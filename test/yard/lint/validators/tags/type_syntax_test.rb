@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'test_helper'
+
 describe 'Yard::Lint::Validators::Tags::TypeSyntax' do
   it 'is a module' do
   assert_kind_of(Module, Yard::Lint::Validators::Tags::TypeSyntax)
