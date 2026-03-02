@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Errors' do
   it 'baseerror is a standarderror' do
     assert_kind_of(StandardError, Yard::Lint::Errors::BaseError.new)

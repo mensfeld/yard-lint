@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector' do
   attr_reader :temp_dir
 

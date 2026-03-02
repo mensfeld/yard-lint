@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::OptionTags::MessagesBuilder' do
   it 'call builds message for missing option tags' do
     offense = { method_name: 'initialize' }

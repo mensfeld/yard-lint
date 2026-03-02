@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::MeaninglessTag::Config' do
   it 'class attributes has id set to meaningless tag' do
     assert_equal(:meaningless_tag, Yard::Lint::Validators::Tags::MeaninglessTag::Config.id)

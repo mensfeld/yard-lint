@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Example Style E2e' do
   attr_reader :config
 

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Documentation::EmptyCommentLine::MessagesBuilder' do
   it 'call with leading violation returns message' do
     offense = {

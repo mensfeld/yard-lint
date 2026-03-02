@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::TagTypePosition::Config' do
   it 'has correct defaults' do
     assert_equal(:tag_type_position, Yard::Lint::Validators::Tags::TagTypePosition::Config.id)

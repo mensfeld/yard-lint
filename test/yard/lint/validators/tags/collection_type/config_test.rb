@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::CollectionType::Config' do
   it 'class attributes has id set to collection type' do
     assert_equal(:collection_type, Yard::Lint::Validators::Tags::CollectionType::Config.id)

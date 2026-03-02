@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Parsers::Base' do
   attr_reader :parser_class, :parser
 

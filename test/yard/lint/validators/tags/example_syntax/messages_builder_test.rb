@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::ExampleSyntax::MessagesBuilder' do
   it 'call builds message for syntax error in example' do
     offense = {

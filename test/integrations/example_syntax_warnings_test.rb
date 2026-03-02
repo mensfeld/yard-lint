@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Example Syntax Warnings' do
   attr_reader :config
 

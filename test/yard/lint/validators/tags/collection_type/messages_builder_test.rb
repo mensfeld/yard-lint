@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::CollectionType::MessagesBuilder' do
   it 'call when enforcing long style short detected formats message for hash k v to hash k v' do
       offense = {

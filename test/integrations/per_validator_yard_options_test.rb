@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Per Validator Yard Options' do
   attr_reader :fixtures_dir
 

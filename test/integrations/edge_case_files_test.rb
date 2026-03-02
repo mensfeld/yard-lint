@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Edge Case Files' do
   attr_reader :fixtures_dir
 

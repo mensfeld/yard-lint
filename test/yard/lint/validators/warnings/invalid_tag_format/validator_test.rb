@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Warnings::InvalidTagFormat::Validator' do
   attr_reader :config, :selection, :validator
 

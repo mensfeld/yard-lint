@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Type Syntax' do
   attr_reader :fixture_path, :config
 

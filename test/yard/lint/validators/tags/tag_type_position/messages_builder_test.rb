@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::TagTypePosition::MessagesBuilder' do
   it 'call when enforcing type first but found type after name formats message correctly for param ta' do
       offense = {

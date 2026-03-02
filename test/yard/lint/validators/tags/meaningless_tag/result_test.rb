@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::MeaninglessTag::Result' do
   it 'class attributes has default severity set to warning' do
     assert_equal('warning', Yard::Lint::Validators::Tags::MeaninglessTag::Result.default_severity)

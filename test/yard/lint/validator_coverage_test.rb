@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::ValidatorCoverage' do
   attr_reader :all_validators, :project_root
 

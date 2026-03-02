@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Executor::QueryExecutor' do
   attr_reader :registry, :executor
 

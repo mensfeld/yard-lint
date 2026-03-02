@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Config' do
   it 'id returns the validator identifier' do
     assert_equal(:tag_group_separator, Yard::Lint::Validators::Tags::TagGroupSeparator::Config.id)

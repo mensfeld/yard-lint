@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Semantic::AbstractMethods::Result' do
   attr_reader :config, :parsed_data, :result
 

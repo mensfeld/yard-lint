@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Global Exclusions' do
   attr_reader :test_dir, :vendor_dir, :lib_dir, :vendor_file, :lib_file
 

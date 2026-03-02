@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::InformalNotation::MessagesBuilder' do
   it 'call formats message for note pattern' do
     offense = {

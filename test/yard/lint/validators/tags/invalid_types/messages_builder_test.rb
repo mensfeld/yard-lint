@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Tags::InvalidTypes::MessagesBuilder' do
   it 'call builds message for invalid tag types' do
     offense = { method_name: 'calculate' }

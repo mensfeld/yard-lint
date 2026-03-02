@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::Validators::Documentation::MarkdownSyntax' do
   it 'is a module' do
   assert_kind_of(Module, Yard::Lint::Validators::Documentation::MarkdownSyntax)

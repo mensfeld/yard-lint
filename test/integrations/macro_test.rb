@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Macro' do
   attr_reader :fixtures_path, :config
 

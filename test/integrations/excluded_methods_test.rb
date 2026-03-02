@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 require 'tempfile'
 
 describe 'Excluded Methods' do

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::PathGrouper' do
   it 'group when files count is below limit returns files sorted' do
     files = ['lib/foo.rb', 'lib/bar.rb', 'lib/baz.rb']

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::ConfigGenerator' do
   attr_reader :temp_dir, :config_path, :original_dir
 

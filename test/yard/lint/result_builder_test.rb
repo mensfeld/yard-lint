@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::ResultBuilder' do
   attr_reader :config, :builder
 

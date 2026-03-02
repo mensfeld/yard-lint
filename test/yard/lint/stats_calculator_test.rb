@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'test_helper'
-
 describe 'Yard::Lint::StatsCalculator' do
   attr_reader :config, :files, :calculator
 
