@@ -1,6 +1,12 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Enhancement]** Relax `ArticleParamPhrase` pattern to detect any trailing verb
+  - Previously required the 4th word to be in a hardcoded `LowValueVerbs` list
+  - Now flags any 4-word `article + param_name + connector + word` description as redundant
+  - Catches descriptions like `"the value to format"`, `"the user to notify"`, `"the file to upload"`
+  - Longer descriptions (5+ words) remain protected by `MaxRedundantWords` threshold
+  - Removes unused `LowValueVerbs` configuration option (no longer needed)
 - **[Feature]** Add configuration validation to catch typos and invalid settings
   - Validates validator names exist before processing files (prevents silent failures)
   - Detects typos in severity levels (e.g., `erro` instead of `error`) with "did you mean" suggestions
