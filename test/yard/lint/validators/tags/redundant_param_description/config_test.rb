@@ -18,12 +18,6 @@ describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::Config' do
     assert_equal(6, defaults['MaxRedundantWords'])
     assert_equal(%w[object instance value data item element], defaults['GenericTerms'])
     assert_equal(%w[being to that which for], defaults['LowValueConnectors'])
-    assert_includes(defaults['LowValueVerbs'], 'perform')
-    assert_includes(defaults['LowValueVerbs'], 'performed')
-    assert_includes(defaults['LowValueVerbs'], 'performing')
-    assert_includes(defaults['LowValueVerbs'], 'invoke')
-    assert_includes(defaults['LowValueVerbs'], 'invoked')
-    assert_includes(defaults['LowValueVerbs'], 'invoking')
   end
 
   it 'defaults includes all pattern toggles' do

@@ -49,6 +49,15 @@ class RedundantParamFixtures
   # @param request [Request] The request being processed
   def article_param_phrase_redundant(action, callback, data, user, request); end
 
+  # Pattern 8b: Article + param + connector + any verb (relaxed matching)
+  # @param value [Object] the value to format
+  # @param user [User] the user to notify
+  # @param file [File] the file to upload
+  # @param data [Hash] the data to transform
+  # @param request [Request] a request to send
+  # @param config [Hash] the config to load
+  def article_param_phrase_any_verb(value, user, file, data, request, config); end
+
   # VALID EXAMPLES - Should NOT be flagged
 
   # Long, meaningful descriptions
