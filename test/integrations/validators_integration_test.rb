@@ -572,6 +572,38 @@ describe 'Validators Integration' do
     assert_operator(phrase_violations.length, :>=, 3)
   end
 
+  # -- Redundant Param Description: ArticleParamPhrase with any verb --
+
+  it 'redundant param description validation detects article param phrase with any trailing verb' do
+    @config = test_config do |c|
+      c.set_validator_config('Tags/RedundantParamDescription', 'Enabled', true)
+      c.set_validator_config('Tags/RedundantParamDescription', 'EnabledPatterns', {
+        'ArticleParam' => false,
+        'PossessiveParam' => false,
+        'TypeRestatement' => false,
+        'ParamToVerb' => false,
+        'IdPattern' => false,
+        'DirectionalDate' => false,
+        'TypeGeneric' => false,
+        'ArticleParamPhrase' => true
+      })
+    end
+
+    result = Yard::Lint.run(path: project_path('test/fixtures/redundant_param_descriptions.rb'), config: config)
+
+    redundant_offenses = result.offenses.select { |o| o[:name] == 'RedundantParamDescription' }
+
+    any_verb_offenses = redundant_offenses.select do |o|
+      o[:object_name] == 'RedundantParamFixtures#article_param_phrase_any_verb'
+    end
+
+    refute_empty(any_verb_offenses)
+    assert_equal(6, any_verb_offenses.length)
+
+    flagged_params = any_verb_offenses.map { |o| o[:param_name] }.sort
+    assert_equal(%w[config data file request user value], flagged_params)
+  end
+
   # -- Tag Group Separator: enabled --
 
   def setup_tag_group_separator_enabled

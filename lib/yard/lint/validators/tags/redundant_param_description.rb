@@ -43,6 +43,13 @@ module Yard
         #   def process(payments, user)
         #   end
         #
+        # @example Redundant - Article + param + connector + any verb (will be flagged)
+        #   # @param value [Object] the value to format
+        #   # @param user [User] the user to notify
+        #   # @param file [File] the file to upload
+        #   def process(value, user, file)
+        #   end
+        #
         # @example Redundant - ID pattern (will be flagged)
         #   # @param treatment_id [String] ID of the treatment
         #   # @param uuid [String] Unique identifier for the list
