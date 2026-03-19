@@ -88,7 +88,7 @@ module Yard
             end
 
             # Check if a line matches the informal pattern
-            # @param line [String] the line to check
+            # @param line [String]
             # @param pattern [String] the pattern to match (without colon)
             # @param case_sensitive [Boolean] whether to match case-sensitively
             # @param require_start [Boolean] whether pattern must be at start of line

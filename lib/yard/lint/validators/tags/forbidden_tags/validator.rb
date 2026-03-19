@@ -36,7 +36,7 @@ module Yard
             end
 
             # Check if a tag matches a forbidden pattern
-            # @param tag [YARD::Tags::Tag] the tag to check
+            # @param tag [YARD::Tags::Tag]
             # @param pattern [Hash] the forbidden pattern with 'Tag' and optional 'Types'
             # @return [Boolean] true if tag matches the pattern
             def matches_pattern?(tag, pattern)
