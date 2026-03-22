@@ -20,6 +20,7 @@ AllCops:
   Exclude:
     - bin/**/*
     - vendor/**/*
+    - test/fixtures/**/*
 
 Naming/PredicateMethod:
   Enabled: false
@@ -88,7 +89,6 @@ Lint/UselessAccessModifier:
 Lint/UnusedMethodArgument:
   Exclude:
     - 'test/integrations/**/*'
-    - 'test/fixtures/**/*'
 
 Metrics/BlockNesting:
   Exclude:

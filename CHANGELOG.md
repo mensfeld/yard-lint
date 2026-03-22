@@ -1,6 +1,11 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Fix]** Accept symbol, string, and numeric literals as valid YARD types in `TypeSyntax` validator (#109)
+  - YARD accepts literal types like `:error`, `"read"`, `'write'`, `-1`, `2.5` in tags, but its `TypesExplainer::Parser` does not support them
+  - The `TypeSyntax` validator was using that parser, causing false positives for valid literal types
+  - Now skips literal types before passing them to the parser, using strict regexes that only match valid Ruby syntax
+  - Supports: simple symbols (`:foo`), predicate/bang/setter symbols (`:foo?`, `:save!`, `:name=`), quoted symbols (`:"content-type"`, `:'x-request-id'`), double and single-quoted strings (`"read"`, `'write'`), integers (`-1`, `0`, `1`), and floats (`1.0`, `-2.5`)
 - **[Feature]** Add configuration validation to catch typos and invalid settings
   - Validates validator names exist before processing files (prevents silent failures)
   - Detects typos in severity levels (e.g., `erro` instead of `error`) with "did you mean" suggestions
