@@ -154,6 +154,38 @@ describe 'Symbol Literal Types' do
     end
   end
 
+  describe 'single-quoted string literals' do
+    it 'accepts single-quoted string literals in @param tags' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?("'read'")
+      end
+
+      assert_nil(offense, "Single-quoted string literal 'read' in @param should not be flagged")
+    end
+
+    it 'accepts single-quoted string literals in @return tags' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?("'success'")
+      end
+
+      assert_nil(offense, "Single-quoted string literal 'success' in @return should not be flagged")
+    end
+
+    it 'accepts single-quoted string literals containing special characters' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?("'.'")
+      end
+
+      assert_nil(offense, "Single-quoted string literal '.' should not be flagged")
+    end
+  end
+
   describe 'mixed literals with regular types' do
     it 'accepts symbol literals mixed with class types' do
       result = Yard::Lint.run(path: fixture_path, config: config, progress: false)

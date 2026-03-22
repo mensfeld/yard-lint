@@ -11,8 +11,8 @@ module Yard
             SYMBOL_LITERAL = /\A:[a-zA-Z_]\w*[?!=]?\z/
             # Matches valid quoted symbol literals: :"foo", :'foo'
             QUOTED_SYMBOL_LITERAL = /\A:["'][^"']*["']\z/
-            # Matches string literals: "foo"
-            STRING_LITERAL = /\A"[^"]*"\z/
+            # Matches string literals: "foo", 'foo'
+            STRING_LITERAL = /\A(["'])[^"']*\1\z/
 
             private_constant :SYMBOL_LITERAL, :QUOTED_SYMBOL_LITERAL, :STRING_LITERAL
 

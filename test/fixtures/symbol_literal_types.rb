@@ -86,6 +86,25 @@ class SymbolLiteralTypes
     sep
   end
 
+  # --- Single-quoted string literals ---
+
+  # @param mode ['read', 'write', 'append'] the file mode
+  # @return [void]
+  def single_quoted_string_param(mode)
+    mode
+  end
+
+  # @return ['success', 'failure'] the outcome
+  def single_quoted_string_return
+    'success'
+  end
+
+  # @param sep ['.', '/', '-'] the separator character
+  # @return [void]
+  def single_quoted_string_special_chars(sep)
+    sep
+  end
+
   # --- Mixed literals with regular types ---
 
   # @param type [:text, :html, Symbol] content type or custom symbol
