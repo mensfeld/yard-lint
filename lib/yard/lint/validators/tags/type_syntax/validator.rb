@@ -7,14 +7,17 @@ module Yard
         module TypeSyntax
           # Runs YARD to validate type syntax using TypesExplainer::Parser
           class Validator < Base
-            # Matches valid Ruby symbol literals: :foo, :foo?, :foo!, :foo=, :"foo bar"
+            # Matches valid Ruby symbol literals: :foo, :foo?, :foo!, :foo=
             SYMBOL_LITERAL = /\A:[a-zA-Z_]\w*[?!=]?\z/
-            # Matches valid quoted symbol literals: :"foo", :'foo'
-            QUOTED_SYMBOL_LITERAL = /\A:["'][^"']*["']\z/
-            # Matches string literals: "foo", 'foo'
-            STRING_LITERAL = /\A(["'])[^"']*\1\z/
+            # Matches valid quoted symbol literals: :"foo", :'foo' (quotes must match)
+            QUOTED_SYMBOL_LITERAL = /\A:("[^"]*"|'[^']*')\z/
+            # Matches string literals: "foo", 'foo' (quotes must match)
+            STRING_LITERAL = /\A("[^"]*"|'[^']*')\z/
+            # Matches numeric literals: 1, -1, 1.0, -2.5
+            NUMERIC_LITERAL = /\A-?\d+(\.\d+)?\z/
 
-            private_constant :SYMBOL_LITERAL, :QUOTED_SYMBOL_LITERAL, :STRING_LITERAL
+            private_constant :SYMBOL_LITERAL, :QUOTED_SYMBOL_LITERAL, :STRING_LITERAL,
+                             :NUMERIC_LITERAL
 
             # Enable in-process execution
             in_process visibility: :public
@@ -39,6 +42,7 @@ module Yard
                   next if type_str.match?(SYMBOL_LITERAL)
                   next if type_str.match?(QUOTED_SYMBOL_LITERAL)
                   next if type_str.match?(STRING_LITERAL)
+                  next if type_str.match?(NUMERIC_LITERAL)
 
                   begin
                     YARD::Tags::TypesExplainer::Parser.parse(type_str)

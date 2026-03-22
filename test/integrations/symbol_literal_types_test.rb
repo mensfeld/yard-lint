@@ -111,14 +111,24 @@ describe 'Symbol Literal Types' do
   end
 
   describe 'quoted symbol literals' do
-    it 'accepts quoted symbol literals with special characters' do
+    it 'accepts double-quoted symbol literals with special characters' do
       result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
 
       offense = result.offenses.find do |o|
-        o[:name] == 'InvalidTypeSyntax' && o[:message].include?('content-type')
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?(':"content-type"')
       end
 
-      assert_nil(offense, 'Quoted symbol :"content-type" should not be flagged')
+      assert_nil(offense, 'Double-quoted symbol :"content-type" should not be flagged')
+    end
+
+    it 'accepts single-quoted symbol literals with special characters' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?(":'content-type'")
+      end
+
+      assert_nil(offense, "Single-quoted symbol :'content-type' should not be flagged")
     end
   end
 
@@ -154,6 +164,28 @@ describe 'Symbol Literal Types' do
     end
   end
 
+  describe 'empty string literals' do
+    it 'accepts empty double-quoted string literals' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?('""')
+      end
+
+      assert_nil(offense, 'Empty double-quoted string "" should not be flagged')
+    end
+
+    it 'accepts empty single-quoted string literals' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?("''")
+      end
+
+      assert_nil(offense, "Empty single-quoted string '' should not be flagged")
+    end
+  end
+
   describe 'single-quoted string literals' do
     it 'accepts single-quoted string literals in @param tags' do
       result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
@@ -183,6 +215,60 @@ describe 'Symbol Literal Types' do
       end
 
       assert_nil(offense, "Single-quoted string literal '.' should not be flagged")
+    end
+  end
+
+  describe 'numeric literals' do
+    it 'accepts integer literals' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:type_string] == '0'
+      end
+
+      assert_nil(offense, 'Integer literal 0 should not be flagged')
+    end
+
+    it 'accepts negative integer literals' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?('-1')
+      end
+
+      assert_nil(offense, 'Negative integer literal -1 should not be flagged')
+    end
+
+    it 'accepts float literals' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?('2.5')
+      end
+
+      assert_nil(offense, 'Float literal 2.5 should not be flagged')
+    end
+
+    it 'accepts negative float literals' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?('-0.5')
+      end
+
+      assert_nil(offense, 'Negative float literal -0.5 should not be flagged')
+    end
+  end
+
+  describe 'all literal types mixed' do
+    it 'accepts integers, floats, strings, symbols, and nil mixed together' do
+      result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+      offense = result.offenses.find do |o|
+        o[:name] == 'InvalidTypeSyntax' && o[:message].include?('all_literal_types_mixed')
+      end
+
+      assert_nil(offense, 'Mixed literal types (int, float, string, symbol, nil) should not be flagged')
     end
   end
 

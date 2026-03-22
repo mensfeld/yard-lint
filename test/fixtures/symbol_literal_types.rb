@@ -105,6 +105,60 @@ class SymbolLiteralTypes
     sep
   end
 
+  # --- Empty string literals ---
+
+  # @param a ["", String] empty or string
+  # @return [void]
+  def empty_double_quoted_string(a)
+    a
+  end
+
+  # @param a ['', String] empty or string
+  # @return [void]
+  def empty_single_quoted_string(a)
+    a
+  end
+
+  # --- Single-quoted symbol literals ---
+
+  # @param header [:'content-type', :'x-request-id'] the HTTP header
+  # @return [String]
+  def single_quoted_symbol(header)
+    header.to_s
+  end
+
+  # --- Numeric literals ---
+
+  # @param exit_code [0, 1, 2] the exit code
+  # @return [void]
+  def integer_literal(exit_code)
+    exit_code
+  end
+
+  # @param code [-1, 0, 1] negative, zero, or positive
+  # @return [void]
+  def negative_integer_literal(code)
+    code
+  end
+
+  # @param ratio [0.5, 1.0, 2.5] the ratio
+  # @return [void]
+  def float_literal(ratio)
+    ratio
+  end
+
+  # @param threshold [-0.5, 0.0, 0.5] the threshold
+  # @return [void]
+  def negative_float_literal(threshold)
+    threshold
+  end
+
+  # @param val [1, 2.5, "auto", :default, nil] mixed literal types
+  # @return [void]
+  def all_literal_types_mixed(val)
+    val
+  end
+
   # --- Mixed literals with regular types ---
 
   # @param type [:text, :html, Symbol] content type or custom symbol
