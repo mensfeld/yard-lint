@@ -7,6 +7,15 @@ module Yard
         module TypeSyntax
           # Runs YARD to validate type syntax using TypesExplainer::Parser
           class Validator < Base
+            # Matches valid Ruby symbol literals: :foo, :foo?, :foo!, :foo=, :"foo bar"
+            SYMBOL_LITERAL = /\A:[a-zA-Z_]\w*[?!=]?\z/
+            # Matches valid quoted symbol literals: :"foo", :'foo'
+            QUOTED_SYMBOL_LITERAL = /\A:["'][^"']*["']\z/
+            # Matches string literals: "foo"
+            STRING_LITERAL = /\A"[^"]*"\z/
+
+            private_constant :SYMBOL_LITERAL, :QUOTED_SYMBOL_LITERAL, :STRING_LITERAL
+
             # Enable in-process execution
             in_process visibility: :public
 
@@ -25,6 +34,12 @@ module Yard
                 next unless tag.types
 
                 tag.types.each do |type_str|
+                  # Skip literal types that YARD accepts but TypesExplainer::Parser doesn't
+                  # See: https://github.com/mensfeld/yard-lint/issues/109
+                  next if type_str.match?(SYMBOL_LITERAL)
+                  next if type_str.match?(QUOTED_SYMBOL_LITERAL)
+                  next if type_str.match?(STRING_LITERAL)
+
                   begin
                     YARD::Tags::TypesExplainer::Parser.parse(type_str)
                   rescue SyntaxError => e
