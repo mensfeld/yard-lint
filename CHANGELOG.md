@@ -1,6 +1,8 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Fix]** Skip `@!attribute` methods in `UndocumentedMethodArguments` validator (#115)
+  - Methods documented with `@!attribute` directive are attribute accessors whose setter parameter does not need explicit `@param` documentation, matching `attr_accessor` behavior
 - **[Fix]** Extend `CollectionType` validator to enforce style for Array types, not just Hash (#114)
   - YARD supports both long (`Array<String>`, `Array(String, Integer)`) and short (`<String>`, `(String, Integer)`) forms for Array collections
   - The validator now detects and enforces the configured `EnforcedStyle` for Array angle bracket and tuple notation

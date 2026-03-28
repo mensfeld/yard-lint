@@ -21,6 +21,9 @@ module Yard
               # Skip aliases and implicit methods
               return if object.is_alias?
               return unless object.is_explicit?
+              # Skip attribute methods (@!attribute directive) — their setter parameter
+              # doesn't need explicit @param documentation, matching attr_accessor behavior
+              return if object.is_attribute?
 
               # Check if parameters count exceeds @param tags count
               param_count = object.parameters.size
