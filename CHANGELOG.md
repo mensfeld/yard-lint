@@ -1,6 +1,9 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Fix]** Accept tuple (fixed-length array) types as valid YARD syntax in `InvalidTypes` validator (#113)
+  - YARD supports tuple notation like `(String, Integer)` for fixed-length arrays with typed positions
+  - The `InvalidTypes` validator's sanitize logic did not strip parentheses, causing tuple types to be incorrectly flagged as `InvalidTagType`
 - **[Fix]** Accept symbol, string, and numeric literals as valid YARD types in `TypeSyntax` validator (#109)
   - YARD accepts literal types like `:error`, `"read"`, `'write'`, `-1`, `2.5` in tags, but its `TypesExplainer::Parser` does not support them
   - The `TypeSyntax` validator was using that parser, causing false positives for valid literal types
