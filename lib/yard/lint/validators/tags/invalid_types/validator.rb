@@ -34,7 +34,7 @@ module Yard
               allowed_types = ALLOWED_DEFAULTS + extra_types
 
               # Sanitize type string (remove type syntax characters)
-              sanitize = ->(type) { type.tr('=><>,{} ', '') }
+              sanitize = ->(type) { type.tr('=><>,{} ()', '') }
 
               # Check for invalid types
               invalid_types = object.docstring.tags
