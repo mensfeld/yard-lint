@@ -1,6 +1,10 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Fix]** Extend `CollectionType` validator to enforce style for Array types, not just Hash (#114)
+  - YARD supports both long (`Array<String>`, `Array(String, Integer)`) and short (`<String>`, `(String, Integer)`) forms for Array collections
+  - The validator now detects and enforces the configured `EnforcedStyle` for Array angle bracket and tuple notation
+  - Correction suggestions in messages now cover Array types (e.g., `<String>` → `Array<String>` or vice versa)
 - **[Fix]** Accept tuple (fixed-length array) types as valid YARD syntax in `InvalidTypes` validator (#113)
   - YARD supports tuple notation like `(String, Integer)` for fixed-length arrays with typed positions
   - The `InvalidTypes` validator's sanitize logic did not strip parentheses, causing tuple types to be incorrectly flagged as `InvalidTagType`

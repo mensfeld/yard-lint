@@ -132,10 +132,12 @@ describe 'Collection Type' do
 
     result = Yard::Lint.run(path: fixture_path, config: short_style_config, progress: false)
 
-    # Should only have violations for Hash{K => V}, not {K => V}
-    offenses = result.offenses.select { |o| o[:name] == 'CollectionType' }
+    # Should only have Hash violations for Hash{K => V}, not {K => V}
+    hash_offenses = result.offenses.select do |o|
+      o[:name] == 'CollectionType' && o[:message].include?('Hash')
+    end
 
-    offenses.each do |offense|
+    hash_offenses.each do |offense|
       # The type_string in the message should be Hash{...}
       assert_includes(offense[:message], 'instead of Hash{')
     end

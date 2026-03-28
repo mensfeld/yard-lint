@@ -47,6 +47,12 @@ module Yard
                 if type_string.start_with?('{')
                   # {K => V} -> Hash{K => V}
                   "Hash#{type_string}"
+                elsif type_string.start_with?('<')
+                  # <String> -> Array<String>
+                  "Array#{type_string}"
+                elsif type_string.start_with?('(')
+                  # (String, Integer) -> Array(String, Integer)
+                  "Array#{type_string}"
                 else
                   # Hash<K, V> -> Hash{K => V}
                   type_string.gsub(/Hash<(.+?)>/) do
@@ -61,8 +67,8 @@ module Yard
               # @param type_string [String] the type string
               # @return [String] the converted type string
               def convert_to_short(type_string)
-                # Hash{K => V} -> {K => V}
-                type_string.sub(/^Hash/, '')
+                # Hash{K => V} -> {K => V} or Array<String> -> <String> or Array(S, I) -> (S, I)
+                type_string.sub(/^(Hash|Array)/, '')
               end
             end
           end
