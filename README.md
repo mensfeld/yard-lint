@@ -19,16 +19,18 @@ Accurate documentation isn't just for human developers anymore. [Research shows]
 
 YARD-Lint validates your YARD documentation for:
 
-- **Documentation Completeness** - Undocumented classes, modules, methods, parameters, and boolean return values
-- **Type Accuracy** - Invalid type definitions, malformed type syntax, non-ASCII characters in types
-- **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions
+- **Documentation Completeness** - Undocumented classes, modules, methods, parameters, boolean return values, and missing `@return` tags
+- **Type Accuracy** - Invalid type definitions, malformed type syntax, non-ASCII characters in types, tuple types, and literal types (symbols, strings, numbers)
+- **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions, forbidden tag patterns
 - **Code Examples** - Syntax validation in `@example` tags, optional style validation with RuboCop/StandardRB
 - **Semantic Correctness** - Abstract methods with implementations, redundant descriptions
-- **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns
-- **Smart Suggestions** - "Did you mean" suggestions for typos in parameter names and tags
+- **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns, tag group separators
+- **Smart Suggestions** - "Did you mean" suggestions for typos in parameter names, tags, and configuration settings
 - **Configuration Safety** - Validates `.yard-lint.yml` for typos and invalid settings before processing
+- **Performance** - In-process YARD execution with shared registry (~10x faster than shell-based execution)
+- **Incremental Adoption** - `--auto-gen-config` generates a baseline todo file to adopt on legacy codebases without fixing everything first
 
-**See the complete list:** [All 28 Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [30+ Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [30 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -182,9 +184,15 @@ Tags/Order:
   EnforcedOrder:
     - param
     - option
+    - yield
+    - yieldparam
+    - yieldreturn
     - return
     - raise
+    - see
     - example
+    - note
+    - todo
 
 Tags/InvalidTypes:
   Enabled: true
@@ -192,6 +200,18 @@ Tags/InvalidTypes:
   ExtraTypes:
     - CustomType
     - MyNamespace::CustomType
+
+# Opt-in: Require @return tags on all methods
+Documentation/MissingReturn:
+  Enabled: true
+  Severity: warning
+  ExcludedMethods:
+    - 'initialize'
+
+# Opt-in: Lint @example code style with RuboCop/StandardRB
+Tags/ExampleStyle:
+  Enabled: true
+  Severity: convention
 ```
 
 **Key features:**
@@ -298,8 +318,8 @@ Information:
 - **[Wiki Home](https://github.com/mensfeld/yard-lint/wiki)** - Full documentation
 - **[Installation](https://github.com/mensfeld/yard-lint/wiki/Installation)** - Installation guide
 - **[Configuration](https://github.com/mensfeld/yard-lint/wiki/Configuration)** - Complete configuration reference
-- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 30+ validators documented
-- **[Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All 28 features explained
+- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 30 validators documented
+- **[Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All features explained
 
 ### Workflows
 
