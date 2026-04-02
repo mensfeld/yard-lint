@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## Unreleased
+## 1.5.0 (2026-04-02)
 - **[Fix]** Skip `@!attribute` methods in `UndocumentedMethodArguments` validator (#115)
   - Methods documented with `@!attribute` directive are attribute accessors whose setter parameter does not need explicit `@param` documentation, matching `attr_accessor` behavior
 - **[Fix]** Extend `CollectionType` validator to enforce style for Array types, not just Hash (#114)
