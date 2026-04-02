@@ -29,7 +29,18 @@ Gem::Specification.new do |spec|
         f.end_with?('.gem') ||
         f.start_with?(
           *%w[Gemfile .gitignore test/ .github/ .rubocop.yml .yard-lint.yml]
-        )
+        ) ||
+        f.end_with?('.lock') ||
+        f.start_with?('misc/') ||
+        %w[
+          .ruby-version
+          mise.toml
+          renovate.json
+          package.json
+          package-lock.json
+          proxy_types
+          Rakefile
+        ].include?(f)
     end
   end
   spec.bindir = 'bin'
