@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## 1.5.1 (Unreleased)
+## 1.5.1 (2026-04-09)
 - **[Fix]** Remove `mise.toml` and `proxy_types` from the repository and exclude non-production files (`.ruby-version`, `Rakefile`, `misc/`, `renovate.json`, `package.json`, `package-lock.json`, lock files) from RubyGems releases
 
 ## 1.5.0 (2026-04-02)
