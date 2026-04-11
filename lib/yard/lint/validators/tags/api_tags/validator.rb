@@ -16,6 +16,15 @@ module Yard
             # @param collector [Executor::ResultCollector] collector for output
             # @return [void]
             def in_process_query(object, collector)
+              # Skip attribute methods (attr_reader/writer/accessor, @!attribute directives,
+              # Struct.new and Data.define generated readers/writers). These are auto-generated
+              # accessors where per-method @api tags either flow through the declaration's
+              # docstring automatically or cannot be attached at all — for example, YARD's
+              # Data.define handler creates getters with only a @return tag, and @!attribute
+              # directives written above a Data.define constant attach to the enclosing
+              # namespace, not the Data class itself. See issue #128.
+              return if object.type == :method && object.is_attribute?
+
               allowed_list = allowed_apis
 
               if object.has_tag?(:api)
