@@ -45,6 +45,15 @@ class ApiTagsAttributeExample
   # because ApiTags skips all attribute methods by design.
   attr_reader :phone
 
+  # @!attribute [r] directive_reader
+  #   Method materialized purely from a directive, with no underlying
+  #   attr_reader or def. Relies on the validator's attribute skip.
+  #
+  #   @return [String] a value produced by the directive
+
+  # @!attribute [rw] directive_accessor
+  #   @return [Integer] a counter produced by the directive
+
   # Regular method documented explicitly.
   #
   # @api public
@@ -64,4 +73,17 @@ class ApiTagsRegularMethodExample
   def city
     'anywhere'
   end
+end
+
+# Holds an attribute method whose explicit api tag value is invalid. Used to
+# verify that the attribute-method skip only suppresses *missing*-tag reports,
+# not *invalid*-value reports, so typos like `publc` are still caught.
+#
+# @api public
+class ApiTagsInvalidValueExample
+  # Attribute reader with an explicit but invalid api value (typo).
+  #
+  # @api publc
+  # @return [String] a value
+  attr_reader :typo_value
 end

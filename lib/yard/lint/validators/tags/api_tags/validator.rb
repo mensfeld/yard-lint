@@ -16,15 +16,6 @@ module Yard
             # @param collector [Executor::ResultCollector] collector for output
             # @return [void]
             def in_process_query(object, collector)
-              # Skip attribute methods (attr_reader/writer/accessor, @!attribute directives,
-              # Struct.new and Data.define generated readers/writers). These are auto-generated
-              # accessors where per-method @api tags either flow through the declaration's
-              # docstring automatically or cannot be attached at all — for example, YARD's
-              # Data.define handler creates getters with only a @return tag, and @!attribute
-              # directives written above a Data.define constant attach to the enclosing
-              # namespace, not the Data class itself. See issue #128.
-              return if object.type == :method && object.is_attribute?
-
               allowed_list = allowed_apis
 
               if object.has_tag?(:api)
@@ -34,6 +25,18 @@ module Yard
                   collector.puts "invalid:#{api_value}"
                 end
               elsif require_api_tags?
+                # Skip missing-tag reports for attribute methods (attr_reader/writer/accessor,
+                # @!attribute directives, Struct.new and Data.define generated readers/writers).
+                # These are auto-generated accessors where per-method @api tags either flow
+                # through the declaration's docstring automatically or cannot be attached at
+                # all — for example, YARD's Data.define handler creates getters with only a
+                # @return tag (hard-replacing their docstring and stripping any inherited @api
+                # from the enclosing class), and @!attribute directives written above a
+                # Data.define constant attach to the enclosing namespace, not the Data class
+                # itself. Note: attribute methods that *do* carry an explicit @api tag still
+                # hit the branch above and get their value validated. See issue #128.
+                return if object.type == :method && object.is_attribute?
+
                 # Only check public methods/classes if require_api_tags is enabled
                 visibility = object.visibility.to_s
                 if visibility == 'public' && !object.root?

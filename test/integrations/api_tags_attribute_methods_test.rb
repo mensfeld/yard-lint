@@ -81,6 +81,29 @@ describe 'Tags/ApiTags attribute methods' do
     end
   end
 
+  describe '@!attribute directive generated methods' do
+    it 'does not flag directive_reader generated purely from @!attribute [r]' do
+      assert_nil(
+        api_tag_offense_for('ApiTagsAttributeExample#directive_reader'),
+        '@!attribute [r] reader should not be flagged for missing @api tag'
+      )
+    end
+
+    it 'does not flag directive_accessor reader generated from @!attribute [rw]' do
+      assert_nil(
+        api_tag_offense_for('ApiTagsAttributeExample#directive_accessor'),
+        '@!attribute [rw] reader should not be flagged for missing @api tag'
+      )
+    end
+
+    it 'does not flag directive_accessor= writer generated from @!attribute [rw]' do
+      assert_nil(
+        api_tag_offense_for('ApiTagsAttributeExample#directive_accessor='),
+        '@!attribute [rw] writer should not be flagged for missing @api tag'
+      )
+    end
+  end
+
   describe 'attr_* generated methods' do
     it 'does not flag documented attr_reader :name' do
       assert_nil(api_tag_offense_for('ApiTagsAttributeExample#name'))
@@ -103,6 +126,18 @@ describe 'Tags/ApiTags attribute methods' do
         api_tag_offense_for('ApiTagsAttributeExample#phone'),
         'attr_reader without explicit @api tag should not be flagged'
       )
+    end
+  end
+
+  describe 'invalid api values on attribute methods' do
+    it 'still flags attribute methods with an explicit but invalid @api value' do
+      offense = api_tag_offense_for('ApiTagsInvalidValueExample#typo_value')
+      refute_nil(
+        offense,
+        'Attribute methods with an explicit invalid @api value must still be flagged ' \
+        '(the skip only suppresses missing-tag reports, not invalid-value reports)'
+      )
+      assert_match(/publc/, offense[:message])
     end
   end
 
@@ -132,7 +167,8 @@ describe 'Tags/ApiTags attribute methods' do
 
       expected = [
         'Public object `ApiTagsRegularMethodExample` is missing @api tag',
-        'Public object `ApiTagsRegularMethodExample#city` is missing @api tag'
+        'Public object `ApiTagsRegularMethodExample#city` is missing @api tag',
+        "Object `ApiTagsInvalidValueExample#typo_value` has invalid @api tag value: 'publc'"
       ].sort
 
       assert_equal(expected, flagged)
