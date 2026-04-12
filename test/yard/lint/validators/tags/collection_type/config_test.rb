@@ -10,7 +10,7 @@ describe 'Yard::Lint::Validators::Tags::CollectionType::Config' do
     assert_equal(true, Yard::Lint::Validators::Tags::CollectionType::Config.defaults['Enabled'])
     assert_equal('convention', Yard::Lint::Validators::Tags::CollectionType::Config.defaults['Severity'])
     assert_equal(
-      %w[param option return yieldreturn],
+      %w[param option return yieldreturn yieldparam raise],
       Yard::Lint::Validators::Tags::CollectionType::Config.defaults['ValidatedTags']
     )
   end

@@ -33,16 +33,13 @@ module Yard
               extra_types = config_or_default('ExtraTypes')
               allowed_types = ALLOWED_DEFAULTS + extra_types
 
-              # Sanitize type string (remove type syntax characters)
-              sanitize = ->(type) { type.tr('=><>,{} ()', '') }
-
               # Check for invalid types
-              invalid_types = object.docstring.tags
-                                    .select { |tag| checked_tags.include?(tag.tag_name) }
+              invalid_types = all_typed_tags(object.docstring, checked_tags)
                                     .flat_map(&:types)
                                     .compact
                                     .uniq
-                                    .map(&sanitize)
+                                    .flat_map { |type| extract_type_names(type) }
+                                    .uniq
                                     .reject { |type| allowed_types.include?(type) }
                                     .reject { |type| type_defined?(type) }
                                     .reject { |type| type.include?('#') }
@@ -53,6 +50,16 @@ module Yard
             end
 
             private
+
+            # Extract individual type names from a compound type string.
+            # Instead of stripping all syntax characters and concatenating (which
+            # turns "Array<self>" into "Arrayself"), this splits on syntax boundaries
+            # and returns each type name individually.
+            # @param type_str [String] the raw type string (e.g., "Array<self>", "Hash{Symbol => String}")
+            # @return [Array<String>] individual type names (e.g., ["Array", "self"], ["Hash", "Symbol", "String"])
+            def extract_type_names(type_str)
+              type_str.split(/[=><,{}\s()]+/).reject(&:empty?)
+            end
 
             # Check if a type is defined in Ruby runtime or YARD registry
             # In in-process mode, parsed classes are in YARD registry but not loaded into Ruby
