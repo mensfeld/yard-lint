@@ -78,6 +78,25 @@ module Yard
 
         private
 
+        # Collect tags matching the given tag names from a docstring, including
+        # tags nested inside @overload blocks. YARD stores @overload inner tags
+        # on the overload's own docstring, so they are invisible to
+        # `docstring.tags` — this helper traverses them.
+        # @param docstring [YARD::Docstring] the docstring to search
+        # @param tag_names [Array<String>] tag names to collect (e.g., %w[param return])
+        # @return [Array<YARD::Tags::Tag>] matching tags from the docstring and any overloads
+        def all_typed_tags(docstring, tag_names)
+          tags = docstring.tags.select { |tag| tag_names.include?(tag.tag_name) }
+
+          docstring.tags(:overload).each do |overload|
+            overload.docstring.tags.each do |tag|
+              tags << tag if tag_names.include?(tag.tag_name)
+            end
+          end
+
+          tags
+        end
+
         # Retrieves configuration value with fallback to default
         # Automatically determines the validator name from the class namespace
         #

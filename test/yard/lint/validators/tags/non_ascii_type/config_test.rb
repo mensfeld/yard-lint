@@ -13,8 +13,8 @@ describe 'Yard::Lint::Validators::Tags::NonAsciiType::Config' do
     assert_equal('warning', Yard::Lint::Validators::Tags::NonAsciiType::Config.defaults['Severity'])
   end
 
-  it 'defaults has validatedtags with param option return yieldreturn yieldparam' do
-    expected_tags = %w[param option return yieldreturn yieldparam]
+  it 'defaults has validatedtags with param option return yieldreturn yieldparam raise' do
+    expected_tags = %w[param option return yieldreturn yieldparam raise]
     assert_equal(expected_tags, Yard::Lint::Validators::Tags::NonAsciiType::Config.defaults['ValidatedTags'])
   end
 

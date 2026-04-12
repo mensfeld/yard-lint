@@ -13,8 +13,8 @@ describe 'Yard::Lint::Validators::Tags::TypeSyntax::Config' do
     assert_equal('warning', Yard::Lint::Validators::Tags::TypeSyntax::Config.defaults['Severity'])
   end
 
-  it 'defaults has validatedtags with param option return yieldreturn' do
-    expected_tags = %w[param option return yieldreturn]
+  it 'defaults has validatedtags with param option return yieldreturn yieldparam raise' do
+    expected_tags = %w[param option return yieldreturn yieldparam raise]
     assert_equal(expected_tags, Yard::Lint::Validators::Tags::TypeSyntax::Config.defaults['ValidatedTags'])
   end
 

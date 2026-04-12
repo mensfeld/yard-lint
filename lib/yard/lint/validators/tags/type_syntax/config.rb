@@ -11,7 +11,7 @@ module Yard
             self.defaults = {
               'Enabled' => true,
               'Severity' => 'warning',
-              'ValidatedTags' => %w[param option return yieldreturn]
+              'ValidatedTags' => %w[param option return yieldreturn yieldparam raise]
             }.freeze
           end
         end

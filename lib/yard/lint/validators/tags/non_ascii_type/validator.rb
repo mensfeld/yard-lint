@@ -23,9 +23,7 @@ module Yard
               validated_tags = config.validator_config('Tags/NonAsciiType', 'ValidatedTags') ||
                                %w[param option return yieldreturn yieldparam]
 
-              object.docstring.tags
-                    .select { |tag| validated_tags.include?(tag.tag_name) }
-                    .each do |tag|
+              all_typed_tags(object.docstring, validated_tags).each do |tag|
                 next unless tag.types
 
                 tag.types.each do |type_str|
