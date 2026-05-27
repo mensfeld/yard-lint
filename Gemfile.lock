@@ -72,7 +72,7 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
     yard (0.9.43)
-    zeitwerk (2.7.5)
+    zeitwerk (2.8.2)
 
 PLATFORMS
   ruby
