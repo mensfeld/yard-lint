@@ -6,13 +6,16 @@ module Yard
       module Warnings
         module DuplicatedParameterName
           # Parser for DuplicatedParameterName warnings
-          class Parser < ::Yard::Lint::Parsers::OneLineBase
+          # YARD output format:
+          #   [warn]: @param tag has duplicate parameter name: ...
+          #       in file `filename.rb' near line N
+          class Parser < ::Yard::Lint::Parsers::TwoLineBase
             # Set of regexps for detecting warnings reported by YARD stats
             self.regexps = {
               general: /^\[warn\]: @param tag has duplicate parameter name/,
-              message: /\[warn\]: (.*) in file/,
-              location: /in file `(.*)`/,
-              line: /line (\d*)/
+              message: /\[warn\]: (.*)$/,
+              location: /in file `(.*?)'\s*near/,
+              line: /near line (\d+)/
             }.freeze
           end
         end

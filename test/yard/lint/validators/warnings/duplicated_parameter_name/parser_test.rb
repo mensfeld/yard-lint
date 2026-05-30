@@ -7,8 +7,8 @@ describe 'Yard::Lint::Validators::Warnings::DuplicatedParameterName::Parser' do
     @parser = Yard::Lint::Validators::Warnings::DuplicatedParameterName::Parser.new
   end
 
-  it 'initialize inherits from onelinebase parser' do
-    assert_kind_of(Yard::Lint::Parsers::OneLineBase, parser)
+  it 'initialize inherits from twolinebase parser' do
+    assert_kind_of(Yard::Lint::Parsers::TwoLineBase, parser)
   end
 
   it 'regexps defines required regexps' do
