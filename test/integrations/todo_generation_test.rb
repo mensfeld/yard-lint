@@ -428,5 +428,34 @@ describe 'Todo Generation' do
     assert_equal(1, result[:exit_code])
     assert_includes(result[:stdout], 'Error')
   end
+
+  # -- regression: nil location (issue #150) --
+
+  # A @!macro [new] body that contains an invalid tag format and is also
+  # referenced inside the defining method's body comment causes YARD to expand
+  # the macro with object=nil. That emits 'Invalid tag format for @return'
+  # WITHOUT the "in file `...`" fragment, so Warnings/InvalidTagFormat's
+  # parser returns offense[:location] = nil. Without the fix, --auto-gen-config
+  # crashes with NoMethodError in make_relative_path.
+  it 'regression nil location auto gen config does not crash when InvalidTagFormat warning has no file context' do
+    FileUtils.mkdir_p('lib')
+
+    File.write('lib/dsl_macro.rb', <<~RUBY)
+      class Api
+        # @!macro [new] dsl_method
+        #   @return attr_name [String] invalid: name before type list
+        def self.dsl_method(name)
+          # @!macro dsl_method
+        end
+
+        dsl_method :color
+      end
+    RUBY
+
+    result = run_yard_lint('--auto-gen-config')
+
+    assert_equal(0, result[:exit_code])
+    assert(File.exist?('.yard-lint-todo.yml'))
+  end
 end
 

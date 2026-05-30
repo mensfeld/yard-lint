@@ -364,21 +364,29 @@ describe 'Yard::Lint::TodoGenerator' do
   end
 
   # Regression test for https://github.com/mensfeld/yard-lint/issues/150
-  # generate must not crash when a validator produces an offense with nil
-  # location (e.g. a YARD warning that lacks an "in file" component).
-  it 'generate does not crash when offense has nil location' do
+  #
+  # A @!macro [new] body that contains an invalid tag format (@return with a
+  # name before the type list) and is also referenced inside the defining
+  # method's own body comment causes YARD to expand the macro with object=nil.
+  # That emits 'Invalid tag format for @return' WITHOUT file context.
+  # Warnings/InvalidTagFormat's :general regex matches that warning, but its
+  # :location regex does not → offense[:location] is nil → NoMethodError on
+  # the unfixed make_relative_path.
+  it 'generate does not crash when YARD emits an InvalidTagFormat warning without file context' do
     Dir.chdir(@test_dir) do
       FileUtils.mkdir_p('lib')
-      File.write('lib/test.rb', "class Test\nend\n")
 
-      # Inject a raw result for Warnings/UnknownTag whose stdout contains a
-      # warning that matches the parser's :general regex but omits the
-      # "in file `...`" fragment, so that offense[:location] is nil.
-      nil_location_stdout = "[warn]: Unknown tag @custom near line 1"
+      File.write('lib/dsl_macro.rb', <<~RUBY)
+        class Api
+          # @!macro [new] dsl_method
+          #   @return attr_name [String] invalid: name before type list
+          def self.dsl_method(name)
+            # @!macro dsl_method
+          end
 
-      Yard::Lint::Runner.any_instance.stubs(:run_validators).returns(
-        unknown_tag: { stdout: nil_location_stdout, stderr: '', exit_code: 0 }
-      )
+          dsl_method :color
+        end
+      RUBY
 
       result = Yard::Lint::TodoGenerator.generate(
         path: 'lib',
