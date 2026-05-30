@@ -95,8 +95,8 @@ module Yard
           validator_result = result_builder.build(validator_name, raw_results)
           next unless validator_result && validator_result.offenses.any?
 
-          # Extract file paths from offenses
-          file_paths = validator_result.offenses.map do |offense|
+          # Extract file paths from offenses, skipping those without a location
+          file_paths = validator_result.offenses.filter_map do |offense|
             make_relative_path(offense[:location])
           end.uniq.sort
 
@@ -128,9 +128,11 @@ module Yard
       end
 
       # Convert absolute path to relative path from current directory
-      # @param path [String] absolute or relative file path
-      # @return [String] relative path from current directory
+      # @param path [String, nil] absolute or relative file path
+      # @return [String, nil] relative path from current directory, or nil if path is nil
       def make_relative_path(path)
+        return path if path.nil?
+
         pwd = Dir.pwd
         path.start_with?(pwd) ? path.sub("#{pwd}/", '') : path
       end

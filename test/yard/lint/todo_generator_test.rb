@@ -343,5 +343,52 @@ describe 'Yard::Lint::TodoGenerator' do
       assert_equal(relative, result)
     end
   end
+
+  # Regression test for https://github.com/mensfeld/yard-lint/issues/150
+  # YARD warnings without a file path (e.g. global-level warnings) produce
+  # offenses with location: nil. make_relative_path must not call start_with?
+  # on nil.
+  it 'make relative path returns nil for nil path without raising' do
+    Dir.chdir(@test_dir) do
+      generator = Yard::Lint::TodoGenerator.new(
+        path: '.',
+        config: @config,
+        force: false,
+        exclude_limit: 15
+      )
+
+      result = generator.send(:make_relative_path, nil)
+
+      assert_nil(result)
+    end
+  end
+
+  # Regression test for https://github.com/mensfeld/yard-lint/issues/150
+  # generate must not crash when a validator produces an offense with nil
+  # location (e.g. a YARD warning that lacks an "in file" component).
+  it 'generate does not crash when offense has nil location' do
+    Dir.chdir(@test_dir) do
+      FileUtils.mkdir_p('lib')
+      File.write('lib/test.rb', "class Test\nend\n")
+
+      # Inject a raw result for Warnings/UnknownTag whose stdout contains a
+      # warning that matches the parser's :general regex but omits the
+      # "in file `...`" fragment, so that offense[:location] is nil.
+      nil_location_stdout = "[warn]: Unknown tag @custom near line 1"
+
+      Yard::Lint::Runner.any_instance.stubs(:run_validators).returns(
+        unknown_tag: { stdout: nil_location_stdout, stderr: '', exit_code: 0 }
+      )
+
+      result = Yard::Lint::TodoGenerator.generate(
+        path: 'lib',
+        config: @config,
+        force: false,
+        exclude_limit: 15
+      )
+
+      assert_kind_of(Hash, result)
+    end
+  end
 end
 
