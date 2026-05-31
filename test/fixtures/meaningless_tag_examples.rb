@@ -74,3 +74,17 @@ module SomeModule
   # @param wrong [String] this is wrong
   CONST_WITH_PARAM = 'value'
 end
+
+# Valid: Struct.new constant with @param (Solargraph uses these to type accessors)
+# @param required_gems [Array<String>]
+# @param helper_modules [Array<String>]
+GemHelpers = Struct.new(:required_gems, :helper_modules, keyword_init: true)
+
+# Valid: Data.define constant with @param (same reason)
+# @param x [Integer]
+# @param y [Integer]
+Point = Data.define(:x, :y)
+
+# Invalid: Struct.new constant with @option (still meaningless)
+# @option opts [String] :key This doesn't belong here
+StructWithOption = Struct.new(:key)

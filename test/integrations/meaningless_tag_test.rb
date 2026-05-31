@@ -77,5 +77,37 @@ describe 'Meaningless Tag' do
     meaningless_tag_offenses = result.offenses.select { |o| o[:name] == 'MeaninglessTag' }
     assert_empty(meaningless_tag_offenses)
   end
+
+  # -- Struct.new / Data.define --
+
+  it 'does not flag @param on Struct.new constants' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offenses = result.offenses.select do |o|
+      o[:name] == 'MeaninglessTag' && o[:message].include?('GemHelpers')
+    end
+
+    assert_empty(offenses)
+  end
+
+  it 'does not flag @param on Data.define constants' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offenses = result.offenses.select do |o|
+      o[:name] == 'MeaninglessTag' && o[:message].include?('Point')
+    end
+
+    assert_empty(offenses)
+  end
+
+  it 'still flags @option on Struct.new constants' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offenses = result.offenses.select do |o|
+      o[:name] == 'MeaninglessTag' && o[:message].include?('StructWithOption')
+    end
+
+    refute_empty(offenses)
+  end
 end
 
