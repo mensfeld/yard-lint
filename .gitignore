@@ -12,3 +12,7 @@
 # Built gems
 /*.gem
 coverage/
+
+# Local tooling and AI assistant configs
+mise.toml
+.claude/

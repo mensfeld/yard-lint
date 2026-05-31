@@ -3,7 +3,7 @@
 ## 1.5.2 (Unreleased)
 - **[Enhancement]** `Tags/InvalidTypes` offense messages now name the invalid type(s) and the tag they appear in (#151)
   - Previously reported a generic `"has at least one tag with an invalid type definition"` message with no further detail
-  - Now reports `"has invalid type(s): @param body: 'bad_type'; @return: 'wrong_type'"` — the exact offending type and the tag (including param name for `@param`) where it was found
+  - Now reports `"has invalid type(s): @param body: \`bad_type\`; @return: \`wrong_type\`"` — the exact offending type and the tag (including param name for `@param`) where it was found
 - **[Fix]** Do not flag `@param` on `Struct.new` / `Data.define` constants in `Tags/MeaninglessTag` (#152)
   - Solargraph uses `@param` annotations on these constants to type the synthesised accessors; flagging them was a false positive
   - `@option` on these constants is still reported as meaningless
