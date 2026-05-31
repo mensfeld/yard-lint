@@ -22,8 +22,13 @@ module Yard
 
               return unless invalid_types.include?(object_type)
 
+              # @param is meaningful on Struct.new / Data.define constants because
+              # Solargraph uses those annotations to type the synthesized accessors.
+              effective_tags = struct_or_data_class?(object) ? tags_to_check - ['param'] : tags_to_check
+              return if effective_tags.empty?
+
               object.docstring.tags.each do |tag|
-                next unless tags_to_check.include?(tag.tag_name)
+                next unless effective_tags.include?(tag.tag_name)
 
                 collector.puts "#{object.file}:#{object.line}: #{object.title}"
                 collector.puts "#{object_type}|#{tag.tag_name}"
@@ -41,6 +46,16 @@ module Yard
             # @return [Array<String>] object types that shouldn't have method-only tags
             def invalid_object_types
               config_or_default('InvalidObjectTypes')
+            end
+
+            # @param object [YARD::CodeObjects::Base] the code object to inspect
+            # @return [Boolean] true when the object is a class synthesised by Struct.new
+            #   or Data.define, where @param documents the generated accessors
+            def struct_or_data_class?(object)
+              return false unless object.type == :class
+
+              sc_path = object.superclass&.path
+              sc_path == 'Struct' || sc_path == 'Data'
             end
           end
         end
