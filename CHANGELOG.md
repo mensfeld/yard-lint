@@ -1,6 +1,14 @@
 # YARD-Lint Changelog
 
 ## 1.5.2 (Unreleased)
+- **[Fix]** Do not flag `@param` on `Struct.new` / `Data.define` constants in `Tags/MeaninglessTag` (#152)
+  - Solargraph uses `@param` annotations on these constants to type the synthesised accessors; flagging them was a false positive
+  - `@option` on these constants is still reported as meaningless
+- **[Fix]** Fix `--auto-gen-config` crash (`NoMethodError`) when a YARD warning is emitted without file context (#150)
+  - A `@!macro [new]` body with an invalid tag format (e.g. `@return name [Type]`) that is also referenced inside the defining method's body causes YARD to expand the macro with `object=nil`, emitting `Invalid tag format` without a file path → `offense[:location] = nil` → `make_relative_path(nil)` → crash
+  - `TodoGenerator#make_relative_path` now returns `nil` for `nil` input; `run_linting` uses `filter_map` to skip nil locations when building exclusion lists
+  - `Runner#filter_result_offenses` now always drops nil-location offenses before exclusion-pattern filtering (they would otherwise appear as `:0` in output)
+  - Fix `Warnings/DuplicatedParameterName::Parser`: was inheriting from `OneLineBase` despite YARD emitting the warning across two lines (same format as `UnknownParameterName`), causing `offense[:location]` to always be `nil`; switched to `TwoLineBase` and corrected the location regex to match YARD's backtick-open/single-quote-close path format
 - **[Fix]** Stop false positives for allowed defaults (`self`, `nil`, `true`, `false`, `void`) inside generic types in `Tags/InvalidTypes` validator
   - Types like `Array<self>`, `Hash{Symbol => nil}`, `Array<true>` were incorrectly flagged as `InvalidTagType` because the sanitize logic concatenated type components (e.g., `Array<self>` became `Arrayself`, which is not in `ALLOWED_DEFAULTS`)
   - Replaced the `tr`-based sanitizer with a proper type name splitter that checks each component individually
