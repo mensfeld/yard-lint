@@ -33,20 +33,26 @@ module Yard
               extra_types = config_or_default('ExtraTypes')
               allowed_types = ALLOWED_DEFAULTS + extra_types
 
-              # Check for invalid types
-              invalid_types = all_typed_tags(object.docstring, checked_tags)
-                                    .flat_map(&:types)
-                                    .compact
-                                    .uniq
-                                    .flat_map { |type| extract_type_names(type) }
-                                    .uniq
-                                    .reject { |type| allowed_types.include?(type) }
-                                    .reject { |type| type_defined?(type) }
-                                    .reject { |type| type.include?('#') }
+              # Collect per-tag violations to surface in the offense message.
+              # Each entry is "tagname param_name:Type1,Type2" (param_name omitted when nil).
+              tag_violations = all_typed_tags(object.docstring, checked_tags).filter_map do |tag|
+                bad = (tag.types || [])
+                        .compact
+                        .flat_map { |type| extract_type_names(type) }
+                        .uniq
+                        .reject { |type| allowed_types.include?(type) }
+                        .reject { |type| type_defined?(type) }
+                        .reject { |type| type.include?('#') }
+                next if bad.empty?
 
-              return if invalid_types.empty?
+                label = tag.name ? "@#{tag.tag_name} #{tag.name}" : "@#{tag.tag_name}"
+                "#{label}:#{bad.join(',')}"
+              end
+
+              return if tag_violations.empty?
 
               collector.puts "#{object.file}:#{object.line}: #{object.title}"
+              collector.puts tag_violations.join('|')
             end
 
             private
