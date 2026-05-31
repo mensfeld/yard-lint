@@ -343,5 +343,60 @@ describe 'Yard::Lint::TodoGenerator' do
       assert_equal(relative, result)
     end
   end
+
+  # Regression test for https://github.com/mensfeld/yard-lint/issues/150
+  # YARD warnings without a file path (e.g. global-level warnings) produce
+  # offenses with location: nil. make_relative_path must not call start_with?
+  # on nil.
+  it 'make relative path returns nil for nil path without raising' do
+    Dir.chdir(@test_dir) do
+      generator = Yard::Lint::TodoGenerator.new(
+        path: '.',
+        config: @config,
+        force: false,
+        exclude_limit: 15
+      )
+
+      result = generator.send(:make_relative_path, nil)
+
+      assert_nil(result)
+    end
+  end
+
+  # Regression test for https://github.com/mensfeld/yard-lint/issues/150
+  #
+  # A @!macro [new] body that contains an invalid tag format (@return with a
+  # name before the type list) and is also referenced inside the defining
+  # method's own body comment causes YARD to expand the macro with object=nil.
+  # That emits 'Invalid tag format for @return' WITHOUT file context.
+  # Warnings/InvalidTagFormat's :general regex matches that warning, but its
+  # :location regex does not → offense[:location] is nil → NoMethodError on
+  # the unfixed make_relative_path.
+  it 'generate does not crash when YARD emits an InvalidTagFormat warning without file context' do
+    Dir.chdir(@test_dir) do
+      FileUtils.mkdir_p('lib')
+
+      File.write('lib/dsl_macro.rb', <<~RUBY)
+        class Api
+          # @!macro [new] dsl_method
+          #   @return attr_name [String] invalid: name before type list
+          def self.dsl_method(name)
+            # @!macro dsl_method
+          end
+
+          dsl_method :color
+        end
+      RUBY
+
+      result = Yard::Lint::TodoGenerator.generate(
+        path: 'lib',
+        config: @config,
+        force: false,
+        exclude_limit: 15
+      )
+
+      assert_kind_of(Hash, result)
+    end
+  end
 end
 

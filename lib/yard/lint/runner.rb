@@ -108,12 +108,18 @@ module Yard
       end
 
       # Filter result offenses based on per-validator exclusions
-      # Removes offenses where the file path matches exclusion patterns
+      # Also always removes offenses with no file location (e.g. YARD warnings
+      # emitted without file context such as from macro expansion with nil object)
+      # since they carry no actionable information and would display as `:0`.
       # @param validator_name [String] full validator name
       # @param result [Results::Base] result object with offenses
       # @return [Results::Base, nil] result with filtered offenses, or nil if no offenses remain
       def filter_result_offenses(validator_name, result)
         validator_excludes = config.validator_all_excludes(validator_name)
+
+        # Drop offenses with no file location regardless of exclusion config
+        result.offenses = result.offenses.reject { |o| (o[:location] || o[:file]).nil? }
+        return nil if result.offenses.empty?
         return result if validator_excludes.empty?
 
         working_dir = Dir.pwd
