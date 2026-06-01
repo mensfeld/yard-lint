@@ -55,4 +55,47 @@ describe 'InvalidTypes offense messages' do
     assert_includes(process_offense[:message], 'bad_type')
     assert_includes(process_offense[:message], '@param value')
   end
+
+  # -- Nested Hash types (regression for issue #151/#152 "complex hash values") --
+
+  it 'does not flag two-level nested Hash return type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('nested_hash_two_levels') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag three-level nested Hash return type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('nested_hash_three_levels') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag Hash inside Array inside Hash param type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_in_array_in_hash') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag simple one-level Hash type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('simple_hash') }
+
+    assert_nil(offense)
+  end
+
+  it 'still flags an invalid type nested inside a Hash value' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_with_invalid_value') }
+
+    refute_nil(offense)
+    assert_includes(offense[:message], 'bad_nested_type')
+  end
 end
