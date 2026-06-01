@@ -19,6 +19,9 @@ module Yard
               nil
               self
               void
+              undefined
+              unspecified
+              unknown
             ].freeze
 
             private_constant :ALLOWED_DEFAULTS

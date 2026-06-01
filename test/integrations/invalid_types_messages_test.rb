@@ -98,4 +98,46 @@ describe 'InvalidTypes offense messages' do
     refute_nil(offense)
     assert_includes(offense[:message], 'bad_nested_type')
   end
+
+  # -- YARD pseudo-types: undefined, unspecified, unknown --
+
+  it 'does not flag Hash with undefined value type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_with_undefined_value') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag Hash with unspecified value type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_with_unspecified_value') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag Hash with unknown value type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_with_unknown_value') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag deeply nested Hash containing undefined' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_nested_with_undefined') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag standalone undefined return type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('standalone_undefined') }
+
+    assert_nil(offense)
+  end
 end
