@@ -197,8 +197,11 @@ Tags/Order:
 Tags/InvalidTypes:
   Enabled: true
   Severity: warning
+  # ExtraTypes: declare non-standard type names that should not be flagged.
+  # Useful for project aliases, LSP extensions (e.g. Solargraph's `generic`),
+  # or any informal type name your team uses in YARD docs.
   ExtraTypes:
-    - CustomType
+    - generic          # Solargraph generic type parameter (lsegal/yard#1683)
     - MyNamespace::CustomType
 
 # Opt-in: Require @return tags on all methods
@@ -221,6 +224,44 @@ Tags/ExampleStyle:
 - Per-validator YARD options and file exclusions
 
 **Learn more:** [Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
+
+## Handling Non-Standard Types
+
+By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes — project-specific aliases, LSP extensions, or informal conventions — you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.
+
+### Project-Specific Type Aliases
+
+```yaml
+Tags/InvalidTypes:
+  ExtraTypes:
+    - Callable        # informal "anything that responds to #call"
+    - Awaitable       # async type alias used across the project
+    - Result          # dry-monad-style Result type used in prose docs
+```
+
+### LSP / Tool-Specific Extensions
+
+[Solargraph](https://solargraph.org) supports a `generic` type-parameter notation (e.g. `Hash{Class<generic<T>> => Set<generic<T>>}`) that is [proposed for adoption](https://github.com/lsegal/yard/issues/1683) but not yet part of the YARD standard. Until it is, add it to `ExtraTypes` to prevent false positives:
+
+```yaml
+Tags/InvalidTypes:
+  ExtraTypes:
+    - generic
+```
+
+### Built-In Pseudo-Types (no configuration needed)
+
+The following lowercase YARD pseudo-types are accepted out of the box and do **not** need to be listed in `ExtraTypes`:
+
+| Type | Meaning |
+|------|---------|
+| `nil` | Explicitly nil |
+| `true` / `false` | Boolean literals |
+| `self` | Returns the receiver |
+| `void` | No meaningful return value |
+| `undefined` | Type is intentionally unspecified (used by Solargraph) |
+| `unspecified` | Alias for undefined |
+| `unknown` | Type is unknown |
 
 ## CI Integration
 
