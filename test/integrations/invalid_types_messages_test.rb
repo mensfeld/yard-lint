@@ -140,4 +140,22 @@ describe 'InvalidTypes offense messages' do
 
     assert_nil(offense)
   end
+
+  # -- String literal hash keys --
+
+  it 'does not flag Hash with string literal keys' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_with_string_keys') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag Hash with multiple string literal keys' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_with_multiple_string_keys') }
+
+    assert_nil(offense)
+  end
 end

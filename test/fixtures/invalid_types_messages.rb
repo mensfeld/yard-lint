@@ -47,4 +47,11 @@ class InvalidTypesMessages
   # Valid: undefined as a standalone return type
   # @return [undefined] raw pseudo-type (not in hash)
   def standalone_undefined; end
+
+  # Valid: string literal keys in Hash types must not produce false positives.
+  # @return [Hash{"to" => Array<Hash{"email", "name" => String}>}] string key hash
+  def hash_with_string_keys; end
+
+  # @return [Hash{"subject" => String, "htmlContent" => String}] multiple string keys
+  def hash_with_multiple_string_keys; end
 end
