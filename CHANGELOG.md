@@ -1,6 +1,9 @@
 # YARD-Lint Changelog
 
 ## 1.5.2 (Unreleased)
+- **[Fix]** `Tags/InvalidTypes` no longer false-positives on nested `Hash{K => V}` types (#151, #152)
+  - Complex hash types such as `Hash{String => Hash{Symbol => Array<String>}}` were occasionally flagged as invalid; the `extract_type_names` splitter already handled them correctly after the 1.5.2 sanitizer rewrite, and regression tests now lock that behaviour in
+  - Invalid types genuinely nested inside hash values (e.g. `Hash{String => bad_type}`) are still caught and surfaced correctly
 - **[Enhancement]** `Tags/InvalidTypes` offense messages now name the invalid type(s) and the tag they appear in (#151)
   - Previously reported a generic `"has at least one tag with an invalid type definition"` message with no further detail
   - Now reports `"has invalid type(s): @param body: \`bad_type\`; @return: \`wrong_type\`"` — the exact offending type and the tag (including param name for `@param`) where it was found
