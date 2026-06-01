@@ -227,7 +227,7 @@ Tags/ExampleStyle:
 
 ## Handling Non-Standard Types
 
-By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes — project-specific aliases, LSP extensions, or informal conventions — you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.
+By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes - project-specific aliases, LSP extensions, or informal conventions - you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.
 
 ### Project-Specific Type Aliases
 
