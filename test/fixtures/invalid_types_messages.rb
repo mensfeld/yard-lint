@@ -30,4 +30,28 @@ class InvalidTypesMessages
   # Invalid: bad type nested inside a hash value should still be caught.
   # @return [Hash{String => bad_nested_type}] hash with invalid value type
   def hash_with_invalid_value; end
+
+  # Valid: YARD pseudo-types used as hash values must not produce false positives.
+  # @return [Hash{String => undefined}] undefined is a YARD pseudo-type
+  def hash_with_undefined_value; end
+
+  # @return [Hash{String => unspecified}] unspecified is a YARD pseudo-type
+  def hash_with_unspecified_value; end
+
+  # @return [Hash{String => unknown}] unknown is a YARD pseudo-type
+  def hash_with_unknown_value; end
+
+  # @return [Hash{String => Array<Hash{String => undefined}>}] nested with undefined
+  def hash_nested_with_undefined; end
+
+  # Valid: undefined as a standalone return type
+  # @return [undefined] raw pseudo-type (not in hash)
+  def standalone_undefined; end
+
+  # Valid: string literal keys in Hash types must not produce false positives.
+  # @return [Hash{"to" => Array<Hash{"email", "name" => String}>}] string key hash
+  def hash_with_string_keys; end
+
+  # @return [Hash{"subject" => String, "htmlContent" => String}] multiple string keys
+  def hash_with_multiple_string_keys; end
 end

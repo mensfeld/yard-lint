@@ -19,6 +19,9 @@ module Yard
               nil
               self
               void
+              undefined
+              unspecified
+              unknown
             ].freeze
 
             private_constant :ALLOWED_DEFAULTS
@@ -72,9 +75,8 @@ module Yard
             # @param type [String] type name to check
             # @return [Boolean] true if type is defined (or at least recognized as a valid type)
             def type_defined?(type)
-              # Symbol types like :foo are valid YARD documentation notations
-              # They document that a method accepts specific symbol values
-              return true if type.start_with?(':')
+              # Symbol and string literal types (:foo, "bar") are valid hash key notations
+              return true if type.start_with?(':', '"', "'")
 
               # Check Ruby runtime first
               # The shell query uses: !(Kernel.const_defined?(type) rescue nil).nil?

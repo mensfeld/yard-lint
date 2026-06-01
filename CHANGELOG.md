@@ -1,7 +1,12 @@
 # YARD-Lint Changelog
 
 ## 1.5.2 (Unreleased)
-- **[Fix]** `Tags/InvalidTypes` no longer false-positives on nested `Hash{K => V}` types (#151, #152)
+- **[Fix]** `Tags/InvalidTypes` no longer reports false positives for YARD pseudo-types `undefined`, `unspecified`, and `unknown` (#152)
+  - These lowercase pseudo-types are used in real-world YARD docs (e.g. Solargraph uses `Hash{String => undefined}` extensively) to signal that a type is intentionally unspecified
+  - They are now treated as valid types alongside the existing `nil`, `void`, `self`, `true`, `false` defaults
+- **[Fix]** `Tags/InvalidTypes` no longer reports false positives for string literal hash keys (e.g. `Hash{"to" => String}`) (#152)
+  - String literal keys like `"email"` or `"name"` are valid YARD hash key notation and are now treated as valid alongside the existing symbol literal support (`:key`)
+- **[Fix]** `Tags/InvalidTypes` no longer reports false positives for nested `Hash{K => V}` types (#151, #152)
   - Complex hash types such as `Hash{String => Hash{Symbol => Array<String>}}` were occasionally flagged as invalid; the `extract_type_names` splitter already handled them correctly after the 1.5.2 sanitizer rewrite, and regression tests now lock that behaviour in
   - Invalid types genuinely nested inside hash values (e.g. `Hash{String => bad_type}`) are still caught and surfaced correctly
 - **[Enhancement]** `Tags/InvalidTypes` offense messages now name the invalid type(s) and the tag they appear in (#151)
