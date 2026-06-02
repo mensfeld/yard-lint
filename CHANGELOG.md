@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## 1.5.2 (Unreleased)
+## 1.5.2 (2026-06-02)
 - **[Fix]** `Tags/InvalidTypes` no longer reports false positives for YARD pseudo-types `undefined`, `unspecified`, and `unknown` (#152)
   - These lowercase pseudo-types are used in real-world YARD docs (e.g. Solargraph uses `Hash{String => undefined}` extensively) to signal that a type is intentionally unspecified
   - They are now treated as valid types alongside the existing `nil`, `void`, `self`, `true`, `false` defaults
