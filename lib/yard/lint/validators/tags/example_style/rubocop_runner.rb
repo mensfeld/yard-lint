@@ -50,6 +50,7 @@ module Yard
             # @return [Array<Regexp>] array of compiled regex objects
             def compile_patterns(patterns)
               patterns.filter_map do |pattern|
+                old, $VERBOSE = $VERBOSE, nil
                 # Pattern format: '/pattern/flags' or 'pattern'
                 if pattern.start_with?('/') && pattern.match?(%r{^/(.+)/([imx]*)$})
                   match = pattern.match(%r{^/(.+)/([imx]*)$})
@@ -60,6 +61,8 @@ module Yard
               rescue RegexpError => e
                 warn "[YARD::Lint] ExampleStyle: Invalid skip pattern '#{pattern}': #{e.message}" if ENV['DEBUG']
                 nil
+              ensure
+                $VERBOSE = old
               end
             end
 
