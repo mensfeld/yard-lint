@@ -101,7 +101,6 @@ module Yard
 
               Regexp.new(regex_pattern).match?(method_name)
             rescue RegexpError
-              # Invalid regex - skip this pattern
               false
             end
 

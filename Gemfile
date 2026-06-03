@@ -9,6 +9,7 @@ gem 'minitest'
 gem 'mocha'
 gem 'simplecov'
 gem 'parallel_tests'
+gem 'warning'
 
 # Optional linters for ExampleStyle validator E2E tests
 gem 'rubocop', require: false

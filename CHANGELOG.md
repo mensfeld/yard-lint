@@ -1,5 +1,9 @@
 # YARD-Lint Changelog
 
+## Unreleased
+- **[Enhancement]** Add Ruby warning category opt-in to test helpers
+- **[Fix]** Use `remove_method` instead of `define_singleton_method` to restore `warn` in `InProcessRegistry#capture_warnings`, eliminating a spurious method redefinition warning
+
 ## 1.5.2 (2026-06-02)
 - **[Fix]** `Tags/InvalidTypes` no longer reports false positives for YARD pseudo-types `undefined`, `unspecified`, and `unknown` (#152)
   - These lowercase pseudo-types are used in real-world YARD docs (e.g. Solargraph uses `Hash{String => undefined}` extensively) to signal that a type is intentionally unspecified

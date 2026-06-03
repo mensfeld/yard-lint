@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+require 'warning'
+
+$VERBOSE = true
+
+if Warning.respond_to?(:categories)
+  (Warning.categories - %i[experimental]).each do |cat|
+    Warning[cat] = true
+  end
+end
+
+Warning.process do |warning|
+  next unless warning.include?(Dir.pwd)
+  next if warning.include?('_test')
+  next if warning.include?('vendor/')
+  next if warning.include?('bundle/')
+  next if warning.include?('.bundle/')
+  next if warning.include?('character class has duplicated range')
+  raise "Warning in your code: #{warning}"
+end
+
 require 'fileutils'
 require 'tempfile'
 require 'stringio'
