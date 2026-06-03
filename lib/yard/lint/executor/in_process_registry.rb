@@ -130,8 +130,8 @@ module Yard
 
           captured
         ensure
-          # Restore original warn method
-          YARD::Logger.instance.define_singleton_method(:warn, original_warn) if original_warn
+          sc = YARD::Logger.instance.singleton_class
+          sc.remove_method(:warn) if sc.public_instance_methods(false).include?(:warn)
         end
       end
     end
