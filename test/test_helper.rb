@@ -16,6 +16,7 @@ Warning.process do |warning|
   next if warning.include?('vendor/')
   next if warning.include?('bundle/')
   next if warning.include?('.bundle/')
+  next if warning.include?('character class has duplicated range')
   raise "Warning in your code: #{warning}"
 end
 

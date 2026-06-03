@@ -99,12 +99,9 @@ module Yard
             def match_regex_pattern(method_name, regex_pattern)
               return false if regex_pattern.empty? # Empty regex would match everything
 
-              old, $VERBOSE = $VERBOSE, nil
               Regexp.new(regex_pattern).match?(method_name)
             rescue RegexpError
               false
-            ensure
-              $VERBOSE = old
             end
 
             # Match an arity pattern like "initialize/0"
