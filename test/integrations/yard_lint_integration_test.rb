@@ -316,6 +316,7 @@ describe 'Yard Lint Integration' do
       assert(offense.key?(:severity))
       assert(offense.key?(:type))
       assert(offense.key?(:name))
+      assert(offense.key?(:validator))
       assert(offense.key?(:message))
       assert(offense.key?(:location))
       assert(offense.key?(:location_line))

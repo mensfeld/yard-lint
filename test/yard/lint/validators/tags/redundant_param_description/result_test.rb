@@ -282,6 +282,7 @@ describe 'Yard::Lint::Validators::Tags::RedundantParamDescription::Result' do
     offense = result.offenses.first
 
     assert(offense.key?(:name))
+    assert(offense.key?(:validator))
     assert(offense.key?(:location))
     assert(offense.key?(:location_line))
     assert(offense.key?(:severity))

@@ -96,6 +96,8 @@ module Yard
         # @return [String] validator name for config lookup
         def validator_name
           # Extract from class path: Validators::Tags::Order::Result => 'Tags/Order'
+          return '' unless self.class.name
+
           parts = self.class.name.split('::')
           validators_index = parts.index('Validators')
           return '' unless validators_index
@@ -125,6 +127,7 @@ module Yard
               severity: configured_severity,
               type: self.class.offense_type,
               name: computed_offense_name,
+              validator: validator_name,
               message: build_message(offense_data),
               location: offense_data[:location] || offense_data[:file],
               location_line: offense_data[:line] || offense_data[:location_line] || 0
