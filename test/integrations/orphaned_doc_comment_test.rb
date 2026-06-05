@@ -332,6 +332,68 @@ describe 'Documentation/OrphanedDocComment' do
     assert_equal(1, offenses.count)
   end
 
+  it 'flags a comment before standalone private keyword (YARD drops it)' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        def public_method; end
+
+        # @return [void] this gets orphaned
+        private
+
+        def private_method; end
+      end
+    RUBY
+    assert_equal(1, offenses.count)
+  end
+
+  it 'flags a comment before standalone public keyword (YARD drops it)' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @return [void] this gets orphaned
+        public
+
+        def my_method; end
+      end
+    RUBY
+    assert_equal(1, offenses.count)
+  end
+
+  it 'flags a comment before extend self (YARD drops it)' do
+    offenses = offenses_for(<<~RUBY)
+      module MyModule
+        # @return [void] this gets orphaned
+        extend self
+
+        def my_method; end
+      end
+    RUBY
+    assert_equal(1, offenses.count)
+  end
+
+  it 'does not flag a comment before define_method (YARD documents it)' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @param value [Integer] the value
+        # @return [void]
+        define_method(:my_method) { |value| }
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before a multiline method definition' do
+    offenses = offenses_for(<<~RUBY)
+      # @param name [String] the name
+      # @param age [Integer] the age
+      # @return [void]
+      def create(
+        name,
+        age
+      ); end
+    RUBY
+    assert_empty(offenses)
+  end
+
   it 'detects multiple orphaned comment blocks in one file' do
     offenses = offenses_for(<<~RUBY)
       # @param x [Integer] first orphan

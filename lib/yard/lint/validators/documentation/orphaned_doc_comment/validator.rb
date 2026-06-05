@@ -11,14 +11,30 @@ module Yard
           class Validator < Base
             in_process visibility: :public
 
-            YARD_TAG_PATTERN = /\A\s*#\s*@([a-z][a-z_]*)/.freeze
+            # Match only known YARD tag names to avoid false positives from instance variable
+            # mentions in comments (e.g. `# @result is nil here` or `# @body.each`).
+            YARD_KNOWN_TAGS = %w[
+              abstract api attr author
+              deprecated
+              example
+              note
+              option overload
+              param private protected public
+              raise raises readonly return
+              scope see since
+              tag todo
+              version
+              yield yieldparam yieldreturn
+            ].join('|').freeze
+            YARD_TAG_PATTERN = /\A\s*#\s*@(#{YARD_KNOWN_TAGS})\b/.freeze
             YARD_DIRECTIVE_PATTERN = /\A\s*#\s*@!/.freeze
             # Matches method/class/module/attribute/alias definitions (with optional visibility prefix)
             # and constant assignments (uppercase-leading identifier followed by =), both of which
             # YARD tracks and attaches preceding doc comments to.
+            # Also matches define_method which YARD handles via a built-in dynamic handler.
             DEFINITION_PATTERN = /
               \A\s*(private\s+|protected\s+|public\s+)?
-              (def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|alias_method\b|alias\b)
+              (def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|alias_method\b|alias\b|define_method\b)
               |
               \A\s*[A-Z][A-Za-z0-9_:]*\s*=
             /x.freeze
