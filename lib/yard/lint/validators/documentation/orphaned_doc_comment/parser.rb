@@ -6,9 +6,10 @@ module Yard
       module Documentation
         module OrphanedDocComment
           # Parses validator output into structured offense hashes.
-          # @example Output format
-          #   /path/to/file.rb:10: @param,@return
+          # @example Output format (one line per orphaned block)
+          #   # "path/to/file.rb:10: @param,@return"
           class Parser < ::Yard::Lint::Parsers::Base
+            # @return [Regexp] parses "file:line: @tag1,@tag2" collector output lines
             LINE_REGEX = /^(.+):(\d+): ([@a-z,_]+)$/.freeze
 
             # @param validator_output [String] raw validator results string

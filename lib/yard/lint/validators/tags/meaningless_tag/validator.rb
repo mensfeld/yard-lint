@@ -22,7 +22,7 @@ module Yard
 
               return unless invalid_types.include?(object_type)
 
-              # @param is meaningful on Struct.new / Data.define constants because
+              # The `@param` tag is meaningful on Struct.new / Data.define constants because
               # Solargraph uses those annotations to type the synthesized accessors.
               effective_tags = struct_or_data_class?(object) ? tags_to_check - ['param'] : tags_to_check
               return if effective_tags.empty?

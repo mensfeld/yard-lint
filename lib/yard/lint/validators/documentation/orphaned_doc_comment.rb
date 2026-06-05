@@ -15,18 +15,18 @@ module Yard
         # non-documentable statement (variable assignment, `require`, `include`, etc.)
         # or sits at the end of a file.
         #
-        # Note: this validator is complementary to `Documentation/BlankLineBeforeDefinition`,
-        # which catches doc blocks separated from a `def` by blank lines.
-        # `OrphanedDocComment` catches doc blocks that lead to non-definition code entirely.
+        # @note This validator is complementary to `Documentation/BlankLineBeforeDefinition`,
+        #   which catches doc blocks separated from a `def` by blank lines.
+        #   `OrphanedDocComment` catches doc blocks that lead to non-definition code entirely.
         #
         # @example Bad - comment before variable assignment
         #   # @param name [String] the name
         #   # @return [void]
-        #   MY_CONSTANT = 'value'
+        #   MY_CONSTANT = "value"
         #
         # @example Bad - comment before require
         #   # @param name [String] the name
-        #   require 'some_gem'
+        #   require "some_gem"
         #
         # @example Bad - comment at end of file
         #   # @param name [String] the name
