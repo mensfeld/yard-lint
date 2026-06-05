@@ -57,6 +57,11 @@ Documentation/MissingReturn:
   Enabled: false  # Opt-in validator
   Severity: warning
   ExcludedMethods:
+
+Documentation/OrphanedDocComment:
+  Description: 'Detects YARD comment blocks with tags not attached to any documentable construct.'
+  Enabled: false  # Opt-in validator
+  Severity: warning
     - 'initialize'    # Exclude all initialize methods
     # - '/^_/'        # Uncomment to exclude private methods (by convention)
 

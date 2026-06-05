@@ -1,6 +1,7 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Feature]** New opt-in validator `Documentation/OrphanedDocComment` detects YARD comment blocks with tags (`@param`, `@return`, etc.) that are not attached to any documentable Ruby construct and will be silently dropped by YARD. Triggered when a tagged comment is immediately followed by a non-documentable statement (variable assignment, `require`, `include`, etc.) or sits at end-of-file. Disabled by default — enable with `Documentation/OrphanedDocComment: Enabled: true`. Complementary to `Documentation/BlankLineBeforeDefinition` which handles the blank-lines-before-def case.
 - **[Enhancement]** Each offense now includes a `validator` field with the full config key (e.g. `"Documentation/MissingReturn"`, `"Tags/Order"`) identifying which validator produced it. The text formatter also now displays this path instead of the short offense name, making it easier to locate the right `.yard-lint.yml` setting to adjust.
 - **[Enhancement]** Add Ruby warning category opt-in to test helpers
 - **[Fix]** Use `remove_method` instead of `define_singleton_method` to restore `warn` in `InProcessRegistry#capture_warnings`, eliminating a spurious method redefinition warning

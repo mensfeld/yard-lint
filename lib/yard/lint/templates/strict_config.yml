@@ -64,6 +64,11 @@ Documentation/MissingReturn:
     - 'initialize'    # Exclude all initialize methods
     # - '/^_/'        # Uncomment to exclude private methods (by convention)
 
+Documentation/OrphanedDocComment:
+  Description: 'Detects YARD comment blocks with tags not attached to any documentable construct.'
+  Enabled: true  # Enabled in strict mode
+  Severity: error
+
 Documentation/MarkdownSyntax:
   Description: 'Detects common markdown syntax errors in documentation.'
   Enabled: true
