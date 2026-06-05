@@ -59,9 +59,15 @@ describe 'Yard::Lint::Results::Base' do
     assert(offense.key?(:severity))
     assert(offense.key?(:type))
     assert(offense.key?(:name))
+    assert(offense.key?(:validator))
     assert(offense.key?(:message))
     assert(offense.key?(:location))
     assert(offense.key?(:location_line))
+  end
+
+  it 'offenses includes validator name in each offense' do
+    result = @test_result_class.new(@parsed_data, nil)
+    assert_equal('Tags/TestValidator', result.offenses.first[:validator])
   end
 
   it 'offenses uses default severity when no config' do

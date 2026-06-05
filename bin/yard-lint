@@ -314,7 +314,7 @@ when 'text', nil
                           end
 
         puts "[#{severity_symbol}] #{offense[:location]}:#{offense[:location_line]}"
-        puts "    #{offense[:name]}: #{offense[:message]}"
+        puts "    #{offense[:validator]}: #{offense[:message]}"
         puts
       end
     end

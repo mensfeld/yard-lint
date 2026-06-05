@@ -1,6 +1,7 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Enhancement]** Each offense now includes a `validator` field with the full config key (e.g. `"Documentation/MissingReturn"`, `"Tags/Order"`) identifying which validator produced it. The text formatter also now displays this path instead of the short offense name, making it easier to locate the right `.yard-lint.yml` setting to adjust.
 - **[Enhancement]** Add Ruby warning category opt-in to test helpers
 - **[Fix]** Use `remove_method` instead of `define_singleton_method` to restore `warn` in `InProcessRegistry#capture_warnings`, eliminating a spurious method redefinition warning
 
