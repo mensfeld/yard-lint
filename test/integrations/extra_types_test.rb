@@ -86,7 +86,7 @@ describe 'Tags/InvalidTypes ExtraTypes configuration' do
   it 'only suppresses the listed ExtraTypes and still flags others' do
     config = test_config do |c|
       c.set_validator_config('Tags/InvalidTypes', 'Enabled', true)
-      # Only add generic — awaitable should still be flagged
+      # Only add generic - awaitable should still be flagged
       c.set_validator_config('Tags/InvalidTypes', 'ExtraTypes', ['generic'])
     end
 
@@ -95,7 +95,7 @@ describe 'Tags/InvalidTypes ExtraTypes configuration' do
     # generic is suppressed across all methods that use it
     generic_types_offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('generic_types') }
     standalone_offense    = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('standalone_generic') }
-    # awaitable is not in ExtraTypes — still flagged
+    # awaitable is not in ExtraTypes - still flagged
     multiple_offense      = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('multiple_custom') }
 
     assert_nil(generic_types_offense, 'generic should not be flagged when in ExtraTypes')

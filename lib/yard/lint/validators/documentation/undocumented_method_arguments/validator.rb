@@ -21,7 +21,7 @@ module Yard
               # Skip aliases and implicit methods
               return if object.is_alias?
               return unless object.is_explicit?
-              # Skip attribute methods (@!attribute directive) — their setter parameter
+              # Skip attribute methods (@!attribute directive) - their setter parameter
               # doesn't need explicit @param documentation, matching attr_accessor behavior
               return if object.is_attribute?
 

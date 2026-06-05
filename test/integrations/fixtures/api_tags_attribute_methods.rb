@@ -41,7 +41,7 @@ class ApiTagsAttributeExample
   # @return [String] the email address
   attr_accessor :email
 
-  # Undocumented attribute reader — still must not be flagged,
+  # Undocumented attribute reader - still must not be flagged,
   # because ApiTags skips all attribute methods by design.
   attr_reader :phone
 

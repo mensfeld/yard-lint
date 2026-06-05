@@ -2,7 +2,7 @@
 
 # Fixture for ExtraTypes integration tests.
 # These methods use non-standard lowercase type names that are NOT valid Ruby
-# constants and are NOT in ALLOWED_DEFAULTS — they would normally produce
+# constants and are NOT in ALLOWED_DEFAULTS - they would normally produce
 # InvalidTagType offenses. With ExtraTypes configured, they should be accepted.
 #
 # Note: uppercase type names (e.g. Callable, Result) are NOT flagged by default

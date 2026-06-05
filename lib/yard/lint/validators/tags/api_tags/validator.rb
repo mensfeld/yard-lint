@@ -29,7 +29,7 @@ module Yard
                 # @!attribute directives, Struct.new and Data.define generated readers/writers).
                 # These are auto-generated accessors where per-method @api tags either flow
                 # through the declaration's docstring automatically or cannot be attached at
-                # all — for example, YARD's Data.define handler creates getters with only a
+                # all - for example, YARD's Data.define handler creates getters with only a
                 # @return tag (hard-replacing their docstring and stripping any inherited @api
                 # from the enclosing class), and @!attribute directives written above a
                 # Data.define constant attach to the enclosing namespace, not the Data class

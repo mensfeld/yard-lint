@@ -50,6 +50,11 @@ Documentation/MissingReturn:
   ExcludedMethods:
     - 'initialize'    # Exclude all initialize methods
 
+Documentation/OrphanedDocComment:
+  Description: 'Detects YARD comment blocks with tags not attached to any documentable construct.'
+  Enabled: true
+  Severity: warning
+
 Documentation/MarkdownSyntax:
   Description: 'Detects common markdown syntax errors in documentation.'
   Enabled: true
