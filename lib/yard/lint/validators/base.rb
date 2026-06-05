@@ -81,7 +81,7 @@ module Yard
         # Collect tags matching the given tag names from a docstring, including
         # tags nested inside @overload blocks. YARD stores @overload inner tags
         # on the overload's own docstring, so they are invisible to
-        # `docstring.tags` — this helper traverses them.
+        # `docstring.tags` - this helper traverses them.
         # @param docstring [YARD::Docstring] the docstring to search
         # @param tag_names [Array<String>] tag names to collect (e.g., %w[param return])
         # @return [Array<YARD::Tags::Tag>] matching tags from the docstring and any overloads

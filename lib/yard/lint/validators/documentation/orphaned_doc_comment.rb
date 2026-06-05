@@ -8,7 +8,7 @@ module Yard
         #
         # Detects YARD documentation comment blocks that contain tags (`@param`,
         # `@return`, etc.) but are not attached to any documentable Ruby construct.
-        # YARD silently drops these comments — they never appear in the registry and
+        # YARD silently drops these comments - they never appear in the registry and
         # the documentation is permanently lost.
         #
         # This happens when a YARD-tagged comment is immediately followed by a

@@ -12,7 +12,7 @@ module Yard
               # @return [String] formatted message
               def call(offense)
                 tags = Array(offense[:tags]).join(', ')
-                "Documentation comment with #{tags} is orphaned — YARD will ignore it"
+                "Documentation comment with #{tags} is orphaned - YARD will ignore it"
               end
             end
           end

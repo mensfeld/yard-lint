@@ -55,7 +55,7 @@ module Yard
                     i += 1
                   end
 
-                  # Skip blocks that contain @! directives — they are macro/method definitions,
+                  # Skip blocks that contain @! directives - they are macro/method definitions,
                   # not orphaned doc comments.
                   next if has_directive || tags.empty?
 
