@@ -13,7 +13,15 @@ module Yard
 
             YARD_TAG_PATTERN = /\A\s*#\s*@([a-z][a-z_]*)/.freeze
             YARD_DIRECTIVE_PATTERN = /\A\s*#\s*@!/.freeze
-            DEFINITION_PATTERN = /\A\s*(private\s+|protected\s+|public\s+)?(def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|alias\b)/.freeze
+            # Matches method/class/module/attribute/alias definitions (with optional visibility prefix)
+            # and constant assignments (uppercase-leading identifier followed by =), both of which
+            # YARD tracks and attaches preceding doc comments to.
+            DEFINITION_PATTERN = /
+              \A\s*(private\s+|protected\s+|public\s+)?
+              (def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|alias_method\b|alias\b)
+              |
+              \A\s*[A-Z][A-Za-z0-9_:]*\s*=
+            /x.freeze
 
             # @param object [YARD::CodeObjects::Base] the code object to query
             # @param collector [Executor::ResultCollector] collector for output

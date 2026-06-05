@@ -9,7 +9,7 @@ module Yard
           class Config < ::Yard::Lint::Validators::Config
             self.id = :orphaned_doc_comment
             self.defaults = {
-              'Enabled' => false,
+              'Enabled' => true,
               'Severity' => 'warning'
             }.freeze
           end

@@ -41,11 +41,6 @@ module Yard
         #
         # ## Configuration
         #
-        # This validator is disabled by default. To enable it:
-        #
-        #     Documentation/OrphanedDocComment:
-        #       Enabled: true
-        #
         # To disable this validator:
         #
         #     Documentation/OrphanedDocComment:

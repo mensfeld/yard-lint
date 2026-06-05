@@ -26,7 +26,7 @@ describe 'Documentation/OrphanedDocComment' do
     result.offenses.select { |o| o[:name] == 'OrphanedDocComment' }
   end
 
-  it 'is disabled by default' do
+  it 'is enabled by default' do
     default_config = test_config
     path = write_file(<<~RUBY)
       # @param x [Integer] something
@@ -34,7 +34,7 @@ describe 'Documentation/OrphanedDocComment' do
       def foo(x); end
     RUBY
     result = Yard::Lint.run(path: path, config: default_config, progress: false)
-    assert_empty(result.offenses.select { |o| o[:name] == 'OrphanedDocComment' })
+    refute_empty(result.offenses.select { |o| o[:name] == 'OrphanedDocComment' })
   end
 
   it 'flags a comment with tags before a variable assignment' do
@@ -201,6 +201,81 @@ describe 'Documentation/OrphanedDocComment' do
     RUBY
     assert_equal(1, offenses.count)
     assert_equal(3, offenses.first[:location_line])
+  end
+
+  it 'does not flag a comment before a constant assignment' do
+    offenses = offenses_for(<<~RUBY)
+      # @return [String] the default name
+      DEFAULT_NAME = 'world'
+
+      def real_method; end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before a Struct constant assignment' do
+    offenses = offenses_for(<<~RUBY)
+      # @param name [String] the name
+      # @param age [Integer] the age
+      Person = Struct.new(:name, :age)
+
+      def real_method; end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before attr_writer' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @return [String]
+        attr_writer :name
+
+        def initialize(name)
+          @name = name
+        end
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before attr_accessor' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @return [String]
+        attr_accessor :name
+
+        def initialize(name)
+          @name = name
+        end
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before alias_method' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        def foo; end
+
+        # @deprecated Use foo instead
+        alias_method :bar, :foo
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'flags a comment before standalone protected (YARD drops it)' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        def public_method; end
+
+        # @return [void] this gets orphaned
+        protected
+
+        def protected_method; end
+      end
+    RUBY
+    assert_equal(1, offenses.count)
   end
 
   it 'detects multiple orphaned comment blocks in one file' do

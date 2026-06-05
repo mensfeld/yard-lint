@@ -52,7 +52,7 @@ Documentation/MissingReturn:
 
 Documentation/OrphanedDocComment:
   Description: 'Detects YARD comment blocks with tags not attached to any documentable construct.'
-  Enabled: false  # Opt-in validator
+  Enabled: true
   Severity: warning
 
 Documentation/MarkdownSyntax:
