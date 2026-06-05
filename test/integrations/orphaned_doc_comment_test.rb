@@ -72,6 +72,16 @@ describe 'Documentation/OrphanedDocComment' do
     assert_equal(1, offenses.count)
   end
 
+  it 'flags a comment with tags before an extend statement' do
+    offenses = offenses_for(<<~RUBY)
+      # @return [void] orphaned
+      extend Comparable
+
+      def real_method; end
+    RUBY
+    assert_equal(1, offenses.count)
+  end
+
   it 'flags a comment with tags at end of file' do
     offenses = offenses_for(<<~RUBY)
       def real_method; end
@@ -224,6 +234,17 @@ describe 'Documentation/OrphanedDocComment' do
     assert_empty(offenses)
   end
 
+  it 'does not flag a comment before a Data.define constant assignment' do
+    offenses = offenses_for(<<~RUBY)
+      # @param x [Integer] the x coordinate
+      # @param y [Integer] the y coordinate
+      Point = Data.define(:x, :y)
+
+      def real_method; end
+    RUBY
+    assert_empty(offenses)
+  end
+
   it 'does not flag a comment before attr_writer' do
     offenses = offenses_for(<<~RUBY)
       class MyClass
@@ -259,6 +280,39 @@ describe 'Documentation/OrphanedDocComment' do
 
         # @deprecated Use foo instead
         alias_method :bar, :foo
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before protected def' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @param x [Integer] something
+        # @return [void]
+        protected def helper(x); end
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before public def' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @param x [Integer] something
+        # @return [void]
+        public def helper(x); end
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before a class method definition' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @param name [String] the name
+        # @return [void]
+        def self.create(name); end
       end
     RUBY
     assert_empty(offenses)
