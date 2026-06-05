@@ -11,22 +11,13 @@ module Yard
           class Validator < Base
             in_process visibility: :public
 
-            # Match only known YARD tag names to avoid false positives from instance variable
-            # mentions in comments (e.g. `# @result is nil here` or `# @body.each`).
-            YARD_KNOWN_TAGS = %w[
-              abstract api attr author
-              deprecated
-              example
-              note
-              option overload
-              param private protected public
-              raise raises readonly return
-              scope see since
-              tag todo
-              version
-              yield yieldparam yieldreturn
-            ].join('|').freeze
-            YARD_TAG_PATTERN = /\A\s*#\s*@(#{YARD_KNOWN_TAGS})\b/.freeze
+            # Derive known tag names from YARD's own registry so we stay in sync with
+            # any tags added by YARD plugins. This avoids false positives from instance
+            # variable mentions in comments (e.g. `# @body.each` or `# @result is nil`).
+            YARD_TAG_PATTERN = begin
+              tags = ::YARD::Tags::Library.labels.keys.map(&:to_s).sort_by(&:length).reverse.join('|')
+              /\A\s*#\s*@(#{tags})\b/
+            end.freeze
             YARD_DIRECTIVE_PATTERN = /\A\s*#\s*@!/.freeze
             # Matches method/class/module/attribute/alias definitions (with optional visibility prefix)
             # and constant assignments (uppercase-leading identifier followed by =), both of which
