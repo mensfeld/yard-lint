@@ -11,7 +11,7 @@ module Yard
               # @param offense [Hash] offense data with :element key
               # @return [String] formatted message
               def call(offense)
-                "Method `#{offense[:element]}` yields to a block but is missing a @yield tag"
+                "Method `#{offense[:element]}` yields to a block but is missing a @yield, @yieldparam, or @yieldreturn tag"
               end
             end
           end

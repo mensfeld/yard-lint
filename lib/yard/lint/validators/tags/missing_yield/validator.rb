@@ -10,10 +10,13 @@ module Yard
             # Enable in-process execution with all visibility (private methods can yield too)
             in_process visibility: :all
 
-            # Matches the `yield` keyword. The negative lookbehind `(?<!\.)` prevents
-            # matching method calls like `Fiber.yield` or `yielder.yield`. Word boundaries
-            # ensure `yield_self` and similar identifiers are not matched.
-            YIELD_PATTERN = /(?<!\.)\byield\b/.freeze
+            # Matches the `yield` keyword. The negative lookbehind `(?<![:.])`
+            # prevents matching method calls like `Fiber.yield` or `yielder.yield`
+            # and symbol literals like `:yield`. Word boundaries ensure `yield_self`
+            # and similar identifiers are not matched.
+            # Note: `yield` inside regex literals (e.g. /yield/) is a known
+            # limitation - it is rare enough in method bodies to be acceptable.
+            YIELD_PATTERN = /(?<![:.])\byield\b/.freeze
 
             # @return [Regexp] matches full-line Ruby comments
             COMMENT_LINE_PATTERN = /\A\s*#/.freeze

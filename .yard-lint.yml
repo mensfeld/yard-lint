@@ -127,7 +127,7 @@ Tags/MeaninglessTag:
     - constant
 
 Tags/MissingYield:
-  Description: 'Detects methods that yield to a block without a @yield tag.'
+  Description: 'Detects methods that yield to a block without a @yield, @yieldparam, or @yieldreturn tag.'
   Enabled: false  # Opt-in validator
   Severity: warning
 

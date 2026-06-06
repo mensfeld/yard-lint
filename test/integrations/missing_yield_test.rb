@@ -232,6 +232,20 @@ describe 'Tags/MissingYield' do
     assert_empty(missing_yield_offenses(result))
   end
 
+  it 'does not flag :yield symbol literal' do
+    file = create_test_file('example.rb', <<~RUBY)
+      class Foo
+        # @return [Boolean] whether the method responds to yield
+        def supports_yield?
+          respond_to?(:yield)
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: enabled_config, progress: false)
+    assert_empty(missing_yield_offenses(result))
+  end
+
   it 'does not flag Fiber.yield (method call, not keyword)' do
     file = create_test_file('example.rb', <<~RUBY)
       class Foo
@@ -310,8 +324,8 @@ describe 'Tags/MissingYield' do
     RUBY
 
     result = Yard::Lint.run(path: file, config: enabled_config, progress: false)
-    # only `each` is flagged - `each_item` is an alias and should not be
-    # (each itself is documented so neither should be flagged)
+    # `each` is documented with @yield so no offense; `each_item` is an
+    # alias and is skipped regardless - neither should be flagged
     assert_empty(missing_yield_offenses(result))
   end
 
