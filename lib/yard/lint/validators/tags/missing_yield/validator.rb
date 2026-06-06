@@ -14,8 +14,8 @@ module Yard
             # prevents matching method calls like `Fiber.yield` or `yielder.yield`
             # and symbol literals like `:yield`. Word boundaries ensure `yield_self`
             # and similar identifiers are not matched.
-            # Note: `yield` inside regex literals (e.g. /yield/) is a known
-            # limitation - it is rare enough in method bodies to be acceptable.
+            # Known limitation: `yield` inside regex literals (e.g. /yield/) is
+            # not stripped before scanning; it is rare enough to be acceptable.
             YIELD_PATTERN = /(?<![:.])\byield\b/.freeze
 
             # @return [Regexp] matches full-line Ruby comments
