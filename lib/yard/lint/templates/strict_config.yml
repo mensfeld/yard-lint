@@ -140,6 +140,11 @@ Tags/MeaninglessTag:
     - module
     - constant
 
+Tags/MissingYield:
+  Description: 'Detects methods that yield to a block without a @yield, @yieldparam, or @yieldreturn tag.'
+  Enabled: true  # Enabled in strict mode
+  Severity: error
+
 Tags/CollectionType:
   Description: 'Validates Hash collection syntax consistency.'
   Enabled: true

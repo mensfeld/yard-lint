@@ -21,7 +21,7 @@ YARD-Lint validates your YARD documentation for:
 
 - **Documentation Completeness** - Undocumented classes, modules, methods, parameters, boolean return values, and missing `@return` tags; orphaned doc comments with YARD tags that YARD silently drops
 - **Type Accuracy** - Invalid type definitions, malformed type syntax, non-ASCII characters in types, tuple types, and literal types (symbols, strings, numbers)
-- **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions, forbidden tag patterns
+- **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions, forbidden tag patterns, undocumented `yield` calls (opt-in)
 - **Code Examples** - Syntax validation in `@example` tags, optional style validation with RuboCop/StandardRB
 - **Semantic Correctness** - Abstract methods with implementations, redundant descriptions
 - **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns, tag group separators
@@ -30,7 +30,7 @@ YARD-Lint validates your YARD documentation for:
 - **Performance** - In-process YARD execution with shared registry (~10x faster than shell-based execution)
 - **Incremental Adoption** - `--auto-gen-config` generates a baseline todo file to adopt on legacy codebases without fixing everything first
 
-**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [30 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [31 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -257,6 +257,42 @@ ANSWER = 42
 ```
 
 This validator is complementary to `Documentation/BlankLineBeforeDefinition` (which handles the case where blank lines separate a doc comment from a `def` - YARD still attaches it despite the gap).
+
+## Documenting yield (opt-in)
+
+The `Tags/MissingYield` validator (opt-in, disabled by default) detects methods that call `yield` in their body but do not document the block with a `@yield`, `@yieldparam`, or `@yieldreturn` tag. Callers need to know a method yields in order to pass a block.
+
+Enable it in `.yard-lint.yml`:
+
+```yaml
+Tags/MissingYield:
+  Enabled: true
+  Severity: warning
+```
+
+```ruby
+# Bad - method yields but block is not documented
+# @param items [Array] the items to process
+def each(items)
+  items.each { |item| yield item }
+end
+
+# Good - block documented with @yield
+# @param items [Array] the items to process
+# @yield [item] each item in the collection
+def each(items)
+  items.each { |item| yield item }
+end
+
+# Good - @yieldparam is also accepted
+# @param items [Array] the items to process
+# @yieldparam item [Object] each item
+def each(items)
+  items.each { |item| yield item }
+end
+```
+
+Method calls like `Fiber.yield` and `yielder.yield` (Enumerator::Yielder) are not flagged - only the `yield` keyword triggers the check.
 
 ## Handling Non-Standard Types
 
