@@ -13,7 +13,8 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Co
       {
         'Enabled' => true,
         'Severity' => 'warning',
-        'AllowedParentClasses' => []
+        'AllowedParentClasses' => [],
+        'AllowedMethods' => []
       },
       Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Config.defaults
     )

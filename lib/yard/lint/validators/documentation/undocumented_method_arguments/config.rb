@@ -11,7 +11,8 @@ module Yard
             self.defaults = {
               'Enabled' => true,
               'Severity' => 'warning',
-              'AllowedParentClasses' => []
+              'AllowedParentClasses' => [],
+              'AllowedMethods' => []
             }.freeze
           end
         end

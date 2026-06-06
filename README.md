@@ -181,6 +181,11 @@ Documentation/UndocumentedObjects:
 Documentation/UndocumentedMethodArguments:
   Enabled: true
   Severity: warning
+  # Skip @param checks for specific methods (exact name, name/arity, /regex/)
+  AllowedMethods:
+    - call            # service objects: call(args) is self-documenting
+    - perform         # background jobs
+    - initialize/1    # only this specific arity of initialize
 
 Tags/Order:
   Enabled: true

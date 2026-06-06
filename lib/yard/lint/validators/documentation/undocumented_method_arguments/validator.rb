@@ -22,6 +22,7 @@ module Yard
               return if object.is_alias?
               return unless object.is_explicit?
               return if parent_class_allowed?(object)
+              return if method_allowed?(object)
               # Skip attribute methods (@!attribute directive) - their setter parameter
               # doesn't need explicit @param documentation, matching attr_accessor behavior
               return if object.is_attribute?
