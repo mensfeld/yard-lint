@@ -195,10 +195,8 @@ module Yard
             rescue RegexpError
               false
             end
-          when %r{.+/\d+$}
-            pattern_name, pattern_arity_str = pattern.split('/')
-            return false unless pattern_arity_str&.match?(/^\d+$/)
-
+          when %r{^[^/]+/\d+$}
+            pattern_name, pattern_arity_str = pattern.split('/', 2)
             method_name == pattern_name && arity == pattern_arity_str.to_i
           else
             method_name == pattern

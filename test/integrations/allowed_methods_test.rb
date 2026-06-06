@@ -438,6 +438,19 @@ describe 'AllowedMethods (Documentation/UndocumentedMethodArguments)' do
     assert(offense?(result), 'malformed arity pattern should not accidentally exempt the method')
   end
 
+  it 'multi-slash pattern like call/1/2 does not accidentally match call with arity 1' do
+    file = create_test_file('example.rb', <<~RUBY)
+      # A service.
+      class MyService
+        # Does the work.
+        def call(input)
+        end
+      end
+    RUBY
+    result = lint(file, config_with_allowed(['call/1/2']))
+    assert(offense?(result), 'call/1/2 is not a valid arity pattern and should not exempt the method')
+  end
+
   it 'whitespace around pattern entries is stripped' do
     file = create_test_file('example.rb', <<~RUBY)
       # A service.
