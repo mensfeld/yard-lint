@@ -16,6 +16,7 @@ module Yard
             # @param collector [Executor::ResultCollector] collector for output
             # @return [void]
             def in_process_query(object, collector)
+              return if parent_class_allowed?(object)
               # Check if docstring is empty
               return unless object.docstring.all.empty?
 

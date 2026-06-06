@@ -40,21 +40,30 @@ Documentation/UndocumentedObjects:
   ExcludedMethods:
     - 'initialize/0'  # Exclude parameter-less initialize
     - '/^_/'          # Exclude private methods (by convention)
+  # AllowedParentClasses:
+  #   - StandardError           # Skip error subclasses
+  #   - ApplicationRecord       # Skip Rails model subclasses
 
 Documentation/UndocumentedMethodArguments:
   Description: 'Checks for method parameters without @param tags.'
   Enabled: true
   Severity: error
+  # AllowedParentClasses:
+  #   - StandardError
 
 Documentation/UndocumentedBooleanMethods:
   Description: 'Checks that question mark methods document their boolean return.'
   Enabled: true
   Severity: error
+  # AllowedParentClasses:
+  #   - StandardError
 
 Documentation/UndocumentedOptions:
   Description: 'Detects methods with options hash parameters but no @option tags.'
   Enabled: true
   Severity: error
+  # AllowedParentClasses:
+  #   - StandardError
 
 Documentation/MissingReturn:
   Description: 'Requires @return tags on all methods (opt-in for strict documentation).'
@@ -63,6 +72,8 @@ Documentation/MissingReturn:
   ExcludedMethods:
     - 'initialize'    # Exclude all initialize methods
     # - '/^_/'        # Uncomment to exclude private methods (by convention)
+  # AllowedParentClasses:
+  #   - StandardError
 
 Documentation/OrphanedDocComment:
   Description: 'Detects YARD comment blocks with tags not attached to any documentable construct.'

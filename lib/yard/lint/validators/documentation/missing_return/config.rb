@@ -13,7 +13,8 @@ module Yard
               'Severity' => 'warning',
               'ExcludedMethods' => [
                 'initialize' # Exclude all initialize methods by default
-              ]
+              ],
+              'AllowedParentClasses' => []
             }.freeze
           end
         end

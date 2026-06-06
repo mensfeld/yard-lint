@@ -173,6 +173,10 @@ Documentation/UndocumentedObjects:
   ExcludedMethods:
     - 'initialize/0'
     - '/^_/'
+  # Skip classes inheriting from these base classes (exact full-path match)
+  AllowedParentClasses:
+    - StandardError
+    - ActiveRecord::Base
 
 Documentation/UndocumentedMethodArguments:
   Enabled: true

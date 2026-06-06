@@ -12,7 +12,8 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedOptions::Config' do
     assert_equal(
       {
         'Enabled' => true,
-        'Severity' => 'warning'
+        'Severity' => 'warning',
+        'AllowedParentClasses' => []
       },
       Yard::Lint::Validators::Documentation::UndocumentedOptions::Config.defaults
     )

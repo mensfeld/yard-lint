@@ -11,7 +11,8 @@ module Yard
             self.defaults = {
               'Enabled' => true,
               'Severity' => 'warning',
-              'ExcludedMethods' => ['initialize/0']
+              'ExcludedMethods' => ['initialize/0'],
+              'AllowedParentClasses' => []
             }.freeze
             self.combines_with = ['Documentation/UndocumentedBooleanMethods'].freeze
           end
