@@ -19,7 +19,7 @@ Accurate documentation isn't just for human developers anymore. [Research shows]
 
 YARD-Lint validates your YARD documentation for:
 
-- **Documentation Completeness** - Undocumented classes, modules, methods, parameters, boolean return values, and missing `@return` tags
+- **Documentation Completeness** - Undocumented classes, modules, methods, parameters, boolean return values, and missing `@return` tags; orphaned doc comments with YARD tags that YARD silently drops
 - **Type Accuracy** - Invalid type definitions, malformed type syntax, non-ASCII characters in types, tuple types, and literal types (symbols, strings, numbers)
 - **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions, forbidden tag patterns
 - **Code Examples** - Syntax validation in `@example` tags, optional style validation with RuboCop/StandardRB
@@ -225,6 +225,39 @@ Tags/ExampleStyle:
 
 **Learn more:** [Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
 
+## Catching Orphaned Documentation Comments
+
+YARD silently ignores comment blocks that contain YARD tags (`@param`, `@return`, etc.) when they are not immediately followed by a documentable construct (method, class, module, constant, attribute). This happens with local variable assignments, `require` calls, `include`/`extend` statements, bare `private`/`public` keywords, or comments at the end of a file - the documentation is simply lost with no warning.
+
+The `Documentation/OrphanedDocComment` validator (enabled by default) catches this:
+
+```ruby
+# Bad - YARD drops this silently; local variable is not documentable
+# @param name [String] the name
+# @return [void]
+local_var = "value"
+
+# Bad - require is not documentable
+# @param id [Integer] user id
+# @return [User]
+require 'some_gem'
+
+# Bad - orphaned at end of file
+# @param id [Integer] user id
+# @return [User]
+
+# Good - properly attached to a method
+# @param name [String] the name
+# @return [void]
+def greet(name); end
+
+# Good - constant assignments are documentable, not flagged
+# @return [Integer] the answer
+ANSWER = 42
+```
+
+This validator is complementary to `Documentation/BlankLineBeforeDefinition` (which handles the case where blank lines separate a doc comment from a `def` - YARD still attaches it despite the gap).
+
 ## Handling Non-Standard Types
 
 By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes - project-specific aliases, LSP extensions, or informal conventions - you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.
@@ -351,6 +384,23 @@ Information:
 ```
 
 **Learn more:** [Advanced Usage](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage) - CLI reference, JSON output, coverage
+
+## Offense Structure
+
+Every offense (in both text and JSON output) includes a `validator` field with the full config key that produced it, making it easy to find the right `.yard-lint.yml` setting to adjust:
+
+```json
+{
+  "name": "OrphanedDocComment",
+  "validator": "Documentation/OrphanedDocComment",
+  "severity": "warning",
+  "message": "Documentation comment with @param, @return is orphaned - YARD will ignore it",
+  "location": "lib/my_class.rb",
+  "location_line": 42
+}
+```
+
+The text formatter also shows the validator path (e.g., `[Documentation/OrphanedDocComment]`) instead of just the short offense name.
 
 ## Documentation
 
