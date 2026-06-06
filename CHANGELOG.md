@@ -1,6 +1,7 @@
 # YARD-Lint Changelog
 
 ## 1.6.0 (Unreleased)
+- **[Feature]** New opt-in validator `Tags/MissingYield` detects methods that call `yield` in their body but do not document the block with a `@yield`, `@yieldparam`, or `@yieldreturn` tag. Callers need to know a method yields in order to pass a block; the validator checks raw docstring text rather than YARD's inferred tag list, so YARD's automatic `@yield` inference for bare `yield expr` statements does not suppress the offense. Method calls like `Fiber.yield` and `yielder.yield` are not flagged. Disabled by default - enable with `Tags/MissingYield: Enabled: true`.
 - **[Feature]** New validator `Documentation/OrphanedDocComment` detects YARD comment blocks with tags (`@param`, `@return`, etc.) that are not attached to any documentable Ruby construct and will be silently dropped by YARD. Triggered when a tagged comment is immediately followed by a non-documentable statement (variable assignment, `require`, `include`, etc.) or sits at end-of-file. Enabled by default. Complementary to `Documentation/BlankLineBeforeDefinition` which handles the blank-lines-before-def case.
 - **[Enhancement]** Each offense now includes a `validator` field with the full config key (e.g. `"Documentation/MissingReturn"`, `"Tags/Order"`) identifying which validator produced it. The text formatter also now displays this path instead of the short offense name, making it easier to locate the right `.yard-lint.yml` setting to adjust.
 - **[Enhancement]** Add Ruby warning category opt-in to test helpers
