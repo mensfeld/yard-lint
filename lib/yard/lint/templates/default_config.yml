@@ -46,6 +46,10 @@ Documentation/UndocumentedMethodArguments:
   Severity: warning
   # AllowedParentClasses:
   #   - StandardError
+  # AllowedMethods: skip @param checks for specific methods (exact name, name/arity, /regex/)
+  #   - call
+  #   - perform
+  #   - initialize/1
 
 Documentation/UndocumentedBooleanMethods:
   Description: 'Checks that question mark methods document their boolean return.'

@@ -148,6 +148,61 @@ module Yard
           end
         end
 
+        # Checks whether the method object's name matches any entry in the validator's
+        # AllowedMethods configuration list. When true, the validator should skip the
+        # object without reporting an offense.
+        #
+        # Three pattern forms are supported (matching ExcludedMethods convention):
+        #   - Exact name:    'call'          — matches any arity
+        #   - Arity:         'initialize/1'  — matches only the given parameter count
+        #                                      (required + optional, excluding * and &)
+        #   - Regex:         '/^perform/'    — matches against the bare method name
+        #
+        # Invalid regex patterns are silently ignored. The empty regex '//' is always
+        # rejected (it would match every method, making the option useless).
+        #
+        # @param object [YARD::CodeObjects::Base] the code object to check
+        # @return [Boolean] true if the method should be skipped
+        def method_allowed?(object)
+          return false unless object.type == :method
+
+          allowed = Array(config_or_default('AllowedMethods'))
+            .compact
+            .map { |p| p.to_s.strip }
+            .reject(&:empty?)
+            .reject { |p| p == '//' }
+          return false if allowed.empty?
+
+          method_name = object.name.to_s
+          arity = object.parameters.reject { |p| p[0].to_s.start_with?('*', '&') }.size
+
+          allowed.any? { |pattern| matches_method_pattern?(method_name, arity, pattern) }
+        end
+
+        # Matches a single AllowedMethods/ExcludedMethods pattern against a method.
+        # @param method_name [String] bare method name (e.g. "call")
+        # @param arity [Integer] parameter count (required + optional, no * or &)
+        # @param pattern [String] one entry from the AllowedMethods list
+        # @return [Boolean]
+        def matches_method_pattern?(method_name, arity, pattern)
+          case pattern
+          when %r{^/(.+)/$}
+            regex_str = Regexp.last_match(1)
+            return false if regex_str.empty?
+
+            begin
+              Regexp.new(regex_str).match?(method_name)
+            rescue RegexpError
+              false
+            end
+          when %r{^[^/]+/\d+$}
+            pattern_name, pattern_arity_str = pattern.split('/', 2)
+            method_name == pattern_name && arity == pattern_arity_str.to_i
+          else
+            method_name == pattern
+          end
+        end
+
         # Retrieves configuration value with fallback to default
         # Automatically determines the validator name from the class namespace
         #
