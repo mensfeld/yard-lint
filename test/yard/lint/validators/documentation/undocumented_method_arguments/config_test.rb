@@ -12,7 +12,8 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Co
     assert_equal(
       {
         'Enabled' => true,
-        'Severity' => 'warning'
+        'Severity' => 'warning',
+        'AllowedParentClasses' => []
       },
       Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Config.defaults
     )

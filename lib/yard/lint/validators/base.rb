@@ -97,6 +97,47 @@ module Yard
           tags
         end
 
+        # Checks whether the object's enclosing class (or the object itself if it is
+        # a class) has a superclass that appears in the validator's AllowedParentClasses
+        # configuration list. When true, validators skip the object so that classes
+        # inheriting from common base classes (e.g. StandardError, ApplicationRecord)
+        # are not flagged.
+        #
+        # Matching is done on YARD's resolved superclass path, which is always the
+        # fully-qualified name (e.g. "ActiveRecord::Base"). Entries in
+        # AllowedParentClasses are matched exactly, so callers must use the same form
+        # (e.g. "ActiveRecord::Base", not "Base").
+        #
+        # For method objects the enclosing namespace's superclass is checked. For
+        # class objects the class itself is checked. Other object types always return
+        # false so that modules and constants are unaffected.
+        #
+        # @param object [YARD::CodeObjects::Base] the code object to check
+        # @return [Boolean] true if the object should be skipped
+        def parent_class_allowed?(object)
+          allowed = Array(config_or_default('AllowedParentClasses'))
+          return false if allowed.empty?
+
+          klass = case object.type
+                  when :class then object
+                  when :method then object.namespace
+                  else return false
+                  end
+
+          return false unless klass.respond_to?(:superclass)
+
+          superclass = klass.superclass
+          return false if superclass.nil?
+
+          superclass_path = superclass.respond_to?(:path) ? superclass.path.to_s : superclass.to_s
+          return false if superclass_path.empty?
+          # Object and BasicObject are the implicit defaults for all Ruby classes;
+          # matching them would exempt every class, which is never the intent.
+          return false if superclass_path == 'Object' || superclass_path == 'BasicObject'
+
+          allowed.any? { |a| superclass_path == a.to_s }
+        end
+
         # Retrieves configuration value with fallback to default
         # Automatically determines the validator name from the class namespace
         #

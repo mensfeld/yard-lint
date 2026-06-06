@@ -18,6 +18,7 @@ module Yard
             def in_process_query(object, collector)
               # Only check method objects
               return unless object.is_a?(YARD::CodeObjects::MethodObject)
+              return if parent_class_allowed?(object)
 
               params = object.parameters || []
 

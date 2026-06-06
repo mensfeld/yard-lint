@@ -22,6 +22,7 @@ module Yard
               # Skip aliases and implicit methods
               return if object.is_alias?
               return unless object.is_explicit?
+              return if parent_class_allowed?(object)
               # Only check boolean methods (ending with ?)
               return unless object.name.to_s.end_with?('?')
 

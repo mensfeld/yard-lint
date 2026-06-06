@@ -10,7 +10,8 @@ module Yard
             self.id = :undocumented_boolean_methods
             self.defaults = {
               'Enabled' => true,
-              'Severity' => 'warning'
+              'Severity' => 'warning',
+              'AllowedParentClasses' => []
             }.freeze
           end
         end

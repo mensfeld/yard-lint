@@ -13,7 +13,8 @@ describe 'Yard::Lint::Validators::Documentation::MissingReturn::Config' do
       {
         'Enabled' => false,
         'Severity' => 'warning',
-        'ExcludedMethods' => ['initialize']
+        'ExcludedMethods' => ['initialize'],
+        'AllowedParentClasses' => []
       },
       Yard::Lint::Validators::Documentation::MissingReturn::Config.defaults
     )

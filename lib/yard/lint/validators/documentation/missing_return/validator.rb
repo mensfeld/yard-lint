@@ -21,6 +21,7 @@ module Yard
               # Skip aliases and implicit methods
               return if object.is_alias?
               return unless object.is_explicit?
+              return if parent_class_allowed?(object)
 
               # Check if @return tag is missing
               return_tag = object.tag(:return)
