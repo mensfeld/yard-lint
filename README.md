@@ -227,15 +227,20 @@ Tags/ExampleStyle:
 
 ## Catching Orphaned Documentation Comments
 
-YARD silently ignores comment blocks that contain YARD tags (`@param`, `@return`, etc.) when they are not immediately followed by a documentable construct (method, class, module, attribute). This happens with variable assignments, `require` calls, `include`/`extend` statements, or comments at the end of a file - the documentation is simply lost with no warning.
+YARD silently ignores comment blocks that contain YARD tags (`@param`, `@return`, etc.) when they are not immediately followed by a documentable construct (method, class, module, constant, attribute). This happens with local variable assignments, `require` calls, `include`/`extend` statements, bare `private`/`public` keywords, or comments at the end of a file - the documentation is simply lost with no warning.
 
 The `Documentation/OrphanedDocComment` validator (enabled by default) catches this:
 
 ```ruby
-# Bad - YARD drops this silently, @return is never attached
+# Bad - YARD drops this silently; local variable is not documentable
 # @param name [String] the name
 # @return [void]
-MY_CONSTANT = "value"
+local_var = "value"
+
+# Bad - require is not documentable
+# @param id [Integer] user id
+# @return [User]
+require 'some_gem'
 
 # Bad - orphaned at end of file
 # @param id [Integer] user id
@@ -245,6 +250,10 @@ MY_CONSTANT = "value"
 # @param name [String] the name
 # @return [void]
 def greet(name); end
+
+# Good - constant assignments are documentable, not flagged
+# @return [Integer] the answer
+ANSWER = 42
 ```
 
 This validator is complementary to `Documentation/BlankLineBeforeDefinition` (which handles the case where blank lines separate a doc comment from a `def` - YARD still attaches it despite the gap).
@@ -385,8 +394,8 @@ Every offense (in both text and JSON output) includes a `validator` field with t
   "name": "OrphanedDocComment",
   "validator": "Documentation/OrphanedDocComment",
   "severity": "warning",
-  "message": "Documentation comment with @param, @return tags is orphaned - YARD will ignore it",
-  "location": "lib/my_class.rb:42",
+  "message": "Documentation comment with @param, @return is orphaned - YARD will ignore it",
+  "location": "lib/my_class.rb",
   "location_line": 42
 }
 ```
