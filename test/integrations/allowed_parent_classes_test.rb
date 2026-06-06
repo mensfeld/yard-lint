@@ -159,6 +159,31 @@ describe 'AllowedParentClasses' do
       refute(result.offenses.any? { |o| o[:name].to_s == 'UndocumentedObject' },
         'documented class with allowed parent should not generate UndocumentedObject offenses')
     end
+
+    it 'does not flag undocumented constants inside an allowed-parent class' do
+      file = create_test_file('example.rb', <<~RUBY)
+        class PaymentError < StandardError
+          DEFAULT_MESSAGE = 'payment failed'
+        end
+      RUBY
+      config = config_with('Documentation/UndocumentedObjects', ['StandardError'])
+      result = Yard::Lint.run(path: file, config: config, progress: false)
+      refute(result.offenses.any? { |o| o[:name].to_s == 'UndocumentedObject' },
+        'should skip constants inside a class inheriting from an allowed parent')
+    end
+
+    it 'does not flag undocumented nested classes inside an allowed-parent class' do
+      file = create_test_file('example.rb', <<~RUBY)
+        class PaymentError < StandardError
+          class Retry
+          end
+        end
+      RUBY
+      config = config_with('Documentation/UndocumentedObjects', ['StandardError'])
+      result = Yard::Lint.run(path: file, config: config, progress: false)
+      refute(result.offenses.any? { |o| o[:name].to_s == 'UndocumentedObject' },
+        'should skip nested classes inside a class inheriting from an allowed parent')
+    end
   end
 
   # ── UndocumentedMethodArguments ───────────────────────────────────────

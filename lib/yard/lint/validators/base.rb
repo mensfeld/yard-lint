@@ -118,24 +118,34 @@ module Yard
           allowed = Array(config_or_default('AllowedParentClasses'))
           return false if allowed.empty?
 
-          klass = case object.type
-                  when :class then object
-                  when :method then object.namespace
-                  else return false
-                  end
+          klasses = case object.type
+                    when :class
+                      # Check the class's own superclass; also check the enclosing class's
+                      # superclass so that nested classes and constants inside an allowed
+                      # parent class are exempted as well.
+                      [object, object.namespace].select { |k| k.respond_to?(:superclass) }
+                    when :method, :constant
+                      ns = object.namespace
+                      ns.respond_to?(:superclass) ? [ns] : []
+                    else
+                      []
+                    end
 
-          return false unless klass.respond_to?(:superclass)
+          return false if klasses.empty?
 
-          superclass = klass.superclass
-          return false if superclass.nil?
+          klasses.any? do |klass|
+            superclass = klass.superclass
+            next false if superclass.nil?
 
-          superclass_path = superclass.respond_to?(:path) ? superclass.path.to_s : superclass.to_s
-          return false if superclass_path.empty?
-          # Object and BasicObject are the implicit defaults for all Ruby classes;
-          # matching them would exempt every class, which is never the intent.
-          return false if superclass_path == 'Object' || superclass_path == 'BasicObject'
+            superclass_path = superclass.respond_to?(:path) ? superclass.path.to_s : superclass.to_s
+            next false if superclass_path.empty?
+            # Every Ruby class without an explicit parent implicitly inherits from Object,
+            # so matching it would exempt all classes — never the intent.
+            # BasicObject is the root of the hierarchy and is guarded for the same reason.
+            next false if superclass_path == 'Object' || superclass_path == 'BasicObject'
 
-          allowed.any? { |a| superclass_path == a.to_s }
+            allowed.any? { |a| superclass_path == a.to_s }
+          end
         end
 
         # Retrieves configuration value with fallback to default
