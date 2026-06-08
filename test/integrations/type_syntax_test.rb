@@ -144,5 +144,23 @@ describe 'Type Syntax' do
     assert_includes(offense[:message], 'Invalid type syntax')
     assert_match(/@(param|return|option)/, offense[:message])
   end
+
+  # -- YARD semicolon shorthand for multi-pair Hash types (issue #171) --
+
+  it 'does not flag two-pair semicolon Hash type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTypeSyntax' && o[:message].include?('semicolon_hash_two_pairs') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag many-pair semicolon Hash type with shared value notation' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTypeSyntax' && o[:message].include?('semicolon_hash_many_pairs') }
+
+    assert_nil(offense)
+  end
 end
 

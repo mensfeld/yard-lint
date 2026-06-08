@@ -58,4 +58,11 @@ class TypeSyntaxExamples
   def nested_unclosed(data)
     # implementation
   end
+
+  # Valid: YARD semicolon shorthand for multi-pair fixed-shape Hash types (issue #171)
+  # @return [Hash{:a => Integer; :b => String}] two-pair semicolon hash
+  def semicolon_hash_two_pairs; end
+
+  # @return [Hash{:range => Hash; :severity => Integer; :source, :code, :message => String}] many-pair semicolon hash
+  def semicolon_hash_many_pairs; end
 end
