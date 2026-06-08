@@ -54,4 +54,15 @@ class InvalidTypesMessages
 
   # @return [Hash{"subject" => String, "htmlContent" => String}] multiple string keys
   def hash_with_multiple_string_keys; end
+
+  # Valid: YARD semicolon shorthand for multi-pair fixed-shape Hash types (issue #171)
+  # @return [Hash{:a => Integer; :b => String}] two-pair semicolon hash
+  def hash_semicolon_two_pairs; end
+
+  # @return [Hash{:range => Hash; :severity => Integer; :source, :code, :message => String}] many-pair semicolon hash
+  def hash_semicolon_many_pairs; end
+
+  # Invalid: bad type inside a semicolon-separated hash should still be caught
+  # @return [Hash{:a => bad_semi_type; :b => String}] semicolon hash with invalid value
+  def hash_semicolon_with_invalid_type; end
 end
