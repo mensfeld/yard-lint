@@ -158,4 +158,31 @@ describe 'InvalidTypes offense messages' do
 
     assert_nil(offense)
   end
+
+  # -- YARD semicolon shorthand for multi-pair Hash types (issue #171) --
+
+  it 'does not flag two-pair semicolon Hash type' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_semicolon_two_pairs') }
+
+    assert_nil(offense)
+  end
+
+  it 'does not flag many-pair semicolon Hash type with shared value notation' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_semicolon_many_pairs') }
+
+    assert_nil(offense)
+  end
+
+  it 'still flags an invalid type inside a semicolon-separated Hash' do
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
+
+    offense = result.offenses.find { |o| o[:name] == 'InvalidTagType' && o[:message].include?('hash_semicolon_with_invalid_type') }
+
+    refute_nil(offense)
+    assert_includes(offense[:message], 'bad_semi_type')
+  end
 end

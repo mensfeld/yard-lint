@@ -67,7 +67,7 @@ module Yard
             # @param type_str [String] the raw type string (e.g., "Array<self>", "Hash{Symbol => String}")
             # @return [Array<String>] individual type names (e.g., ["Array", "self"], ["Hash", "Symbol", "String"])
             def extract_type_names(type_str)
-              type_str.split(/[=><,{}\s()]+/).reject(&:empty?)
+              type_str.split(/[=><,{}\s();]+/).reject(&:empty?)
             end
 
             # Check if a type is defined in Ruby runtime or YARD registry
