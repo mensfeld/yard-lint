@@ -37,6 +37,10 @@ OptionParser.new do |opts|
     options[:progress] = value
   end
 
+  opts.on('--stdin', 'Read source from stdin; PATH argument is required for config/reporting') do
+    options[:stdin] = true
+  end
+
   opts.separator ''
   opts.separator 'Diff mode options (mutually exclusive):'
 
@@ -117,6 +121,7 @@ OptionParser.new do |opts|
     puts '  yard-lint --auto-gen-config                    # Generate todo file for existing violations'
     puts '  yard-lint --regenerate-todo                    # Regenerate todo file'
     puts '  yard-lint --auto-gen-config --exclude-limit 10 # Custom grouping threshold'
+    puts '  cat lib/foo.rb | yard-lint --stdin lib/foo.rb  # Lint source piped from stdin'
     exit
   end
 end.parse!
@@ -199,6 +204,16 @@ end
 # Get path argument (defaults to current directory)
 path = ARGV[0] || '.'
 
+# Read stdin source when --stdin flag is given
+stdin_source = nil
+if options[:stdin]
+  if path == '.' || File.directory?(path)
+    puts 'Error: --stdin requires an explicit file path argument (e.g. yard-lint --stdin lib/foo.rb)'
+    exit 1
+  end
+  stdin_source = $stdin.read
+end
+
 # Clear YARD registry to ensure fresh run on each CLI invocation
 YARD::Registry.clear
 
@@ -241,8 +256,12 @@ begin
     path: path,
     config: config,
     progress: options[:progress],
-    diff: diff_mode
+    diff: diff_mode,
+    source: stdin_source
   )
+rescue ArgumentError => e
+  puts "Error: #{e.message}"
+  exit 1
 rescue Yard::Lint::Git::Error => e
   puts "Git error: #{e.message}"
   exit 1

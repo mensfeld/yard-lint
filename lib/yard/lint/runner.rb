@@ -15,9 +15,11 @@ module Yard
 
       # @param selection [Array<String>] array with ruby files to check
       # @param config [Yard::Lint::Config] configuration object
-      def initialize(selection, config = Config.new)
+      # @param source [String, nil] in-memory source content (overrides disk reads)
+      def initialize(selection, config = Config.new, source: nil)
         @selection = Array(selection).flatten
         @config = config
+        @source = source
         @result_builder = ResultBuilder.new(config)
         @progress_formatter = nil
       end
@@ -45,7 +47,7 @@ module Yard
 
         # Initialize in-process infrastructure
         registry = Executor::InProcessRegistry.new
-        registry.parse(selection)
+        registry.parse(selection, source: @source)
 
         query_executor = Executor::QueryExecutor.new(registry)
         warning_dispatcher = Executor::WarningDispatcher.new
