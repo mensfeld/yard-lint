@@ -127,6 +127,9 @@ module Yard
         # Parse Ruby source from a string and register objects under a virtual path.
         # YARD::Parser::SourceParser#parse accepts a StringIO but keeps @file as '(stdin)'
         # unless we set it explicitly before parsing.
+        # @param source [String] Ruby source code to parse
+        # @param virtual_path [String] filename to assign to registered objects
+        # @return [void]
         def parse_source_string(source, virtual_path)
           parser = YARD::Parser::SourceParser.new(:ruby)
           parser.file = virtual_path
