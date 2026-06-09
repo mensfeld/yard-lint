@@ -21,8 +21,10 @@ module Yard
         # Parse Ruby source files and populate the YARD registry.
         # Captures any warnings emitted by YARD during parsing for later dispatch.
         # @param files [Array<String>] absolute or relative paths to Ruby source files
+        # @param source [String, nil] in-memory source; when given, `files.first` is used
+        #   as the virtual filename for registry/location reporting only
         # @return [void]
-        def parse(files)
+        def parse(files, source: nil)
           @mutex.synchronize do
             return if @parsed
 
@@ -33,16 +35,28 @@ module Yard
             original_level = YARD::Logger.instance.level
             YARD::Logger.instance.level = 4 # Only show fatal errors
 
-            # First pass: parse all files to process directive definitions
-            YARD.parse(files)
+            if source
+              virtual_path = files.first
+              # First pass: register directive/macro definitions from the in-memory source.
+              # We set parser.file manually so registered objects carry the virtual path.
+              parse_source_string(source, virtual_path)
+              # Clear checksums so the second pass is not skipped
+              YARD::Registry.checksums.clear
+              # Second pass: full parse with all directives available
+              @warnings = capture_warnings { parse_source_string(source, virtual_path) }
+            else
+              # First pass: parse all files to process directive definitions
+              YARD.parse(files)
 
-            # Clear checksums to force reparsing without clearing the registry.
-            # This allows macro definitions from the first pass to be available
-            # during the second pass, enabling proper directive expansion regardless of parse order.
-            YARD::Registry.checksums.clear
+              # Clear checksums to force reparsing without clearing the registry.
+              # This allows macro definitions from the first pass to be available
+              # during the second pass, enabling proper directive expansion regardless of parse order.
+              YARD::Registry.checksums.clear
 
-            # Second pass: reparse files now that all directive definitions are available
-            @warnings = capture_warnings { YARD.parse(files) }
+              # Second pass: reparse files now that all directive definitions are available
+              @warnings = capture_warnings { YARD.parse(files) }
+            end
+
             @parsed = true
 
             YARD::Logger.instance.level = original_level
@@ -109,6 +123,15 @@ module Yard
         end
 
         private
+
+        # Parse Ruby source from a string and register objects under a virtual path.
+        # YARD::Parser::SourceParser#parse accepts a StringIO but keeps @file as '(stdin)'
+        # unless we set it explicitly before parsing.
+        def parse_source_string(source, virtual_path)
+          parser = YARD::Parser::SourceParser.new(:ruby)
+          parser.file = virtual_path
+          parser.parse(StringIO.new(source))
+        end
 
         # Capture warnings during a block execution
         # @yield Block to execute while capturing warnings

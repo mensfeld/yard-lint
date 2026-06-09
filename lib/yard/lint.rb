@@ -23,18 +23,28 @@ module Yard
       # @param diff [Hash, nil] diff mode options
       #   - :mode [Symbol] one of :ref, :staged, :changed
       #   - :base_ref [String, nil] base ref for :ref mode (auto-detects main/master if nil)
+      # @param source [String, nil] in-memory source content; when given, the file is not
+      #   read from disk — `path` must be a single .rb file path (used for config/exclusion
+      #   resolution and offense location reporting only)
       # @return [Yard::Lint::Result] result object with offenses
-      def run(path:, config: nil, config_file: nil, progress: nil, diff: nil)
+      def run(path:, config: nil, config_file: nil, progress: nil, diff: nil, source: nil)
+        if source
+          raise ArgumentError, '`source:` requires `path:` to be a single .rb file, not a directory or glob' \
+            if path.is_a?(Array) || path.to_s.include?('*') || File.directory?(path.to_s)
+        end
+
         config ||= load_config(config_file)
 
-        # Determine files to lint based on diff mode or normal path expansion
-        files = if diff
+        # Determine files to lint based on source, diff mode, or normal path expansion
+        files = if source
+                  [File.expand_path(path)]
+                elsif diff
                   get_diff_files(diff, path, config)
                 else
                   expand_path(path, config)
                 end
 
-        runner = Runner.new(files, config)
+        runner = Runner.new(files, config, source: source)
 
         # Enable progress by default if output is a TTY
         show_progress = progress.nil? ? $stdout.tty? : progress

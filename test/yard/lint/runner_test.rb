@@ -114,5 +114,50 @@ describe 'Yard::Lint::Runner' do
     result = custom_runner.run
     assert_equal(0, result.count)
   end
+
+  describe 'source parameter' do
+    it 'stores source when provided' do
+      source_runner = Yard::Lint::Runner.new(selection, config, source: 'class Foo; end')
+      assert_equal('class Foo; end', source_runner.instance_variable_get(:@source))
+    end
+
+    it 'source defaults to nil when not provided' do
+      assert_nil(runner.instance_variable_get(:@source))
+    end
+
+    it 'run with source does not raise and returns aggregate result' do
+      source = <<~RUBY
+        # Documented
+        class RunnerSourceTest
+          # @return [void]
+          def go; end
+        end
+      RUBY
+
+      file = Tempfile.new(['runner_source', '.rb'])
+      file.write(source)
+      file.close
+
+      source_runner = Yard::Lint::Runner.new([file.path], config, source: source)
+      result = source_runner.run
+
+      assert_kind_of(Yard::Lint::Results::Aggregate, result)
+    ensure
+      file&.unlink
+    end
+
+    it 'run without source does not raise and returns aggregate result' do
+      file = Tempfile.new(['runner_no_source', '.rb'])
+      file.write("# Documented\nclass NoSourceTest; end\n")
+      file.close
+
+      no_source_runner = Yard::Lint::Runner.new([file.path], config)
+      result = no_source_runner.run
+
+      assert_kind_of(Yard::Lint::Results::Aggregate, result)
+    ensure
+      file&.unlink
+    end
+  end
 end
 
