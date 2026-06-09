@@ -9,8 +9,7 @@ module Yard
         # Detects methods that call `yield` in their body but do not document
         # the block with a `@yield`, `@yieldparam`, or `@yieldreturn` tag.
         # Callers need to know a method yields so they can pass a block;
-        # undocumented yield is a silent API contract that only source readers
-        # discover.
+        # undocumented yield is a silent API contract that only source readers discover.
         #
         # This validator is disabled by default (opt-in).
         #

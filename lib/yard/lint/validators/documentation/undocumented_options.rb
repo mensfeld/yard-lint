@@ -8,8 +8,7 @@ module Yard
         #
         # Checks that options hashes have detailed documentation about their keys.
         # When a method accepts an options hash parameter, the individual option
-        # keys should be documented using `@option` tags. This validator is enabled
-        # by default.
+        # keys should be documented using `@option` tags. This validator is enabled by default.
         #
         # @example Bad - Options parameter without @option tags
         #   # Configures the service
