@@ -9,8 +9,7 @@ module Yard
         #
         # Detects duplicate `@param` tags for the same parameter name. If a parameter
         # is documented multiple times, it's unclear which documentation is correct
-        # and can confuse both readers and YARD's parser. This validator is enabled
-        # by default.
+        # and can confuse both readers and YARD's parser. This validator is enabled by default.
         #
         # @example Bad - Duplicate @param tags
         #   # @param name [String] the name

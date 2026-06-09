@@ -8,8 +8,7 @@ module Yard
         #
         # Validates YARD type syntax using YARD's TypesExplainer::Parser. This
         # validator ensures that type annotations can be properly parsed by YARD
-        # and follow YARD's type specification format. This validator is enabled
-        # by default.
+        # and follow YARD's type specification format. This validator is enabled by default.
         #
         # @example Bad - Invalid type syntax that YARD cannot parse
         #   # @param data [{String, Integer}] invalid hash syntax

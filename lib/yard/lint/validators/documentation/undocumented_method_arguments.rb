@@ -8,8 +8,7 @@ module Yard
         #
         # Ensures that all method parameters are documented with `@param` tags.
         # This validator checks that every parameter in a method signature has
-        # a corresponding `@param` documentation tag. This validator is enabled
-        # by default.
+        # a corresponding `@param` documentation tag. This validator is enabled by default.
         #
         # @example Bad - Missing @param tags
         #   # Does something with data

@@ -9,8 +9,7 @@ module Yard
         #
         # Detects malformed YARD directive syntax. Directives have specific format
         # requirements (like `@!attribute [r] name` for read-only attributes), and
-        # this validator ensures those requirements are met. This validator is
-        # enabled by default.
+        # this validator ensures those requirements are met. This validator is enabled by default.
         #
         # @example Bad - Malformed directive syntax
         #   # @!attribute name missing brackets
