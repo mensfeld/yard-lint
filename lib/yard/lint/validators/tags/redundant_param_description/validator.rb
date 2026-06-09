@@ -64,7 +64,8 @@ module Yard
             # @param low_value_verbs [Array<String>] low-value verbs
             # @param patterns [Hash] enabled pattern flags
             # @return [String, nil] pattern type or nil
-            # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/ParameterLists
+            # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+            # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
             def detect_pattern(param_name, description, type_name, word_count, articles, generic_terms, connectors, low_value_verbs, patterns)
               desc_parts = description.split
               articles_re = /^(#{articles.join('|')})/i
@@ -136,7 +137,8 @@ module Yard
 
               nil
             end
-            # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/ParameterLists
+            # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+            # rubocop:enable Metrics/AbcSize, Metrics/ParameterLists
 
             private
 
