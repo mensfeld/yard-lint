@@ -142,6 +142,30 @@ yard-lint lib/ --only Tags/Order,Documentation/UndocumentedObjects
 
 **Learn more:** [Advanced Usage Guide](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)
 
+### Lint from stdin (LSP / Editor Integration)
+
+Pass source bytes directly without reading from disk. The `path` argument is still required - it governs config resolution, exclusion matching, and offense location reporting.
+
+**CLI:**
+
+```bash
+# Lint source piped through stdin - path is used for config/reporting only
+cat lib/foo.rb | yard-lint --stdin lib/foo.rb
+```
+
+**Ruby API:**
+
+```ruby
+# Lint an in-memory buffer - file does not need to exist on disk
+result = Yard::Lint.run(
+  path: 'lib/foo.rb',            # used for config, exclusions, and offense locations
+  source: editor_buffer_content, # actual source bytes to lint
+  progress: false
+)
+```
+
+This is how [solargraph-yard-lint](https://github.com/lekemula/solargraph-yard-lint) surfaces yard-lint offenses on unsaved editor buffers - the file path provides context while the live buffer content is linted directly, matching the behaviour of RuboCop's `--stdin` flag.
+
 ## Configuration Basics
 
 Create a `.yard-lint.yml` file in your project root:
@@ -402,6 +426,7 @@ Output:
   -q, --quiet             Quiet mode (only show summary)
       --stats             Show documentation coverage statistics
       --[no-]progress     Show progress indicator (default: auto-detect TTY)
+      --stdin             Read source from stdin; PATH still required for config/reporting
 
 Coverage:
       --min-coverage N    Minimum documentation coverage required (0-100)
