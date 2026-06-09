@@ -13,12 +13,10 @@ module Yard
 
             private
 
-            # @param offense [Hash] offense details
+            # @param offense [Hash] offense details including :max_length from the validator
             # @return [String] formatted message
             def build_message(offense)
-              max_length = config&.validator_config(validator_name, 'MaxLength') ||
-                           LineLength::Config.defaults['MaxLength']
-              MessagesBuilder.call(offense.merge(max_length: max_length))
+              MessagesBuilder.call(offense)
             end
           end
         end

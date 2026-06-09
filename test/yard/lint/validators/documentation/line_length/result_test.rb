@@ -33,19 +33,21 @@ describe 'Yard::Lint::Validators::Documentation::LineLength::Result' do
     assert_equal('LineLength', Yard::Lint::Validators::Documentation::LineLength::Result.offense_name)
   end
 
-  it 'build message delegates to messagesbuilder with max_length' do
+  it 'build message includes length and max_length from offense data' do
     parsed = [
       {
         location: 'lib/example.rb',
         line: 5,
         object_line: 10,
         object_name: 'MyClass#process',
-        length: 135
+        length: 135,
+        max_length: 120
       }
     ]
     r = Yard::Lint::Validators::Documentation::LineLength::Result.new(parsed, config)
     msg = r.offenses.first[:message]
     assert_includes(msg, '135')
+    assert_includes(msg, '120')
     assert_includes(msg, 'MyClass#process')
   end
 end

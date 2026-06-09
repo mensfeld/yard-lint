@@ -9,7 +9,7 @@ module Yard
           #
           # Expected format (two lines per object with violations):
           #   file.rb:OBJECT_LINE: ObjectName
-          #   LINE_NO:LENGTH|LINE_NO:LENGTH|...
+          #   MAX_LENGTH|LINE_NO:LENGTH|LINE_NO:LENGTH|...
           class Parser < Parsers::Base
             # @param output [String] raw validator output
             # @return [Array<Hash>] array of violation hashes
@@ -31,7 +31,13 @@ module Yard
                   i += 1
                   next unless i < lines.size
 
-                  lines[i].split('|').each do |part|
+                  parts = lines[i].split('|')
+                  next if parts.empty?
+
+                  # First token is max_length, remainder are line_no:length pairs
+                  max_length = parts.shift.to_i
+
+                  parts.each do |part|
                     line_no, length = part.split(':', 2)
                     next unless line_no && length
 
@@ -40,7 +46,8 @@ module Yard
                       line: line_no.to_i,
                       object_line: object_line,
                       object_name: object_name,
-                      length: length.to_i
+                      length: length.to_i,
+                      max_length: max_length
                     }
                   end
                 end

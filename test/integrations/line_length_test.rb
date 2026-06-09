@@ -253,4 +253,67 @@ describe 'LineLength' do
     refute_empty(offenses)
     assert_equal('Documentation/LineLength', offenses.first[:validator])
   end
+
+  it 'offense message includes max_length from config' do
+    long_line = '# ' + ('g' * 69)  # 71 chars, exceeds 70
+    file = create_test_file('msg_max.rb', <<~RUBY)
+      #{long_line}
+      def process(value)
+        value
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: enabled_config(max_length: 70), progress: false)
+    offenses = line_length_offenses(result)
+    refute_empty(offenses)
+    assert_includes(offenses.first[:message], '70')
+    assert_includes(offenses.first[:message], '71')
+  end
+
+  it 'wrapped tag continuation lines are checked at correct source positions' do
+    # A @param tag whose description wraps to a second comment line.
+    # YARD's line_range covers both source lines, so both are candidates for length checks.
+    continuation = '#   ' + ('h' * 117)  # 121 chars — over the limit
+    file = create_test_file('wrapped.rb', <<~RUBY)
+      # Short description.
+      # @param value [String] short opening
+      #{continuation}
+      def process(value)
+        value
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: enabled_config, progress: false)
+    offenses = line_length_offenses(result)
+    refute_empty(offenses, 'Long continuation line inside a docstring should be flagged')
+    assert_equal(1, offenses.size)
+    assert_equal(3, offenses.first[:location_line], 'Offense should point at the continuation line (line 3)')
+  end
+
+  it 'multiple documented objects in one file reads file only once (no incorrect line offsets)' do
+    long_line = '# ' + ('i' * 119)
+    file = create_test_file('multi_obj.rb', <<~RUBY)
+      # Good class doc.
+      class MyClass
+        #{long_line}
+        def method_one
+        end
+
+        #{long_line}
+        def method_two
+        end
+
+        # Short doc.
+        def method_three
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: enabled_config, progress: false)
+    offenses = line_length_offenses(result)
+    assert_equal(2, offenses.size, 'Each long docstring in the same file should produce an offense')
+    messages = offenses.map { |o| o[:message] }
+    assert(messages.any? { |m| m.include?('method_one') })
+    assert(messages.any? { |m| m.include?('method_two') })
+  end
 end

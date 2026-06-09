@@ -10,7 +10,7 @@ describe 'Yard::Lint::Validators::Documentation::LineLength::Parser' do
   it 'call with single violation parses one over-length line' do
     output = <<~OUTPUT
       lib/example.rb:10: MyClass#process
-      5:135
+      120|5:135
     OUTPUT
 
     result = parser.call(output)
@@ -22,7 +22,8 @@ describe 'Yard::Lint::Validators::Documentation::LineLength::Parser' do
           line: 5,
           object_line: 10,
           object_name: 'MyClass#process',
-          length: 135
+          length: 135,
+          max_length: 120
         }
       ],
       result
@@ -32,7 +33,7 @@ describe 'Yard::Lint::Validators::Documentation::LineLength::Parser' do
   it 'call with multiple violations on same object parses all lines' do
     output = <<~OUTPUT
       lib/example.rb:15: MyClass#execute
-      3:125|4:140
+      120|3:125|4:140
     OUTPUT
 
     result = parser.call(output)
@@ -44,14 +45,16 @@ describe 'Yard::Lint::Validators::Documentation::LineLength::Parser' do
           line: 3,
           object_line: 15,
           object_name: 'MyClass#execute',
-          length: 125
+          length: 125,
+          max_length: 120
         },
         {
           location: 'lib/example.rb',
           line: 4,
           object_line: 15,
           object_name: 'MyClass#execute',
-          length: 140
+          length: 140,
+          max_length: 120
         }
       ],
       result
@@ -61,9 +64,9 @@ describe 'Yard::Lint::Validators::Documentation::LineLength::Parser' do
   it 'call with multiple objects parses violations from both objects' do
     output = <<~OUTPUT
       lib/a.rb:10: Foo#bar
-      2:130
+      120|2:130
       lib/b.rb:20: Baz#qux
-      18:150|19:160
+      80|18:90|19:95
     OUTPUT
 
     result = parser.call(output)
@@ -72,11 +75,23 @@ describe 'Yard::Lint::Validators::Documentation::LineLength::Parser' do
     assert_equal('lib/a.rb', result[0][:location])
     assert_equal(2, result[0][:line])
     assert_equal(130, result[0][:length])
+    assert_equal(120, result[0][:max_length])
     assert_equal('lib/b.rb', result[1][:location])
     assert_equal(18, result[1][:line])
-    assert_equal(150, result[1][:length])
+    assert_equal(90, result[1][:length])
+    assert_equal(80, result[1][:max_length])
     assert_equal(19, result[2][:line])
-    assert_equal(160, result[2][:length])
+    assert_equal(95, result[2][:length])
+  end
+
+  it 'call with custom max length preserves max_length in offense' do
+    output = <<~OUTPUT
+      lib/example.rb:5: Foo#bar
+      80|2:85
+    OUTPUT
+
+    result = parser.call(output)
+    assert_equal(80, result.first[:max_length])
   end
 
   it 'call with empty string returns empty array' do
