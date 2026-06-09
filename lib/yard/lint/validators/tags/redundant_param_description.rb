@@ -68,7 +68,8 @@ module Yard
         #   end
         #
         # @example Good - Long, meaningful descriptions with context
-        #   # @param date [Date, nil] the date that can describe the event starting information or nil if event did not yet start
+        #   # @param date [Date, nil] the date describing when the event starts,
+        #   #   or nil if the event has not yet started
         #   # @param user [User] the user who initiated the request and will receive notifications
         #   # @param data [Hash] configuration options for the API endpoint including timeout and retry settings
         #   def configure(date, user, data)

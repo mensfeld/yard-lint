@@ -79,7 +79,7 @@ Documentation/BlankLineBeforeDefinition:
 
 Documentation/LineLength:
   Description: 'Detects documentation comment lines that exceed the configured maximum length.'
-  Enabled: false
+  Enabled: true
   Severity: convention
   MaxLength: 120
 

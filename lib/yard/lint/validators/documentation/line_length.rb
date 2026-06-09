@@ -14,7 +14,7 @@ module Yard
         # Disabled by default — enable it and set MaxLength to taste.
         #
         # @example Bad - line exceeds MaxLength (120)
-        #   # This is an extremely verbose documentation line that goes well beyond the configured maximum line length limit.
+        #   # This documentation line is too long and exceeds the configured maximum length.
         #   def process(value)
         #   end
         #
