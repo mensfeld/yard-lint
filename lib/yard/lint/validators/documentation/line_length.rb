@@ -35,7 +35,6 @@ module Yard
         #
         #     Documentation/LineLength:
         #       Enabled: false
-        #
         module LineLength
         end
       end
