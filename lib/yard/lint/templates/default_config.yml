@@ -102,6 +102,12 @@ Documentation/BlankLineBeforeDefinition:
     SingleBlankLine: true
     OrphanedDocs: true
 
+Documentation/LineLength:
+  Description: 'Detects documentation comment lines that exceed the configured maximum length.'
+  Enabled: false  # Opt-in validator
+  Severity: convention
+  MaxLength: 120
+
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'

@@ -24,13 +24,13 @@ YARD-Lint validates your YARD documentation for:
 - **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions, forbidden tag patterns, undocumented `yield` calls (opt-in)
 - **Code Examples** - Syntax validation in `@example` tags, optional style validation with RuboCop/StandardRB
 - **Semantic Correctness** - Abstract methods with implementations, redundant descriptions
-- **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns, tag group separators
+- **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns, tag group separators, configurable documentation line length (opt-in)
 - **Smart Suggestions** - "Did you mean" suggestions for typos in parameter names, tags, and configuration settings
 - **Configuration Safety** - Validates `.yard-lint.yml` for typos and invalid settings before processing
 - **Performance** - In-process YARD execution with shared registry (~10x faster than shell-based execution)
 - **Incremental Adoption** - `--auto-gen-config` generates a baseline todo file to adopt on legacy codebases without fixing everything first
 
-**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [31 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [32 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -248,6 +248,11 @@ Documentation/MissingReturn:
 Tags/ExampleStyle:
   Enabled: true
   Severity: convention
+
+# Opt-in: Enforce max line length in documentation comments
+Documentation/LineLength:
+  Enabled: true
+  MaxLength: 100
 ```
 
 **Key features:**
