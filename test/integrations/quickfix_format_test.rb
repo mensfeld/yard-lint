@@ -16,11 +16,12 @@ describe 'Quickfix output format' do
     Dir.mktmpdir do |dir|
       virtual = File.join(dir, 'sample.rb')
       output = IO.popen(
-        "printf #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         '--format quickfix --no-progress 2>&1',
         &:read
       )
 
+      refute_equal(0, $CHILD_STATUS.exitstatus)
       lines = output.lines.map(&:chomp).reject(&:empty?)
       refute_empty(lines, 'Expected at least one offense line')
 
@@ -40,7 +41,7 @@ describe 'Quickfix output format' do
     Dir.mktmpdir do |dir|
       virtual = File.join(dir, 'myfile.rb')
       output = IO.popen(
-        "printf #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         '--format quickfix --no-progress 2>&1',
         &:read
       )
@@ -53,7 +54,7 @@ describe 'Quickfix output format' do
     end
   end
 
-  it 'outputs nothing when there are no offenses' do
+  it 'outputs nothing on stdout when there are no offenses' do
     source = <<~RUBY
       # A well-documented class
       class Clean
@@ -80,7 +81,7 @@ describe 'Quickfix output format' do
 
       virtual = File.join(dir, 'clean.rb')
       output = IO.popen(
-        "printf #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         "--config #{Shellwords.escape(config_file)} --format quickfix --no-progress 2>&1",
         &:read
       )
@@ -96,7 +97,7 @@ describe 'Quickfix output format' do
     Dir.mktmpdir do |dir|
       virtual = File.join(dir, 'sample.rb')
       IO.popen(
-        "printf #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         '--format quickfix --no-progress 2>&1',
         &:read
       )
@@ -125,7 +126,7 @@ describe 'Quickfix output format' do
 
       virtual = File.join(dir, 'sample.rb')
       output = IO.popen(
-        "printf #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         "--config #{Shellwords.escape(config_file)} --format quickfix --no-progress 2>&1",
         &:read
       )
@@ -155,7 +156,7 @@ describe 'Quickfix output format' do
 
       virtual = File.join(dir, 'sample.rb')
       output = IO.popen(
-        "printf #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         "--config #{Shellwords.escape(config_file)} --format quickfix --no-progress 2>&1",
         &:read
       )
@@ -185,7 +186,7 @@ describe 'Quickfix output format' do
 
       virtual = File.join(dir, 'sample.rb')
       output = IO.popen(
-        "printf #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         "--config #{Shellwords.escape(config_file)} --format quickfix --no-progress 2>&1",
         &:read
       )
@@ -194,9 +195,75 @@ describe 'Quickfix output format' do
     end
   end
 
+  it 'offense messages with embedded newlines are collapsed to a single line' do
+    source = "class NoDoc\n  def undoc(arg); arg; end\nend\n"
+
+    Dir.mktmpdir do |dir|
+      virtual = File.join(dir, 'sample.rb')
+      output = IO.popen(
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        '--format quickfix --no-progress 2>&1',
+        &:read
+      )
+
+      output.lines.map(&:chomp).reject(&:empty?).each do |line|
+        assert_match(
+          /\A.+:\d+: [EWC?]: /,
+          line,
+          "Line does not start with valid quickfix prefix (possible embedded newline): #{line.inspect}"
+        )
+      end
+    end
+  end
+
+  it 'prints coverage failure to stderr and exits non-zero when min_coverage not met' do
+    Dir.mktmpdir do |dir|
+      # Write an undocumented class to disk so StatsCalculator can count objects
+      rb_file = File.join(dir, 'sample.rb')
+      File.write(rb_file, "class NoDoc; end\n")
+
+      combined = IO.popen(
+        "#{@bin_path} #{Shellwords.escape(rb_file)} --min-coverage 100 --format quickfix --no-progress 2>&1",
+        &:read
+      )
+      stderr_only = IO.popen(
+        "#{@bin_path} #{Shellwords.escape(rb_file)} --min-coverage 100 --format quickfix --no-progress 2>&1 >/dev/null",
+        &:read
+      )
+
+      assert_match(/coverage/i, combined, "Expected coverage message in output: #{combined.inspect}")
+      assert_match(/coverage/i, stderr_only, "Expected coverage failure message on stderr: #{stderr_only.inspect}")
+      refute_equal(0, $CHILD_STATUS.exitstatus)
+    end
+  end
+
+  it 'suppresses progress output automatically without --no-progress' do
+    source = "class NoDoc\n  def undoc(arg); arg; end\nend\n"
+
+    Dir.mktmpdir do |dir|
+      virtual = File.join(dir, 'sample.rb')
+      # Without --no-progress and without a TTY, progress should not appear
+      output = IO.popen(
+        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+        '--format quickfix 2>&1',
+        &:read
+      )
+
+      output.lines.map(&:chomp).reject(&:empty?).each do |line|
+        assert_match(
+          /\A.+:\d+: [EWC?]: /,
+          line,
+          "Unexpected non-offense line in quickfix output (progress contamination?): #{line.inspect}"
+        )
+      end
+    end
+  end
+
   it 'unknown format exits with error' do
-    output = `#{@bin_path} --format bogus . --no-progress 2>&1`
-    refute_equal(0, $CHILD_STATUS.exitstatus)
-    assert_match(/unknown format/i, output)
+    Dir.mktmpdir do |dir|
+      output = `#{@bin_path} --format bogus #{Shellwords.escape(dir)} --no-progress 2>&1`
+      refute_equal(0, $CHILD_STATUS.exitstatus)
+      assert_match(/unknown format/i, output)
+    end
   end
 end

@@ -189,7 +189,7 @@ set makeprg=yard-lint\ --format\ quickfix\ --no-progress\ %
 set errorformat=%f:%l:\ %t:\ %m
 ```
 
-Then `:make` lints the current file and `:cnext` / `:cprev` jump between offenses.
+Then `:make` lints the current file and `:cnext` / `:cprev` jump between offenses. Note: Vim only recognises `E` and `W` as named types for `:clist E`/`:clist W` filtering — `C` (convention) offenses are stored and navigable but appear without a named type in filtered views.
 
 **Emacs** — set `compile-command`:
 
