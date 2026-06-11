@@ -30,7 +30,7 @@ YARD-Lint validates your YARD documentation for:
 - **Performance** - In-process YARD execution with shared registry (~10x faster than shell-based execution)
 - **Incremental Adoption** - `--auto-gen-config` generates a baseline todo file to adopt on legacy codebases without fixing everything first
 
-**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [32 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [34 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -434,7 +434,7 @@ jobs:
 ```bash
 #!/bin/bash
 # .git/hooks/pre-commit
-bundle exec yard-lint lib/ --staged --fail-on-severity error
+bundle exec yard-lint lib/ --staged
 ```
 
 ### GitLab CI
@@ -517,7 +517,7 @@ The text formatter also shows the validator path (e.g., `[Documentation/Orphaned
 - **[Wiki Home](https://github.com/mensfeld/yard-lint/wiki)** - Full documentation
 - **[Installation](https://github.com/mensfeld/yard-lint/wiki/Installation)** - Installation guide
 - **[Configuration](https://github.com/mensfeld/yard-lint/wiki/Configuration)** - Complete configuration reference
-- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 30 validators documented
+- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 34 validators documented
 - **[Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All features explained
 
 ### Workflows

@@ -244,6 +244,7 @@ Tags/RedundantParamDescription:
     - element
   EnabledPatterns:
     ArticleParam: true
+    ArticleParamPhrase: true
     PossessiveParam: true
     TypeRestatement: true
     ParamToVerb: true
