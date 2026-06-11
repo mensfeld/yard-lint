@@ -17,7 +17,7 @@ OptionParser.new do |opts|
     config_file = file
   end
 
-  opts.on('-f', '--format FORMAT', 'Output format (text, json)') do |format|
+  opts.on('-f', '--format FORMAT', 'Output format (text, json, quickfix)') do |format|
     options[:format] = format
   end
 
@@ -115,6 +115,7 @@ OptionParser.new do |opts|
     puts '  yard-lint --staged                             # Lint only staged files'
     puts '  yard-lint --changed                            # Lint only uncommitted files'
     puts '  yard-lint --format json lib/                   # Output in JSON format'
+    puts '  yard-lint --format quickfix lib/               # Output in quickfix format (Vim/Emacs)'
     puts '  yard-lint --init                               # Generate default config'
     puts '  yard-lint --init --strict                      # Generate strict config'
     puts '  yard-lint --update                             # Update config with new validators'
@@ -278,6 +279,17 @@ when 'json'
     offense_count: result.count,
     offenses: result.offenses
   })
+  exit result.exit_code
+when 'quickfix'
+  result.offenses.each do |offense|
+    severity_char = case offense[:severity]
+                    when 'error' then 'E'
+                    when 'warning' then 'W'
+                    when 'convention' then 'C'
+                    else '?'
+                    end
+    puts "#{offense[:location]}:#{offense[:location_line]}: #{severity_char}: #{offense[:validator]}: #{offense[:message]}"
+  end
   exit result.exit_code
 when 'text', nil
   # Calculate coverage stats if requested or configured
