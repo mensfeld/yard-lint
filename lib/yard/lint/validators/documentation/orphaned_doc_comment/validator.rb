@@ -24,12 +24,36 @@ module Yard
             # and constant assignments (uppercase-leading identifier followed by =), both of which
             # YARD tracks and attaches preceding doc comments to.
             # Also matches define_method which YARD handles via a built-in dynamic handler.
+            # `attr\b` is matched after the `attr_*` variants so the bare `attr :name` form
+            # (handled by YARD's attribute handler) is recognised without swallowing them.
             DEFINITION_PATTERN = /
               \A\s*(private\s+|protected\s+|public\s+)?
-              (def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|alias_method\b|alias\b|define_method\b)
+              (def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|attr\b|alias_method\b|alias\b|define_method\b)
               |
               \A\s*[A-Z][A-Za-z0-9_:]*\s*=
             /x.freeze
+
+            # Matches a DSL-style method call whose first argument is a symbol or string literal
+            # (e.g. `ransacker :foo do`, `validates(:name, ...)`, `scope :active, -> { ... }`).
+            # YARD's DSL handler turns such a call into a documentable method object when the
+            # preceding comment carries an implicit-docstring tag, so a doc comment in front of
+            # one of these is NOT orphaned.
+            DSL_CALL_PATTERN = /\A\s*(?<method>[a-z_]\w*[!?]?)(?:\s+|\s*\(\s*)(?::\w|:["']|["'])/.freeze
+            # Mirror of YARD::Handlers::Ruby::DSLHandlerMethods::IGNORE_METHODS - calls to these
+            # are skipped by YARD's DSL handler, so a preceding doc comment really is dropped.
+            # (The `attr*`/`alias*` entries are already covered by DEFINITION_PATTERN.)
+            DSL_IGNORE_METHODS = %w[
+              alias alias_method autoload attr attr_accessor attr_reader attr_writer
+              extend include module_function public private protected private_constant
+              private_class_method public_class_method
+            ].freeze
+            # YARD's DSL handler only creates a method object when the comment carries one of these
+            # tags (see DSLHandlerMethods#implicit_docstring?). Matched on raw comment lines because
+            # some (`@method`, `@attribute`, `@scope`, `@visibility`) are not in YARD's tag registry
+            # and would otherwise be missed by YARD_TAG_PATTERN. Directive (`@!`) forms are excluded
+            # here because directive blocks are already skipped upstream.
+            IMPLICIT_DOCSTRING_TAG_PATTERN =
+              /\A\s*#\s*@(?:method|attribute|overload|visibility|scope|return)\b/.freeze
 
             # @param object [YARD::CodeObjects::Base] the code object to query
             # @param collector [Executor::ResultCollector] collector for output
@@ -59,8 +83,10 @@ module Yard
                   tags = []
 
                   has_directive = false
+                  has_implicit_tag = false
                   while i < lines.length && comment_line?(lines[i])
                     has_directive = true if directive_line?(lines[i])
+                    has_implicit_tag = true if implicit_docstring_tag?(lines[i])
                     tag = extract_yard_tag(lines[i])
                     tags << tag if tag
                     i += 1
@@ -73,7 +99,7 @@ module Yard
                   # Skip trailing blank lines after the comment block
                   i += 1 while i < lines.length && lines[i].strip.empty?
 
-                  if i >= lines.length || !definition_line?(lines[i])
+                  unless documentable?(lines[i], has_implicit_tag)
                     collector.puts "#{file}:#{block_start + 1}: #{tags.uniq.join(',')}"
                   end
                 else
@@ -108,10 +134,36 @@ module Yard
               "@#{match[1]}" if match
             end
 
+            # @param line [String, nil] the source line following the comment block, or nil at EOF
+            # @param has_implicit_tag [Boolean] whether the comment block carries a tag that makes
+            #   YARD's DSL handler emit a method object (see IMPLICIT_DOCSTRING_TAG_PATTERN)
+            # @return [Boolean] true if YARD will attach the comment to a documentable construct
+            def documentable?(line, has_implicit_tag)
+              return false if line.nil?
+
+              definition_line?(line) || (has_implicit_tag && dsl_method_line?(line))
+            end
+
             # @param line [String] a raw source line
             # @return [Boolean] true if the line starts a YARD-documentable definition
             def definition_line?(line)
               line.match?(DEFINITION_PATTERN)
+            end
+
+            # @param line [String] a raw source line
+            # @return [Boolean] true if the line is a DSL-style call YARD's handler documents
+            #   (symbol/string first argument and not one of YARD's ignored methods)
+            def dsl_method_line?(line)
+              match = line.match(DSL_CALL_PATTERN)
+              return false unless match
+
+              !DSL_IGNORE_METHODS.include?(match[:method])
+            end
+
+            # @param line [String] a raw source line
+            # @return [Boolean] true if the comment line carries an implicit-docstring tag
+            def implicit_docstring_tag?(line)
+              line.match?(IMPLICIT_DOCSTRING_TAG_PATTERN)
             end
           end
         end

@@ -325,6 +325,14 @@ def greet(name); end
 # Good - constant assignments are documentable, not flagged
 # @return [Integer] the answer
 ANSWER = 42
+
+# Good - DSL calls (ransacker, validates, scope, ...) are turned into method
+# objects by YARD's DSL handler when the comment carries a tag like @return,
+# so they are documentable and not flagged
+# @return [Arel::Nodes::Node]
+ransacker :owner_name do
+  Arel.sql("...")
+end
 ```
 
 This validator is complementary to `Documentation/BlankLineBeforeDefinition` (which handles the case where blank lines separate a doc comment from a `def` - YARD still attaches it despite the gap).

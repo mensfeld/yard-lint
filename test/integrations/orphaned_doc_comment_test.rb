@@ -408,4 +408,82 @@ describe 'Documentation/OrphanedDocComment' do
     RUBY
     assert_equal(2, offenses.count)
   end
+
+  it 'does not flag a comment before a DSL call with a block (YARD documents it)' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # Custom ransacker for searching owner by name or phone
+        #
+        # @return [Arel::Nodes::Node]
+        ransacker :owner_name_or_phone do
+          Arel.sql("x")
+        end
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before a DSL call with a hash argument' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @return [Boolean]
+        validates :name, presence: true
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before a parenthesized DSL call' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @return [Owner]
+        belongs_to(:owner)
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before a DSL call documented with @overload' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @overload active
+        scope :active, -> { where(active: true) }
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'does not flag a comment before bare attr' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @return [String] the name
+        attr :name
+      end
+    RUBY
+    assert_empty(offenses)
+  end
+
+  it 'flags a DSL call when the comment lacks an implicit-docstring tag (YARD drops it)' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        # @param value [String] orphaned - no @return/@overload/etc.
+        ransacker :owner_name do
+          Arel.sql("x")
+        end
+      end
+    RUBY
+    assert_equal(1, offenses.count)
+  end
+
+  it 'flags a comment before private with a symbol argument (YARD ignores it)' do
+    offenses = offenses_for(<<~RUBY)
+      class MyClass
+        def helper; end
+
+        # @return [void] orphaned
+        private :helper
+      end
+    RUBY
+    assert_equal(1, offenses.count)
+  end
 end
