@@ -7,11 +7,9 @@ module Yard
         module TextSubstitution
           # Builds human-readable messages for TextSubstitution violations.
           class MessagesBuilder
-            TRUNCATE_AT = 60
-
             class << self
-              # @param offense [Hash]
-              # @return [String]
+              # @param offense [Hash] offense details with :forbidden, :replacement, :line_text keys
+              # @return [String] formatted message
               def call(offense)
                 forbidden   = offense[:forbidden]
                 replacement = offense[:replacement]
@@ -20,9 +18,7 @@ module Yard
                 message = "Replace '#{forbidden}' with '#{replacement}' in documentation"
 
                 if line_text && !line_text.empty?
-                  truncated = line_text.length > TRUNCATE_AT \
-                    ? "#{line_text[0, TRUNCATE_AT - 3]}..." \
-                    : line_text
+                  truncated = line_text.length > 60 ? "#{line_text[0, 57]}..." : line_text
                   message += ". Found: \"#{truncated}\""
                 end
 

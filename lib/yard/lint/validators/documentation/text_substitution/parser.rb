@@ -11,8 +11,9 @@ module Yard
           #   file.rb:LINE: ObjectTitle
           #   forbidden|replacement|line_offset|line_text
           class Parser < ::Yard::Lint::Parsers::Base
-            # @param yard_output [String]
-            # @return [Array<Hash>]
+            # @param yard_output [String] raw collector output from the validator
+            # @option _kwargs [Object] :unused accepts no options (reserved for future use)
+            # @return [Array<Hash>] array with violation details
             def call(yard_output, **_kwargs)
               return [] if yard_output.nil? || yard_output.strip.empty?
 

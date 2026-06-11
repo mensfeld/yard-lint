@@ -32,6 +32,10 @@ module Yard
 
             private
 
+            # Scans each line of a docstring for forbidden strings, skipping fenced code blocks.
+            # @param docstring_text [String] full docstring text to scan
+            # @param substitutions [Hash{String => String}] map of forbidden string to replacement
+            # @return [Array<Hash>] list of violations with forbidden, replacement, line_offset, line_text
             def find_violations(docstring_text, substitutions)
               violations = []
               in_code_block = false
