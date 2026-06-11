@@ -112,6 +112,14 @@ Documentation/LineLength:
   Severity: error
   MaxLength: 120
 
+Documentation/TextSubstitution:
+  Description: 'Detects forbidden characters or strings in documentation and suggests replacements.'
+  Enabled: true
+  Severity: warning
+  Substitutions:
+    "—": "-"    # em-dash (U+2014)
+    "–": "-"    # en-dash (U+2013)
+
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'
