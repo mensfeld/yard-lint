@@ -166,6 +166,39 @@ result = Yard::Lint.run(
 
 This is how [solargraph-yard-lint](https://github.com/lekemula/solargraph-yard-lint) surfaces yard-lint offenses on unsaved editor buffers - the file path provides context while the live buffer content is linted directly, matching the behaviour of RuboCop's `--stdin` flag.
 
+### Quickfix Output (Vim / Emacs)
+
+Use `--format quickfix` to get one offense per line in the standard `file:line: S: Validator: message` format that editors parse natively for their quickfix/error lists:
+
+```bash
+yard-lint --format quickfix lib/
+```
+
+Example output:
+
+```
+lib/foo.rb:42: E: Documentation/UndocumentedObjects: Class Foo is not documented
+lib/foo.rb:57: W: Tags/InvalidTypes: has invalid type(s): @return: `Sting`
+lib/bar.rb:12: C: Tags/Order: Tags are not in the correct order
+```
+
+**Vim** — set `makeprg` and use `:make` to populate the quickfix list:
+
+```vim
+set makeprg=yard-lint\ --format\ quickfix\ --no-progress\ %
+set errorformat=%f:%l:\ %t:\ %m
+```
+
+Then `:make` lints the current file and `:cnext` / `:cprev` jump between offenses. Note: Vim only recognises `E` and `W` as named types for `:clist E`/`:clist W` filtering — `C` (convention) offenses are stored and navigable but appear without a named type in filtered views.
+
+**Emacs** — set `compile-command`:
+
+```elisp
+(setq compile-command "yard-lint --format quickfix --no-progress lib/")
+```
+
+Then `M-x compile` and `M-g n` / `M-g p` navigate between offenses.
+
 ## Configuration Basics
 
 Create a `.yard-lint.yml` file in your project root:
@@ -427,7 +460,7 @@ Configuration:
   -c, --config FILE       Path to config file (default: .yard-lint.yml)
 
 Output:
-  -f, --format FORMAT     Output format (text, json)
+  -f, --format FORMAT     Output format (text, json, quickfix)
   -q, --quiet             Quiet mode (only show summary)
       --stats             Show documentation coverage statistics
       --[no-]progress     Show progress indicator (default: auto-detect TTY)
@@ -462,7 +495,7 @@ Information:
 
 ## Offense Structure
 
-Every offense (in both text and JSON output) includes a `validator` field with the full config key that produced it, making it easy to find the right `.yard-lint.yml` setting to adjust:
+Every offense (in text, JSON, and quickfix output) includes a `validator` field with the full config key that produced it, making it easy to find the right `.yard-lint.yml` setting to adjust:
 
 ```json
 {

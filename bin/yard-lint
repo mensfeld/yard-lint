@@ -17,7 +17,7 @@ OptionParser.new do |opts|
     config_file = file
   end
 
-  opts.on('-f', '--format FORMAT', 'Output format (text, json)') do |format|
+  opts.on('-f', '--format FORMAT', 'Output format (text, json, quickfix)') do |format|
     options[:format] = format
   end
 
@@ -115,6 +115,7 @@ OptionParser.new do |opts|
     puts '  yard-lint --staged                             # Lint only staged files'
     puts '  yard-lint --changed                            # Lint only uncommitted files'
     puts '  yard-lint --format json lib/                   # Output in JSON format'
+    puts '  yard-lint --format quickfix lib/               # Output in quickfix format (Vim/Emacs)'
     puts '  yard-lint --init                               # Generate default config'
     puts '  yard-lint --init --strict                      # Generate strict config'
     puts '  yard-lint --update                             # Update config with new validators'
@@ -250,6 +251,9 @@ if options[:only]
   config.only_validators = options[:only]
 end
 
+# Suppress progress for quickfix to avoid contaminating machine-readable output
+options[:progress] = false if options[:format] == 'quickfix' && options[:progress].nil?
+
 # Run the linter
 begin
   result = Yard::Lint.run(
@@ -270,6 +274,11 @@ rescue Yard::Lint::Errors::FileNotFoundError => e
   exit 1
 end
 
+# Maps a severity string to its single-character quickfix/display code
+severity_char = lambda do |s|
+  { 'error' => 'E', 'warning' => 'W', 'convention' => 'C', 'never' => 'C' }.fetch(s.to_s, '?')
+end
+
 # Format and display results
 case options[:format]
 when 'json'
@@ -278,6 +287,19 @@ when 'json'
     offense_count: result.count,
     offenses: result.offenses
   })
+  exit result.exit_code
+when 'quickfix'
+  if config.min_coverage
+    coverage = result.documentation_coverage
+    if coverage && coverage[:coverage] < config.min_coverage
+      warn "Error: Documentation coverage #{coverage[:coverage].round(2)}% is below minimum #{config.min_coverage}%"
+    end
+  end
+  result.offenses.each do |offense|
+    char = severity_char.call(offense[:severity])
+    message = offense[:message].to_s.gsub(/\n/, ' ')
+    puts "#{offense[:location]}:#{offense[:location_line]}: #{char}: #{offense[:validator]}: #{message}"
+  end
   exit result.exit_code
 when 'text', nil
   # Calculate coverage stats if requested or configured
@@ -325,14 +347,7 @@ when 'text', nil
       puts "Found #{result.count} offense(s):\n\n"
 
       result.offenses.each do |offense|
-        severity_symbol = case offense[:severity]
-                          when 'error' then 'E'
-                          when 'warning' then 'W'
-                          when 'convention' then 'C'
-                          else '?'
-                          end
-
-        puts "[#{severity_symbol}] #{offense[:location]}:#{offense[:location_line]}"
+        puts "[#{severity_char.call(offense[:severity])}] #{offense[:location]}:#{offense[:location_line]}"
         puts "    #{offense[:validator]}: #{offense[:message]}"
         puts
       end
