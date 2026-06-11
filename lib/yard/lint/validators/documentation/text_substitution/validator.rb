@@ -25,8 +25,9 @@ module Yard
 
               violations.each do |violation|
                 collector.puts "#{object.file}:#{object.line}: #{object.title}"
-                collector.puts "#{violation[:forbidden]}|#{violation[:replacement]}|" \
-                               "#{violation[:line_offset]}|#{violation[:line_text]}"
+                collector.puts violation[:forbidden]
+                collector.puts violation[:replacement]
+                collector.puts "#{violation[:line_offset]}|#{violation[:line_text]}"
               end
             end
 
@@ -48,6 +49,8 @@ module Yard
                 next if in_code_block
 
                 substitutions.each do |forbidden, replacement|
+                  next if forbidden.nil? || forbidden.empty?
+                  next if replacement.nil? || replacement.empty?
                   next unless line.include?(forbidden)
 
                   violations << {

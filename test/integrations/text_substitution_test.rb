@@ -113,6 +113,28 @@ describe 'TextSubstitution' do
     assert_includes(offenses.first[:message], 'Found:')
   end
 
+  it 'correctly parses forbidden strings that contain pipe characters' do
+    custom_config = test_config do |c|
+      c.set_validator_config('Documentation/TextSubstitution', 'Enabled', true)
+      c.set_validator_config('Documentation/TextSubstitution', 'Substitutions',
+                             { 'a|b' => 'c' })
+    end
+
+    file = create_test_file('pipe_in_forbidden.rb', <<~RUBY)
+      # This text contains a|b which should be flagged.
+      def pipe_method
+        :ok
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: custom_config, progress: false)
+    offenses = text_sub_offenses(result)
+    refute_empty(offenses)
+    assert_equal('a|b', offenses.first[:forbidden])
+    assert_equal('c', offenses.first[:replacement])
+    assert_includes(offenses.first[:message], "Replace 'a|b' with 'c'")
+  end
+
   it 'offense name is TextSubstitution' do
     result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
     offenses = text_sub_offenses(result)
