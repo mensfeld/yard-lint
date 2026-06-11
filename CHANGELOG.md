@@ -1,6 +1,6 @@
 # YARD-Lint Changelog
 
-## 1.6.0 (Unreleased)
+## 1.6.0 (2026-06-11)
 - **[Feature]** New `--format quickfix` output mode emits one offense per line in the standard `file:line: S: Validator: message` format. Vim users can set `makeprg=yard-lint\ --format\ quickfix\ --no-progress\ %` and navigate offenses with `:cnext`/`:cprev`; Emacs users can use it as their `compile-command` and navigate with `M-g n`/`M-g p`. Produces no output (and exits 0) when there are no offenses.
 - **[Feature]** New opt-in validator `Documentation/LineLength` detects documentation comment lines that exceed a configurable maximum length (#176). Disabled by default (`Enabled: false`) to avoid breaking existing projects; enable with `Documentation/LineLength: Enabled: true` and tune with `MaxLength: 120` (default). Uses YARD's already-parsed docstring to determine which source lines belong to the comment block, avoiding fragile backwards-scanning. Each over-length line produces a separate offense at its exact file location.
 - **[Feature]** `Yard::Lint.run` now accepts an optional `source:` keyword argument for linting in-memory source without reading from disk. `path:` is still required and governs config resolution, exclusion matching, and offense location reporting — only the source bytes come from the caller. The CLI gains a corresponding `--stdin` flag (`cat lib/foo.rb | yard-lint --stdin lib/foo.rb`). Enables LSP/editor integration tools (e.g. `solargraph-yard-lint`) to lint unsaved buffers without waiting for a save. (#173)
