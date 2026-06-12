@@ -12,11 +12,15 @@ module Yard
 
             # Matches the `yield` keyword. The negative lookbehind `(?<![:.])`
             # prevents matching method calls like `Fiber.yield` or `yielder.yield`
-            # and symbol literals like `:yield`. Word boundaries ensure `yield_self`
-            # and similar identifiers are not matched.
+            # and symbol literals like `:yield`. The negative lookahead `(?!:)`
+            # prevents matching the label form - a symbol hash key or keyword
+            # argument like `{ yield: true }` (a real block yield is never
+            # directly followed by a colon: `yield ::Const` has a space).
+            # Word boundaries ensure `yield_self` and similar identifiers are
+            # not matched.
             # Known limitation: `yield` inside regex literals (e.g. /yield/) is
             # not stripped before scanning; it is rare enough to be acceptable.
-            YIELD_PATTERN = /(?<![:.])\byield\b/.freeze
+            YIELD_PATTERN = /(?<![:.])\byield\b(?!:)/.freeze
 
             # @return [Regexp] matches full-line Ruby comments
             COMMENT_LINE_PATTERN = /\A\s*#/.freeze
