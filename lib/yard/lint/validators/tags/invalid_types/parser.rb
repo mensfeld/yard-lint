@@ -10,8 +10,12 @@ module Yard
           #   /path/to/file.rb:10: ClassName#method_name
           #   @tagname param_name:BadType1,BadType2|@tagname2:BadType3
           class Parser < Parsers::Base
-            # @return [Regexp] matches "file:line: ClassName#method"
-            LOCATION_REGEX = /^(.+):(\d+):\s+(.+)[#.](.+)$/
+            # @return [Regexp] matches "file:line: ObjectTitle"
+            LOCATION_REGEX = /^(.+):(\d+):\s+(.+)$/
+            # @return [Regexp] splits a title into namespace and method name on
+            #   the last # or . separator; titles without one (e.g. CONST,
+            #   Foo::Bar) are kept whole
+            TITLE_REGEX = /\A(.*)[#.]([^#.]+)\z/
             # @return [Regexp] matches the tag violations line (starts with @)
             TAG_VIOLATIONS_REGEX = /^@/
 
@@ -23,18 +27,22 @@ module Yard
               i = 0
 
               while i < lines.size
-                match = lines[i].match(LOCATION_REGEX)
+                # Violation lines (starting with @) must never be consumed as
+                # location lines, even if they happen to match the loose regex
+                match = lines[i].match?(TAG_VIOLATIONS_REGEX) ? nil : lines[i].match(LOCATION_REGEX)
 
                 unless match
                   i += 1
                   next
                 end
 
+                class_name, method_name = split_title(match[3])
+
                 offense = {
                   location: match[1],
                   line: match[2].to_i,
-                  class_name: match[3],
-                  method_name: match[4],
+                  class_name: class_name,
+                  method_name: method_name,
                   tag_violations: []
                 }
 
@@ -53,6 +61,15 @@ module Yard
             end
 
             private
+
+            # Splits a YARD object title into namespace and method name parts
+            # @param title [String] object title (e.g. "Foo#bar", "#bar", "CONST")
+            # @return [Array(String, String)] namespace and method name; for titles
+            #   without a separator both parts are the full title
+            def split_title(title)
+              match = title.match(TITLE_REGEX)
+              match ? [match[1], match[2]] : [title, title]
+            end
 
             # Parse "tagname param:Type1,Type2|tagname2:Type3" into structured data
             # @param line [String] the violations line
