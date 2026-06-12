@@ -122,10 +122,11 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
 
   private
 
-  def mock_yard_object(docstring:, is_alias: false)
+  def mock_yard_object(docstring:, is_alias: false, type: :method)
     object = stub('object')
     docstring_obj = stub('docstring')
 
+    object.stubs(:type).returns(type)
     object.stubs(:is_alias?).returns(is_alias)
     object.stubs(:docstring).returns(docstring_obj)
     object.stubs(:file).returns('lib/example.rb')

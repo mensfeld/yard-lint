@@ -17,7 +17,9 @@ module Yard
             # @param collector [Executor::ResultCollector] collector for output
             # @return [void]
             def in_process_query(object, collector)
-              return if object.is_alias?
+              # is_alias? exists only on method objects; on namespace objects
+              # YARD's method_missing raises NameError, so guard by type first
+              return if object.type == :method && object.is_alias?
 
               # Extract @tag names from docstring
               tag_pattern = /^@(\S+)/
