@@ -97,6 +97,19 @@ module Yard
           tags
         end
 
+        # Tracks docstring locations already processed by this validator
+        # instance. Objects generated from a single comment block (e.g. the
+        # reader and writer created by attr_accessor) share one docstring;
+        # content-scanning validators use this to report each docstring once.
+        # @param object [YARD::CodeObjects::Base] the code object to check
+        # @return [Boolean] true if this object's docstring was already seen
+        def duplicate_docstring?(object)
+          @scanned_docstrings ||= Set.new
+          key = [object.file, object.docstring.line_range&.first || object.line]
+
+          !@scanned_docstrings.add?(key)
+        end
+
         # Returns the tag that actually carries a tag's types and description.
         # For most tags that is the tag itself, but @option tags wrap their
         # data in a nested pair tag - tag.types and tag.text are nil on the

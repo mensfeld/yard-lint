@@ -23,6 +23,7 @@ module Yard
 
               line_range = object.docstring.line_range
               return unless line_range
+              return if duplicate_docstring?(object)
 
               max_length = config_or_default('MaxLength').to_i
               source_lines = cached_lines(object.file)
