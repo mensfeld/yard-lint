@@ -23,9 +23,9 @@ module Yard
               return unless object.is_explicit?
               return if parent_class_allowed?(object)
 
-              # Check if @return tag is missing
-              return_tag = object.tag(:return)
-              return unless return_tag.nil?
+              # Check if @return tag is missing; tags nested inside @overload
+              # blocks live on the overload's own docstring, so check those too
+              return unless all_typed_tags(object.docstring, %w[return]).empty?
 
               # Calculate arity (exclude splat and block parameters)
               arity = object.parameters.reject { |p| p[0].to_s.start_with?('*', '&') }.size

@@ -18,7 +18,11 @@ module Yard
               patterns = forbidden_patterns
               return if patterns.empty?
 
-              object.docstring.tags.each do |tag|
+              # Include tags nested inside @overload blocks - they live on the
+              # overload's own docstring and are invisible to docstring.tags
+              forbidden_tag_names = patterns.map { |pattern| pattern['Tag'] }.compact.uniq
+
+              all_typed_tags(object.docstring, forbidden_tag_names).each do |tag|
                 patterns.each do |pattern|
                   next unless matches_pattern?(tag, pattern)
 

@@ -28,8 +28,10 @@ module Yard
 
               return unless has_options_param
 
-              # Check if method has any @option tags
-              option_tags = object.tags(:option)
+              # Check if method has any @option tags; tags nested inside
+              # overload blocks live on the overload's own docstring, so
+              # check those too
+              option_tags = all_typed_tags(object.docstring, %w[option])
 
               return unless option_tags.empty?
 

@@ -27,9 +27,11 @@ module Yard
               # doesn't need explicit @param documentation, matching attr_accessor behavior
               return if object.is_attribute?
 
-              # Check if parameters count exceeds @param tags count
+              # Check if parameters count exceeds @param tags count; tags nested
+              # inside @overload blocks live on the overload's own docstring,
+              # so count those too
               param_count = object.parameters.size
-              param_tags_count = object.tags(:param).size
+              param_tags_count = all_typed_tags(object.docstring, %w[param]).size
 
               return unless param_count > param_tags_count
 
