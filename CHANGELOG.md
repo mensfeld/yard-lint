@@ -1,5 +1,8 @@
 # YARD-Lint Changelog
 
+## Unreleased
+- **[Fix]** Boolean validator options explicitly set to `false` in `.yard-lint.yml` are no longer silently ignored. The shared config fallback (`Validators::Base#config_or_default` and `Config#get_validator_config_with_default`) used `value || default`, so a user-configured `false` fell through to the truthy default — e.g. `Tags/InformalNotation: RequireStartOfLine: false` had no effect and mid-line informal notation was never reported. The fallback now only applies when the key is genuinely unset (`nil`).
+
 ## 1.6.1 (2026-06-11)
 - **[Fix]** `Documentation/OrphanedDocComment` no longer reports false positives for documented DSL-style method calls (e.g. `ransacker :foo do … end`, `validates :name`, `scope :active, -> { … }`). YARD's DSL handler turns such a call into a documentable method object when the preceding comment carries an implicit-docstring tag (`@return`, `@overload`, `@method`, `@attribute`, `@scope`, `@visibility`), so the comment is attached rather than dropped. The validator now recognises this case: a tagged comment before a DSL call is only flagged when the call is one YARD's handler ignores (`include`, `extend`, `private :sym`, etc.) or the comment lacks an implicit-docstring tag (in which case YARD really does drop it). Also fixes a pre-existing false positive for the bare `attr :name` attribute form.
 

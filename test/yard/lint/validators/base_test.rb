@@ -126,6 +126,34 @@ describe 'YardLintValidatorsBaseConfigOrDefault' do
     end
   end
 
+  it 'config or default when config value is false returns false instead of the default' do
+    config.stubs(:validator_config)
+      .with('Tags/TestValidator', 'SomeKey')
+      .returns(false)
+
+    unless defined?(Yard::Lint::Validators::Tags::TestValidator)
+      Yard::Lint::Validators::Tags.const_set(:TestValidator, Module.new)
+    end
+
+    config_class = Class.new do
+      def self.defaults
+        { 'SomeKey' => true }
+      end
+    end
+
+    Yard::Lint::Validators::Tags::TestValidator.const_set(:Config, config_class)
+
+    result = validator.send(:config_or_default, 'SomeKey')
+    assert_equal(false, result)
+  ensure
+    if defined?(Yard::Lint::Validators::Tags::TestValidator::Config)
+      Yard::Lint::Validators::Tags::TestValidator.send(:remove_const, :Config)
+    end
+    if defined?(Yard::Lint::Validators::Tags::TestValidator)
+      Yard::Lint::Validators::Tags.send(:remove_const, :TestValidator)
+    end
+  end
+
   it 'config or default when validator name cannot be extracted returns nil' do
     invalid_validator_class = Class.new(Yard::Lint::Validators::Base) do
       def self.name
