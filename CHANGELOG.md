@@ -1,6 +1,7 @@
 # YARD-Lint Changelog
 
 ## Unreleased
+- **[Fix]** Offenses on top-level (root namespace) methods and on constants are no longer silently discarded. The location regex shared by the `Documentation/UndocumentedMethodArguments` and `Tags/InvalidTypes` parsers required a `#` or `.` separator in the object title, so titles like `#my_method` (top-level method) or `MAX_RETRIES` (constant) never matched and their offenses were dropped after the validator had already detected them. `Tags/Order` was affected too via the shared parser: a dropped location line shifted the parallel expected-order list, so surviving offenses could be reported with another method's expected tag order. The parsers now accept any object title and split namespace/method name on the last separator when one is present.
 - **[Fix]** Boolean validator options explicitly set to `false` in `.yard-lint.yml` are no longer silently ignored. The shared config fallback (`Validators::Base#config_or_default` and `Config#get_validator_config_with_default`) used `value || default`, so a user-configured `false` fell through to the truthy default — e.g. `Tags/InformalNotation: RequireStartOfLine: false` had no effect and mid-line informal notation was never reported. The fallback now only applies when the key is genuinely unset (`nil`).
 
 ## 1.6.1 (2026-06-11)
