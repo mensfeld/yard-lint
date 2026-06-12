@@ -65,5 +65,27 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Parser' do
     assert_equal('method2', result[1][:method_name])
     assert_equal('return->error,error->example', result[1][:separators])
   end
+
+  it 'call keeps pairing intact when a location line is unparseable' do
+    input = <<~OUTPUT
+      lib/example.rb:10: Example#method1
+      param->return
+      THIS LINE IS NOT A LOCATION
+      example->meta
+      lib/example.rb:20: Example#method2
+      return->error
+    OUTPUT
+
+    result = parser.call(input)
+
+    assert_equal(2, result.size)
+
+    second = result.find { |o| o[:method_name] == 'method2' }
+
+    refute_nil(second)
+    # The unparseable entry must be dropped alone - it must not shift the
+    # separator payloads of the offenses that follow it
+    assert_equal('return->error', second[:separators])
+  end
 end
 
