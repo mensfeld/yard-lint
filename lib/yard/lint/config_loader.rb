@@ -110,20 +110,27 @@ module Yard
       # @return [Hash] configuration hash with inheritance resolved
       # @raise [Yard::Lint::Errors::CircularDependencyError] if circular dependency detected
       def load_file(path)
-        # Prevent circular dependencies
+        # A cycle exists only when the file is an ancestor on the inheritance
+        # path currently being loaded - @loaded_files acts as that stack.
+        # A file reachable through several branches (diamond inheritance,
+        # e.g. two configs sharing a common base) is legal.
         if @loaded_files.include?(path)
           raise Errors::CircularDependencyError, "Circular dependency detected: #{path}"
         end
 
         @loaded_files << path
 
-        yaml = YAML.load_file(path) || {}
+        begin
+          yaml = YAML.load_file(path) || {}
 
-        # Handle inheritance
-        base_config = load_inherited_configs(yaml, File.dirname(path))
+          # Handle inheritance
+          base_config = load_inherited_configs(yaml, File.dirname(path))
 
-        # Merge current config over inherited config
-        merge_configs(base_config, yaml)
+          # Merge current config over inherited config
+          merge_configs(base_config, yaml)
+        ensure
+          @loaded_files.pop
+        end
       end
 
       # Load all inherited configurations
