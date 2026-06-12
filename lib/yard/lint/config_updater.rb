@@ -69,7 +69,7 @@ module Yard
       # Load the existing user config
       # @return [Hash] parsed YAML config
       def load_existing_config
-        YAML.load_file(@path) || {}
+        ConfigLoader.load_yaml_file(@path)
       end
 
       # Load the template config

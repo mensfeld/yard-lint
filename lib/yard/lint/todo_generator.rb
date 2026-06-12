@@ -206,7 +206,7 @@ module Yard
       # Update existing config file to add inherit_from todo file
       # @return [void]
       def update_existing_config
-        config_yaml = YAML.load_file(@config_path) || {}
+        config_yaml = ConfigLoader.load_yaml_file(@config_path)
         inherit_from = Array(config_yaml['inherit_from'] || [])
 
         # Add todo file to inherit_from if not already present
