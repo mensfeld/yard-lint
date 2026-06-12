@@ -29,12 +29,18 @@ module Yard
 
               object.docstring.tags.each do |tag|
                 next unless tags_to_check.include?(tag.tag_name)
-                next unless tag.name && tag.text && !tag.text.strip.empty?
 
-                param_name = tag.name
-                description = tag.text.strip.gsub(/\.$/, '')
+                # Option tags carry their description on the nested pair tag;
+                # the documented name is the option key (e.g. ":mode"), not the
+                # hash parameter name
+                data = tag_data(tag)
+                param_name = data.equal?(tag) ? tag.name : data.name.to_s.sub(/\A:/, '')
+                next if param_name.nil? || param_name.empty?
+                next unless data.text && !data.text.strip.empty?
+
+                description = data.text.strip.gsub(/\.$/, '')
                 word_count = description.split.length
-                type_name = tag.types&.first&.gsub(/[<>{}\[\],]/, '')&.strip
+                type_name = data.types&.first&.gsub(/[<>{}\[\],]/, '')&.strip
 
                 next if word_count > max_words
 
@@ -46,7 +52,7 @@ module Yard
                 next unless pattern_type
 
                 collector.puts "#{object.file}:#{object.line}: #{object.title}"
-                collector.puts "#{tag.tag_name}|#{param_name}|#{tag.text.strip}|#{type_name || ''}|#{pattern_type}|#{word_count}"
+                collector.puts "#{tag.tag_name}|#{param_name}|#{data.text.strip}|#{type_name || ''}|#{pattern_type}|#{word_count}"
               end
             end
             # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/AbcSize

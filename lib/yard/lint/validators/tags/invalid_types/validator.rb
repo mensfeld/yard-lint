@@ -39,7 +39,7 @@ module Yard
               # Collect per-tag violations to surface in the offense message.
               # Each entry is "tagname param_name:Type1,Type2" (param_name omitted when nil).
               tag_violations = all_typed_tags(object.docstring, checked_tags).filter_map do |tag|
-                bad = (tag.types || [])
+                bad = (tag_data(tag).types || [])
                         .compact
                         .flat_map { |type| extract_type_names(type) }
                         .uniq

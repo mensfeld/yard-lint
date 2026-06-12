@@ -20,9 +20,10 @@ module Yard
               style = enforced_style
 
               all_typed_tags(object.docstring, validated_tags).each do |tag|
-                next unless tag.types
+                types = tag_data(tag).types
+                next unless types
 
-                tag.types.each do |type_str|
+                types.each do |type_str|
                   detected_style = detect_style(type_str)
 
                   # Report violations based on enforced style

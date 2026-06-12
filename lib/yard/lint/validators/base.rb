@@ -97,6 +97,16 @@ module Yard
           tags
         end
 
+        # Returns the tag that actually carries a tag's types and description.
+        # For most tags that is the tag itself, but @option tags wrap their
+        # data in a nested pair tag - tag.types and tag.text are nil on the
+        # OptionTag itself, with the documented option living on tag.pair.
+        # @param tag [YARD::Tags::Tag] tag whose data holder should be resolved
+        # @return [YARD::Tags::Tag] the tag holding types/text data
+        def tag_data(tag)
+          tag.respond_to?(:pair) && tag.pair ? tag.pair : tag
+        end
+
         # Checks whether the object's enclosing class (or the object itself if it is
         # a class) has a superclass that appears in the validator's AllowedParentClasses
         # configuration list. When true, validators skip the object so that classes

@@ -49,7 +49,7 @@ module Yard
               pattern_types = pattern['Types']
               return true if pattern_types.nil? || pattern_types.empty?
 
-              tag_types = tag.types || []
+              tag_types = tag_data(tag).types || []
               (tag_types & pattern_types).any?
             end
 
@@ -58,7 +58,7 @@ module Yard
             # @param pattern [Hash] the matched pattern
             # @return [String] details line for parser
             def build_details(tag, pattern)
-              types_text = (tag.types || []).join(',')
+              types_text = (tag_data(tag).types || []).join(',')
               pattern_types = (pattern['Types'] || []).join(',')
               "#{tag.tag_name}|#{types_text}|#{pattern_types}"
             end
