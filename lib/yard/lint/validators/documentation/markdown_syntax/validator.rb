@@ -35,10 +35,11 @@ module Yard
               bold_count = non_code_text.scan(/\*\*/).count
               errors << 'unclosed_bold' if bold_count.odd?
 
-              # Check for invalid list markers
+              # Check for invalid list markers, reported with their absolute
+              # source line rather than a docstring-relative index
               docstring_text.lines.each_with_index do |line, line_idx|
                 stripped = line.strip
-                errors << "invalid_list_marker:#{line_idx + 1}" if stripped.match?(/^[•·]/)
+                errors << "invalid_list_marker:#{docstring_line(object, line_idx)}" if stripped.match?(/^[•·]/)
               end
 
               return if errors.empty?
