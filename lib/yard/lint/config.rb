@@ -243,10 +243,13 @@ module Yard
       # @param key [String] configuration key
       # @return [Object, nil] configuration value or default
       def get_validator_config_with_default(validator_name, key)
-        validator_config(validator_name, key) || begin
-          validator_cfg = ConfigLoader.validator_config(validator_name)
-          validator_cfg&.defaults&.dig(key)
-        end
+        value = validator_config(validator_name, key)
+        # A nil? check (not ||) so that explicitly configured false values
+        # are honored instead of falling back to a truthy default
+        return value unless value.nil?
+
+        validator_cfg = ConfigLoader.validator_config(validator_name)
+        validator_cfg&.defaults&.dig(key)
       end
 
       # Get AllValidators section

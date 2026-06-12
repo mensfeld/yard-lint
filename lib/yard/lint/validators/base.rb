@@ -236,7 +236,10 @@ module Yard
 
           return defaults[key] unless validator_name
 
-          config.validator_config(validator_name, key) || defaults[key]
+          value = config.validator_config(validator_name, key)
+          # A nil? check (not ||) so that explicitly configured false values
+          # are honored instead of falling back to a truthy default
+          value.nil? ? defaults[key] : value
         end
       end
     end
