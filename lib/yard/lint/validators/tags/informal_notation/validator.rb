@@ -19,6 +19,7 @@ module Yard
             def in_process_query(object, collector)
               docstring_text = object.docstring.to_s
               return if docstring_text.empty?
+              return if duplicate_docstring?(object)
 
               patterns = config_patterns
               case_sensitive = config_case_sensitive
