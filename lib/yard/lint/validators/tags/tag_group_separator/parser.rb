@@ -39,12 +39,19 @@ module Yard
               end
 
               base_hash.delete_if { |_key, value| value == 'valid' }
-              separator_data = base_hash.values.map(&:last)
 
-              Validators::Documentation::UndocumentedMethodArguments::Parser
-                .new
-                .call(base_hash.values.map(&:first).join("\n"))
-                .each.with_index { |element, index| element[:separators] = separator_data[index] }
+              location_parser = Validators::Documentation::UndocumentedMethodArguments::Parser.new
+
+              # Parse each location together with its own separators so that an
+              # unparseable location line drops only its own offense instead of
+              # shifting the separators of all offenses that follow it
+              base_hash.values.filter_map do |location, separators|
+                element = location_parser.call(location).first
+                next unless element
+
+                element[:separators] = separators
+                element
+              end
             end
 
             private

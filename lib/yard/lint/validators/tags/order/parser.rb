@@ -40,12 +40,19 @@ module Yard
               end
 
               base_hash.delete_if { |_key, value| value == 'valid' }
-              order = base_hash.values.map(&:last)
 
-              Validators::Documentation::UndocumentedMethodArguments::Parser
-                .new
-                .call(base_hash.values.map(&:first).join("\n"))
-                .each.with_index { |element, index| element[:order] = order[index] }
+              location_parser = Validators::Documentation::UndocumentedMethodArguments::Parser.new
+
+              # Parse each location together with its own ordering so that an
+              # unparseable location line drops only its own offense instead of
+              # shifting the orderings of all offenses that follow it
+              base_hash.values.filter_map do |location, ordering|
+                element = location_parser.call(location).first
+                next unless element
+
+                element[:order] = ordering
+                element
+              end
             end
 
             private
