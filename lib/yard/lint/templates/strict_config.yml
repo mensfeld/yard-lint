@@ -149,6 +149,10 @@ Tags/InvalidTypes:
     - yieldreturn
     - yieldparam
     - raise
+  # The strict preset opts in: flag CamelCase type names that are neither loaded
+  # Ruby constants nor defined in the analyzed codebase (catches typos). Add any
+  # legitimate dependency types to ExtraTypes to silence false positives.
+  StrictConstantNames: true
 
 Tags/TypeSyntax:
   Description: 'Validates YARD type syntax using YARD parser.'
