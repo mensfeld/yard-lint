@@ -31,10 +31,11 @@ module Yard
               code_block_count = docstring_text.scan(/^```/).count
               errors << 'unclosed_code_block' if code_block_count.odd?
 
-              # Check for unclosed bold markers (excluding code sections)
-              non_code_text = docstring_text.gsub(/`[^`]*`/, '')
-              bold_count = non_code_text.scan(/\*\*/).count
-              errors << 'unclosed_bold' if bold_count.odd?
+              # Check for unclosed bold markers, ignoring fenced code blocks and
+              # inline code spans (their contents are code, not markdown) as well
+              # as `**` runs surrounded by whitespace, which cannot delimit
+              # CommonMark emphasis (e.g. the exponent operator in `x ** y`).
+              errors << 'unclosed_bold' if bold_marker_count(docstring_text).odd?
 
               # Check for invalid list markers, reported with their absolute
               # source line rather than a docstring-relative index
@@ -67,6 +68,34 @@ module Yard
                 next if in_fence
 
                 count += line.count('`')
+              end
+              count
+            end
+
+            # Counts `**` emphasis markers, skipping fenced code blocks and
+            # inline code spans entirely. A `**` run is only counted when it
+            # abuts a non-whitespace character on at least one side, since a run
+            # padded by whitespace on both sides can neither open nor close
+            # CommonMark emphasis - this excludes the exponent operator (`x ** y`)
+            # without dropping genuine `**bold**` markers.
+            # @param text [String] the docstring text
+            # @return [Integer] number of bold markers that can delimit emphasis
+            def bold_marker_count(text)
+              in_fence = false
+              count = 0
+              text.each_line do |line|
+                if line.strip.start_with?('```')
+                  in_fence = !in_fence
+                  next
+                end
+                next if in_fence
+
+                non_code = line.gsub(/`[^`]*`/, '')
+                non_code.scan(/(.?)\*\*(.?)/) do
+                  before = Regexp.last_match(1)
+                  after = Regexp.last_match(2)
+                  count += 1 if before.match?(/\S/) || after.match?(/\S/)
+                end
               end
               count
             end
