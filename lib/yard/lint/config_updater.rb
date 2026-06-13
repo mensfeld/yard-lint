@@ -96,6 +96,14 @@ module Yard
         # Build merged config
         merged = {}
 
+        # Preserve inheritance directives (inherit_from / inherit_gem) so that
+        # --update does not silently drop them - otherwise a .yard-lint-todo.yml
+        # baseline (or an inherited gem config) is lost and every silenced
+        # offense reappears.
+        %w[inherit_from inherit_gem].each do |key|
+          merged[key] = existing[key] if existing.key?(key)
+        end
+
         # Copy AllValidators from existing, falling back to template
         merged['AllValidators'] = existing['AllValidators'] || template['AllValidators']
 
@@ -157,6 +165,19 @@ module Yard
         lines << '# YARD-Lint Configuration'
         lines << '# See https://github.com/mensfeld/yard-lint for documentation'
         lines << ''
+
+        # Write inheritance directives first (these must be preserved across updates)
+        if config['inherit_from']
+          lines << 'inherit_from:'
+          Array(config['inherit_from']).each { |file| lines << "  - #{file}" }
+          lines << ''
+        end
+
+        if config['inherit_gem'].is_a?(Hash)
+          lines << 'inherit_gem:'
+          config['inherit_gem'].each { |gem_name, gem_file| lines << "  #{gem_name}: #{gem_file}" }
+          lines << ''
+        end
 
         # Write AllValidators section
         if config['AllValidators']
