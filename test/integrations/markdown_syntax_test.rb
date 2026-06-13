@@ -86,6 +86,52 @@ describe 'Markdown Syntax' do
     assert_empty(markdown_errors)
   end
 
+  it 'does not flag the exponent operator as unclosed bold' do
+    file = create_test_file('exponentiation.rb', <<~RUBY)
+      # Computes x ** y for the given operands.
+      def power(x, y)
+        x**y
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+    markdown_errors = result.offenses.select { |o| o[:name].to_s == 'MarkdownSyntax' }
+
+    assert_empty(markdown_errors)
+  end
+
+  it 'does not flag double splat inside a fenced code block as unclosed bold' do
+    file = create_test_file('fenced_splat.rb', <<~RUBY)
+      # Wraps a call.
+      #
+      # @example
+      #   ```ruby
+      #   def call(**opts)
+      #   end
+      #   ```
+      def wrap(**opts)
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+    markdown_errors = result.offenses.select { |o| o[:name].to_s == 'MarkdownSyntax' }
+
+    assert_empty(markdown_errors)
+  end
+
+  it 'does not flag single-character bold as unclosed' do
+    file = create_test_file('single_char_bold.rb', <<~RUBY)
+      # Returns **a** when the flag is set, **b** otherwise.
+      def pick(flag)
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+    markdown_errors = result.offenses.select { |o| o[:name].to_s == 'MarkdownSyntax' }
+
+    assert_empty(markdown_errors)
+  end
+
   it 'when documentation has multiple errors detects all errors' do
     file = create_test_file('multiple_errors.rb', <<~RUBY)
       # Process data with `unclosed backtick and **unclosed bold
