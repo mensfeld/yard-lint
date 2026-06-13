@@ -13,6 +13,11 @@ module Yard
               'Severity' => 'warning',
               'CaseSensitive' => false,
               'RequireStartOfLine' => true,
+              # Opt-in: also skip 4-space (or tab) indented Markdown code blocks,
+              # not just fenced (```) blocks. Off by default because indented
+              # content is also used for list continuations and wrapped prose,
+              # which would then be skipped too.
+              'SkipIndentedCodeBlocks' => false,
               'Patterns' => {
                 'Note' => '@note',
                 'IMPORTANT' => '@note',
