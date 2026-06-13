@@ -119,6 +119,19 @@ describe 'Markdown Syntax' do
     assert_empty(markdown_errors)
   end
 
+  it 'does not flag single-character bold as unclosed' do
+    file = create_test_file('single_char_bold.rb', <<~RUBY)
+      # Returns **a** when the flag is set, **b** otherwise.
+      def pick(flag)
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+    markdown_errors = result.offenses.select { |o| o[:name].to_s == 'MarkdownSyntax' }
+
+    assert_empty(markdown_errors)
+  end
+
   it 'when documentation has multiple errors detects all errors' do
     file = create_test_file('multiple_errors.rb', <<~RUBY)
       # Process data with `unclosed backtick and **unclosed bold

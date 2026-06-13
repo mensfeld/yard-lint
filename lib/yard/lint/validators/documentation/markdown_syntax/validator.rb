@@ -91,10 +91,13 @@ module Yard
                 next if in_fence
 
                 non_code = line.gsub(/`[^`]*`/, '')
-                non_code.scan(/(.?)\*\*(.?)/) do
-                  before = Regexp.last_match(1)
-                  after = Regexp.last_match(2)
-                  count += 1 if before.match?(/\S/) || after.match?(/\S/)
+                non_code.scan(/\*\*/) do
+                  match = Regexp.last_match
+                  # Peek at the surrounding characters without consuming them, so
+                  # adjacent runs like `**a**` (single-character bold) still pair up.
+                  before = match.pre_match[-1]
+                  after = match.post_match[0]
+                  count += 1 if before&.match?(/\S/) || after&.match?(/\S/)
                 end
               end
               count
