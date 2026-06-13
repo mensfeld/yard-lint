@@ -97,6 +97,12 @@ module Yard
           next unless @config.validator_enabled?(validator_name)
 
           validator_result = result_builder.build(validator_name, raw_results)
+          next unless validator_result
+
+          # Apply per-validator Exclude patterns (and drop no-location offenses)
+          # exactly as a normal run does, so the baseline does not silence files
+          # that are already excluded.
+          validator_result = runner.send(:filter_result_offenses, validator_name, validator_result)
           next unless validator_result && validator_result.offenses.any?
 
           # Extract file paths from offenses, skipping those without a location

@@ -22,7 +22,7 @@ describe 'Yard::Lint::Validators::Tags::InformalNotation::Config' do
     assert_equal('@todo', patterns['FIXME'])
     assert_equal('@see', patterns['See'])
     assert_equal('@see', patterns['See also'])
-    assert_equal('@deprecated', patterns['Warning'])
+    assert_equal('@note', patterns['Warning'])
     assert_equal('@deprecated', patterns['Deprecated'])
     assert_equal('@author', patterns['Author'])
     assert_equal('@version', patterns['Version'])

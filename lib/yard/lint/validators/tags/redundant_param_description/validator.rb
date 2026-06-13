@@ -105,9 +105,14 @@ module Yard
                 end
               end
 
-              # ParamToVerb pattern
+              # ParamToVerb pattern: "<param> to <low-value verb>" (e.g.
+              # "user to update"). The third word must actually be a low-value
+              # verb, otherwise meaningful noun phrases like "path to file" are
+              # wrongly flagged.
               if patterns['ParamToVerb'] && word_count <= 4 && desc_parts.length == 3
-                if desc_parts[0].downcase == param_name.downcase && desc_parts[1].downcase == 'to'
+                if desc_parts[0].downcase == param_name.downcase &&
+                   desc_parts[1].downcase == 'to' &&
+                   low_value_verbs.include?(desc_parts[2].downcase)
                   return 'param_to_verb'
                 end
               end
