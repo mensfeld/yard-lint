@@ -100,7 +100,9 @@ module Yard
           when SEVERITY_WARNING
             (statistics[:error] + statistics[:warning]).positive? ? 1 : 0
           when SEVERITY_CONVENTION
-            offenses.any? ? 1 : 0
+            # Exclude 'never'-severity offenses, which are meant to run without
+            # ever failing the build (they are also omitted from #statistics).
+            (statistics[:error] + statistics[:warning] + statistics[:convention]).positive? ? 1 : 0
           else
             0
           end
