@@ -24,9 +24,11 @@ module Yard
                 code = example.text
                 next if code.nil? || code.empty?
 
-                # Clean the code: strip output indicators (#=>) and everything after it
+                # Clean the code: strip YARD output indicators (# =>) and
+                # everything after them, but only when the "# =>" is a real
+                # trailing comment - not when it appears inside a string literal
                 code_lines = code.split("\n").map do |line|
-                  line.sub(/\s*#\s*=>.*$/, '')
+                  strip_output_marker(line)
                 end
 
                 cleaned_code = code_lines.join("\n").strip
@@ -66,6 +68,51 @@ module Yard
                   $VERBOSE = original_verbose
                 end
               end
+            end
+
+            private
+
+            # Removes a trailing YARD `# => result` output marker from a line of
+            # example code, but only when the `#` actually starts a comment - a
+            # `#` inside a string or character literal is left untouched, so a
+            # string such as `"result # => x"` is not corrupted into an
+            # unterminated literal.
+            # @param line [String] a single line of example source
+            # @return [String] the line with a trailing output marker removed
+            def strip_output_marker(line)
+              in_single = false
+              in_double = false
+              i = 0
+
+              while i < line.length
+                char = line[i]
+
+                if (in_single || in_double) && char == '\\'
+                  i += 2
+                  next
+                end
+
+                if in_single
+                  in_single = false if char == "'"
+                elsif in_double
+                  in_double = false if char == '"'
+                elsif char == "'"
+                  in_single = true
+                elsif char == '"'
+                  in_double = true
+                elsif char == '#'
+                  # A comment starts here (outside any string). Strip it only
+                  # when it is a YARD output marker; leave ordinary comments,
+                  # which the Ruby parser handles fine.
+                  return line[0...i].rstrip if line[i..].match?(/\A#\s*=>/)
+
+                  break
+                end
+
+                i += 1
+              end
+
+              line
             end
           end
         end
