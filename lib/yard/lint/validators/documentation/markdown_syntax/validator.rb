@@ -22,9 +22,10 @@ module Yard
 
               errors = []
 
-              # Check for unclosed backticks
-              backtick_count = docstring_text.scan(/`/).count
-              errors << 'unclosed_backtick' if backtick_count.odd?
+              # Check for unclosed inline backticks, ignoring fenced code blocks
+              # (``` ... ```): their fence characters and contents are not
+              # inline-code markers and otherwise inflate the count.
+              errors << 'unclosed_backtick' if inline_backtick_count(docstring_text).odd?
 
               # Check for unclosed code blocks
               code_block_count = docstring_text.scan(/^```/).count
@@ -46,6 +47,28 @@ module Yard
 
               collector.puts "#{object.file}:#{object.line}: #{object.title}"
               collector.puts errors.join('|')
+            end
+
+            private
+
+            # Counts inline backticks, skipping fenced code blocks (``` ... ```)
+            # entirely - their fence characters and contents are not inline-code
+            # markers.
+            # @param text [String] the docstring text
+            # @return [Integer] number of inline backticks outside fenced blocks
+            def inline_backtick_count(text)
+              in_fence = false
+              count = 0
+              text.each_line do |line|
+                if line.strip.start_with?('```')
+                  in_fence = !in_fence
+                  next
+                end
+                next if in_fence
+
+                count += line.count('`')
+              end
+              count
             end
           end
         end
