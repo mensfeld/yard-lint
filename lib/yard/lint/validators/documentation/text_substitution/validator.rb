@@ -50,10 +50,16 @@ module Yard
                 end
                 next if in_code_block
 
+                # Match against the line with inline code spans (`...`) removed,
+                # so a forbidden string that only appears inside code is not
+                # flagged - it is literal code, not prose to be substituted. The
+                # reported line_text remains the original line.
+                scannable = line.gsub(/`[^`]*`/, '')
+
                 substitutions.each do |forbidden, replacement|
                   next if forbidden.nil? || forbidden.empty?
                   next if replacement.nil? || replacement.empty?
-                  next unless line.include?(forbidden)
+                  next unless scannable.include?(forbidden)
 
                   violations << {
                     forbidden: forbidden,
