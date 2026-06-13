@@ -78,7 +78,10 @@ module Yard
         # Get changed files from git based on mode
         git_files = case diff[:mode]
                     when :ref
-                      Git.changed_files(diff[:base_ref], path)
+                      # When no explicit REF was given, honor the configured
+                      # DefaultBaseRef before falling back to main/master.
+                      base_ref = diff[:base_ref] || config&.diff_mode_default_base_ref
+                      Git.changed_files(base_ref, path)
                     when :staged
                       Git.staged_files(path)
                     when :changed
