@@ -9,6 +9,7 @@ module Yard
         # Patterns matching the 'general' regexps from each warning validator's parser.
         # These patterns identify which validator should handle each warning.
         PATTERNS = {
+          'Warnings/SyntaxError' => /^\[warn\]: Syntax error in /,
           'Warnings/UnknownTag' => /^\[warn\]: Unknown tag.*@.*near line/,
           'Warnings/UnknownParameterName' => /^\[warn\]: @param tag has unknown parameter name/,
           'Warnings/DuplicatedParameterName' => /^\[warn\]: @param tag has duplicate parameter name/,

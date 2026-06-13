@@ -327,6 +327,11 @@ Tags/ForbiddenTags:
   # - Tag: api  # Forbids @api tag entirely (no Types = any occurrence)
 
 # Warnings validators - catches YARD parser errors
+Warnings/SyntaxError:
+  Description: 'Detects Ruby files YARD cannot parse (syntax errors).'
+  Enabled: true
+  Severity: error
+
 Warnings/UnknownTag:
   Description: 'Detects unknown YARD tags.'
   Enabled: true
