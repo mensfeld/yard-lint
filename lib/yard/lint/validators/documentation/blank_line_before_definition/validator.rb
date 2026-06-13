@@ -50,8 +50,11 @@ module Yard
                 if stripped.empty?
                   blank_count += 1
                 elsif stripped.start_with?('#')
-                  # Skip Ruby magic comments - they're not YARD documentation
-                  next if magic_comment?(stripped)
+                  # Skip lines that are not YARD documentation: magic comments,
+                  # shebangs, tool sigils/directives (Sorbet, RuboCop, Standard),
+                  # and bare `#` separators. Treating them as a doc block caused
+                  # spurious blank-line offenses for undocumented definitions.
+                  next if non_documentation_comment?(stripped)
 
                   has_doc_block = true
                   break
@@ -70,6 +73,18 @@ module Yard
             def magic_comment?(line)
               # Ruby magic comments: frozen_string_literal, encoding, warn_indent, shareable_constant_value
               line.match?(/^#\s*(frozen[_-]string[_-]literal|encoding|warn[_-]indent|shareable[_-]constant[_-]value)\s*:/i)
+            end
+
+            # Check if a comment line is not YARD documentation (magic comment,
+            # shebang, tool sigil/directive, or a bare `#` separator).
+            # @param line [String] stripped comment line
+            # @return [Boolean] true if the line should not count as documentation
+            def non_documentation_comment?(line)
+              magic_comment?(line) ||
+                line.start_with?('#!') ||                          # shebang
+                line.match?(/\A#\s*(rubocop|standard):/i) ||       # linter directives
+                line.match?(/\A#\s*typed:/i) ||                    # Sorbet sigil
+                line.match?(/\A#+\s*\z/)                           # bare # separator
             end
 
             # Check if the given pattern is enabled in configuration
