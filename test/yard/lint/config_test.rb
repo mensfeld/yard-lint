@@ -151,7 +151,7 @@ describe 'Yard::Lint::Config' do
     config_path = '/tmp/.yard-lint.yml'
     Yard::Lint::Config.stubs(:find_config_file).returns(config_path)
     File.stubs(:exist?).with(config_path).returns(true)
-    YAML.stubs(:load_file).with(config_path).returns({})
+    YAML.stubs(:load_file).with(config_path, aliases: true).returns({})
 
     config = Yard::Lint::Config.load
 
