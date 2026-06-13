@@ -117,9 +117,13 @@ module Yard
                 return nil unless best_match
 
                 tag, distance = best_match
-                max_distance = [unknown_tag.length, tag.length].max / 2
+                # Require the edit distance to be strictly less than half the
+                # longer length, so short, very different names like @foo/@spec
+                # are not "corrected" to @todo/@see (which differ by half their
+                # characters).
+                max_length = [unknown_tag.length, tag.length].max
 
-                distance <= max_distance ? tag : nil
+                distance < max_length / 2.0 ? tag : nil
               end
 
               # Calculate Levenshtein distance between two strings
