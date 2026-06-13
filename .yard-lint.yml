@@ -284,6 +284,11 @@ Tags/ForbiddenTags:
   ForbiddenPatterns: []
 
 # Warnings validators - catches YARD parser errors
+Warnings/SyntaxError:
+  Description: 'Detects Ruby files YARD cannot parse (syntax errors).'
+  Enabled: true
+  Severity: error
+
 Warnings/UnknownTag:
   Description: 'Detects unknown YARD tags.'
   Enabled: true
