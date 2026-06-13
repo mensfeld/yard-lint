@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'ripper'
+require 'set'
+
 module Yard
   module Lint
     module Validators
@@ -82,18 +85,23 @@ module Yard
             # @param collector [Executor::ResultCollector] collector for output lines
             # @return [void]
             def scan_file(file, collector)
-              lines = File.readlines(file, chomp: true)
+              source = File.read(file)
+              lines = source.lines.map(&:chomp)
+              # Line indices (0-based) that hold a real, full-line Ruby comment.
+              # Derived from the lexer so that '#'-leading lines inside heredocs
+              # and string literals are not mistaken for documentation comments.
+              comment_lines = full_line_comment_indices(source, lines)
               i = 0
 
               while i < lines.length
-                if comment_line?(lines[i])
+                if comment_line?(lines[i], i, comment_lines)
                   block_start = i
                   tags = []
 
                   has_directive = false
                   has_implicit_tag = false
                   has_named_object_tag = false
-                  while i < lines.length && comment_line?(lines[i])
+                  while i < lines.length && comment_line?(lines[i], i, comment_lines)
                     has_directive = true if directive_line?(lines[i])
                     has_implicit_tag = true if implicit_docstring_tag?(lines[i])
                     has_named_object_tag = true if lines[i].match?(NAMED_OBJECT_TAG_PATTERN)
@@ -118,11 +126,46 @@ module Yard
               end
             end
 
+            # Lex the source and collect the 0-based indices of lines whose first
+            # non-whitespace content is a Ruby comment. Heredoc bodies and string
+            # literals lex as content tokens (not `:on_comment`), so their
+            # `#`-leading lines are excluded - fixing the false positives where
+            # tag-looking text inside a heredoc was treated as a doc comment.
+            # @param source [String] the full file source
+            # @param lines [Array<String>] the source split into chomped lines
+            # @return [Set<Integer>] 0-based indices of full-line comments
+            def full_line_comment_indices(source, lines)
+              indices = Set.new
+              ::Ripper.lex(source).each do |(position, type, _token, _state)|
+                next unless type == :on_comment
+
+                line_no, column = position
+                index = line_no - 1
+                current = lines[index]
+                next unless current
+
+                # Only a full-line comment (nothing but whitespace before the '#').
+                indices << index if current[0...column].to_s.strip.empty?
+              end
+              indices
+            rescue StandardError
+              # If the source cannot be lexed, fall back to the previous regex
+              # behaviour so a single unparseable file does not lose detection.
+              fallback = Set.new
+              lines.each_with_index do |line, index|
+                fallback << index if line.strip.start_with?('#')
+              end
+              fallback
+            end
+
             # @param line [String] a raw source line
+            # @param index [Integer] 0-based line index
+            # @param comment_lines [Set<Integer>] indices of real full-line comments
             # @return [Boolean] true if the line is a Ruby comment (excluding magic comments)
-            def comment_line?(line)
-              stripped = line.strip
-              stripped.start_with?('#') && !magic_comment?(stripped)
+            def comment_line?(line, index, comment_lines)
+              return false unless comment_lines.include?(index)
+
+              !magic_comment?(line.strip)
             end
 
             # @param stripped_line [String] a comment line with leading/trailing whitespace removed
