@@ -1,5 +1,3 @@
-https://github.com/mensfeld/yard-lint/pull/214/conflicts# YARD-Lint Changelog
-
 ## Unreleased
 - **[Fix]** Diff modes (`--diff`, `--staged`, `--changed`) now find changed files when yard-lint is run from a repository subdirectory. `git diff --name-only` reports paths relative to the repo root, but the filter expanded them against the current working directory - so from a subdirectory every path failed `File.exist?` and the diff modes silently linted nothing (exiting 0). Paths are now expanded against the repository root (`git rev-parse --show-toplevel`).
 - **[Fix]** Diamond-shaped config inheritance no longer raises a false `CircularDependencyError`. The loader tracked every file ever loaded instead of the files on the inheritance path currently being resolved, so two configs both inheriting one shared base (e.g. `inherit_from: [a.yml, b.yml]` where both inherit `common.yml`) aborted although no cycle exists. The tracker now acts as a proper recursion stack; true cycles are still detected.
