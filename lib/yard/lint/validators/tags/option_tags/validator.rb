@@ -28,6 +28,11 @@ module Yard
 
               return unless has_options_param
 
+              # A parameter that merely has an options-like name but is
+              # documented as a non-Hash type (e.g. a Boolean keyword argument
+              # or an Array) is not an options hash, so do not demand @option.
+              return if options_param_documented_as_non_hash?(object, parameter_names)
+
               # Check if method has any @option tags; tags nested inside
               # overload blocks live on the overload's own docstring, so
               # check those too
@@ -40,6 +45,27 @@ module Yard
             end
 
             private
+
+            # Whether an options-named parameter is documented with a concrete
+            # non-Hash @param type. Such a parameter (e.g. `@param options
+            # [Boolean]`) is not an options hash and should not require @option.
+            # @param object [YARD::CodeObjects::MethodObject] the method
+            # @param parameter_names [Array<String>] configured options names
+            # @return [Boolean]
+            def options_param_documented_as_non_hash?(object, parameter_names)
+              param_tags = all_typed_tags(object.docstring, %w[param])
+
+              object.parameters.any? do |param|
+                name = param[0].to_s.gsub(/[*:]/, '')
+                next false unless parameter_names.include?(name)
+
+                tag = param_tags.find { |t| t.name == name }
+                types = tag&.types
+                next false if types.nil? || types.empty?
+
+                types.none? { |type| type.to_s.match?(/\AHash\b|\AHash[<{(]/) }
+              end
+            end
 
             # @return [Array<String>] parameter names that should have @option tags
             def config_parameter_names
