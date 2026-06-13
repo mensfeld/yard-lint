@@ -32,6 +32,11 @@ module Yard
 
               return unless has_options_param
 
+              # A named (non-splat) parameter documented with a concrete
+              # non-Hash @param type is not an options hash, so don't demand
+              # @option tags for it.
+              return if options_param_documented_as_non_hash?(object)
+
               # Check if @option tags are missing
               option_tags = object.tags(:option)
               return unless option_tags.empty?
@@ -39,6 +44,31 @@ module Yard
               # Output method location and parameter info
               collector.puts "#{object.file}:#{object.line}: #{object.title}"
               collector.puts params.map { |p| p.join(' ') }.join(', ')
+            end
+
+            private
+
+            # Whether a named options-style parameter is documented with a
+            # concrete non-Hash @param type (e.g. `@param option [Symbol]`).
+            # Double-splat (`**opts`) collectors are always hashes and excluded.
+            # @param object [YARD::CodeObjects::MethodObject] the method
+            # @return [Boolean]
+            def options_param_documented_as_non_hash?(object)
+              param_tags = all_typed_tags(object.docstring, %w[param])
+
+              object.parameters.any? do |param|
+                name = param[0].to_s
+                next false if name.start_with?('**')
+
+                bare = name.gsub(/[*:]/, '')
+                next false unless bare.match?(/\A(options?|opts?|kwargs)\z/)
+
+                tag = param_tags.find { |t| t.name == bare }
+                types = tag&.types
+                next false if types.nil? || types.empty?
+
+                types.none? { |type| type.to_s.match?(/\AHash\b|\AHash[<{(]/) }
+              end
             end
           end
         end
