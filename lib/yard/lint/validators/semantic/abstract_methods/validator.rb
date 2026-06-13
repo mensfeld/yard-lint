@@ -39,11 +39,14 @@ module Yard
               # looks like a real implementation.
               body_lines = merge_continuations(body_lines)
 
+              # A line is an allowed (non-)implementation if it is a comment,
+              # the closing `end`, or matches one of the configured
+              # AllowedImplementations patterns (e.g. raising NotImplementedError).
+              allowed = allowed_implementation_patterns
               has_real_implementation = body_lines.any? do |line|
-                !line.start_with?('#') &&
-                  !line.include?('NotImplementedError') &&
-                  !line.include?('raise') &&
-                  line != 'end'
+                next false if line.start_with?('#') || line == 'end'
+
+                allowed.none? { |pattern| line.match?(pattern) }
               end
 
               return unless has_real_implementation
@@ -53,6 +56,18 @@ module Yard
             end
 
             private
+
+            # The configured AllowedImplementations patterns compiled to
+            # regexps. A body line matching any of these does not count as a
+            # real implementation. Invalid patterns are ignored.
+            # @return [Array<Regexp>]
+            def allowed_implementation_patterns
+              Array(config_or_default('AllowedImplementations')).filter_map do |pattern|
+                Regexp.new(pattern.to_s)
+              rescue RegexpError
+                nil
+              end
+            end
 
             # Joins lines that are continuations of the previous statement (the
             # previous line ends with a comma or a backslash) into a single
