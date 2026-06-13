@@ -38,7 +38,8 @@ module Yard
               # Line 1: file:line: object_title
               # Line 2: pattern|replacement|line_offset|line_text (pipe-separated)
               found_patterns.each do |match|
-                collector.puts "#{object.file}:#{object.line}: #{object.title}"
+                line = docstring_line(object, match[:line_offset])
+                collector.puts "#{object.file}:#{line}: #{object.title}"
                 collector.puts "#{match[:pattern]}|#{match[:replacement]}|" \
                                "#{match[:line_offset]}|#{match[:line_text]}"
               end
