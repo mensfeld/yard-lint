@@ -1,4 +1,5 @@
 ## Unreleased
+- **[Fix]** An unknown `--format` value is now rejected up front instead of after the entire (potentially long) lint run completes. `yard-lint --format xml lib/` previously analyzed everything and only then printed "Unknown format".
 - **[Fix]** The config error for an unrecognizable validator name no longer points to a nonexistent `yard-lint --list-validators` flag (following that advice produced an invalid-option error). It now links the wiki Validators page.
 - **[Fix]** Category-level configuration is now honored. A department key such as `Documentation:` with `Enabled: false` passed validation but was silently ignored, so the category's validators still ran. `Config#validator_enabled?` now consults a category-level `Enabled` setting (an explicit per-validator setting still takes precedence).
 - **[Fix]** `Tags/ApiTags` no longer requires an `@api` tag on constants. The missing-tag check flagged any public non-root object, so a constant (e.g. `MAX_RETRIES = 5`) was reported as "missing @api tag" - although the validator's documentation promises it checks classes, modules, and methods. The check is now restricted to those three object types.
