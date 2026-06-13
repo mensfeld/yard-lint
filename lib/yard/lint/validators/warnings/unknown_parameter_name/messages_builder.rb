@@ -203,9 +203,12 @@ module Yard
                 return nil unless best_match
 
                 param, distance = best_match
-                max_distance = [unknown_param.length, param.length].max / 2
+                # Require the edit distance to be strictly less than half the
+                # longer length, so short, very different names are not
+                # "corrected" to an unrelated parameter.
+                max_length = [unknown_param.length, param.length].max
 
-                distance <= max_distance ? param : nil
+                distance < max_length / 2.0 ? param : nil
               end
 
               # Calculate Levenshtein distance between two strings
