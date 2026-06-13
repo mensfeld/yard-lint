@@ -58,14 +58,27 @@ module Yard
                 suggestion = find_suggestion(unknown_tag)
 
                 if suggestion
+                  # A directive (e.g. parse, method, attribute) must be written
+                  # with the @! prefix; only real tags use a plain @. Rendering
+                  # a directive suggestion as @parse would itself be an unknown
+                  # tag.
+                  prefix = directive_only?(suggestion) ? '@!' : '@'
                   # Replace just the descriptive part before "in file"
-                  message.sub(/Unknown tag @\w+/, "Unknown tag @#{unknown_tag} (did you mean '@#{suggestion}'?)")
+                  message.sub(/Unknown tag @\w+/, "Unknown tag @#{unknown_tag} (did you mean '#{prefix}#{suggestion}'?)")
                 else
                   message
                 end
               end
 
               private
+
+              # Whether the given name is a YARD directive and not also a tag,
+              # so it must be referenced with the @! prefix.
+              # @param name [String] candidate tag/directive name
+              # @return [Boolean]
+              def directive_only?(name)
+                known_directives.include?(name) && !known_tags.include?(name)
+              end
 
               # Find the best suggestion using DidYouMean spell checker
               # @param unknown_tag [String] the unknown tag name (without @ prefix)
