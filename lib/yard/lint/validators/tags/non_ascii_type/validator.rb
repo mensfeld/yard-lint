@@ -14,9 +14,11 @@ module Yard
             # Pattern to match non-ASCII characters
             NON_ASCII_PATTERN = /[^\x00-\x7F]/
 
-            # String and quoted-symbol literal types are values, not Ruby type
-            # names, so non-ASCII inside them is legitimate (e.g. ["naïve"]).
+            # Matches a string literal type (e.g. "naïve"). Such literals are
+            # values, not Ruby type names, so non-ASCII inside them is valid.
             STRING_LITERAL = /\A("[^"]*"|'[^']*')\z/
+            # Matches a quoted-symbol literal type (e.g. :"naïve"); non-ASCII
+            # inside the quoted value is likewise valid.
             QUOTED_SYMBOL_LITERAL = /\A:("[^"]*"|'[^']*')\z/
 
             private_constant :STRING_LITERAL, :QUOTED_SYMBOL_LITERAL
