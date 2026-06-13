@@ -33,8 +33,11 @@ module Yard
                 stripped = line.strip
 
                 if stripped.empty? && comment_end.nil?
-                  # Skip empty lines before finding comment block
-                  next
+                  # A blank line between the definition and any comment above
+                  # means there is no attached docstring (YARD only attaches a
+                  # comment immediately above the definition), so stop scanning -
+                  # otherwise a detached file header is mistaken for the doc.
+                  break
                 elsif stripped.start_with?('#')
                   comment_end ||= i
                   comment_start = i
