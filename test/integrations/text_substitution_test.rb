@@ -57,6 +57,27 @@ describe 'TextSubstitution' do
     assert_empty(code_block_offenses)
   end
 
+  it 'does not flag a forbidden string inside an inline code span' do
+    file = create_test_file('inline_code.rb', <<~RUBY)
+      # Renders the range `start — finish` as code.
+      # @return [void]
+      def render; end
+    RUBY
+    result = Yard::Lint.run(path: file, config: config, progress: false)
+    assert_empty(text_sub_offenses(result))
+  end
+
+  it 'still flags a forbidden string in prose on a line that also has inline code' do
+    file = create_test_file('mixed_inline.rb', <<~RUBY)
+      # Use `code` here — but this dash is prose.
+      # @return [void]
+      def render; end
+    RUBY
+    result = Yard::Lint.run(path: file, config: config, progress: false)
+    offenses = text_sub_offenses(result).select { |o| o[:forbidden] == "—" }
+    refute_empty(offenses)
+  end
+
   it 'is disabled by default' do
     default_config = test_config
     result = Yard::Lint.run(path: fixture_path, config: default_config, progress: false)
