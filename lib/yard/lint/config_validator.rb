@@ -202,7 +202,8 @@ module Yard
         if suggestions.any?
           @errors << "  Did you mean: #{suggestions.first}?"
         else
-          @errors << '  Run `yard-lint --list-validators` to see all available validators'
+          @errors << '  See https://github.com/mensfeld/yard-lint/wiki/Validators ' \
+                     'for all available validators'
         end
       end
 
