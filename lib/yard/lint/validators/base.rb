@@ -110,6 +110,18 @@ module Yard
           !@scanned_docstrings.add?(key)
         end
 
+        # Converts a zero-based line offset within a docstring's text into an
+        # absolute line number in the source file, so offenses can point at
+        # the offending documentation line instead of the definition line.
+        # @param object [YARD::CodeObjects::Base] the documented object
+        # @param line_offset [Integer] zero-based offset within the docstring text
+        # @return [Integer] absolute source line number
+        def docstring_line(object, line_offset)
+          start_line = object.docstring.line_range&.first || object.line
+
+          start_line + line_offset
+        end
+
         # Returns the tag that actually carries a tag's types and description.
         # For most tags that is the tag itself, but @option tags wrap their
         # data in a nested pair tag - tag.types and tag.text are nil on the
