@@ -33,7 +33,10 @@ module Yard
 
           by_dir.each do |dir, dir_files|
             if should_group_directory?(dir, dir_files.uniq, limit)
-              result << "#{dir}/**/*"
+              # For root-level files File.dirname is ".", and "./**/*" matches
+              # nothing under File.fnmatch (FNM_PATHNAME), so the generated todo
+              # file would fail to exclude them. Use a plain recursive glob.
+              result << (dir == '.' ? '**/*' : "#{dir}/**/*")
             else
               result.concat(dir_files.uniq)
             end
