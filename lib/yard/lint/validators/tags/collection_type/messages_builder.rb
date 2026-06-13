@@ -54,13 +54,44 @@ module Yard
                   # (String, Integer) -> Array(String, Integer)
                   "Array#{type_string}"
                 else
-                  # Hash<K, V> -> Hash{K => V}
-                  type_string.gsub(/Hash<(.+?)>/) do
-                    types = ::Regexp.last_match(1)
-                    # Split on comma, handle nested types
-                    "Hash{#{types.sub(/,\s*/, ' => ')}}"
+                  # Hash<K, V> -> Hash{K => V}, handling nested generics with
+                  # balanced-bracket splitting so the suggestion stays valid.
+                  convert_hash_short_to_long(type_string)
+                end
+              end
+
+              # Converts Hash<K, V> to Hash{K => V}, recursing into the key and
+              # value and splitting on the top-level comma so nested types like
+              # Hash<Symbol, Hash<String, Integer>> are not mangled.
+              # @param type_string [String] the type string
+              # @return [String] the converted type string
+              def convert_hash_short_to_long(type_string)
+                match = type_string.match(/\AHash<(.+)>\z/m)
+                return type_string unless match
+
+                key, value = split_top_level(match[1])
+                return type_string unless value
+
+                "Hash{#{convert_hash_short_to_long(key.strip)} => " \
+                  "#{convert_hash_short_to_long(value.strip)}}"
+              end
+
+              # Splits a generic body on its first top-level comma, respecting
+              # nested <>, {}, and () so nested generics are kept intact.
+              # @param str [String] the inside of a generic (without the brackets)
+              # @return [Array] [key, value], or [str, nil] when there is no
+              #   top-level comma
+              def split_top_level(str)
+                depth = 0
+                str.each_char.with_index do |char, index|
+                  case char
+                  when '<', '{', '(' then depth += 1
+                  when '>', '}', ')' then depth -= 1
+                  when ','
+                    return [str[0...index], str[(index + 1)..]] if depth.zero?
                   end
                 end
+                [str, nil]
               end
 
               # Converts long syntax to short syntax
