@@ -10,9 +10,9 @@ module Yard
             # Set of regexps for detecting warnings reported by YARD stats
             self.regexps = {
               general: /^\[warn\]: Unknown directive.*@!.*near line/,
-              message: /\[warn\]: (.*) in file/,
+              message: %r{\[warn\]: (.*?) in file},
               location: /in file `(.*)`/,
-              line: /line (\d*)/
+              line: %r{near line (\d+)}
             }.freeze
           end
         end

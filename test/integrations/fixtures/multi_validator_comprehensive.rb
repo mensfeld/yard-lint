@@ -140,3 +140,14 @@ class RealWorldDSL
     @validators << { field: field, opts: opts }
   end
 end
+
+# Scenario 9: Genuinely under-documented positional arguments
+# - UndocumentedMethodArguments (real positional param without @param)
+class UnderDocumentedArgs
+  # Combines two positional arguments
+  # @param first [String] the first value
+  # @return [String] the combination
+  def combine(first, second)
+    "#{first}#{second}"
+  end
+end

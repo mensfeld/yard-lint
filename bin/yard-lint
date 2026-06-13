@@ -10,7 +10,8 @@ options = {}
 config_file = nil
 diff_mode = nil
 
-OptionParser.new do |opts|
+begin
+  OptionParser.new do |opts|
   opts.banner = 'Usage: yard-lint [options] [PATH]'
 
   opts.on('-c', '--config FILE', 'Path to config file (default: .yard-lint.yml)') do |file|
@@ -125,7 +126,12 @@ OptionParser.new do |opts|
     puts '  cat lib/foo.rb | yard-lint --stdin lib/foo.rb  # Lint source piped from stdin'
     exit
   end
-end.parse!
+  end.parse!
+rescue OptionParser::ParseError => e
+  warn "Error: #{e.message}"
+  warn 'Run `yard-lint --help` for usage.'
+  exit 1
+end
 
 # Handle --init flag
 if options[:init]
@@ -225,6 +231,9 @@ begin
            else
              Yard::Lint::Config.load || Yard::Lint::Config.new
            end
+rescue Yard::Lint::Errors::ConfigFileNotFoundError => e
+  puts "Configuration Error: #{e.message}"
+  exit 1
 rescue Yard::Lint::Errors::InvalidConfigError => e
   puts "Configuration Error:\n#{e.message}"
   exit 1
