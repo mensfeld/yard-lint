@@ -71,14 +71,22 @@ module Yard
         def uncommitted_files(path)
           ensure_git_repository!
 
-          # Get both staged and unstaged changes
+          # Get both staged and unstaged changes to tracked files
           stdout, stderr, status = Open3.capture3('git', 'diff', '--name-only', 'HEAD')
 
           unless status.success?
             raise Error, "Git diff failed: #{stderr.strip}"
           end
 
-          filter_ruby_files(stdout.split("\n"), path)
+          files = stdout.split("\n")
+
+          # Also include untracked (but not git-ignored) files - "all changes in
+          # the working directory" should cover newly added, not-yet-staged files.
+          others_stdout, _stderr, others_status =
+            Open3.capture3('git', 'ls-files', '--others', '--exclude-standard')
+          files += others_stdout.split("\n") if others_status.success?
+
+          filter_ruby_files(files.uniq, path)
         end
 
         private
