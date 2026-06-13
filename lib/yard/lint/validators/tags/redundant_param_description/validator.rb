@@ -74,7 +74,9 @@ module Yard
             # rubocop:disable Metrics/AbcSize, Metrics/ParameterLists
             def detect_pattern(param_name, description, type_name, word_count, articles, generic_terms, connectors, low_value_verbs, patterns)
               desc_parts = description.split
-              articles_re = /^(#{articles.join('|')})/i
+              # Anchored on both ends: only a whole-word article counts, not
+              # any word that merely starts with one (authenticated, theme)
+              articles_re = /\A(#{articles.map { |a| Regexp.escape(a) }.join('|')})\z/i
 
               # ArticleParam pattern
               if patterns['ArticleParam'] && word_count <= 3 && desc_parts.length == 2
