@@ -31,6 +31,8 @@ module Yard
               (def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|attr\b|alias_method\b|alias\b|define_method\b)
               |
               \A\s*[A-Z][A-Za-z0-9_:]*\s*=
+              |
+              \A\s*\w+\s+def\b
             /x.freeze
 
             # Matches a DSL-style method call whose first argument is a symbol or string literal
@@ -38,7 +40,13 @@ module Yard
             # YARD's DSL handler turns such a call into a documentable method object when the
             # preceding comment carries an implicit-docstring tag, so a doc comment in front of
             # one of these is NOT orphaned.
-            DSL_CALL_PATTERN = /\A\s*(?<method>[a-z_]\w*[!?]?)(?:\s+|\s*\(\s*)(?::\w|:["']|["'])/.freeze
+            DSL_CALL_PATTERN = %r{\A\s*(?:[A-Za-z_][\w:]*\.)?(?<method>[a-z_]\w*[!?]?)(?:\s+|\s*\(\s*)(?::\w|:["']|["'])}.freeze
+            # Matches a plain method call (optionally with a receiver), used when
+            # the comment carries a @method/@attribute tag that names the object
+            # YARD creates - then the call's argument shape does not matter.
+            METHOD_CALL_PATTERN = /\A\s*(?:[A-Za-z_][\w:]*\.)?[a-z_]\w*[!?]?(?:[\s(]|\z)/.freeze
+            # Matches a @method/@attribute tag that names a created object.
+            NAMED_OBJECT_TAG_PATTERN = /\A\s*#\s*@(?:method|attribute)\s+\S/.freeze
             # Mirror of YARD::Handlers::Ruby::DSLHandlerMethods::IGNORE_METHODS - calls to these
             # are skipped by YARD's DSL handler, so a preceding doc comment really is dropped.
             # (The `attr*`/`alias*` entries are already covered by DEFINITION_PATTERN.)
@@ -84,9 +92,11 @@ module Yard
 
                   has_directive = false
                   has_implicit_tag = false
+                  has_named_object_tag = false
                   while i < lines.length && comment_line?(lines[i])
                     has_directive = true if directive_line?(lines[i])
                     has_implicit_tag = true if implicit_docstring_tag?(lines[i])
+                    has_named_object_tag = true if lines[i].match?(NAMED_OBJECT_TAG_PATTERN)
                     tag = extract_yard_tag(lines[i])
                     tags << tag if tag
                     i += 1
@@ -99,7 +109,7 @@ module Yard
                   # Skip trailing blank lines after the comment block
                   i += 1 while i < lines.length && lines[i].strip.empty?
 
-                  unless documentable?(lines[i], has_implicit_tag)
+                  unless documentable?(lines[i], has_implicit_tag, has_named_object_tag)
                     collector.puts "#{file}:#{block_start + 1}: #{tags.uniq.join(',')}"
                   end
                 else
@@ -145,11 +155,18 @@ module Yard
             # @param line [String, nil] the source line following the comment block, or nil at EOF
             # @param has_implicit_tag [Boolean] whether the comment block carries a tag that makes
             #   YARD's DSL handler emit a method object (see IMPLICIT_DOCSTRING_TAG_PATTERN)
+            # @param has_named_object_tag [Boolean] whether the comment block carries a
+            #   @method/@attribute tag naming the object YARD creates, so any following
+            #   method call attaches the docstring regardless of its arguments
             # @return [Boolean] true if YARD will attach the comment to a documentable construct
-            def documentable?(line, has_implicit_tag)
+            def documentable?(line, has_implicit_tag, has_named_object_tag = false)
               return false if line.nil?
 
-              definition_line?(line) || (has_implicit_tag && dsl_method_line?(line))
+              definition_line?(line) ||
+                (has_implicit_tag && dsl_method_line?(line)) ||
+                # A @method/@attribute tag names the object YARD creates, so any
+                # following method call (regardless of its arguments) attaches it.
+                (has_named_object_tag && line.match?(METHOD_CALL_PATTERN))
             end
 
             # @param line [String] a raw source line
