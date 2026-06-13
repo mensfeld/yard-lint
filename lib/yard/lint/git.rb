@@ -83,6 +83,13 @@ module Yard
 
         private
 
+        # Absolute path to the repository root (git reports paths relative to it)
+        # @return [String] repo root, or the current directory if it can't be determined
+        def repository_root
+          stdout, _stderr, status = Open3.capture3('git', 'rev-parse', '--show-toplevel')
+          status.success? ? stdout.strip : Dir.pwd
+        end
+
         # Ensure we're in a git repository
         # @raise [Error] if not in a git repository
         def ensure_git_repository!
@@ -99,10 +106,14 @@ module Yard
         # @return [Array<String>] absolute paths to Ruby files that exist
         def filter_ruby_files(files, path)
           base_path = File.expand_path(path)
+          # git reports paths relative to the repository root, which is not
+          # necessarily the current working directory, so expand against the
+          # repo root - otherwise running from a subdirectory finds nothing.
+          root = repository_root
 
           files
             .select { |f| f.end_with?('.rb') }
-            .map { |f| File.expand_path(f) }
+            .map { |f| File.expand_path(f, root) }
             .select { |f| File.exist?(f) } # Skip deleted files
             .select { |f| file_within_path?(f, base_path) }
         end
