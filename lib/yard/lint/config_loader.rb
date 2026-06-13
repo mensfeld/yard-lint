@@ -154,6 +154,11 @@ module Yard
             if File.exist?(inherited_path)
               inherited = load_file(inherited_path)
               config = merge_configs(config, inherited)
+            else
+              # Stay loud: silently skipping makes a renamed/deleted todo
+              # baseline resurrect every baselined offense with no clue why
+              $stderr.puts "Warning: inherit_from file '#{file}' not found " \
+                           "(resolved to #{inherited_path}) - skipping"
             end
           end
         end
