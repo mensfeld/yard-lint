@@ -51,13 +51,14 @@ describe 'Yard::Lint::Git' do
 
   it 'changed files when base ref is provided uses the provided base ref' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
 
     Open3.stubs(:capture3)
       .with('git', 'diff', '--name-only', 'develop...HEAD')
       .returns(["lib/foo.rb\n", '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/foo.rb').returns('/home/user/project/lib/foo.rb')
+    File.stubs(:expand_path).with('lib/foo.rb', '/home/user/project').returns('/home/user/project/lib/foo.rb')
     File.stubs(:exist?).returns(true)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
@@ -67,6 +68,7 @@ describe 'Yard::Lint::Git' do
 
   it 'changed files when base ref is nil auto detects default branch' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     Yard::Lint::Git.stubs(:default_branch).returns('main')
 
     Open3.stubs(:capture3)
@@ -74,7 +76,7 @@ describe 'Yard::Lint::Git' do
       .returns(["lib/foo.rb\n", '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/foo.rb').returns('/home/user/project/lib/foo.rb')
+    File.stubs(:expand_path).with('lib/foo.rb', '/home/user/project').returns('/home/user/project/lib/foo.rb')
     File.stubs(:exist?).returns(true)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
@@ -84,6 +86,7 @@ describe 'Yard::Lint::Git' do
 
   it 'changed files when base ref is nil raises error when default branch cannot be detected' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     Yard::Lint::Git.stubs(:default_branch).returns(nil)
 
     assert_raises(Yard::Lint::Git::Error) do
@@ -93,6 +96,7 @@ describe 'Yard::Lint::Git' do
 
   it 'changed files when git diff succeeds returns ruby files only' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     git_output = "lib/foo.rb\nlib/bar.js\nlib/baz.rb\n"
 
     Open3.stubs(:capture3)
@@ -100,8 +104,8 @@ describe 'Yard::Lint::Git' do
       .returns([git_output, '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/foo.rb').returns('/home/user/project/lib/foo.rb')
-    File.stubs(:expand_path).with('lib/baz.rb').returns('/home/user/project/lib/baz.rb')
+    File.stubs(:expand_path).with('lib/foo.rb', '/home/user/project').returns('/home/user/project/lib/foo.rb')
+    File.stubs(:expand_path).with('lib/baz.rb', '/home/user/project').returns('/home/user/project/lib/baz.rb')
     File.stubs(:exist?).returns(true)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
@@ -113,6 +117,7 @@ describe 'Yard::Lint::Git' do
 
   it 'changed files when git diff succeeds filters out deleted files' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     git_output = "lib/existing.rb\nlib/deleted.rb\n"
 
     Open3.stubs(:capture3)
@@ -120,8 +125,8 @@ describe 'Yard::Lint::Git' do
       .returns([git_output, '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/existing.rb').returns('/home/user/project/lib/existing.rb')
-    File.stubs(:expand_path).with('lib/deleted.rb').returns('/home/user/project/lib/deleted.rb')
+    File.stubs(:expand_path).with('lib/existing.rb', '/home/user/project').returns('/home/user/project/lib/existing.rb')
+    File.stubs(:expand_path).with('lib/deleted.rb', '/home/user/project').returns('/home/user/project/lib/deleted.rb')
     File.stubs(:exist?).with('/home/user/project/lib/existing.rb').returns(true)
     File.stubs(:exist?).with('/home/user/project/lib/deleted.rb').returns(false)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
@@ -132,6 +137,7 @@ describe 'Yard::Lint::Git' do
 
   it 'changed files when git diff succeeds filters files within specified path' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     git_output = "lib/foo.rb\nspec/bar.rb\n"
 
     Open3.stubs(:capture3)
@@ -139,8 +145,8 @@ describe 'Yard::Lint::Git' do
       .returns([git_output, '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/foo.rb').returns('/home/user/project/lib/foo.rb')
-    File.stubs(:expand_path).with('spec/bar.rb').returns('/home/user/project/spec/bar.rb')
+    File.stubs(:expand_path).with('lib/foo.rb', '/home/user/project').returns('/home/user/project/lib/foo.rb')
+    File.stubs(:expand_path).with('spec/bar.rb', '/home/user/project').returns('/home/user/project/spec/bar.rb')
     File.stubs(:exist?).returns(true)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
@@ -150,6 +156,7 @@ describe 'Yard::Lint::Git' do
 
   it 'changed files when git diff fails raises an error' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
 
     Open3.stubs(:capture3)
       .with('git', 'diff', '--name-only', 'main...HEAD')
@@ -164,6 +171,7 @@ describe 'Yard::Lint::Git' do
 
   it 'staged files returns staged ruby files' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     git_output = "lib/staged.rb\nlib/another.rb\n"
 
     Open3.stubs(:capture3)
@@ -171,8 +179,8 @@ describe 'Yard::Lint::Git' do
       .returns([git_output, '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/staged.rb').returns('/home/user/project/lib/staged.rb')
-    File.stubs(:expand_path).with('lib/another.rb').returns('/home/user/project/lib/another.rb')
+    File.stubs(:expand_path).with('lib/staged.rb', '/home/user/project').returns('/home/user/project/lib/staged.rb')
+    File.stubs(:expand_path).with('lib/another.rb', '/home/user/project').returns('/home/user/project/lib/another.rb')
     File.stubs(:exist?).returns(true)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
@@ -184,6 +192,7 @@ describe 'Yard::Lint::Git' do
 
   it 'staged files excludes deleted files diff filter acm' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     git_output = "lib/modified.rb\n"
 
     Open3.stubs(:capture3)
@@ -191,7 +200,7 @@ describe 'Yard::Lint::Git' do
       .returns([git_output, '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/modified.rb').returns('/home/user/project/lib/modified.rb')
+    File.stubs(:expand_path).with('lib/modified.rb', '/home/user/project').returns('/home/user/project/lib/modified.rb')
     File.stubs(:exist?).returns(true)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
@@ -201,6 +210,7 @@ describe 'Yard::Lint::Git' do
 
   it 'staged files when git diff fails raises an error' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
 
     Open3.stubs(:capture3)
       .with('git', 'diff', '--cached', '--name-only', '--diff-filter=ACM')
@@ -215,6 +225,7 @@ describe 'Yard::Lint::Git' do
 
   it 'uncommitted files returns uncommitted ruby files' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
     git_output = "lib/modified.rb\nlib/unstaged.rb\n"
 
     Open3.stubs(:capture3)
@@ -222,8 +233,8 @@ describe 'Yard::Lint::Git' do
       .returns([git_output, '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
-    File.stubs(:expand_path).with('lib/modified.rb').returns('/home/user/project/lib/modified.rb')
-    File.stubs(:expand_path).with('lib/unstaged.rb').returns('/home/user/project/lib/unstaged.rb')
+    File.stubs(:expand_path).with('lib/modified.rb', '/home/user/project').returns('/home/user/project/lib/modified.rb')
+    File.stubs(:expand_path).with('lib/unstaged.rb', '/home/user/project').returns('/home/user/project/lib/unstaged.rb')
     File.stubs(:exist?).returns(true)
     File.stubs(:directory?).with('/home/user/project/lib').returns(true)
 
@@ -235,6 +246,7 @@ describe 'Yard::Lint::Git' do
 
   it 'uncommitted files when git diff fails raises an error' do
     Yard::Lint::Git.stubs(:ensure_git_repository!)
+    Yard::Lint::Git.stubs(:repository_root).returns('/home/user/project')
 
     Open3.stubs(:capture3)
       .with('git', 'diff', '--name-only', 'HEAD')

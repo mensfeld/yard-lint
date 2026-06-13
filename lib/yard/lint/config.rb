@@ -155,6 +155,20 @@ module Yard
         # If --only is specified, it takes full control
         return only_validators.include?(validator_name) if only_validators.any?
 
+        # An explicit per-validator Enabled in the user's config wins.
+        raw_validator = @raw_config[validator_name]
+        if raw_validator.is_a?(Hash) && raw_validator.key?('Enabled')
+          return raw_validator['Enabled'] != false
+        end
+
+        # Otherwise honor a category-level Enabled (e.g. `Documentation:
+        # { Enabled: false }`), which previously validated but was ignored.
+        category = validator_name.split('/').first
+        raw_category = @raw_config[category]
+        if raw_category.is_a?(Hash) && raw_category.key?('Enabled')
+          return raw_category['Enabled'] != false
+        end
+
         validator_config = validators[validator_name] || {}
         validator_config['Enabled'] != false # Default to true
       end

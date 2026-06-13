@@ -22,7 +22,7 @@ module Yard
                 'FIXME' => '@todo',
                 'See' => '@see',
                 'See also' => '@see',
-                'Warning' => '@deprecated',
+                'Warning' => '@note',
                 'Deprecated' => '@deprecated',
                 'Author' => '@author',
                 'Version' => '@version',
