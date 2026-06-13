@@ -25,7 +25,8 @@ module Yard
               return if violations.empty?
 
               violations.each do |violation|
-                collector.puts "#{object.file}:#{object.line}: #{object.title}"
+                line = docstring_line(object, violation[:line_offset])
+                collector.puts "#{object.file}:#{line}: #{object.title}"
                 collector.puts violation[:forbidden]
                 collector.puts violation[:replacement]
                 collector.puts "#{violation[:line_offset]}|#{violation[:line_text]}"
