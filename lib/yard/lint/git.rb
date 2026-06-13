@@ -112,10 +112,32 @@ module Yard
           root = repository_root
 
           files
+            .map { |f| unquote_git_path(f) }
             .select { |f| f.end_with?('.rb') }
             .map { |f| File.expand_path(f, root) }
             .select { |f| File.exist?(f) } # Skip deleted files
             .select { |f| file_within_path?(f, base_path) }
+        end
+
+        # Unquotes a path as git emits it with the default core.quotepath=true:
+        # paths containing non-ASCII (or special) bytes are wrapped in double
+        # quotes with C-style escapes (e.g. "caf\303\251.rb"). Without this such
+        # files end with `"` rather than `.rb` and are silently dropped.
+        # @param path [String] a path from git output
+        # @return [String] the unquoted path
+        def unquote_git_path(path)
+          return path unless path.start_with?('"') && path.end_with?('"')
+
+          inner = path[1..-2]
+          unescaped = inner.gsub(/\\(?:(\d{3})|(.))/) do
+            octal = Regexp.last_match(1)
+            if octal
+              octal.to_i(8).chr
+            else
+              { 't' => "\t", 'n' => "\n", 'r' => "\r" }.fetch(Regexp.last_match(2), Regexp.last_match(2))
+            end
+          end
+          unescaped.force_encoding(Encoding::UTF_8)
         end
 
         # Check if file is within the specified path
