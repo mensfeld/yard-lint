@@ -42,6 +42,11 @@ module Yard
                 # hit the branch above and get their value validated. See issue #128.
                 return if object.type == :method && object.is_attribute?
 
+                # An api tag is expected on classes, modules, and methods (per
+                # this validator's documentation) - not on constants or other
+                # object types, which were being flagged as missing the tag.
+                return unless %i[class module method].include?(object.type)
+
                 # Only check public methods/classes if require_api_tags is enabled
                 visibility = object.visibility.to_s
                 if visibility == 'public' && !object.root?
