@@ -152,7 +152,7 @@ end
 # Handle --update flag
 if options[:update]
   begin
-    result = Yard::Lint::ConfigUpdater.update(strict: options[:strict])
+    result = Yard::Lint::ConfigUpdater.update(path: config_file, strict: options[:strict])
 
     if result[:added].any? || result[:removed].any?
       puts 'Updated .yard-lint.yml:'
@@ -191,7 +191,8 @@ if options[:auto_gen_config]
       path: path,
       config: config,
       force: options[:force] || false,
-      exclude_limit: options[:exclude_limit] || 15
+      exclude_limit: options[:exclude_limit] || 15,
+      config_path: config_file
     )
 
     puts result[:message]
