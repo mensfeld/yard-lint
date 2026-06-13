@@ -207,16 +207,27 @@ module Yard
       # @return [void]
       def update_existing_config
         config_yaml = ConfigLoader.load_yaml_file(@config_path)
-        inherit_from = Array(config_yaml['inherit_from'] || [])
+        return if Array(config_yaml['inherit_from']).include?('.yard-lint-todo.yml')
 
-        # Add todo file to inherit_from if not already present
-        unless inherit_from.include?('.yard-lint-todo.yml')
-          inherit_from.unshift('.yard-lint-todo.yml')
-          config_yaml['inherit_from'] = inherit_from
+        raw = File.read(@config_path)
 
-          # Write updated config
-          File.write(@config_path, config_yaml.to_yaml)
-        end
+        # Edit the file textually rather than round-tripping through to_yaml,
+        # which would strip every comment and reformat the user's config.
+        updated =
+          if config_yaml.key?('inherit_from') && raw.match?(/^inherit_from:[ \t]*$/)
+            # Existing block list - prepend our entry as the first item.
+            raw.sub(/^inherit_from:[ \t]*$\n/) { "#{Regexp.last_match(0)}  - .yard-lint-todo.yml\n" }
+          elsif config_yaml.key?('inherit_from')
+            # Existing inline/array form (rare) - fall back to a structured
+            # rewrite; comments cannot be preserved in this case.
+            config_yaml['inherit_from'] = ['.yard-lint-todo.yml'] + Array(config_yaml['inherit_from'])
+            config_yaml.to_yaml
+          else
+            # No inherit_from yet - prepend a block, preserving the file verbatim.
+            "inherit_from:\n  - .yard-lint-todo.yml\n\n#{raw}"
+          end
+
+        File.write(@config_path, updated)
       end
 
       # Create a minimal config file that inherits from todo file
