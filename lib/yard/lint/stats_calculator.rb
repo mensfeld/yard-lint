@@ -20,6 +20,10 @@ module Yard
         return default_stats if files.empty?
 
         raw_stats = run_yard_stats_query
+        # nil means the YARD subprocess failed - return nil (coverage unknown)
+        # rather than default_stats, which would falsely report 100% coverage
+        # and let a MinCoverage gate pass.
+        return nil if raw_stats.nil?
         return default_stats if raw_stats.empty?
 
         parsed_stats = parse_stats_output(raw_stats)
@@ -52,8 +56,10 @@ module Yard
 
             stdout, _stderr, status = Open3.capture3(cmd)
 
-            # Return empty string if YARD command fails
-            return '' unless status.exitstatus.zero?
+            # Return nil if the YARD command fails (non-zero exit, or killed by
+            # a signal so exitstatus is nil) - distinct from genuinely empty
+            # output, so coverage is reported as unknown rather than 100%.
+            return nil unless status.exitstatus&.zero?
 
             stdout
           end

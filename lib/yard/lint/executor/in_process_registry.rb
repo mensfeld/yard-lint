@@ -30,6 +30,10 @@ module Yard
 
             YARD::Registry.clear
 
+            # Register custom tags declared in .yardopts so the parser does not
+            # warn about them (matching how the real `yard` command behaves).
+            register_yardopts_tags
+
             # Suppress YARD's default output by setting log level high
             # YARD uses its own logging levels, 4 is ERROR/FATAL level
             original_level = YARD::Logger.instance.level
@@ -127,6 +131,33 @@ module Yard
         end
 
         private
+
+        # Reads .yardopts (if present in the working directory) and registers
+        # any custom tags it declares, so YARD does not emit "Unknown tag"
+        # warnings for tags the project has defined - the same tags the real
+        # `yard` command would honor.
+        # @return [void]
+        def register_yardopts_tags
+          yardopts = File.join(Dir.pwd, '.yardopts')
+          return unless File.exist?(yardopts)
+
+          require 'shellwords'
+          args = Shellwords.split(File.read(yardopts))
+          index = 0
+          while index < args.length
+            # Tag-defining options: --tag, --type-tag, --type-name-tag,
+            # --name-tag, --title-tag all make the tag name "known".
+            if args[index] =~ /\A--(?:type-|type-name-|name-|title-)?tag\z/ && args[index + 1]
+              name = args[index + 1].split(':', 2).first
+              YARD::Tags::Library.define_tag(name, name.to_sym) if name && !name.empty?
+              index += 2
+            else
+              index += 1
+            end
+          end
+        rescue StandardError => e
+          warn "[YARD::Lint] Failed to load .yardopts tags: #{e.message}" if ENV['DEBUG']
+        end
 
         # Parse Ruby source from a string and register objects under a virtual path.
         # YARD::Parser::SourceParser#parse accepts a StringIO but keeps @file as '(stdin)'
