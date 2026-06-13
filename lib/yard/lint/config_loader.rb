@@ -79,6 +79,19 @@ module Yard
         def load(path)
           new(path).load
         end
+
+        # Load a YAML config file with alias/anchor support and clean errors.
+        # Psych 4+ rejects aliases by default, breaking the common RuboCop-style
+        # shared-section idiom; malformed YAML would otherwise escape as a raw
+        # Psych::SyntaxError backtrace.
+        # @param path [String] path to the YAML file
+        # @return [Hash] parsed YAML, or an empty hash for empty files
+        # @raise [Errors::InvalidConfigError] when the file contains invalid YAML
+        def load_yaml_file(path)
+          YAML.load_file(path, aliases: true) || {}
+        rescue Psych::SyntaxError => e
+          raise Errors::InvalidConfigError, "Invalid YAML in #{path}: #{e.message}"
+        end
       end
 
       # All validator names (auto-discovered from codebase structure)
@@ -121,7 +134,7 @@ module Yard
         @loaded_files << path
 
         begin
-          yaml = YAML.load_file(path) || {}
+          yaml = self.class.load_yaml_file(path)
 
           # Handle inheritance
           base_config = load_inherited_configs(yaml, File.dirname(path))

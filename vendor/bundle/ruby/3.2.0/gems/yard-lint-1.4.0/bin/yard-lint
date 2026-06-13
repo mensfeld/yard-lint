@@ -1,0 +1,268 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+
+require 'optparse'
+require 'yard-lint'
+
+options = {}
+config_file = nil
+diff_mode = nil
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: yard-lint [options] [PATH]'
+
+  opts.on('-c', '--config FILE', 'Path to config file (default: .yard-lint.yml)') do |file|
+    config_file = file
+  end
+
+  opts.on('-f', '--format FORMAT', 'Output format (text, json)') do |format|
+    options[:format] = format
+  end
+
+  opts.on('-q', '--quiet', 'Quiet mode (only show summary)') do
+    options[:quiet] = true
+  end
+
+  opts.on('--stats', 'Show statistics summary') do
+    options[:stats] = true
+  end
+
+  opts.on('--min-coverage PERCENT', Float, 'Minimum documentation coverage required (0-100)') do |percent|
+    options[:min_coverage] = percent
+  end
+
+  opts.on('--[no-]progress', 'Show progress indicator (default: auto)') do |value|
+    options[:progress] = value
+  end
+
+  opts.separator ''
+  opts.separator 'Diff mode options (mutually exclusive):'
+
+  opts.on('--diff [REF]', 'Lint only files changed since REF (default: main/master auto-detected)') do |ref|
+    diff_mode = { mode: :ref, base_ref: ref }
+  end
+
+  opts.on('--staged', 'Lint only staged files (git index)') do
+    diff_mode = { mode: :staged }
+  end
+
+  opts.on('--changed', 'Lint only uncommitted files') do
+    diff_mode = { mode: :changed }
+  end
+
+  opts.separator ''
+  opts.separator 'Validator selection:'
+
+  opts.on('--only VALIDATORS', 'Run only specified validators (comma-separated)') do |validators|
+    options[:only] = validators.split(',').map(&:strip)
+  end
+
+  opts.separator ''
+  opts.separator 'Other options:'
+
+  opts.on('--init', 'Generate .yard-lint.yml config file with defaults') do
+    options[:init] = true
+  end
+
+  opts.on('--update', 'Update .yard-lint.yml to add new validators and remove obsolete ones') do
+    options[:update] = true
+  end
+
+  opts.on('--strict', 'Generate strict config (all Error severity, 100% coverage). Use with --init or --update') do
+    options[:strict] = true
+  end
+
+  opts.on('--force', 'Force overwrite when using --init') do
+    options[:force] = true
+  end
+
+  opts.on('-v', '--version', 'Show version') do
+    puts "yard-lint #{Yard::Lint::VERSION}"
+    exit
+  end
+
+  opts.on('-h', '--help', 'Show this help') do
+    puts opts
+    puts
+    puts 'Examples:'
+    puts '  yard-lint                                      # Lint current directory'
+    puts '  yard-lint lib/                                 # Lint all files in lib/'
+    puts '  yard-lint --only Tags/TypeSyntax lib/          # Run only one validator on lib/'
+    puts '  yard-lint --only Tags/Order,Tags/TypeSyntax    # Run specific validators'
+    puts '  yard-lint --diff main                          # Lint files changed since main branch'
+    puts '  yard-lint --staged                             # Lint only staged files'
+    puts '  yard-lint --changed                            # Lint only uncommitted files'
+    puts '  yard-lint --format json lib/                   # Output in JSON format'
+    puts '  yard-lint --init                               # Generate default config'
+    puts '  yard-lint --init --strict                      # Generate strict config'
+    puts '  yard-lint --update                             # Update config with new validators'
+    exit
+  end
+end.parse!
+
+# Handle --init flag
+if options[:init]
+  if Yard::Lint::ConfigGenerator.generate(force: options[:force], strict: options[:strict])
+    if options[:strict]
+      puts 'Created .yard-lint.yml with strict configuration (all Error severity, 100% coverage)'
+    else
+      puts 'Created .yard-lint.yml with default configuration'
+    end
+    exit 0
+  else
+    puts 'Error: .yard-lint.yml already exists'
+    puts 'Use --init --force to overwrite'
+    exit 1
+  end
+end
+
+# Handle --update flag
+if options[:update]
+  begin
+    result = Yard::Lint::ConfigUpdater.update(strict: options[:strict])
+
+    if result[:added].any? || result[:removed].any?
+      puts 'Updated .yard-lint.yml:'
+      if result[:added].any?
+        puts "  Added #{result[:added].size} new validator(s): #{result[:added].join(', ')}"
+      end
+      if result[:removed].any?
+        puts "  Removed #{result[:removed].size} obsolete validator(s): #{result[:removed].join(', ')}"
+      end
+      puts "  Preserved #{result[:preserved].size} existing validator(s)"
+    else
+      puts '.yard-lint.yml is already up to date'
+    end
+    exit 0
+  rescue Yard::Lint::Errors::ConfigFileNotFoundError => e
+    puts "Error: #{e.message}"
+    exit 1
+  end
+end
+
+# Get path argument (defaults to current directory)
+path = ARGV[0] || '.'
+
+# Clear YARD registry to ensure fresh run on each CLI invocation
+YARD::Registry.clear
+
+# Load config and apply CLI overrides
+config = if config_file
+           Yard::Lint::Config.from_file(config_file)
+         else
+           Yard::Lint::Config.load || Yard::Lint::Config.new
+         end
+
+# Apply CLI min_coverage override if provided
+config.min_coverage = options[:min_coverage] if options[:min_coverage]
+
+# Apply --only filter if provided
+if options[:only]
+  unknown = options[:only] - Yard::Lint::ConfigLoader::ALL_VALIDATORS
+  if unknown.any?
+    checker = DidYouMean::SpellChecker.new(dictionary: Yard::Lint::ConfigLoader::ALL_VALIDATORS)
+    messages = unknown.map do |name|
+      suggestions = checker.correct(name)
+      suggestions.any? ? "  #{name} (did you mean: #{suggestions.first}?)" : "  #{name}"
+    end
+    puts "Error: Unknown validator(s):"
+    puts messages.join("\n")
+    puts "\nAvailable validators:"
+    Yard::Lint::ConfigLoader::ALL_VALIDATORS.each { |v| puts "  #{v}" }
+    exit 1
+  end
+  config.only_validators = options[:only]
+end
+
+# Run the linter
+begin
+  result = Yard::Lint.run(
+    path: path,
+    config: config,
+    progress: options[:progress],
+    diff: diff_mode
+  )
+rescue Yard::Lint::Git::Error => e
+  puts "Git error: #{e.message}"
+  exit 1
+rescue Yard::Lint::Errors::FileNotFoundError => e
+  puts "Error: #{e.message}"
+  exit 1
+end
+
+# Format and display results
+case options[:format]
+when 'json'
+  require 'json'
+  puts JSON.pretty_generate({
+    offense_count: result.count,
+    offenses: result.offenses
+  })
+  exit result.exit_code
+when 'text', nil
+  # Calculate coverage stats if requested or configured
+  coverage = result.documentation_coverage if options[:stats] || options[:min_coverage] || config.min_coverage
+
+  # Show coverage stats if available
+  if coverage && (options[:stats] || options[:quiet])
+    puts "\nDocumentation Coverage: #{coverage[:coverage].round(2)}%"
+    puts "  Total objects:      #{coverage[:total]}"
+    puts "  Documented:         #{coverage[:documented]}"
+    puts "  Undocumented:       #{coverage[:total] - coverage[:documented]}"
+
+    if config.min_coverage
+      if coverage[:coverage] >= config.min_coverage
+        puts "  Status:             ✓ Meets minimum (#{config.min_coverage}%)"
+      else
+        puts "  Status:             ✗ Below minimum (#{config.min_coverage}%)"
+      end
+    end
+    puts
+  end
+
+  if result.clean?
+    # Still check coverage requirement even if no offenses
+    if coverage && config.min_coverage && coverage[:coverage] < config.min_coverage
+      puts "Error: Documentation coverage #{coverage[:coverage].round(2)}% is below minimum #{config.min_coverage}%"
+      exit result.exit_code
+    end
+
+    puts 'No offenses found' unless options[:quiet]
+    exit 0
+  else
+    # Show statistics if requested or in quiet mode
+    if options[:stats] || options[:quiet]
+      stats = result.statistics
+      puts "#{result.count} offense(s) detected"
+      puts "  Errors:      #{stats[:error]}"
+      puts "  Warnings:    #{stats[:warning]}"
+      puts "  Conventions: #{stats[:convention]}"
+      puts
+    end
+
+    # Show individual offenses unless in quiet mode
+    unless options[:quiet]
+      puts "Found #{result.count} offense(s):\n\n"
+
+      result.offenses.each do |offense|
+        severity_symbol = case offense[:severity]
+                          when 'error' then 'E'
+                          when 'warning' then 'W'
+                          when 'convention' then 'C'
+                          else '?'
+                          end
+
+        puts "[#{severity_symbol}] #{offense[:location]}:#{offense[:location_line]}"
+        puts "    #{offense[:name]}: #{offense[:message]}"
+        puts
+      end
+    end
+
+    exit result.exit_code
+  end
+else
+  puts "Error: Unknown format '#{options[:format]}'"
+  exit 1
+end
