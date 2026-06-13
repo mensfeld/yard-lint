@@ -231,6 +231,9 @@ describe 'Yard::Lint::Git' do
     Open3.stubs(:capture3)
       .with('git', 'diff', '--name-only', 'HEAD')
       .returns([git_output, '', stub(success?: true)])
+    Open3.stubs(:capture3)
+      .with('git', 'ls-files', '--others', '--exclude-standard')
+      .returns(['', '', stub(success?: true)])
 
     File.stubs(:expand_path).with('/home/user/project/lib').returns('/home/user/project/lib')
     File.stubs(:expand_path).with('lib/modified.rb', '/home/user/project').returns('/home/user/project/lib/modified.rb')
