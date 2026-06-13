@@ -42,22 +42,25 @@ module Yard
             # @param type_str [String] the type string to check
             # @return [String, nil] 'long' or 'short', or nil if not a collection type
             def detect_style(type_str)
+              # The Hash/Array prefixes are anchored with a negative lookbehind
+              # so only the built-in classes match - not custom classes whose
+              # names merely contain them (MyHash, ByteArray).
               # Hash types
               # Hash<...> is short style (should be Hash{K => V})
-              if type_str =~ /Hash<.*>/
+              if type_str =~ /(?<![A-Za-z0-9_])Hash<.*>/
                 'short'
               # Hash{...} is long style
-              elsif type_str =~ /Hash\{.*\}/
+              elsif type_str =~ /(?<![A-Za-z0-9_])Hash\{.*\}/
                 'long'
               # {...} without Hash prefix is short style
               elsif type_str =~ /^\{.*\}$/
                 'short'
               # Array types
               # Array<...> is long style
-              elsif type_str =~ /Array<.*>/
+              elsif type_str =~ /(?<![A-Za-z0-9_])Array<.*>/
                 'long'
               # Array(...) is long style
-              elsif type_str =~ /Array\(.*\)/
+              elsif type_str =~ /(?<![A-Za-z0-9_])Array\(.*\)/
                 'long'
               # <...> without Array prefix is short style
               elsif type_str =~ /^<.*>$/
