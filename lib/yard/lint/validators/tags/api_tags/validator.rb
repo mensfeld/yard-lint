@@ -19,7 +19,12 @@ module Yard
               allowed_list = allowed_apis
 
               if object.has_tag?(:api)
-                api_value = object.tag(:api).text
+                # YARD tag text includes indented continuation/description lines
+                # (e.g. "private\nfor internal use only"). The @api value is a
+                # single token, so validate only the first word - otherwise a
+                # documented `@api private` is flagged as invalid, and the
+                # newline in the emitted value corrupts the parser's pairing.
+                api_value = object.tag(:api).text.to_s.split(/\s+/).first.to_s
                 unless allowed_list.include?(api_value)
                   collector.puts "#{object.file}:#{object.line}: #{object.title}"
                   collector.puts "invalid:#{api_value}"
