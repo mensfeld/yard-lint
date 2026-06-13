@@ -290,6 +290,27 @@ describe 'Tags/MissingYield' do
     assert_empty(missing_yield_offenses(result))
   end
 
+  # -- Nested method definitions --
+
+  it 'does not attribute a nested def\'s yield to the enclosing method' do
+    file = create_test_file('example.rb', <<~RUBY)
+      class Foo
+        # Defines a helper at runtime; does not yield itself.
+        def define_helper
+          def helper
+            yield 1
+          end
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: enabled_config, progress: false)
+    names = missing_yield_offenses(result).map { |o| o[:element].to_s }
+
+    refute_includes(names, 'Foo#define_helper', 'enclosing method does not yield')
+    assert_includes(names, 'Foo#helper', 'the nested method that yields is still flagged')
+  end
+
   # -- Visibility --
 
   it 'flags private methods that yield' do

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'ripper'
+
 module Yard
   module Lint
     module Validators
@@ -62,8 +64,42 @@ module Yard
             end
 
             # @param source [String] raw method source code
-            # @return [Boolean] true if the source contains the `yield` keyword
+            # @return [Boolean] true if the method itself yields (ignoring yields
+            #   that belong to a nested method definition)
             def source_contains_yield?(source)
+              sexp = ::Ripper.sexp(source)
+              # If the isolated source does not parse on its own, fall back to the
+              # line scan rather than silently missing a yield.
+              return yield_in_lines?(source) if sexp.nil?
+
+              method_level_yield?(sexp)
+            end
+
+            # Walks the Ripper S-expression for a `yield` that belongs to the
+            # method being analysed - one nested directly inside this definition
+            # rather than inside a nested `def`. `def_depth` counts enclosing
+            # method definitions; the analysed method's own body is depth 1, so a
+            # yield inside a nested `def` (depth 2+) is correctly ignored.
+            # @param node [Object] a Ripper S-expression node
+            # @param def_depth [Integer] number of enclosing `def`/`defs` nodes
+            # @return [Boolean] true if a yield at the method's own level is found
+            def method_level_yield?(node, def_depth = 0)
+              return false unless node.is_a?(::Array)
+
+              case node.first
+              when :yield, :yield0
+                return def_depth == 1
+              when :def, :defs
+                return node.any? { |child| method_level_yield?(child, def_depth + 1) }
+              end
+
+              node.any? { |child| method_level_yield?(child, def_depth) }
+            end
+
+            # Line-based fallback used when Ripper cannot parse the source.
+            # @param source [String] raw method source code
+            # @return [Boolean] true if a `yield` keyword appears on a code line
+            def yield_in_lines?(source)
               source.each_line.any? do |line|
                 next false if line.match?(COMMENT_LINE_PATTERN)
 
