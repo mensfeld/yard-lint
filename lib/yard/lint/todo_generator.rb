@@ -13,9 +13,12 @@ module Yard
         # @param config [Config] yard-lint configuration object with validator settings
         # @param force [Boolean] whether to overwrite existing todo file if present
         # @param exclude_limit [Integer] minimum files in directory before grouping into wildcard patterns
+        # @param config_path [String, nil] config file to link the todo into
+        #   (defaults to .yard-lint.yml in the current directory)
         # @return [Hash] result with :message, :offense_count, :validator_count
-        def generate(path:, config:, force: false, exclude_limit: DEFAULT_EXCLUDE_LIMIT)
-          new(path: path, config: config, force: force, exclude_limit: exclude_limit).generate
+        def generate(path:, config:, force: false, exclude_limit: DEFAULT_EXCLUDE_LIMIT, config_path: nil)
+          new(path: path, config: config, force: force, exclude_limit: exclude_limit,
+              config_path: config_path).generate
         end
       end
 
@@ -24,13 +27,14 @@ module Yard
       # @param config [Config] yard-lint configuration object
       # @param force [Boolean] whether to overwrite existing todo file
       # @param exclude_limit [Integer] minimum files before grouping into patterns
-      def initialize(path:, config:, force:, exclude_limit:)
+      # @param config_path [String, nil] config file to link the todo into
+      def initialize(path:, config:, force:, exclude_limit:, config_path: nil)
         @path = path
         @config = config
         @force = force
         @exclude_limit = exclude_limit
         @todo_path = File.join(Dir.pwd, '.yard-lint-todo.yml')
-        @config_path = File.join(Dir.pwd, Config::DEFAULT_CONFIG_FILE)
+        @config_path = config_path || File.join(Dir.pwd, Config::DEFAULT_CONFIG_FILE)
       end
 
       # Generate the .yard-lint-todo.yml file with exclusions for current violations
@@ -93,6 +97,12 @@ module Yard
           next unless @config.validator_enabled?(validator_name)
 
           validator_result = result_builder.build(validator_name, raw_results)
+          next unless validator_result
+
+          # Apply per-validator Exclude patterns (and drop no-location offenses)
+          # exactly as a normal run does, so the baseline does not silence files
+          # that are already excluded.
+          validator_result = runner.send(:filter_result_offenses, validator_name, validator_result)
           next unless validator_result && validator_result.offenses.any?
 
           # Extract file paths from offenses, skipping those without a location

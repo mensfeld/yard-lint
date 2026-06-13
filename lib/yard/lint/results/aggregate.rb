@@ -83,10 +83,11 @@ module Yard
         # @return [Integer] 0 for success, 1 for failure
         def exit_code
           # Check minimum coverage requirement first
-          if @config&.min_coverage &&
-             documentation_coverage &&
-             documentation_coverage[:coverage] < @config.min_coverage
-            return 1
+          if @config&.min_coverage
+            coverage = documentation_coverage
+            # Fail safe: if a minimum is required but coverage could not be
+            # determined (e.g. the YARD stats subprocess failed), do not pass.
+            return 1 if coverage.nil? || coverage[:coverage] < @config.min_coverage
           end
 
           return 0 if offenses.empty?
