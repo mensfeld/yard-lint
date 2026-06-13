@@ -33,8 +33,8 @@ module Yard
               return unless has_options_param
 
               # A named (non-splat) parameter documented with a concrete
-              # non-Hash @param type is not an options hash, so don't demand
-              # @option tags for it.
+              # non-Hash type (via its param tag) is not an options hash, so it
+              # does not need option tags.
               return if options_param_documented_as_non_hash?(object)
 
               # Check if @option tags are missing
