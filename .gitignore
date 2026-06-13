@@ -17,3 +17,6 @@ coverage/
 # Local tooling and AI assistant configs
 mise.toml
 .claude/
+
+# Local-only bug audit tracker (not part of the published gem)
+/BUGS.md
