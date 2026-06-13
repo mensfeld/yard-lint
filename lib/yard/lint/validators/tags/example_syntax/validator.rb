@@ -53,7 +53,7 @@ module Yard
                   $VERBOSE = nil
                   RubyVM::InstructionSequence.compile(cleaned_code)
                 rescue SyntaxError => e
-                  example_name = example.name || "Example #{index + 1}"
+                  example_name = example.name.to_s.empty? ? "Example #{index + 1}" : example.name
                   collector.puts "#{object.file}:#{object.line}: #{object.title}"
                   collector.puts 'syntax_error'
                   collector.puts example_name
