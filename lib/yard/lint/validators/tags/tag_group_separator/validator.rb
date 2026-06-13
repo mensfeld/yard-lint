@@ -54,17 +54,17 @@ module Yard
               had_blank_line = true
 
               lines.each do |line|
-                stripped = line.strip
-
-                if stripped.empty?
+                if line.strip.empty?
                   had_blank_line = true
                   next
                 end
 
-                if stripped.start_with?('@')
-                  tag_name = stripped.match(/^@(\S+)/)&.captures&.first
-                  next unless tag_name
+                # A real YARD tag begins at column 0 of the docstring. Indented
+                # @-leading lines are tag continuation or @example/code content
+                # (e.g. an instance variable like `@result`), not new tag groups.
+                tag_name = line[/\A@(\S+)/, 1]
 
+                if tag_name
                   current_group = group_for_tag(tag_name)
 
                   if previous_group && current_group != previous_group && !had_blank_line
