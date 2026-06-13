@@ -260,6 +260,14 @@ if options[:only]
   config.only_validators = options[:only]
 end
 
+# Validate the output format before doing any (potentially long) work, rather
+# than running the whole lint and only then rejecting an unknown format.
+valid_formats = %w[text json quickfix]
+if options[:format] && !valid_formats.include?(options[:format])
+  puts "Error: Unknown format '#{options[:format]}'. Valid formats: #{valid_formats.join(', ')}"
+  exit 1
+end
+
 # Suppress progress for quickfix to avoid contaminating machine-readable output
 options[:progress] = false if options[:format] == 'quickfix' && options[:progress].nil?
 

@@ -35,31 +35,35 @@ module Yard
             original_level = YARD::Logger.instance.level
             YARD::Logger.instance.level = 4 # Only show fatal errors
 
-            if source
-              virtual_path = files.first
-              # First pass: register directive/macro definitions from the in-memory source.
-              # We set parser.file manually so registered objects carry the virtual path.
-              parse_source_string(source, virtual_path)
-              # Clear checksums so the second pass is not skipped
-              YARD::Registry.checksums.clear
-              # Second pass: full parse with all directives available
-              @warnings = capture_warnings { parse_source_string(source, virtual_path) }
-            else
-              # First pass: parse all files to process directive definitions
-              YARD.parse(files)
+            begin
+              if source
+                virtual_path = files.first
+                # First pass: register directive/macro definitions from the in-memory source.
+                # We set parser.file manually so registered objects carry the virtual path.
+                parse_source_string(source, virtual_path)
+                # Clear checksums so the second pass is not skipped
+                YARD::Registry.checksums.clear
+                # Second pass: full parse with all directives available
+                @warnings = capture_warnings { parse_source_string(source, virtual_path) }
+              else
+                # First pass: parse all files to process directive definitions
+                YARD.parse(files)
 
-              # Clear checksums to force reparsing without clearing the registry.
-              # This allows macro definitions from the first pass to be available
-              # during the second pass, enabling proper directive expansion regardless of parse order.
-              YARD::Registry.checksums.clear
+                # Clear checksums to force reparsing without clearing the registry.
+                # This allows macro definitions from the first pass to be available
+                # during the second pass, enabling proper directive expansion regardless of parse order.
+                YARD::Registry.checksums.clear
 
-              # Second pass: reparse files now that all directive definitions are available
-              @warnings = capture_warnings { YARD.parse(files) }
+                # Second pass: reparse files now that all directive definitions are available
+                @warnings = capture_warnings { YARD.parse(files) }
+              end
+
+              @parsed = true
+            ensure
+              # Restore the log level even if parsing raises, so a single bad
+              # file does not leave YARD's global logger silenced for the run.
+              YARD::Logger.instance.level = original_level
             end
-
-            @parsed = true
-
-            YARD::Logger.instance.level = original_level
           end
         end
 
