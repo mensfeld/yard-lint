@@ -118,7 +118,15 @@ module Yard
             # @param stripped_line [String] a comment line with leading/trailing whitespace removed
             # @return [Boolean] true if the line is a Ruby magic comment (frozen_string_literal, encoding, etc.)
             def magic_comment?(stripped_line)
-              stripped_line.match?(/\A#\s*(frozen[_-]string[_-]literal|encoding|warn[_-]indent|shareable[_-]constant[_-]value)\s*:/i)
+              # A real magic comment has a single-token value (e.g. `true`,
+              # `utf-8`), optionally followed by `;` (combined directives) or an
+              # emacs `-*-` wrapper. Requiring that avoids treating prose that
+              # merely starts with a magic-comment word - like
+              # `# encoding: UTF-8 is assumed for all inputs` - as a magic
+              # comment, which would split a documentation block.
+              stripped_line.match?(
+                /\A#\s*(?:-\*-\s*)?(frozen[_-]string[_-]literal|encoding|warn[_-]indent|shareable[_-]constant[_-]value)\s*:\s*\S+\s*(?:;|-\*-|\z)/i
+              )
             end
 
             # @param line [String] a raw source line
