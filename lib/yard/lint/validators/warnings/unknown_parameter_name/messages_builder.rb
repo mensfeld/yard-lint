@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'did_you_mean'
-require 'shellwords'
 
 module Yard
   module Lint
@@ -52,14 +51,8 @@ module Yard
 
                 line_num = line.to_i
 
-                # First, try to parse directly from the Ruby source file
-                # This is faster and doesn't require YARD to be fully loaded
-                params = parse_parameters_from_source(file, line_num)
-                return params unless params.empty?
-
-                # Fallback: Query YARD list for the method
-                # This requires YARD to parse the file first
-                fetch_parameters_via_yard(file, line_num)
+                # Parse directly from the Ruby source file.
+                parse_parameters_from_source(file, line_num)
               rescue StandardError => e
                 # If anything goes wrong, just return empty array (no suggestion)
                 warn "Failed to fetch parameters: #{e.message}" if ENV['DEBUG']
@@ -73,8 +66,10 @@ module Yard
               def parse_parameters_from_source(file, line)
                 return [] unless File.exist?(file)
 
-                # Calculate the search range (line numbers are 1-indexed)
-                start_line = [(line - 15), 1].max
+                # The warning is reported at the method's def line, so start
+                # there - scanning earlier would pick up an unrelated method
+                # defined in the preceding lines.
+                start_line = [line, 1].max
                 end_line = line + 5
 
                 # Only read the lines in the relevant range to avoid loading the whole file
@@ -92,12 +87,15 @@ module Yard
                 param_lines = []
 
                 lines.each do |source_line|
+                  # The method name may include a receiver (def self.foo, def
+                  # obj.foo) or be an operator, so match anything up to the
+                  # opening parenthesis rather than a bare \w+.
                   # Match single-line method definitions: def method_name(param1, param2)
-                  if source_line =~ /^\s*def\s+\w+\s*\((.*?)\)/
+                  if source_line =~ /^\s*def\s+[^(]+\((.*?)\)/
                     params_str = ::Regexp.last_match(1)
                     return extract_parameter_names(params_str)
                   # Match start of multi-line method definition: def method_name(
-                  elsif source_line =~ /^\s*def\s+\w+\s*\((.*)$/
+                  elsif source_line =~ /^\s*def\s+[^(]+\((.*)$/
                     in_multiline_def = true
                     param_lines << ::Regexp.last_match(1)
                     next
@@ -111,7 +109,7 @@ module Yard
                       params_str = params_str[/\A(.*?)\)/, 1] || params_str
                       return extract_parameter_names(params_str)
                     end
-                  elsif source_line.match?(/^\s*def\s+\w+\s*$/)
+                  elsif source_line.match?(/^\s*def\s+[^(]+$/)
                     # Method with no parameters
                     return []
                   end
@@ -130,38 +128,42 @@ module Yard
               def extract_parameter_names(params_str)
                 return [] if params_str.nil? || params_str.strip.empty?
 
-                params_str.split(',').map do |param|
-                  # Remove default values: "name = 'default'" => "name"
-                  param = param.split('=').first
-                  # Remove type annotations: "name:" => "name"
-                  param = param.delete(':')
-                  # Remove splat and block symbols: "*args", "**kwargs", "&block"
-                  param = param.delete('*&')
-                  # Strip whitespace
-                  param.strip
-                end.reject(&:empty?)
+                split_top_level_params(params_str).filter_map do |param|
+                  # Strip leading splat/block markers (*args, **kwargs, &block).
+                  name = param.strip.sub(/\A[*&]+/, '')
+                  # The name is everything up to the first ':' (keyword) or '='
+                  # (default), so a symbol default like `mode: :fast` or a default
+                  # containing commas like `list = [1, 2]` is not mangled.
+                  name = name[/\A[^:=]+/].to_s.strip
+                  name.empty? ? nil : name
+                end
               end
 
-              # Fetch parameters via YARD list command (fallback method)
-              # @param file [String] file path
-              # @param line [Integer] line number
-              # @return [Array<String>] array of parameter names
-              def fetch_parameters_via_yard(file, line)
-                # Query YARD for the method at this location
-                # Use Shellwords.escape to prevent command injection
-                escaped_file = Shellwords.escape(file)
-                query = "'type == :method && file == \"#{escaped_file}\" && line >= #{line - 15} && line <= #{line + 5}'"
-                cmd = "yard list --query #{query} 2>/dev/null"
-
-                output = `#{cmd}`.strip
-                return [] if output.empty?
-
-                # YARD list doesn't show parameters, we'd need to parse the source
-                # So this fallback is just for validation - use source parsing instead
-                []
-              rescue StandardError => e
-                warn "Failed to query YARD: #{e.message}" if ENV['DEBUG']
-                []
+              # Splits a parameter string on top-level commas, respecting
+              # brackets so defaults like `[1, 2]` or `{a: 1}` stay intact.
+              # @param params_str [String] the raw parameter list
+              # @return [Array<String>] individual parameter substrings
+              def split_top_level_params(params_str)
+                parts = []
+                current = +''
+                depth = 0
+                params_str.each_char do |char|
+                  case char
+                  when '(', '[', '{' then depth += 1; current << char
+                  when ')', ']', '}' then depth -= 1; current << char
+                  when ','
+                    if depth.zero?
+                      parts << current
+                      current = +''
+                    else
+                      current << char
+                    end
+                  else
+                    current << char
+                  end
+                end
+                parts << current
+                parts
               end
 
               # Find the best suggestion using DidYouMean spell checker
@@ -203,9 +205,12 @@ module Yard
                 return nil unless best_match
 
                 param, distance = best_match
-                max_distance = [unknown_param.length, param.length].max / 2
+                # Require the edit distance to be strictly less than half the
+                # longer length, so short, very different names are not
+                # "corrected" to an unrelated parameter.
+                max_length = [unknown_param.length, param.length].max
 
-                distance <= max_distance ? param : nil
+                distance < max_length / 2.0 ? param : nil
               end
 
               # Calculate Levenshtein distance between two strings

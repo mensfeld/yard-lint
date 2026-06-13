@@ -53,7 +53,10 @@ module Yard
 
             # @return [Array<String>] tags order
             def tags_order
-              config.validator_config('Tags/Order', 'EnforcedOrder')
+              # Fall back to the default when EnforcedOrder is unset or
+              # explicitly null in the config - otherwise `nil.dup` crashes
+              # the entire run.
+              config_or_default('EnforcedOrder')
             end
           end
         end
