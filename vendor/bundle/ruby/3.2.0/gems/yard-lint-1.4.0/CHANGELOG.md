@@ -1,0 +1,340 @@
+# YARD-Lint Changelog
+
+## 1.4.0 (2026-01-19)
+- **[Fix]** Handle directive definitions depending on file load order (#65, @zaben903)
+- **[CI]** Update Ruby 4.0 from preview2 to stable release as the default version
+  - Ruby 4.0 is now the default for yard-lint dogfooding and gem release workflows
+  - Code coverage is now tracked only on Ruby 4.0
+  - Added `.ruby-version` file specifying Ruby 4.0
+  - Continues to support Ruby 3.2, 3.3, and 3.4
+- **[Feature]** Add `Tags/ForbiddenTags` validator to detect forbidden tag and type combinations (#59)
+  - Allows projects to disallow specific tag patterns like `@return [void]`
+  - Supports tag-only patterns (forbid entire tag) and tag+type patterns
+  - Configurable `ForbiddenPatterns` list with `Tag` and optional `Types` keys
+  - Use case: Enforce documentation of side effects instead of `@return [void]`
+  - Use case: Forbid overly generic types like `@param [Object]`
+  - Use case: Forbid specific tags entirely (e.g., `@api`)
+  - Disabled by default (opt-in validator) with 'convention' severity
+
+## 1.3.0 (2025-12-10)
+- **[Fix]** Expand `Tags/Order` default `EnforcedOrder` to include all standard YARD tags
+  - Previous config only included: `param`, `option`, `return`, `raise`, `example`
+  - Now includes full order: `param`, `option`, `yield`, `yieldparam`, `yieldreturn`, `return`, `raise`, `see`, `example`, `note`, `todo`
+  - Tags not in the list were silently ignored, so `@note`, `@todo`, `@see`, and `@yield*` ordering was not validated
+  - Updated both `default_config.yml` and `strict_config.yml`
+- **[Enhancement]** Add `IMPORTANT:` pattern detection to `Tags/InformalNotation` validator
+  - Detects `IMPORTANT:` and `Important:` informal notation and suggests using `@note` tag
+  - YARD does not have a dedicated `@important` tag; `@note` is the standard tag for emphasized notes
+- **[Feature]** Add `Tags/TagGroupSeparator` validator to enforce blank line separators between different YARD tag groups (#29)
+  - Enforces visual separation between semantically different tag groups (e.g., `@param` tags should be separated from `@return` tags by a blank line)
+  - Configurable tag groups: param (param, option), return (return), error (raise, throws), example (example), meta (see, note, todo, deprecated, since, version, api), yield (yield, yieldparam, yieldreturn)
+  - Optional `RequireAfterDescription` setting to require blank line between description and first tag
+  - Unknown tags are treated as their own group (require separator from known groups)
+  - Disabled by default (opt-in validator) with 'convention' severity
+- **[Feature]** Add `Tags/InformalNotation` validator to detect informal notation patterns in documentation (#33)
+  - Detects patterns like `Note:`, `TODO:`, `See:`, `Warning:`, `Deprecated:` and suggests proper YARD tags
+  - Suggests appropriate replacements: `@note`, `@todo`, `@see`, `@deprecated`, `@author`, `@version`, etc.
+  - Skips patterns inside fenced code blocks to avoid false positives
+  - Case-insensitive matching by default (configurable via `CaseSensitive`)
+  - Start-of-line matching by default (configurable via `RequireStartOfLine`)
+  - Fully configurable pattern mappings via `Patterns` option
+  - Enabled by default with 'warning' severity
+- **[Feature]** Add `Tags/NonAsciiType` validator to detect non-ASCII characters in YARD type specifications (#39)
+  - Ruby type names must be valid Ruby identifiers (ASCII only)
+  - Detects characters like `…` (U+2026), `→` (U+2192), `—` (U+2014) in type specs
+  - Common cause: copy-paste from word processors with smart typography
+  - Reports specific character and Unicode code point in error message
+  - Example: `@param flags [Symbol, …]` → reports `'…' (U+2026)`
+  - Enabled by default with 'warning' severity
+  - Configurable `ValidatedTags` (default: param, option, return, yieldreturn, yieldparam)
+- **[Fix]** Fix `Encoding::CompatibilityError` crash when YARD encounters non-ASCII characters in type specifications
+  - TypeSyntax validator now handles encoding issues gracefully
+  - Sanitizes YARD error messages that may contain invalid UTF-8 sequences
+- **[Fix]** Fix relative exclusion patterns not matching files discovered with absolute paths
+  - Patterns like `vendor/**/*` were not being applied when running `yard-lint /path/to/project` or `yard-lint .`
+  - Root cause: `expand_path` converted files to absolute paths before filtering, but compared against relative patterns
+  - Now matches patterns against both relative and absolute paths (similar to RuboCop's `PathUtil#match_path?`)
+  - Extracted `discover_ruby_files` method for better separation of concerns
+  - Added `determine_base_dir`, `excluded_file?`, `relative_path_from`, and `match_path?` helper methods
+  - Comprehensive integration tests in `spec/integrations/global_exclusions_spec.rb`
+- **[Enhancement]** Make PATH argument optional, defaulting to current directory (like RuboCop)
+  - Running `yard-lint` without arguments now lints the current directory
+  - Maintains backward compatibility with explicit path arguments
+  - Updated help text and examples to show default behavior
+- **[Fix]** Respect per-validator `YardOptions` when filtering by visibility (#41)
+  - Executor was ignoring `YardOptions` defined on individual validators
+  - Specifying `YardOptions` on a specific validator now correctly overrides `AllValidators` defaults
+  - Enables use cases like validating tag order on private methods, but skipping documentation requirement
+  - Example: Set `--private` in `AllValidators.YardOptions`, then override with empty `YardOptions: []` on `Documentation/UndocumentedObjects` to skip private methods or constants
+- **[Feature]** Add in-process YARD execution for ~10x faster performance
+  - Parses files once and shares the YARD registry across all validators
+  - Eliminates subprocess spawning overhead (previously spawned 17+ processes per run)
+  - Maintains identical detection results and output format
+  - All 17 validators migrated to in-process execution
+  - Warning validators (UnknownTag, UnknownParameterName, etc.) capture YARD warnings during parsing
+  - Respects `--private`/`--protected` YardOptions for visibility filtering
+  - Fixed `void` typo in allowed types (was `vold`)
+  - Properly handles symbol types (`:all`, `:public`) in type validation
+- **[Change]** Remove shell mode execution (was deprecated fallback)
+  - In-process execution is now the only mode
+  - Shell mode fallback code and `YARD_LINT_SHELL_MODE` environment variable removed
+  - Simplifies codebase by removing ~1000 lines of shell-related code
+- **[Feature]** Add `Documentation/EmptyCommentLine` validator to detect unnecessary empty comment lines in YARD documentation blocks
+  - Detects empty `#` lines at the start of documentation blocks (leading)
+  - Detects empty `#` lines at the end of documentation blocks (trailing)
+  - Correctly allows empty lines between sections (e.g., between description and @param tags)
+  - Configurable `EnabledPatterns` to check leading, trailing, or both
+  - Reads source files directly to detect comment block boundaries
+  - Enabled by default with 'convention' severity
+  - Comprehensive test coverage with 45 unit and integration tests
+- **[Feature]** Add "did you mean" suggestions for UnknownParameterName validator
+  - Suggests correct parameter names when documentation mismatches are detected
+  - Uses Ruby's `did_you_mean` gem as primary suggestion engine
+  - Falls back to Levenshtein distance algorithm when DidYouMean doesn't find matches
+  - Parses Ruby source files directly to extract actual method parameters
+  - Handles all parameter types: regular, keyword, splat, block, with defaults
+  - Example: `@param user_nme [String] typo` → suggests "did you mean 'user_name'?"
+  - Only suggests when parameter names are similar enough (distance threshold)
+  - Comprehensive test coverage with 19 unit tests and 12 integration tests
+  - Inspired by yard-junk's helpful error messages
+- **[Feature]** Add "did you mean" suggestions for UnknownTag validator
+  - Suggests correct YARD tag names when typos are detected
+  - Dynamically loads valid tags and directives from YARD::Tags::Library for automatic compatibility with any YARD version
+  - Checks against all 22 standard YARD meta-data tags and 8 directives (in YARD 0.9.x)
+  - Uses Ruby's `did_you_mean` gem as primary suggestion engine
+  - Falls back to Levenshtein distance algorithm when DidYouMean doesn't find matches
+  - Example: `@returns [String]` → suggests "did you mean '@return'?"
+  - Example: `@raises [Error]` → suggests "did you mean '@raise'?"
+  - Example: `@params value` → suggests "did you mean '@param'?"
+  - Only suggests when tag names are similar enough (within 50% edit distance)
+  - Comprehensive test coverage with 35 unit tests and 12 integration tests covering common typos
+  - Completes the "did you mean" feature set alongside UnknownParameterName validator
+  - Inspired by yard-junk's helpful suggestion system
+- **[Fix]** Replace hard-coded `#!/bin/bash` with `#!/bin/sh` for BSD/macOS compatibility (#34)
+  - Scripts now use POSIX-compliant shell instead of Bash
+  - Fixes `Errno::ENOENT` errors on *BSD systems where `/bin/bash` doesn't exist
+  - Affects all validators that use temporary shell scripts: InvalidTypes, RedundantParamDescription, EmptyCommentLine, TypeSyntax, CollectionType, MeaninglessTag, TagTypePosition
+- **[Fix]** Fix Runner bug where offense messages were lost during per-validator exclusion filtering
+  - `filter_result_offenses` was creating new Result objects with stripped offense data
+  - Enhanced messages (like "did you mean" suggestions) were being discarded
+  - Now modifies existing Result object's offenses array to preserve all data
+  - Fixes issue affecting all validators with custom message builders
+- **[Change]** Update `.yard-lint.yml` to set `FailOnSeverity` to `convention` level
+  - Previously set to `error`, now fails on any severity including convention
+  - Ensures stricter enforcement of documentation style conventions
+- **[CI]** Add macOS testing to CI workflow
+  - Tests Ruby 3.4 on macOS to validate BSD/POSIX compatibility
+- **[CI]** Add parallel_tests gem to run specs in parallel for faster CI execution
+- **[Feature]** Add `ArticleParamPhrase` pattern to `Tags/RedundantParamDescription` validator (#32)
+  - Detects filler phrases like "The action being performed" or "A callback to invoke"
+  - Matches pattern: `<Article> <param_name> <connector> [<low_value_verb>...]`
+  - Configurable `LowValueConnectors` list (default: being, to, that, which, for)
+  - Configurable `LowValueVerbs` list (default: perform, process, use, handle, act, pass, invoke, call, execute, run)
+  - Enabled by default via `EnabledPatterns.ArticleParamPhrase`
+  - Pattern-specific error message explaining the filler phrase adds no value
+  - Comprehensive test coverage with fixtures and integration tests
+- **[Feature]** Add `--only` CLI option to run specific validators
+  - Run single validator: `yard-lint --only Tags/TypeSyntax`
+  - Run multiple validators: `yard-lint --only Tags/Order,Tags/TypeSyntax`
+  - Overrides `Enabled: false` in config for specified validators
+  - Provides "did you mean" suggestions for typos using Ruby's `did_you_mean` gem
+  - Lists all available validators when unknown validator is specified
+  - Requires exact validator names (case-sensitive, full path like `Tags/Order`)
+- **[Feature]** Add `Documentation/BlankLineBeforeDefinition` validator to detect blank lines between YARD documentation and definitions (#30)
+  - Detects single blank line violations where YARD still associates docs but violates conventions
+  - Detects orphaned documentation (2+ blank lines) where YARD completely ignores the documentation
+  - Works with methods, classes, and modules
+  - Configurable `EnabledPatterns` to check only single blank lines, only orphaned docs, or both
+  - Separate `Severity` and `OrphanedSeverity` configuration options for different violation types
+  - Respects `--private` and `--protected` YardOptions for visibility filtering
+  - Enabled by default with 'convention' severity for both violation types
+- **[Fix]** Fix yard-lint silently returning "No offenses found" for non-existent file paths
+  - Previously, specifying a non-existent path would silently succeed with empty results
+  - Now raises `Errors::FileNotFoundError` with clear message: "No such file or directory: /path"
+  - Matches behavior of similar tools like RuboCop
+  - Only validates explicit file paths (glob patterns and directories are not affected)
+- **[Feature]** Add `--update` command to update existing `.yard-lint.yml` with new validators
+  - Adds new validators introduced in newer yard-lint versions with their template defaults
+  - Removes obsolete validators that no longer exist in yard-lint
+  - Preserves all existing user configuration (custom severities, exclusions, etc.)
+  - Reports added, removed, and preserved validator counts
+  - Supports `--strict` flag to use strict template defaults for new validators
+  - Example: `yard-lint --update` or `yard-lint --update --strict`
+- **[Fix]** Fix integration specs failing in parallel test runs due to relative fixture paths
+  - Updated `MeaninglessTag`, `EmptyCommentLine`, `MultiValidatorComprehensive`, `InformalNotation`, `BlankLineBeforeDefinition`, `MagicComments`, `CollectionType`, `TagTypePosition` specs to use absolute paths
+  - Updated `ValidatorCoverage` spec to use absolute paths for config and template files
+  - Uses `File.expand_path` with `__dir__` for reliable path resolution regardless of working directory
+
+## 1.2.3 (2025-11-13)
+- **[Feature]** Add per-validator exclusion support for fine-grained file filtering
+  - Individual validators can now specify `Exclude` patterns in `.yard-lint.yml`
+  - Exclusions work alongside global `AllValidators.Exclude` patterns
+  - Both global and per-validator exclusions are applied (union of both pattern sets)
+  - Enables excluding intentionally invalid documentation examples from specific validators
+  - Default config excludes validator implementation files and spec fixtures from `Tags/ExampleSyntax`
+  - Pattern matching works with glob patterns (`**/*.rb`, `**/validators/**/parser.rb`)
+  - Filters validator results based on file location, not just input file selection
+  - Handles both absolute and relative paths correctly in pattern matching
+  - Comprehensive integration test coverage for exclusion scenarios
+  - Example: Exclude parser.rb files with intentionally broken @example tags from syntax validation
+- **[Change]** Update `.yard-lint.yml` to set all validator severities to `error` level
+  - Changes `FailOnSeverity` from `warning` to `error` for stricter enforcement
+  - All validators now use `error` severity instead of `warning` or `convention`
+  - Ensures any documentation issue triggers exit code 1 for CI/CD pipelines
+  - Provides consistent behavior across all validation rules
+- **[Fix]** Fix integration tests failing due to fixture files being filtered by global exclusions
+  - Added `test_config` helper in spec_helper.rb that clears default exclusions for tests
+  - Updated all integration test files to use `test_config` instead of `Yard::Lint::Config.new`
+  - Prevents test fixtures in `spec/fixtures/` from being filtered out by `spec/**/*` exclusion pattern
+  - Ensures integration tests can properly validate linter behavior on fixture files
+- **[Fix]** Remove not needed `bin/` files.
+
+## 1.2.2 (2025-11-13)
+- **[Fix]** Fix `--version` flag failing with `uninitialized constant Yard::Lint::VERSION` error
+  - Zeitwerk expected `Version` (camel case) but file defined `VERSION` (all caps)
+  - Added version.rb to Zeitwerk ignore list and load it manually
+  - Prevents Zeitwerk naming convention conflicts with constant names
+  - Added CLI integration specs to test version flag behavior
+- [Change] Remove unused `net/http` and `uri` dependencies
+
+## 1.2.1 (2025-11-12)
+- [Fix] Fix help text examples showing incorrect argument order (options before PATH instead of PATH before options)
+
+## 1.2.0 (2025-11-12)
+- **[Fix]** Add Ruby 3.5+ compatibility without requiring IRB gem dependency
+  - Ruby 3.5 moved IRB out of default gems, requiring explicit installation
+  - YARD's legacy parser depends on `IRB::Notifier` for debug output
+  - Created lightweight `IRB::Notifier` shim to satisfy YARD without full IRB gem
+  - Shim tries to load real IRB first, only provides fallback if LoadError occurs
+  - Does not override or interfere with real IRB gem when present
+  - Safe to use in applications that depend on yard-lint and also use IRB
+  - Shim automatically loaded in subprocesses via RUBYOPT environment variable
+  - Avoids adding IRB and its transitive dependencies to supply chain
+  - All 977 tests pass on Ruby 3.5.0-preview1 without IRB gem
+- **[Feature]** Add Documentation Coverage Statistics with minimum threshold enforcement
+  - `--min-coverage PERCENT` - Fail if documentation coverage is below threshold (0-100)
+  - `--stats` flag now displays coverage metrics (total objects, documented, undocumented, percentage)
+  - `MinCoverage` configuration option in `.yard-lint.yml` under `AllValidators` section
+  - CLI flag overrides config file setting for flexibility in CI/CD pipelines
+  - Coverage calculation uses YARD queries to count documented vs undocumented objects
+  - Works seamlessly with diff mode (--diff, --staged, --changed) to calculate coverage for changed files only
+  - Exit code 1 when coverage is below minimum threshold, even if no linting offenses found
+  - Summary-only output in --quiet mode shows coverage with pass/fail status
+  - Comprehensive unit and integration test coverage for all scenarios
+  - Performance optimized with auto-cleanup temp directories for large codebases
+- **[Feature]** Add Diff Mode for incremental linting - only analyze files that changed
+  - `--diff [REF]` - Lint only files changed since REF (auto-detects main/master if not specified)
+  - `--staged` - Lint only staged files (git index)
+  - `--changed` - Lint only uncommitted files
+  - Enables practical usage in large legacy codebases
+  - Perfect for CI/CD pipelines (only check what changed in PR)
+  - Ideal for pre-commit hooks (only check staged files)
+  - Auto-detects main/master branch with fallback to master
+  - Applies global exclusion patterns to git diff results
+  - Silently skips deleted files
+  - Returns clean result when no files are changed
+  - Uses shell-based git commands via Open3 (no new dependencies)
+  - Configuration support via `AllValidators.DiffMode` section
+  - Mutually exclusive diff flags (--diff, --staged, --changed)
+
+## 1.1.0 (2025-11-11)
+- **[Feature]** Add `Tags/ExampleSyntax` validator to validate Ruby syntax in `@example` tags
+  - Uses Ruby 3.2's `RubyVM::InstructionSequence.compile()` to parse example code
+  - Automatically strips output indicators (`#=>`) before validation
+  - Intelligently skips incomplete single-line snippets (e.g., `multiply(3, 4)`)
+  - Reports multi-line syntax errors with full context from Ruby's parser
+  - Enabled by default with 'warning' severity
+  - Helps prevent broken code examples in documentation
+- **[Feature]** Add `Tags/RedundantParamDescription` validator to detect meaningless parameter descriptions
+  - Detects 7 types of redundant patterns: article+param, possessive, type restatement, param-to-verb, ID pattern, directional date, type+generic
+  - Configurable pattern toggles to enable/disable individual pattern types
+  - Word count threshold (`MaxRedundantWords`: 6) prevents false positives on longer descriptions
+  - Character length threshold (`MinMeaningfulLength`: 15) for additional context
+  - Configurable articles list (`Articles`: The, the, A, a, An, an)
+  - Configurable generic terms list (`GenericTerms`: object, instance, value, data, item, element)
+  - Pattern-specific error messages with actionable suggestions
+  - EXACT pattern matching (not prefix) to avoid false positives
+  - Enabled by default with 'convention' severity
+  - Helps maintain high-quality, meaningful documentation
+- **[Feature]** Add `--init` command to generate `.yard-lint.yml` configuration file with sensible defaults
+- **[Feature]** Add `--force` flag to overwrite existing config file when using `--init`
+- **[Feature]** Add `EnforcedStyle` configuration option to `Tags/CollectionType` validator for bidirectional style enforcement
+  - Supports 'long' style: `Hash{K => V}` (default, standard YARD syntax)
+  - Supports 'short' style: `{K => V}` (Ruby-like syntax without Hash prefix)
+  - Automatically detects violations in either direction and suggests correct style
+  - Updated messages to show correct suggestion based on enforced style
+- **[Feature]** Add `Documentation/UndocumentedOptions` validator to detect methods with options hash parameters but no @option tags
+  - Detects `options = {}`, `opts = {}`, `**kwargs`, and similar patterns
+  - Helps catch missing documentation for option hash parameters
+  - Configurable via `Documentation/UndocumentedOptions` in config
+- **[Feature]** Add `Documentation/MarkdownSyntax` validator to detect common markdown syntax errors in documentation
+  - Detects unclosed backticks in inline code
+  - Detects unclosed code blocks (```)
+  - Detects unclosed bold formatting (**)
+  - Detects invalid list markers (• instead of - or *)
+  - Configurable via `Documentation/MarkdownSyntax` in config
+- [Enhancement] Simplify README by condensing alternative style examples
+- [Documentation] Add Quick Start section to README with `--init` command
+- [Documentation] Update CLI help to show new `--init` and `--force` options
+
+## 1.0.0 (2025-11-09)
+- [Fix] Fix "Argument list too long" error on large codebases by using xargs pattern with temporary file lists
+- [Enhancement] Expand default exclusion patterns to include typical Ruby/Rails directories (test/, log/, coverage/, db/migrate/, etc.)
+- **[Feature]** Add `Tags/TypeSyntax` validator to detect malformed YARD type syntax using YARD's built-in parser
+  - Detects unclosed brackets: `Array<`, `Hash{Symbol =>`
+  - Detects empty generics: `Array<>`
+  - Detects malformed hash syntax: `Hash{Symbol}`
+  - Configurable `ValidatedTags` option (default: param, option, return, yieldreturn)
+- **[Feature]** Add `Tags/MeaninglessTag` validator to detect `@param` and `@option` tags on non-method objects
+  - Prevents meaningless tags on classes, modules, and constants
+  - Configurable `CheckedTags` (default: param, option) and `InvalidObjectTypes` (default: class, module, constant)
+- **[Feature]** Add `Tags/CollectionType` validator to enforce YARD's Hash collection syntax
+  - Enforces `Hash{K => V}` over `Hash<K, V>` (generic syntax from other languages)
+  - Configurable `ValidatedTags` (default: param, option, return, yieldreturn)
+  - Provides automatic correction suggestions
+- **[Feature]** Add `Tags/TagTypePosition` validator to validate type annotation position in tags
+  - Configurable style: `type_after_name` (YARD standard: `@param name [Type]`) or `type_first` (`@param [Type] name`)
+  - Only validates `@param` and `@option` tags (excludes `@return` as it has no parameter name)
+  - Reads source code directly to avoid false positives from YARD's internal docstring normalization
+- [Fix] Fix `Warnings/UnknownParameterName` validator showing only line number instead of full file path by correcting regex pattern
+- [Enhancement] Add comprehensive integration tests for `UnknownParameterName` validator
+- [Documentation] Add inline documentation explaining cache clearing in bin/yard-lint
+- [Documentation] Expand README with troubleshooting section for ExcludedMethods patterns
+
+## 0.2.2 (2025-11-07)
+- **[Feature]** Add `ExcludedMethods` configuration option to exclude methods from validation using simple names, regex patterns, or arity notation (default excludes parameter-less `initialize/0` methods).
+- [Fix] Fix `UndocumentedObjects` validator incorrectly flagging methods with `@return [Boolean]` tags as undocumented by using `docstring.all.empty?` instead of `docstring.blank?`.
+- [Fix] Fix `UndocumentedBooleanMethods` validator incorrectly flagging methods with `@return [Boolean]` (type without description text) by checking for return types instead of description text.
+- [Enhancement] Implement per-arguments YARD database isolation using SHA256 hash of arguments to prevent contamination between validators with different file selections.
+- [Refactoring] Remove file filtering workaround as database isolation eliminates the need for it.
+- [Change] YARD database directories are now created under a base temp directory with unique subdirectories per argument set.
+
+## 0.2.1 (2025-11-07)
+- Release to validate Trusted Publishing flow.
+
+## 0.2.0 (2025-11-07)
+
+- Initial release of YARD-Lint gem
+- Comprehensive YARD documentation validation
+- CLI tool (`yard-lint`) for running linter
+- Detects undocumented classes, modules, and methods
+- Validates parameter documentation
+- Validates tag type definitions
+- Enforces tag ordering conventions
+- Validates boolean method documentation
+- Detects YARD warnings (unknown tags, invalid directives, etc.)
+- JSON and text output formats
+- Configurable tag ordering and extra type definitions
+- Ruby API for programmatic usage
+- Result object with offense categorization
+- Three severity levels: error, warning, convention
+- YAML configuration file support (`.yard-lint.yml`)
+- Automatic configuration file discovery
+- File exclusion patterns with glob support
+- Configurable exit code based on severity level
+- Quiet mode (`--quiet`) for minimal output
+- Statistics summary (`--stats`)
+- @api tag validation with configurable allowed APIs
+- @abstract method validation
+- @option hash documentation validation
+- Zeitwerk for automatic code loading

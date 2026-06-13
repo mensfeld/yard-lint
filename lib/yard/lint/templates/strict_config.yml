@@ -146,6 +146,9 @@ Tags/InvalidTypes:
     - param
     - option
     - return
+    - yieldreturn
+    - yieldparam
+    - raise
 
 Tags/TypeSyntax:
   Description: 'Validates YARD type syntax using YARD parser.'
@@ -156,6 +159,8 @@ Tags/TypeSyntax:
     - option
     - return
     - yieldreturn
+    - yieldparam
+    - raise
 
 Tags/MeaninglessTag:
   Description: 'Detects @param/@option tags on classes, modules, or constants.'
@@ -184,6 +189,8 @@ Tags/CollectionType:
     - option
     - return
     - yieldreturn
+    - yieldparam
+    - raise
 
 Tags/TagTypePosition:
   Description: 'Validates type annotation position in tags.'
@@ -254,6 +261,7 @@ Tags/RedundantParamDescription:
     IdPattern: true
     DirectionalDate: true
     TypeGeneric: true
+    ArticleParamPhrase: true
 
 Tags/InformalNotation:
   Description: 'Detects informal tag notation patterns like "Note:" instead of @note.'
@@ -263,6 +271,8 @@ Tags/InformalNotation:
   RequireStartOfLine: true
   Patterns:
     Note: '@note'
+    IMPORTANT: '@note'
+    Important: '@note'
     Todo: '@todo'
     TODO: '@todo'
     FIXME: '@todo'
@@ -287,6 +297,7 @@ Tags/NonAsciiType:
     - return
     - yieldreturn
     - yieldparam
+    - raise
 
 Tags/TagGroupSeparator:
   Description: 'Enforces blank line separators between different YARD tag groups.'

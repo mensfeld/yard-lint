@@ -21,7 +21,7 @@ module Yard
             # @return [void]
             def in_process_query(object, collector)
               validated_tags = config.validator_config('Tags/NonAsciiType', 'ValidatedTags') ||
-                               %w[param option return yieldreturn yieldparam]
+                               Config.defaults['ValidatedTags']
 
               all_typed_tags(object.docstring, validated_tags).each do |tag|
                 next unless tag.types
