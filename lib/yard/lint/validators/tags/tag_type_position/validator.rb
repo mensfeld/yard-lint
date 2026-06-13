@@ -33,8 +33,10 @@ module Yard
               (start_line...(end_line - 1)).reverse_each do |line_num|
                 line = source_lines[line_num].to_s.strip
 
-                # Skip empty lines
-                next if line.empty?
+                # A blank line means the comment above is detached from the
+                # definition - YARD does not attach it as the docstring, so stop
+                # scanning rather than reaching up to an unrelated comment block.
+                break if line.empty?
 
                 # Stop if we hit code (non-comment line)
                 break unless line.start_with?('#')
@@ -43,6 +45,10 @@ module Yard
                 next unless line.include?('@')
 
                 checked_tags.each do |tag_name|
+                  # The @option grammar is always "name [Type] :key", so the name
+                  # must precede the type - it is not subject to type_first.
+                  next if style == 'type_first' && tag_name == 'option'
+
                   if style == 'type_first'
                     # Detect: @tag_name word [Type] (violation when type_first is enforced)
                     pattern = /@#{tag_name}\s+(\w+)\s+\[([^\]]+)\]/
