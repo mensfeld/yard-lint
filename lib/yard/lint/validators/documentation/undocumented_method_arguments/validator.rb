@@ -29,8 +29,11 @@ module Yard
 
               # Check if parameters count exceeds @param tags count; tags nested
               # inside @overload blocks live on the overload's own docstring,
-              # so count those too
-              param_count = object.parameters.size
+              # so count those too. Splat (*args, **opts) and block (&block)
+              # parameters are excluded from the count - blocks are documented
+              # with @yield rather than @param, and this matches the arity
+              # convention used everywhere else in the gem (e.g. method_allowed?).
+              param_count = object.parameters.reject { |p| p[0].to_s.start_with?('*', '&') }.size
               param_tags_count = all_typed_tags(object.docstring, %w[param]).size
 
               return unless param_count > param_tags_count
