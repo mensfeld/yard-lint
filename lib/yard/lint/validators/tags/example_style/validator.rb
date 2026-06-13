@@ -28,7 +28,7 @@ module Yard
                 code = example.text
                 next if code.nil? || code.empty?
 
-                example_name = example.name || "Example #{index + 1}"
+                example_name = example.name.to_s.empty? ? "Example #{index + 1}" : example.name
 
                 # Run linter (pass file path for context/config discovery)
                 offenses = runner.run(code, example_name, file_path: object.file)
