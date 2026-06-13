@@ -14,6 +14,13 @@ module Yard
             # Pattern to match non-ASCII characters
             NON_ASCII_PATTERN = /[^\x00-\x7F]/
 
+            # String and quoted-symbol literal types are values, not Ruby type
+            # names, so non-ASCII inside them is legitimate (e.g. ["naïve"]).
+            STRING_LITERAL = /\A("[^"]*"|'[^']*')\z/
+            QUOTED_SYMBOL_LITERAL = /\A:("[^"]*"|'[^']*')\z/
+
+            private_constant :STRING_LITERAL, :QUOTED_SYMBOL_LITERAL
+
             # Execute query for a single object during in-process execution.
             # Checks type specifications for non-ASCII characters.
             # @param object [YARD::CodeObjects::Base] the code object to query
@@ -27,6 +34,9 @@ module Yard
                 next unless tag.types
 
                 tag.types.each do |type_str|
+                  # Skip literal value types - non-ASCII is valid inside them.
+                  next if type_str.match?(STRING_LITERAL) || type_str.match?(QUOTED_SYMBOL_LITERAL)
+
                   non_ascii_chars = type_str.scan(NON_ASCII_PATTERN).uniq
                   next if non_ascii_chars.empty?
 
