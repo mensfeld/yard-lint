@@ -71,14 +71,22 @@ module Yard
         def uncommitted_files(path)
           ensure_git_repository!
 
-          # Get both staged and unstaged changes
+          # Get both staged and unstaged changes to tracked files
           stdout, stderr, status = Open3.capture3('git', 'diff', '--name-only', 'HEAD')
 
           unless status.success?
             raise Error, "Git diff failed: #{stderr.strip}"
           end
 
-          filter_ruby_files(stdout.split("\n"), path)
+          files = stdout.split("\n")
+
+          # Also include untracked (but not git-ignored) files - "all changes in
+          # the working directory" should cover newly added, not-yet-staged files.
+          others_stdout, _stderr, others_status =
+            Open3.capture3('git', 'ls-files', '--others', '--exclude-standard')
+          files += others_stdout.split("\n") if others_status.success?
+
+          filter_ruby_files(files.uniq, path)
         end
 
         private
@@ -112,10 +120,32 @@ module Yard
           root = repository_root
 
           files
+            .map { |f| unquote_git_path(f) }
             .select { |f| f.end_with?('.rb') }
             .map { |f| File.expand_path(f, root) }
             .select { |f| File.exist?(f) } # Skip deleted files
             .select { |f| file_within_path?(f, base_path) }
+        end
+
+        # Unquotes a path as git emits it with the default core.quotepath=true:
+        # paths containing non-ASCII (or special) bytes are wrapped in double
+        # quotes with C-style escapes (e.g. "caf\303\251.rb"). Without this such
+        # files end with `"` rather than `.rb` and are silently dropped.
+        # @param path [String] a path from git output
+        # @return [String] the unquoted path
+        def unquote_git_path(path)
+          return path unless path.start_with?('"') && path.end_with?('"')
+
+          inner = path[1..-2]
+          unescaped = inner.gsub(/\\(?:(\d{3})|(.))/) do
+            octal = Regexp.last_match(1)
+            if octal
+              octal.to_i(8).chr
+            else
+              { 't' => "\t", 'n' => "\n", 'r' => "\r" }.fetch(Regexp.last_match(2), Regexp.last_match(2))
+            end
+          end
+          unescaped.force_encoding(Encoding::UTF_8)
         end
 
         # Check if file is within the specified path
