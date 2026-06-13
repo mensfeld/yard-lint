@@ -55,7 +55,7 @@ describe 'Informal Notation' do
     end
 
     refute_empty(warning_offenses)
-    assert_includes(warning_offenses.first[:message], '@deprecated')
+    assert_includes(warning_offenses.first[:message], '@note')
   end
 
   it 'detecting informal notation patterns finds deprecated patterns' do
