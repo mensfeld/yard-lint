@@ -62,6 +62,12 @@ module Yard
             # @param excluded_methods [Array<String>] list of exclusion patterns
             # @return [Boolean] true if method should be excluded
             def method_excluded?(element, arity, excluded_methods)
+              # ExcludedMethods only applies to methods. A class, module, or
+              # constant element has no #/. separator, so never derive a
+              # "method name" from it - otherwise a pattern like /cache/ would
+              # silently suppress the offense for a class such as Memcached.
+              return false unless element.match?(/[#.]/)
+
               # Extract method name from element (e.g., "Foo::Bar#baz" -> "baz")
               method_name = element.split(/[#.]/).last
               return false unless method_name
