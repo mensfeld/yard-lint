@@ -44,6 +44,12 @@ Documentation/UndocumentedMethodArguments:
   Description: 'Checks for method parameters without @param tags.'
   Enabled: true
   Severity: warning
+  # Match each parameter to a @param tag by name (catches a misnamed @param).
+  # Set to false to fall back to a lenient count-only comparison.
+  CheckParameterNames: true
+  # Opt-in: skip methods with no documentation at all (reported by
+  # Documentation/UndocumentedObjects) instead of flagging them here too.
+  SkipFullyUndocumented: false
   # AllowedParentClasses:
   #   - StandardError
   # AllowedMethods: skip @param checks for specific methods (exact name, name/arity, /regex/)

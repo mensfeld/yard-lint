@@ -5,14 +5,18 @@
 # error. The opt-in SkipNonRuby option (default false) skips @example blocks
 # that are interactive console transcripts rather than runnable Ruby.
 describe 'Tags/ExampleSyntax SkipNonRuby' do
-  FIXTURE = File.expand_path('fixtures/example_syntax_non_ruby.rb', __dir__)
+  # A method (not a constant): a constant assigned inside a `describe` block
+  # leaks to the top-level lexical scope, colliding with other test files.
+  def fixture_path
+    File.expand_path('fixtures/example_syntax_non_ruby.rb', __dir__)
+  end
 
   def example_offenses(skip_non_ruby:)
     config = test_config do |c|
       c.set_validator_config('Tags/ExampleSyntax', 'Enabled', true)
       c.set_validator_config('Tags/ExampleSyntax', 'SkipNonRuby', skip_non_ruby)
     end
-    result = Yard::Lint.run(path: FIXTURE, config: config, progress: false)
+    result = Yard::Lint.run(path: fixture_path, config: config, progress: false)
     result.offenses.select { |o| o[:name] == 'ExampleSyntax' }
   end
 
