@@ -22,6 +22,7 @@ module Yard
               undefined
               unspecified
               unknown
+              Boolean
             ].freeze
 
             private_constant :ALLOWED_DEFAULTS
@@ -34,6 +35,7 @@ module Yard
             def in_process_query(object, collector)
               checked_tags = config_or_default('ValidatedTags')
               extra_types = config_or_default('ExtraTypes')
+              strict = config_or_default('StrictConstantNames')
               allowed_types = ALLOWED_DEFAULTS + extra_types
 
               # Collect per-tag violations to surface in the offense message.
@@ -44,7 +46,7 @@ module Yard
                         .flat_map { |type| extract_type_names(type) }
                         .uniq
                         .reject { |type| allowed_types.include?(type) }
-                        .reject { |type| type_defined?(type) }
+                        .reject { |type| type_defined?(type, strict: strict) }
                         .reject { |type| type.include?('#') }
                 next if bad.empty?
 
@@ -73,17 +75,16 @@ module Yard
             # Check if a type is defined in Ruby runtime or YARD registry
             # In in-process mode, parsed classes are in YARD registry but not loaded into Ruby
             # @param type [String] type name to check
+            # @param strict [Boolean] when true, a syntactically valid but unknown
+            #   constant name (e.g. a typo) is treated as undefined instead of recognized
             # @return [Boolean] true if type is defined (or at least recognized as a valid type)
-            def type_defined?(type)
+            def type_defined?(type, strict: false)
               # Symbol and string literal types (:foo, "bar") are valid hash key notations
               return true if type.start_with?(':', '"', "'")
 
-              # Check Ruby runtime first
-              # The shell query uses: !(Kernel.const_defined?(type) rescue nil).nil?
-              # This means: if const_defined? returns ANY value (true or false, not nil),
-              # the type is considered "recognized" and should not be flagged as invalid.
-              # This allows common types like "Boolean" which aren't actual Ruby classes
-              # but are still recognized by Ruby as valid constant names to check.
+              # Check Ruby runtime first.
+              # const_defined? returns true (loaded constant), false (valid name but
+              # not loaded), or raises NameError (invalid constant syntax).
               begin
                 const_result = Kernel.const_defined?(type)
               rescue NameError
@@ -91,7 +92,20 @@ module Yard
                 # These aren't valid Ruby constants, so we can't check them this way
                 const_result = nil
               end
-              return true unless const_result.nil?
+
+              if strict
+                # Strict mode: only a constant actually loaded in this process
+                # (Ruby core/stdlib) is accepted outright. A valid-but-unloaded
+                # name (const_result == false) or invalid syntax (nil) still gets
+                # the YARD registry check below, so codebase-defined types pass but
+                # unknown CamelCase names (typos) are flagged.
+                return true if const_result == true
+              else
+                # Lenient (default): any syntactically valid constant name is
+                # accepted, because YARD does not load the project's code so most
+                # real types are not const_defined? in this process.
+                return true unless const_result.nil?
+              end
 
               # Check YARD registry (for classes defined in parsed files)
               # This may fail for malformed type strings or registry issues

@@ -11,7 +11,8 @@ describe 'Yard::Lint::Validators::Tags::InvalidTypes::Config' do
         'Enabled' => true,
         'Severity' => 'warning',
         'ValidatedTags' => %w[param option return yieldreturn yieldparam raise],
-        'ExtraTypes' => []
+        'ExtraTypes' => [],
+        'StrictConstantNames' => false
       },
       Yard::Lint::Validators::Tags::InvalidTypes::Config.defaults
     )

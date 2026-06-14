@@ -145,6 +145,10 @@ Tags/InvalidTypes:
     - yieldreturn
     - yieldparam
     - raise
+  # Opt-in: flag CamelCase type names that are neither loaded Ruby constants
+  # nor defined in the analyzed codebase (catches typos like `Strng`). Off by
+  # default because types from un-analyzed dependencies would also be flagged.
+  StrictConstantNames: false
 
 Tags/TypeSyntax:
   Description: 'Validates YARD type syntax using YARD parser.'

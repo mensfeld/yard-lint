@@ -20,7 +20,9 @@ describe 'Template defaults parity' do
     'default_config.yml' => { 'Documentation/UndocumentedObjects' => %w[ExcludedMethods] },
     'strict_config.yml' => {
       'Documentation/UndocumentedObjects' => %w[ExcludedMethods],
-      'Documentation/BlankLineBeforeDefinition' => %w[OrphanedSeverity]
+      'Documentation/BlankLineBeforeDefinition' => %w[OrphanedSeverity],
+      # The strict preset opts into strict constant-name checking
+      'Tags/InvalidTypes' => %w[StrictConstantNames]
     }
   }.freeze
 
