@@ -24,12 +24,14 @@ module Yard
               patterns = config_patterns
               case_sensitive = config_case_sensitive
               require_start = config_require_start_of_line
+              skip_indented = config_skip_indented_code_blocks
 
               found_patterns = find_informal_patterns(
                 docstring_text,
                 patterns,
                 case_sensitive,
-                require_start
+                require_start,
+                skip_indented
               )
 
               return if found_patterns.empty?
@@ -52,8 +54,9 @@ module Yard
             # @param patterns [Hash] pattern => replacement mapping
             # @param case_sensitive [Boolean] whether to match case-sensitively
             # @param require_start [Boolean] whether pattern must be at start of line
+            # @param skip_indented [Boolean] whether to also skip indented code blocks
             # @return [Array<Hash>] array of matches with pattern, replacement, line_offset, line_text
-            def find_informal_patterns(docstring_text, patterns, case_sensitive, require_start)
+            def find_informal_patterns(docstring_text, patterns, case_sensitive, require_start, skip_indented = false)
               found_patterns = []
               matched_lines = Set.new
               in_code_block = false
@@ -67,6 +70,9 @@ module Yard
 
                 # Skip lines inside code blocks
                 next if in_code_block
+
+                # Optionally skip 4-space/tab indented Markdown code blocks
+                next if skip_indented && indented_code_line?(line)
 
                 # Skip lines already matched (avoids duplicate reports for similar patterns)
                 next if matched_lines.include?(line_offset)
@@ -87,6 +93,14 @@ module Yard
               end
 
               found_patterns
+            end
+
+            # Check if a line is part of a Markdown indented code block
+            # (4+ leading spaces or a leading tab, with non-whitespace content).
+            # @param line [String] the raw docstring line
+            # @return [Boolean] true if the line is indented code
+            def indented_code_line?(line)
+              line.match?(/\A(?: {4}|\t)/) && !line.strip.empty?
             end
 
             # Check if a line matches the informal pattern
@@ -126,6 +140,11 @@ module Yard
             # @return [Boolean] whether patterns must appear at start of line
             def config_require_start_of_line
               config_or_default('RequireStartOfLine')
+            end
+
+            # @return [Boolean] whether to skip indented Markdown code blocks
+            def config_skip_indented_code_blocks
+              config_or_default('SkipIndentedCodeBlocks')
             end
           end
         end
