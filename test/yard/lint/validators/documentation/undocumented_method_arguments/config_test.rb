@@ -14,7 +14,9 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Co
         'Enabled' => true,
         'Severity' => 'warning',
         'AllowedParentClasses' => [],
-        'AllowedMethods' => []
+        'AllowedMethods' => [],
+        'CheckParameterNames' => false,
+        'SkipFullyUndocumented' => false
       },
       Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Config.defaults
     )

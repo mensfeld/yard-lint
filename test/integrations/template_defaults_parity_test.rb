@@ -22,7 +22,9 @@ describe 'Template defaults parity' do
       'Documentation/UndocumentedObjects' => %w[ExcludedMethods],
       'Documentation/BlankLineBeforeDefinition' => %w[OrphanedSeverity],
       # The strict preset opts into strict constant-name checking
-      'Tags/InvalidTypes' => %w[StrictConstantNames]
+      'Tags/InvalidTypes' => %w[StrictConstantNames],
+      # The strict preset opts into name-based @param matching
+      'Documentation/UndocumentedMethodArguments' => %w[CheckParameterNames]
     }
   }.freeze
 
