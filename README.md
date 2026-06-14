@@ -23,7 +23,7 @@ YARD-Lint validates your YARD documentation for:
 - **Type Accuracy** - Invalid type definitions, malformed type syntax, non-ASCII characters in types, tuple types, literal types (symbols, strings, numbers), and misspelled class names (opt-in via `StrictConstantNames`)
 - **Tag Validation** - Incorrect tag ordering, meaningless tags, invalid tag positions, unknown tags with suggestions, forbidden tag patterns, undocumented `yield` calls (opt-in)
 - **Parse Errors** - Files YARD cannot parse (syntax errors) are reported instead of silently skipped, so a run never passes over code that does not parse
-- **Code Examples** - Syntax validation in `@example` tags, optional style validation with RuboCop/StandardRB
+- **Code Examples** - Syntax validation in `@example` tags (with an opt-in skip for irb/pry/shell console transcripts), optional style validation with RuboCop/StandardRB
 - **Semantic Correctness** - Abstract methods with implementations, redundant descriptions
 - **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns, tag group separators, configurable documentation line length (opt-in)
 - **Smart Suggestions** - "Did you mean" suggestions for typos in parameter names, tags, and configuration settings

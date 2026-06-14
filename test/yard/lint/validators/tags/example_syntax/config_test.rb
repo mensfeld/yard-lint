@@ -9,7 +9,8 @@ describe 'Yard::Lint::Validators::Tags::ExampleSyntax::Config' do
     assert_equal(
       {
         'Enabled' => true,
-        'Severity' => 'warning'
+        'Severity' => 'warning',
+        'SkipNonRuby' => false
       },
       Yard::Lint::Validators::Tags::ExampleSyntax::Config.defaults
     )

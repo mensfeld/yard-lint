@@ -10,7 +10,12 @@ module Yard
             self.id = :example_syntax
             self.defaults = {
               'Enabled' => true,
-              'Severity' => 'warning'
+              'Severity' => 'warning',
+              # Opt-in: skip @example blocks that are interactive console
+              # transcripts (irb/pry sessions, their `=>` output, or shell `$`
+              # prompts) rather than runnable Ruby. Off by default so a real
+              # syntax error in a normal example is not accidentally hidden.
+              'SkipNonRuby' => false
             }.freeze
           end
         end
