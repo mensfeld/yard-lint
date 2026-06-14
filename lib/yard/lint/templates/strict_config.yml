@@ -48,7 +48,7 @@ Documentation/UndocumentedMethodArguments:
   Description: 'Checks for method parameters without @param tags.'
   Enabled: true
   Severity: error
-  # The strict preset matches @param tags to parameters by name, not just count.
+  # Match each parameter to a @param tag by name (catches a misnamed @param).
   CheckParameterNames: true
   # Opt-in: skip methods with no documentation at all (reported by
   # Documentation/UndocumentedObjects) instead of flagging them here too.

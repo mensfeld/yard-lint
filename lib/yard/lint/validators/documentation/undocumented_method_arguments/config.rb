@@ -13,11 +13,11 @@ module Yard
               'Severity' => 'warning',
               'AllowedParentClasses' => [],
               'AllowedMethods' => [],
-              # Opt-in: match each parameter to a @param tag by name instead of
-              # only comparing counts. Catches a misnamed @param (e.g. `@param
-              # wrong` for `def push(item)`) that the count check accepts. Off by
-              # default to preserve the lenient count-based behaviour.
-              'CheckParameterNames' => false,
+              # Match each parameter to a @param tag by name (default). Catches a
+              # misnamed @param (e.g. `@param wrong` for `def push(item)`) that a
+              # count-only check would accept. Set to false to fall back to the
+              # lenient count-only comparison.
+              'CheckParameterNames' => true,
               # Opt-in: skip methods with no documentation at all and let
               # Documentation/UndocumentedObjects report them, avoiding a second
               # offense for the same fully-undocumented method. Off by default.
