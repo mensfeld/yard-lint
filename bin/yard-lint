@@ -133,6 +133,19 @@ rescue OptionParser::ParseError => e
   exit 1
 end
 
+# Disambiguate `--diff PATH`. `--diff [REF]` takes an optional argument, so
+# `yard-lint --diff lib/` makes OptionParser consume `lib/` as the REF, leaving
+# no PATH (the run then tries `git diff lib/...HEAD` and fails). When the --diff
+# argument is not a resolvable git ref but is an existing path and no explicit
+# path was given, treat it as the PATH and let the base ref auto-detect.
+if diff_mode && diff_mode[:mode] == :ref && diff_mode[:base_ref] && ARGV.empty?
+  candidate = diff_mode[:base_ref]
+  if File.exist?(candidate) && !Yard::Lint::Git.branch_exists?(candidate)
+    ARGV.unshift(candidate)
+    diff_mode[:base_ref] = nil
+  end
+end
+
 # Handle --init flag
 if options[:init]
   if Yard::Lint::ConfigGenerator.generate(force: options[:force], strict: options[:strict])
