@@ -230,6 +230,10 @@ Tags/ExampleSyntax:
   Description: 'Validates Ruby syntax in @example tags.'
   Enabled: true
   Severity: error
+  # Opt-in: skip @example blocks that are interactive console transcripts
+  # (irb/pry sessions, their `=>` output, or shell `$` prompts) rather than
+  # runnable Ruby. Off by default so a real syntax error is not hidden.
+  SkipNonRuby: false
 
 Tags/ExampleStyle:
   Description: 'Validates code style in @example tags using RuboCop/StandardRB.'

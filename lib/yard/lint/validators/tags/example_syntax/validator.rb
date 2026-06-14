@@ -18,11 +18,16 @@ module Yard
             def in_process_query(object, collector)
               return unless object.has_tag?(:example)
 
+              skip_non_ruby = config_or_default('SkipNonRuby')
               example_tags = object.tags(:example)
 
               example_tags.each_with_index do |example, index|
                 code = example.text
                 next if code.nil? || code.empty?
+
+                # Opt-in: an interactive console transcript is not runnable Ruby,
+                # so skip it rather than reporting its prompts as syntax errors.
+                next if skip_non_ruby && console_transcript?(code)
 
                 # Clean the code: strip YARD output indicators (# =>) and
                 # everything after them, but only when the "# =>" is a real
@@ -71,6 +76,25 @@ module Yard
             end
 
             private
+
+            # Matches a line that begins (after optional whitespace) with an
+            # interactive console prompt or REPL output marker:
+            #   >> / ?>      irb input / continuation
+            #   =>           irb/pry result output
+            #   irb( irb>    irb prompt
+            #   pry( / [n] pry(   pry prompt
+            #   $            shell prompt
+            CONSOLE_PROMPT = /\A\s*(?:>>|\?>|=>|\$\s|irb[\s(>]|(?:\[\d+\]\s*)?pry[\s(>])/.freeze
+
+            private_constant :CONSOLE_PROMPT
+
+            # Check whether an @example body is an interactive console transcript
+            # (irb/pry session or shell prompt) rather than runnable Ruby.
+            # @param code [String] the raw @example text
+            # @return [Boolean] true if any line looks like a console prompt/output
+            def console_transcript?(code)
+              code.each_line.any? { |line| line.match?(CONSOLE_PROMPT) }
+            end
 
             # Removes a trailing YARD `# => result` output marker from a line of
             # example code, but only when the `#` actually starts a comment - a
