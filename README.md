@@ -382,6 +382,35 @@ end
 
 Method calls like `Fiber.yield` and `yielder.yield` (Enumerator::Yielder) are not flagged - only the `yield` keyword triggers the check.
 
+## Encouraging full-width documentation (opt-in)
+
+`Documentation/LineLength` flags comment lines that are too *long*. `Documentation/UnderfilledLines` is its inverse: it flags documentation prose that wraps **too early** - text that uses only a fraction of the available width and spills onto extra lines, wasting vertical space. This pattern is especially common in AI-generated documentation.
+
+Enable it in `.yard-lint.yml`:
+
+```yaml
+Documentation/UnderfilledLines:
+  Enabled: true
+  MaxLength: 120          # target width (match your Documentation/LineLength)
+  MinTrailingSpace: 20    # only flag when the widest line wastes >= 20 columns
+```
+
+```ruby
+# Bad - prose wraps at ~55 columns when 120 are available
+# Processes the incoming payload and returns a normalized
+# hash that downstream consumers can rely on for routing.
+def process(payload); end
+
+# Good - prose fills the available width before wrapping
+# Processes the incoming payload and returns a normalized hash that downstream
+# consumers can rely on for routing.
+def process(payload); end
+```
+
+The validator reports one offense per wasteful paragraph and is deliberately conservative - it would rather miss a case than emit a false positive. It only looks at the free-text description body (tags, fenced/indented code, lists, tables, headings, blockquotes and non-ASCII text are left alone), and a paragraph is reported only when re-wrapping its words at `MaxLength` would genuinely use fewer lines.
+
+Unlike `LineLength` (which measures an objective property), "this line should have been longer" is a stylistic judgement. Projects that use **semantic line breaks** (one sentence or clause per line, see [sembr.org](https://sembr.org)) are never flagged - any paragraph whose non-final lines all end at a sentence boundary (`.?!:;`) is treated as intentional. Leave the validator off, or add `,` to `SentenceEndChars`, if that style is used heavily.
+
 ## Handling Non-Standard Types
 
 By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `Boolean`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes - project-specific aliases, LSP extensions, or informal conventions - you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.

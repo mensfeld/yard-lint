@@ -117,6 +117,16 @@ Documentation/LineLength:
   Severity: error
   MaxLength: 120
 
+Documentation/UnderfilledLines:
+  Description: 'Detects documentation prose that wraps before using the available line width.'
+  Enabled: false  # Opt-in validator (heuristic; stays convention even in strict)
+  Severity: convention
+  MaxLength: 120
+  MinTrailingSpace: 20
+  MinParagraphLines: 2
+  SentenceEndChars: ['.', '?', '!', ':', ';']
+  SkipNonAscii: true
+
 Documentation/TextSubstitution:
   Description: 'Detects forbidden characters or strings in documentation and suggests replacements.'
   Enabled: true

@@ -83,6 +83,14 @@ Documentation/LineLength:
   Severity: convention
   MaxLength: 120
 
+Documentation/UnderfilledLines:
+  Description: 'Detects documentation prose that wraps before using the available line width.'
+  # Opt-in. yard-lint intentionally wraps its own comments narrower than 120,
+  # so enabling this at MaxLength 120 would report that as underfilled.
+  Enabled: false
+  Severity: convention
+  MaxLength: 120
+
 Documentation/TextSubstitution:
   Description: 'Detects forbidden characters or strings in documentation and suggests replacements.'
   Enabled: false  # Opt-in validator
