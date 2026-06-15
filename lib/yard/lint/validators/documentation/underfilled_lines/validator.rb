@@ -68,7 +68,9 @@ module Yard
             # @return [Array<String>] lines of the file, memoized per path
             def cached_lines(file)
               @file_cache ||= {}
-              @file_cache[file] ||= File.readlines(file)
+              # scrub invalid bytes so the marker/structural regexes never raise
+              # Encoding::CompatibilityError on a non-UTF-8 source file.
+              @file_cache[file] ||= File.readlines(file).map!(&:scrub)
             end
 
             # Classify each source line in the docstring range. Plain-prose lines become
@@ -252,8 +254,7 @@ module Yard
             # @return [Integer] number of wrapped lines
             def reflow_count(paragraph, max_length)
               prefix_width = paragraph.first[:prefix_width]
-              words = paragraph.flat_map { |line| line[:content].split(/\s+/) }
-              words.reject!(&:empty?)
+              words = paragraph.flat_map { |line| line[:content].split }
               return paragraph.size if words.empty?
 
               lines = 1

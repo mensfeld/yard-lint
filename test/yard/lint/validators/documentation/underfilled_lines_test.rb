@@ -234,12 +234,15 @@ describe 'Documentation/UnderfilledLines integration' do
     RUBY
   end
 
-  it 'does not flag non-ascii prose by default' do
-    assert_empty underfilled_offenses(<<~RUBY)
+  it 'skips non-ascii prose by default but flags it when SkipNonAscii is false' do
+    source = <<~RUBY
       # このメソッドはユーザー識別子を正規化して返します。
       # ログとメトリクスでの表示に使用されます。
       def jp; end
     RUBY
+
+    assert_empty underfilled_offenses(source)
+    assert_equal(1, underfilled_offenses(source, SkipNonAscii: false).size)
   end
 
   it 'does not flag a line ending in an abbreviation' do
@@ -317,7 +320,39 @@ describe 'Documentation/UnderfilledLines integration' do
       def process(payload); end
     RUBY
 
-    assert_equal(1, underfilled_offenses(source, MinTrailingSpace: 20).size)
+    # widest non-final line fills 57/120, so requiring 50 columns of slack still
+    # flags while requiring 90 suppresses - neither value is the default (20).
+    assert_equal(1, underfilled_offenses(source, MinTrailingSpace: 50).size)
     assert_empty underfilled_offenses(source, MinTrailingSpace: 90)
+  end
+
+  it 'honors MinParagraphLines' do
+    source = <<~RUBY
+      # Processes the incoming payload and returns a normalized
+      # hash that downstream consumers can rely on for routing.
+      def process(payload); end
+    RUBY
+
+    assert_equal(1, underfilled_offenses(source).size)
+    assert_empty underfilled_offenses(source, MinParagraphLines: 3)
+  end
+
+  it 'does not crash on a source file with invalid UTF-8 bytes' do
+    Tempfile.create(['underfilled', '.rb']) do |file|
+      file.binmode
+      file.write("# encoding: ISO-8859-1\n")
+      file.write("# Returns the caf\xE9 preference for the user and the\n")
+      file.write("# associated locale so callers can format it for display.\n")
+      file.write("def caf; end\n")
+      file.flush
+
+      config = test_config do |c|
+        c.set_validator_config('Documentation/UnderfilledLines', 'Enabled', true)
+      end
+
+      # Must not raise Encoding::CompatibilityError / ArgumentError.
+      result = Yard::Lint.run(path: file.path, config: config)
+      assert_kind_of(Array, result.offenses)
+    end
   end
 end
