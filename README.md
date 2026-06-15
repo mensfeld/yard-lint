@@ -31,7 +31,7 @@ YARD-Lint validates your YARD documentation for:
 - **Performance** - In-process YARD execution with shared registry (~10x faster than shell-based execution)
 - **Incremental Adoption** - `--auto-gen-config` generates a baseline todo file to adopt on legacy codebases without fixing everything first
 
-**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [34 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [35 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -239,6 +239,11 @@ Documentation/UndocumentedObjects:
 Documentation/UndocumentedMethodArguments:
   Enabled: true
   Severity: warning
+  # Match each @param to a parameter by name (default). Catches a misnamed tag,
+  # not just a missing one. Set to false for a lenient count-only comparison.
+  CheckParameterNames: true
+  # Opt-in: skip methods with no documentation at all (left to UndocumentedObjects)
+  SkipFullyUndocumented: false
   # Skip @param checks for specific methods (exact name, name/arity, /regex/)
   AllowedMethods:
     - call            # service objects: call(args) is self-documenting
@@ -270,6 +275,9 @@ Tags/InvalidTypes:
   ExtraTypes:
     - generic          # Solargraph generic type parameter (lsegal/yard#1683)
     - MyNamespace::CustomType
+  # Opt-in: flag CamelCase types that are not loaded constants nor defined in the
+  # analyzed codebase (catches typos like `Strng`). Enabled by --init --strict.
+  StrictConstantNames: false
 
 # Opt-in: Require @return tags on all methods
 Documentation/MissingReturn:
@@ -376,7 +384,7 @@ Method calls like `Fiber.yield` and `yielder.yield` (Enumerator::Yielder) are no
 
 ## Handling Non-Standard Types
 
-By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes - project-specific aliases, LSP extensions, or informal conventions - you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.
+By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `Boolean`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes - project-specific aliases, LSP extensions, or informal conventions - you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.
 
 ### Project-Specific Type Aliases
 
@@ -400,12 +408,13 @@ Tags/InvalidTypes:
 
 ### Built-In Pseudo-Types (no configuration needed)
 
-The following lowercase YARD pseudo-types are accepted out of the box and do **not** need to be listed in `ExtraTypes`:
+The following YARD pseudo-types are accepted out of the box and do **not** need to be listed in `ExtraTypes`:
 
 | Type | Meaning |
 |------|---------|
 | `nil` | Explicitly nil |
 | `true` / `false` | Boolean literals |
+| `Boolean` | YARD boolean pseudo-type (`true` or `false`) |
 | `self` | Returns the receiver |
 | `void` | No meaningful return value |
 | `undefined` | Type is intentionally unspecified (used by Solargraph) |
@@ -526,7 +535,7 @@ The text formatter also shows the validator path (e.g., `[Documentation/Orphaned
 - **[Wiki Home](https://github.com/mensfeld/yard-lint/wiki)** - Full documentation
 - **[Installation](https://github.com/mensfeld/yard-lint/wiki/Installation)** - Installation guide
 - **[Configuration](https://github.com/mensfeld/yard-lint/wiki/Configuration)** - Complete configuration reference
-- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 34 validators documented
+- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 35 validators documented
 - **[Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All features explained
 
 ### Workflows
