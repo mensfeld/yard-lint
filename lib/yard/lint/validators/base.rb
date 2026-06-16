@@ -122,6 +122,17 @@ module Yard
           start_line + line_offset
         end
 
+        # Returns the lines of a source file, reading from disk only on the first
+        # call for each unique path. Invalid bytes are scrubbed so that callers
+        # matching regexes against the lines never raise Encoding::CompatibilityError
+        # on a non-UTF-8 source file.
+        # @param file [String] absolute path to the source file
+        # @return [Array<String>] lines of the file, memoized per path
+        def cached_lines(file)
+          @file_cache ||= {}
+          @file_cache[file] ||= File.readlines(file).map!(&:scrub)
+        end
+
         # Returns the tag that actually carries a tag's types and description.
         # For most tags that is the tag itself, but @option tags wrap their
         # data in a nested pair tag - tag.types and tag.text are nil on the

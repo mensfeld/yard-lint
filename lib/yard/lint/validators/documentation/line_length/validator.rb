@@ -41,17 +41,6 @@ module Yard
               collector.puts "#{object.file}:#{object.line}: #{object.title}"
               collector.puts "#{max_length}|#{violations.join('|')}"
             end
-
-            private
-
-            # Returns the lines of a source file, reading from disk only on the first call
-            # for each unique path.
-            # @param file [String] absolute path to the source file
-            # @return [Array<String>] lines of the file, memoized per path
-            def cached_lines(file)
-              @file_cache ||= {}
-              @file_cache[file] ||= File.readlines(file)
-            end
           end
         end
       end
