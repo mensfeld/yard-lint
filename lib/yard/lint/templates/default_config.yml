@@ -114,6 +114,21 @@ Documentation/LineLength:
   Severity: convention
   MaxLength: 120
 
+Documentation/UnderfilledLines:
+  Description: 'Detects documentation prose that wraps before using the available line width.'
+  Enabled: false  # Opt-in validator (the inverse of LineLength)
+  Severity: convention
+  MaxLength: 120
+  # Only flag when the widest non-final line wastes at least this many columns.
+  MinTrailingSpace: 20
+  # Single-line descriptions are never flagged.
+  MinParagraphLines: 2
+  # A non-final line ending in one of these is a deliberate break (skipped).
+  # Add ',' to also respect comma breaks (suppresses more, catches less).
+  SentenceEndChars: ['.', '?', '!', ':', ';']
+  # Skip paragraphs with non-ASCII text (String#length is not display width).
+  SkipNonAscii: true
+
 Documentation/TextSubstitution:
   Description: 'Detects forbidden characters or strings in documentation and suggests replacements.'
   Enabled: false  # Opt-in validator
