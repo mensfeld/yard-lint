@@ -62,17 +62,6 @@ module Yard
 
             private
 
-            # Returns the lines of a source file, reading from disk only on the first
-            # call for each unique path.
-            # @param file [String] absolute path to the source file
-            # @return [Array<String>] lines of the file, memoized per path
-            def cached_lines(file)
-              @file_cache ||= {}
-              # scrub invalid bytes so the marker/structural regexes never raise
-              # Encoding::CompatibilityError on a non-UTF-8 source file.
-              @file_cache[file] ||= File.readlines(file).map!(&:scrub)
-            end
-
             # Classify each source line in the docstring range. Plain-prose lines become
             # hashes; everything else (blank lines, tags, code, markdown structure) is a
             # `:break` marker that separates paragraphs.

@@ -167,3 +167,34 @@ describe 'YardLintValidatorsBaseConfigOrDefault' do
   end
 end
 
+describe 'YardLintValidatorsBaseCachedLines' do
+  attr_reader :validator
+
+  before do
+    @validator = Yard::Lint::Validators::Base.new(Yard::Lint::Config.new, ['lib/example.rb'])
+  end
+
+  it 'reads a file from disk only once per path and memoizes the result' do
+    File.expects(:readlines).with('/some/file.rb').once.returns(["line one\n"])
+
+    first = validator.send(:cached_lines, '/some/file.rb')
+    second = validator.send(:cached_lines, '/some/file.rb')
+
+    assert_equal(["line one\n"], first)
+    assert_same(first, second)
+  end
+
+  it 'scrubs invalid bytes so regex matching never raises on a non-utf-8 file' do
+    Tempfile.create(['base_cached', '.rb']) do |file|
+      file.binmode
+      file.write("# caf\xE9 latin-1 comment\n")
+      file.flush
+
+      lines = validator.send(:cached_lines, file.path)
+
+      assert(lines.all?(&:valid_encoding?), 'expected scrubbed lines to be valid UTF-8')
+      assert(lines.first.match?(/\A#/), 'scrubbed line should match a UTF-8 regex without raising')
+    end
+  end
+end
+
