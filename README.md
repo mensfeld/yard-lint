@@ -25,13 +25,13 @@ YARD-Lint validates your YARD documentation for:
 - **Parse Errors** - Files YARD cannot parse (syntax errors) are reported instead of silently skipped, so a run never passes over code that does not parse
 - **Code Examples** - Syntax validation in `@example` tags (with an opt-in skip for irb/pry/shell console transcripts), optional style validation with RuboCop/StandardRB
 - **Semantic Correctness** - Abstract methods with implementations, redundant descriptions
-- **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns, tag group separators, configurable documentation line length (opt-in)
+- **Style & Formatting** - Empty comment lines, blank lines before definitions, informal notation patterns, tag group separators, and configurable documentation line length and line fill — flagging comment lines that are too long or prose that wraps before using the available width (both opt-in)
 - **Smart Suggestions** - "Did you mean" suggestions for typos in parameter names, tags, and configuration settings
 - **Configuration Safety** - Validates `.yard-lint.yml` for typos and invalid settings before processing
 - **Performance** - In-process YARD execution with shared registry (~10x faster than shell-based execution)
 - **Incremental Adoption** - `--auto-gen-config` generates a baseline todo file to adopt on legacy codebases without fixing everything first
 
-**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [35 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [36 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -293,6 +293,11 @@ Tags/ExampleStyle:
 
 # Opt-in: Enforce max line length in documentation comments
 Documentation/LineLength:
+  Enabled: true
+  MaxLength: 100
+
+# Opt-in: Flag documentation prose that wraps before using the available width
+Documentation/UnderfilledLines:
   Enabled: true
   MaxLength: 100
 ```
