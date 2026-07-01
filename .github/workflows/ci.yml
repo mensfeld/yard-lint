@@ -21,14 +21,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         ruby:
-          - '3.2'
           - '3.3'
           - '3.4'
           - '4.0'
         exclude:
           # Only test Ruby 3.4 on macOS to limit CI usage
-          - os: macos-latest
-            ruby: '3.2'
           - os: macos-latest
             ruby: '3.3'
           - os: macos-latest
