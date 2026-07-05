@@ -360,6 +360,13 @@ Tags/TagGroupSeparator:
     yield: [yield, yieldparam, yieldreturn]
   RequireAfterDescription: false
 
+Tags/TagSeparator:
+  Description: 'Enforces a blank line between every consecutive YARD tag.'
+  Enabled: false  # Opt-in validator
+  Severity: convention
+  Exempt: []
+  RequireAfterDescription: false
+
 Tags/ForbiddenTags:
   Description: 'Detects forbidden tag and type combinations.'
   Enabled: false  # Opt-in validator
