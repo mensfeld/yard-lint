@@ -29,8 +29,8 @@ if RUBY_VERSION.start_with?('4.0')
   require 'simplecov'
 
   SimpleCov.start do
-    add_filter '/test/'
-    add_filter '/vendor/'
+    skip '/test/'
+    skip '/vendor/'
 
     minimum_coverage 95
   end
