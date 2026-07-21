@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
         # UnknownDirective validator
         #
@@ -30,7 +29,6 @@ module Yard
         #
         #     Warnings/UnknownDirective:
         #       Enabled: false
-        #
         module UnknownDirective
         end
       end

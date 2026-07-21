@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Tags validators - validate YARD tag quality and consistency
       module Tags
         # ExampleSyntax validator
         #

@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
         # UnknownTag validator
         #
@@ -40,7 +39,6 @@ module Yard
         #
         #     Warnings/UnknownTag:
         #       Enabled: false
-        #
         module UnknownTag
         end
       end

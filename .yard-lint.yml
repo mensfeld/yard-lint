@@ -99,6 +99,11 @@ Documentation/TextSubstitution:
     "—": "-"    # em-dash (U+2014)
     "–": "-"    # en-dash (U+2013)
 
+Documentation/DuplicateNamespaceComment:
+  Description: 'Detects namespaces (modules and classes) documented in more than one file.'
+  Enabled: true
+  Severity: error
+
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'

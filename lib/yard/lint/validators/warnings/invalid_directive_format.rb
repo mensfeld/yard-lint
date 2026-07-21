@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
         # InvalidDirectiveFormat validator
         #
@@ -29,7 +28,6 @@ module Yard
         #
         #     Warnings/InvalidDirectiveFormat:
         #       Enabled: false
-        #
         module InvalidDirectiveFormat
         end
       end

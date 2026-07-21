@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
         # DuplicatedParameterName validator
         #
@@ -29,7 +28,6 @@ module Yard
         #
         #     Warnings/DuplicatedParameterName:
         #       Enabled: false
-        #
         module DuplicatedParameterName
         end
       end
