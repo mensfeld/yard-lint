@@ -3,9 +3,7 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
-        # Validator for detecting invalid directive formats
         module InvalidDirectiveFormat
           # Configuration for InvalidDirectiveFormat validator
           class Config < ::Yard::Lint::Validators::Config

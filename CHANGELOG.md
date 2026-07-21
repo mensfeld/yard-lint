@@ -1,3 +1,6 @@
+## 1.10.0 (2026-07-21)
+- **[Feature]** Added `Documentation/DuplicateNamespaceComment` (enabled by default, severity `warning`) - detects namespaces (modules and classes) that carry a YARD documentation comment in more than one file. When a namespace is reopened across files and documented in several of them, YARD merges the reopenings into a single object and keeps only one docstring, silently discarding the rest (the last documented reopening wins, with no warning), so competing descriptions are lost. This is a common accident for shared namespaces (e.g. `Users` or `Users::Operations`) spread across many files; it does not affect a leaf object such as `Users::Operations::Create` that lives in a single file. Because YARD does not record which reopening carried a comment, the validator re-reads each definition site to detect the documented ones (ignoring blank-line-detached comments and directive/magic comments), and reports one offense per namespace documented in two or more files, listing every documented location and noting when the docstrings differ (meaning content is actually lost). Configurable via the standard `Enabled` and `Severity` keys.
+
 ## 1.9.0 (2026-07-01)
 - **[Breaking]** Dropped support for Ruby 3.2. The minimum required Ruby version is now 3.3.0. This change was necessary because the `parallel` gem no longer supports Ruby 3.2.
 

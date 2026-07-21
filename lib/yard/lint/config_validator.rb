@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-# YARD Lint - comprehensive linter for YARD documentation
 module Yard
-  # YARD Lint module providing linting functionality for YARD documentation
   module Lint
     # Validates configuration structure and values to catch typos and invalid settings
     class ConfigValidator

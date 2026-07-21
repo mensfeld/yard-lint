@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
         # InvalidTagFormat validator
         #
@@ -29,7 +28,6 @@ module Yard
         #
         #     Warnings/InvalidTagFormat:
         #       Enabled: false
-        #
         module InvalidTagFormat
         end
       end

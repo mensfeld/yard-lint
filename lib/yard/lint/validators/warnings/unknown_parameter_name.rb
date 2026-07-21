@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
         # UnknownParameterName validator
         #
@@ -27,7 +26,6 @@ module Yard
         #
         #     Warnings/UnknownParameterName:
         #       Enabled: false
-        #
         module UnknownParameterName
         end
       end

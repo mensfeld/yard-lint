@@ -3,15 +3,14 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
-      module Warnings
-        module DuplicatedParameterName
-          # Configuration for DuplicatedParameterName validator
+      module Documentation
+        module DuplicateNamespaceComment
+          # Configuration for DuplicateNamespaceComment validator
           class Config < ::Yard::Lint::Validators::Config
-            self.id = :duplicated_parameter_name
+            self.id = :duplicate_namespace_comment
             self.defaults = {
               'Enabled' => true,
-              'Severity' => 'error'
+              'Severity' => 'warning'
             }.freeze
           end
         end

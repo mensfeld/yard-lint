@@ -3,7 +3,6 @@
 module Yard
   module Lint
     module Validators
-      # Validators for checking YARD warnings
       module Warnings
         # SyntaxError validator
         #
@@ -25,7 +24,6 @@ module Yard
         #
         #     Warnings/SyntaxError:
         #       Enabled: false
-        #
         module SyntaxError
         end
       end

@@ -10,6 +10,7 @@ require 'did_you_mean'
 require 'yard'
 require 'set'
 
+# YARD Lint - comprehensive linter for YARD documentation
 module Yard
   # YARD Lint module providing linting functionality for YARD documentation
   module Lint

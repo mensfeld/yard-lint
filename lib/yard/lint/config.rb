@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# YARD Lint - comprehensive linter for YARD documentation
 module Yard
   module Lint
     # Configuration object for YARD Lint
