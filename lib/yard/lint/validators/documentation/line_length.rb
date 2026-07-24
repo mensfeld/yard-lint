@@ -11,7 +11,7 @@ module Yard
         # above a documentable Ruby construct). YARD's parsed docstring is used to
         # determine which lines belong to a docstring, avoiding fragile backwards-scanning.
         #
-        # Disabled by default — enable it and set MaxLength to taste.
+        # Disabled by default - enable it and set MaxLength to taste.
         #
         # @example Bad - line exceeds MaxLength (120)
         #   # This documentation line is too long and exceeds the configured maximum length.

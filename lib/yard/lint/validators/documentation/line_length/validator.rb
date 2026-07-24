@@ -9,7 +9,7 @@ module Yard
           #
           # Uses YARD's `docstring.line_range` to locate the exact source lines belonging to
           # each docstring block. This handles block comments, wrapped tag descriptions, and
-          # macro expansion correctly — no arithmetic reconstruction needed.
+          # macro expansion correctly - no arithmetic reconstruction needed.
           class Validator < Validators::Base
             in_process visibility: :all
 

@@ -186,7 +186,7 @@ module Yard
             superclass_path = superclass.respond_to?(:path) ? superclass.path.to_s : superclass.to_s
             next false if superclass_path.empty?
             # Every Ruby class without an explicit parent implicitly inherits from Object,
-            # so matching it would exempt all classes — never the intent.
+            # so matching it would exempt all classes - never the intent.
             # BasicObject is the root of the hierarchy and is guarded for the same reason.
             next false if superclass_path == 'Object' || superclass_path == 'BasicObject'
 
@@ -199,10 +199,10 @@ module Yard
         # object without reporting an offense.
         #
         # Three pattern forms are supported (matching ExcludedMethods convention):
-        #   - Exact name:    'call'          — matches any arity
-        #   - Arity:         'initialize/1'  — matches only the given parameter count
+        #   - Exact name:    'call'          - matches any arity
+        #   - Arity:         'initialize/1'  - matches only the given parameter count
         #                                      (required + optional, excluding * and &)
-        #   - Regex:         '/^perform/'    — matches against the bare method name
+        #   - Regex:         '/^perform/'    - matches against the bare method name
         #
         # Invalid regex patterns are silently ignored. The empty regex '//' is always
         # rejected (it would match every method, making the option useless).
