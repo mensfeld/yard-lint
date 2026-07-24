@@ -1,4 +1,4 @@
-## 1.10.1 (unreleased)
+## 1.10.1 (2026-07-24)
 - **[Bugfix]** `Documentation/BlankLineBeforeDefinition` no longer reports a foreign comment block above a definition as documentation that was accidentally detached from it. When the object is documented (non-empty docstring) but that docstring did not come from the comment block sitting above this definition, the block is not a detached docstring - it is a file-level license/copyright banner, an encoding note, or an unrelated comment above a namespace reopening whose documentation lives in another file. The check compares the object's docstring against the block's text, so it recognizes any such banner without hardcoding its wording. Definitions whose documentation was genuinely lost (an undocumented object with a comment block detached above it) are still reported.
 
 ## 1.10.0 (2026-07-24)
