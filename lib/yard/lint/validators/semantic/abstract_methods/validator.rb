@@ -46,7 +46,7 @@ module Yard
               has_real_implementation = body_lines.any? do |line|
                 next false if line.start_with?('#') || line == 'end'
 
-                allowed.none? { |pattern| line.match?(pattern) }
+                allowed.none? { |pattern| normalize_raise_alias(line).match?(pattern) }
               end
 
               return unless has_real_implementation
@@ -67,6 +67,18 @@ module Yard
               rescue RegexpError
                 nil
               end
+            end
+
+            # Rewrites a leading `fail` keyword to `raise` so the two are treated alike when
+            # matching AllowedImplementations. `fail` is a built-in alias of `raise`
+            # (`Kernel#fail`), so `fail NotImplementedError` is an identical abstract-method
+            # guard to `raise NotImplementedError`, but the configured patterns are written
+            # with `raise`. Only a leading keyword is rewritten, so identifiers such as
+            # `failure` or a `fail(...)` call elsewhere in a line are left untouched.
+            # @param line [String] a stripped body line
+            # @return [String]
+            def normalize_raise_alias(line)
+              line.sub(/\Afail\b/, 'raise')
             end
 
             # Joins lines that are continuations of the previous statement (the
