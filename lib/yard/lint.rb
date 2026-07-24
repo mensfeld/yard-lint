@@ -25,7 +25,7 @@ module Yard
       #   - :mode [Symbol] one of :ref, :staged, :changed
       #   - :base_ref [String, nil] base ref for :ref mode (auto-detects main/master if nil)
       # @param source [String, nil] in-memory source content; when given, the file is not
-      #   read from disk — `path` must be a single .rb file path (used for config/exclusion
+      #   read from disk - `path` must be a single .rb file path (used for config/exclusion
       #   resolution and offense location reporting only)
       # @return [Yard::Lint::Result] result object with offenses
       def run(path:, config: nil, config_file: nil, progress: nil, diff: nil, source: nil)

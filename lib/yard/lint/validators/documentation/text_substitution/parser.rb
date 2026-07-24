@@ -22,7 +22,7 @@ module Yard
             def call(yard_output, **_kwargs)
               return [] if yard_output.nil? || yard_output.strip.empty?
 
-              # Do not strip lines — forbidden/replacement may have significant whitespace
+              # Do not strip lines - forbidden/replacement may have significant whitespace
               lines = yard_output.split("\n")
               violations = []
 
