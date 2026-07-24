@@ -1,4 +1,4 @@
-## 1.10.2 (unreleased)
+## 1.10.2 (2026-07-24)
 - **[Bugfix]** `Semantic/AbstractMethods` no longer flags an `@abstract` method whose body is `fail NotImplementedError`. `fail` is a built-in alias of `raise` (`Kernel#fail`), so `fail NotImplementedError` is an identical abstract-method guard to `raise NotImplementedError`, but the `AllowedImplementations` patterns are written with `raise` and were matched literally. A leading `fail` keyword is now normalized to `raise` before matching, so both forms are recognized (and any custom `raise`-based `AllowedImplementations` pattern automatically covers its `fail` alias). Identifiers such as `failure` and non-leading `fail(...)` calls are left untouched.
 
 ## 1.10.1 (2026-07-24)
