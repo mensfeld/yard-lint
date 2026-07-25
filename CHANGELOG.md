@@ -1,4 +1,4 @@
-## 1.10.3 (2026-07-25)
+## 1.10.3 (Unreleased)
 - **[Bugfix]** `Documentation/OrphanedDocComment` no longer flags a tagged doc comment above a class variable assignment (`@@name = ...`) as orphaned. YARD's `ClassVariableHandler` registers class variables as documentable code objects and attaches the preceding comment to them (a bare `@private`/`@api` tag included), so the comment is not dropped - it was only the validator's definition matcher that recognized constants (`FOO = ...`) but not class variables. Class variable assignments are now recognized as documentable, so `# @private`/`@@logger = ...` internal-marker pairs are left alone. Single instance-variable assignments (`@cached = ...`), which YARD does not document, are still reported.
 
 ## 1.10.2 (2026-07-24)
