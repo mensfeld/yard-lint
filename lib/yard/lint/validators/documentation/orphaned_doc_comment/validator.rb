@@ -29,11 +29,17 @@ module Yard
             # Also matches define_method which YARD handles via a built-in dynamic handler.
             # `attr\b` is matched after the `attr_*` variants so the bare `attr :name` form
             # (handled by YARD's attribute handler) is recognised without swallowing them.
+            # Class variable assignments (`@@name = ...`) are matched too: YARD's
+            # ClassVariableHandler registers them as documentable objects and attaches the
+            # preceding comment (including a bare `@private`/`@api` tag), so such a comment is
+            # not orphaned.
             DEFINITION_PATTERN = /
               \A\s*(private\s+|protected\s+|public\s+)?
               (def |class |module |attr_reader|attr_writer|attr_accessor|attr_internal|attr\b|alias_method\b|alias\b|define_method\b)
               |
               \A\s*[A-Z][A-Za-z0-9_:]*\s*=
+              |
+              \A\s*@@[A-Za-z_]\w*\s*=
               |
               \A\s*\w+\s+def\b
             /x.freeze

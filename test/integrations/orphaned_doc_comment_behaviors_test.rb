@@ -72,6 +72,28 @@ describe 'Documentation/OrphanedDocComment behaviours' do
       RUBY
     end
 
+    it 'does not flag a @private comment before a class variable assignment' do
+      # YARD's ClassVariableHandler registers `@@logger` as a documentable object
+      # and attaches this comment (marking it private), so it is not orphaned.
+      assert_clean(<<~RUBY)
+        class Config
+          # @private
+          @@logger = Logger.new($stdout)
+        end
+      RUBY
+    end
+
+    it 'does not flag a tagged comment before an indented class variable assignment' do
+      assert_clean(<<~RUBY)
+        module M
+          class Config
+            # @return [Queue] the log queue
+            @@log_queue = Queue.new
+          end
+        end
+      RUBY
+    end
+
     it 'does not flag a comment before define_method with a block' do
       assert_clean(<<~RUBY)
         class C
