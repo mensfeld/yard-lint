@@ -18,6 +18,8 @@ Gem::Specification.new do |spec|
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/mensfeld/yard-lint'
   spec.metadata['changelog_uri'] = 'https://github.com/mensfeld/yard-lint/blob/master/CHANGELOG.md'
+  spec.metadata['bug_tracker_uri'] = 'https://github.com/mensfeld/yard-lint/issues'
+  spec.metadata['documentation_uri'] = 'https://github.com/mensfeld/yard-lint'
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   # Specify which files should be added to the gem when it is released.
