@@ -93,14 +93,32 @@ describe 'BlankLineBeforeDefinition issue #300' do
     )
   end
 
-  it 'ignores a comment matched by a plain-substring pattern' do
-    # A literal substring (no /.../ delimiters) is matched anywhere in the line.
+  it 'ignores a comment matched by a plain-literal (whole-word) pattern' do
+    # A literal (no /.../ delimiters) matches the whole word `FIXME` in the line.
     offenses = blank_line_offenses(constant_block, config(['FIXME']))
 
     assert_empty(
       offenses,
       "Expected no blank-line offenses, got: #{offenses.map { |o| o[:message] }.inspect}"
     )
+  end
+
+  it 'does not let a literal fragment match inside a larger word' do
+    # A real prose docstring containing "rapid" must NOT be suppressed by the
+    # literal pattern "api" - the fix anchors literals at word boundaries.
+    file = create_test_file(<<~RUBY)
+      # A sample module
+      module Sample
+        # Ensures rapid startup of the system.
+
+        def documented_but_detached; end
+      end
+    RUBY
+
+    offenses = blank_line_offenses(file, config(['api']))
+
+    refute_empty(offenses)
+    assert(offenses.any? { |o| o[:message].include?('documented_but_detached') })
   end
 
   it 'does not flag an undocumented method preceded by an ignored commented-out definition' do

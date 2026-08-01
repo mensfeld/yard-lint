@@ -164,8 +164,8 @@ module Yard
 
             # Compiled `IgnoredCommentPatterns` from configuration. Each entry is
             # either a `/regex/` (compiled as a regular expression) or a plain
-            # string (matched as a literal substring). Blank entries and invalid
-            # regexes are dropped. Memoized for the lifetime of the validator.
+            # string (matched as a whole word). Blank entries and invalid regexes
+            # are dropped. Memoized for the lifetime of the validator.
             # @return [Array<Regexp>] compiled patterns
             def ignored_comment_patterns
               @ignored_comment_patterns ||=
@@ -177,19 +177,33 @@ module Yard
             end
 
             # Compile a single `IgnoredCommentPatterns` entry into a Regexp.
-            # A `/.../` entry is a regular expression; anything else is matched as
-            # a literal substring. An invalid or empty regex is skipped (returns
-            # nil) rather than raising.
+            # A `/.../` entry is a regular expression. Anything else is a literal
+            # matched at word boundaries, so a fragment like `api` does not match
+            # inside `rapid` (which would silently suppress a real docstring); use
+            # a `/regex/` entry for substring or case-insensitive matching. An
+            # invalid or empty regex is skipped (returns nil) rather than raising.
             # @param pattern [String] one configured pattern
             # @return [Regexp, nil]
             def compile_comment_pattern(pattern)
               if (match = pattern.match(%r{\A/(.+)/\z}))
                 Regexp.new(match[1])
               else
-                Regexp.new(Regexp.escape(pattern))
+                Regexp.new(word_bounded_literal(pattern))
               end
             rescue RegexpError
               nil
+            end
+
+            # Escape a literal pattern and anchor it at word boundaries, but only
+            # on a side that ends in a word character so punctuation-only patterns
+            # (e.g. `...` section separators) still match.
+            # @param pattern [String] the literal pattern
+            # @return [String] escaped, boundary-anchored regex source
+            def word_bounded_literal(pattern)
+              escaped = Regexp.escape(pattern)
+              escaped = "\\b#{escaped}" if pattern.match?(/\A\w/)
+              escaped = "#{escaped}\\b" if pattern.match?(/\w\z/)
+              escaped
             end
 
             # Check if the given pattern is enabled in configuration
