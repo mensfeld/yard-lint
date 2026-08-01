@@ -14,6 +14,7 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedObjects::Config' do
         'Enabled' => true,
         'Severity' => 'warning',
         'ExcludedMethods' => ['initialize/0'],
+        'ExcludedObjects' => [],
         'AllowedParentClasses' => []
       },
       Yard::Lint::Validators::Documentation::UndocumentedObjects::Config.defaults

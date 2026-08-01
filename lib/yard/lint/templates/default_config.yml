@@ -36,6 +36,12 @@ Documentation/UndocumentedObjects:
   ExcludedMethods:
     - 'initialize/0'  # Exclude parameter-less initialize
     - '/^_/'          # Exclude private methods (by convention)
+  # ExcludedObjects matches the fully-qualified name of ANY object (class,
+  # module, method, or constant). Unlike ExcludedMethods it can exclude
+  # constants and be anchored to a full path.
+  # ExcludedObjects:
+  #   - 'MyApp::Config::DEFAULTS'    # exact fully-qualified constant
+  #   - '/^MyApp::Keys::KEY_/'       # every KEY_* constant under MyApp::Keys
   # AllowedParentClasses:
   #   - StandardError           # Skip error subclasses
   #   - ApplicationRecord       # Skip Rails model subclasses
