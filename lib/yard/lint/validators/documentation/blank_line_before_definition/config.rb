@@ -15,7 +15,13 @@ module Yard
               'EnabledPatterns' => {
                 'SingleBlankLine' => true,
                 'OrphanedDocs' => true
-              }
+              },
+              # Comment lines matching any of these patterns are not treated as
+              # documentation, so a blank line below them is not reported as a
+              # detached docstring. Each entry is a `/regex/` or a literal matched
+              # at word boundaries. Useful for commented-out code, `# FIXME`
+              # notes, etc.
+              'IgnoredCommentPatterns' => []
             }.freeze
           end
         end

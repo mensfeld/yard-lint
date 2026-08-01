@@ -136,7 +136,8 @@ module Yard
             end
 
             # Check if a comment line is not YARD documentation (magic comment,
-            # shebang, tool sigil/directive, or a bare `#` separator).
+            # shebang, tool sigil/directive, a bare `#` separator, or a line the
+            # user has excluded via `IgnoredCommentPatterns`).
             # @param line [String] stripped comment line
             # @return [Boolean] true if the line should not count as documentation
             def non_documentation_comment?(line)
@@ -144,7 +145,70 @@ module Yard
                 line.start_with?('#!') ||                          # shebang
                 line.match?(/\A#\s*(rubocop|standard):/i) ||       # linter directives
                 line.match?(/\A#\s*typed:/i) ||                    # Sorbet sigil
-                line.match?(/\A#+\s*\z/)                           # bare # separator
+                line.match?(/\A#+\s*\z/) ||                         # bare # separator
+                ignored_comment?(line)                             # user-configured exclusions
+            end
+
+            # Whether the comment line matches one of the user-configured
+            # `IgnoredCommentPatterns`. Such a line is not treated as
+            # documentation, so it never counts as a docstring detached from the
+            # definition below it. This lets a project silence the blank-line
+            # offense for comments that are not docs - commented-out code in a
+            # constant block, `# FIXME` notes, section separators - without the
+            # linter having to guess what is and is not code (see issue #300).
+            # @param line [String] stripped comment line
+            # @return [Boolean] true if the line matches an ignored pattern
+            def ignored_comment?(line)
+              ignored_comment_patterns.any? { |pattern| pattern.match?(line) }
+            end
+
+            # Compiled `IgnoredCommentPatterns` from configuration. Each entry is
+            # either a `/regex/` (compiled as a regular expression) or a plain
+            # string (matched as a whole word). Blank entries, the empty regex
+            # `//`, and invalid regexes are dropped (an empty regex would match
+            # every comment, making the option useless - consistent with the
+            # other pattern-list options). Memoized for the lifetime of the
+            # validator.
+            # @return [Array<Regexp>] compiled patterns
+            def ignored_comment_patterns
+              @ignored_comment_patterns ||=
+                Array(config_or_default('IgnoredCommentPatterns'))
+                .compact
+                .map { |pattern| pattern.to_s.strip }
+                .reject(&:empty?)
+                .reject { |pattern| pattern == '//' }
+                .filter_map { |pattern| compile_comment_pattern(pattern) }
+            end
+
+            # Compile a single `IgnoredCommentPatterns` entry into a Regexp.
+            # A `/.../` entry is a regular expression. Anything else is a literal
+            # matched at word boundaries, so a fragment like `api` does not match
+            # inside `rapid` (which would silently suppress a real docstring); use
+            # a `/regex/` entry for substring or case-insensitive matching. An
+            # invalid regex is skipped (returns nil) rather than raising; the empty
+            # regex `//` is filtered out before it reaches here.
+            # @param pattern [String] one configured pattern
+            # @return [Regexp, nil]
+            def compile_comment_pattern(pattern)
+              if (match = pattern.match(%r{\A/(.+)/\z}))
+                Regexp.new(match[1])
+              else
+                Regexp.new(word_bounded_literal(pattern))
+              end
+            rescue RegexpError
+              nil
+            end
+
+            # Escape a literal pattern and anchor it at word boundaries, but only
+            # on a side that ends in a word character so punctuation-only patterns
+            # (e.g. `...` section separators) still match.
+            # @param pattern [String] the literal pattern
+            # @return [String] escaped, boundary-anchored regex source
+            def word_bounded_literal(pattern)
+              escaped = Regexp.escape(pattern)
+              escaped = "\\b#{escaped}" if pattern.match?(/\A\w/)
+              escaped = "#{escaped}\\b" if pattern.match?(/\w\z/)
+              escaped
             end
 
             # Check if the given pattern is enabled in configuration

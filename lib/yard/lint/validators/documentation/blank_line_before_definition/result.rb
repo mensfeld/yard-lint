@@ -30,6 +30,7 @@ module Yard
                   severity: severity,
                   type: self.class.offense_type,
                   name: computed_offense_name,
+                  validator: validator_name,
                   message: build_message(offense_data),
                   location: offense_data[:location] || offense_data[:file],
                   location_line: offense_data[:line] || offense_data[:location_line] || 0

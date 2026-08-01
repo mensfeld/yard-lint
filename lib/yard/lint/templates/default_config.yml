@@ -114,6 +114,13 @@ Documentation/BlankLineBeforeDefinition:
   EnabledPatterns:
     SingleBlankLine: true
     OrphanedDocs: true
+  # Comment lines matching any of these patterns are NOT treated as
+  # documentation, so a blank line below them is not reported as a detached
+  # docstring. Each entry is a /regex/ or a literal matched at word boundaries.
+  # Handy for commented-out code in constant blocks, FIXME notes, separators, etc.
+  # IgnoredCommentPatterns:
+  #   - '/\A#\s*\w[\w:]*\s*=/'   # commented-out assignments, e.g. "# KEY = 1"
+  #   - 'FIXME'                  # a comment with the word FIXME
 
 Documentation/LineLength:
   Description: 'Detects documentation comment lines that exceed the configured maximum length.'
