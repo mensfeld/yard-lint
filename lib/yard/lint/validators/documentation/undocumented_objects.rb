@@ -8,7 +8,35 @@ module Yard
         #
         # Checks for missing documentation on classes, modules, and methods.
         # This validator supports flexible method exclusions through the `ExcludedMethods`
-        # configuration option.
+        # configuration option, and full-object exclusions (including constants)
+        # through the `ExcludedObjects` option.
+        #
+        # ## `ExcludedMethods` vs `ExcludedObjects`
+        #
+        # `ExcludedMethods` matches only the **unqualified method name** (the part
+        # after the final `#`/`.`) and never applies to classes, modules, or
+        # constants. This keeps a pattern like `/cache/` from silently suppressing
+        # a class such as `Memcached`, but it means constants cannot be excluded and
+        # a method cannot be targeted by its full path.
+        #
+        # `ExcludedObjects` matches the **fully-qualified name** of any object -
+        # class, module, method, or constant - and supports exact names, arity
+        # notation (for methods), and regex patterns matched against the full path:
+        #
+        #     Documentation/UndocumentedObjects:
+        #       ExcludedObjects:
+        #         - 'MyApp::Config::DEFAULTS'   # exact fully-qualified constant
+        #         - '/^MyApp::Keys::KEY_/'      # every KEY_* constant under MyApp::Keys
+        #         - '/^MyApp::Internal#/'       # every method on MyApp::Internal
+        #         - 'MyApp::Api#call/1'         # only MyApp::Api#call with exactly 1 param
+        #
+        # Arity notation follows the same rules as `ExcludedMethods` (see below):
+        # the count is `required + optional` parameters, excluding splat (`*`) and
+        # block (`&`). Classes, modules, and constants have no arity and never match
+        # an arity pattern.
+        #
+        # Use `ExcludedObjects` when you need to skip constants (issue #299) or to
+        # exclude one specific object without affecting same-named objects elsewhere.
         #
         # ## Pattern Types
         #
