@@ -136,7 +136,8 @@ module Yard
             end
 
             # Check if a comment line is not YARD documentation (magic comment,
-            # shebang, tool sigil/directive, or a bare `#` separator).
+            # shebang, tool sigil/directive, a bare `#` separator, or a line of
+            # commented-out Ruby code).
             # @param line [String] stripped comment line
             # @return [Boolean] true if the line should not count as documentation
             def non_documentation_comment?(line)
@@ -144,7 +145,31 @@ module Yard
                 line.start_with?('#!') ||                          # shebang
                 line.match?(/\A#\s*(rubocop|standard):/i) ||       # linter directives
                 line.match?(/\A#\s*typed:/i) ||                    # Sorbet sigil
-                line.match?(/\A#+\s*\z/)                           # bare # separator
+                line.match?(/\A#+\s*\z/) ||                         # bare # separator
+                commented_out_code?(line)                          # e.g. "# KEY = 1"
+            end
+
+            # Whether a comment line is commented-out Ruby code rather than prose
+            # documentation. A block of constants with some entries commented out
+            # (`# KEY_F12 = ...`) is a common pattern; treating such a line as a
+            # doc block produced a spurious blank-line offense for the next,
+            # deliberately undocumented, definition (see issue #300).
+            #
+            # The patterns are intentionally narrow so they never match real
+            # documentation: an assignment excludes the comparison operators
+            # (`==`, `=~`, `=>`), and `class`/`module`/`def` must be followed by a
+            # name the way a definition is, not by prose.
+            # @param line [String] stripped comment line
+            # @return [Boolean] true if the line is commented-out code
+            def commented_out_code?(line)
+              # Assignment to a constant, local, ivar/cvar/gvar (e.g. "# KEY = 1",
+              # "# @x = 1"), but not a comparison or hash rocket.
+              line.match?(/\A#\s*[@$]{0,2}[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\s*=(?![=~>])/) ||
+                line.match?(/\A#\s*def\s+\w/) ||                          # method definition
+                line.match?(/\A#\s*(class|module)\s+[A-Z]/) ||           # class/module definition
+                line.match?(/\A#\s*(require|require_relative)\s+['"]/) || # require statement
+                line.match?(/\A#\s*(include|extend|prepend)\s+[A-Z]/) ||  # mixin statement
+                line.match?(/\A#\s*attr_(reader|writer|accessor)\s+:/)    # attribute macro
             end
 
             # Check if the given pattern is enabled in configuration

@@ -79,5 +79,20 @@ describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Resu
     result = Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result.new(parsed_data, @config)
     assert_equal('convention', result.offenses.first[:severity])
   end
+
+  it 'includes the validator name so the offense can be identified and disabled' do
+    parsed_data = [
+      {
+        location: 'lib/example.rb',
+        line: 10,
+        object_name: 'MyClass#process',
+        violation_type: 'single',
+        blank_count: 1
+      }
+    ]
+
+    result = Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Result.new(parsed_data, @config)
+    assert_equal('Documentation/BlankLineBeforeDefinition', result.offenses.first[:validator])
+  end
 end
 

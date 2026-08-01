@@ -3,25 +3,20 @@
 require 'tmpdir'
 require 'fileutils'
 
-# Reproduction / highlight tests for
-# https://github.com/mensfeld/yard-lint/issues/300
+# Regression tests for https://github.com/mensfeld/yard-lint/issues/300
 #
-# Two problems are reported when a blank line separates a non-documentation
+# Two problems were reported when a blank line separates a non-documentation
 # comment from an UNDOCUMENTED definition (typically a block of constants whose
 # documentation is intentionally skipped):
 #
-#   1. A false "Blank line between documentation and definition" offense is
-#      raised even though the comment above is not documentation for the object
-#      (e.g. a commented-out line of code, or a note addressed to maintainers),
-#      and the object itself carries no docstring. The blank line is a visual
-#      separator, not a detached docstring.
+#   1. A false "Blank line between documentation and definition" offense was
+#      raised even though the comment above is commented-out code (e.g.
+#      `# KEY_F12 = ...`), not documentation, and the object itself carries no
+#      docstring. The blank line is a visual separator, not a detached docstring.
 #
-#   2. The offense that IS produced carries no validator name (`offense[:validator]`
-#      is nil), so it renders as "    : Blank line ..." in the text output and the
-#      user cannot tell which validator to disable.
-#
-# These tests assert the intended behaviour, so they FAIL against the current
-# implementation and pin down exactly what a fix must address.
+#   2. The offense carried no validator name (`offense[:validator]` was nil), so
+#      it rendered as "    : Blank line ..." in the text output and the user
+#      could not tell which validator to disable.
 describe 'BlankLineBeforeDefinition issue #300' do
   before do
     @test_dir = Dir.mktmpdir
@@ -78,16 +73,15 @@ describe 'BlankLineBeforeDefinition issue #300' do
     )
   end
 
-  it 'does not flag an undocumented method preceded by a maintainer note across blank lines' do
-    # A comment addressed to maintainers (not YARD documentation) sits between
-    # two undocumented methods, separated by blank lines on both sides.
+  it 'does not flag an undocumented method preceded by a commented-out definition' do
+    # A commented-out method sits directly below a real one (a common way to
+    # park dead code), then a blank line, then the next undocumented method.
+    # The commented-out line is code, not documentation for something_else.
     file = create_test_file(<<~RUBY)
       # A helper collection
       module Helpers
         def something; end
-
-        # This note is only here to clarify something for maintainers and is
-        # not meant to document the method below.
+        # def old_helper; end
 
         def something_else; end
       end
