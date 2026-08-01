@@ -233,12 +233,14 @@ Documentation/UndocumentedObjects:
     - 'initialize/0'
     - '/^_/'
   # Exclude any object (class, module, method, or constant) by its
-  # fully-qualified name or a /regex/ anchored to the full path. Use this to
-  # skip constants (ExcludedMethods never applies to them) or to target a
-  # single object without matching same-named objects elsewhere.
+  # fully-qualified name, full-path name/arity, or a /regex/ matched against
+  # the full path. Use this to skip constants (ExcludedMethods never applies to
+  # them) or to target a single object without matching same-named objects
+  # elsewhere.
   ExcludedObjects:
     - 'MyApp::Config::DEFAULTS'    # exact fully-qualified constant
     - '/^MyApp::Keys::KEY_/'       # every KEY_* constant under MyApp::Keys
+    - 'MyApp::Api#call/1'          # only MyApp::Api#call with exactly 1 param
   # Skip classes inheriting from these base classes (exact full-path match)
   AllowedParentClasses:
     - StandardError

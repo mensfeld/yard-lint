@@ -20,14 +20,20 @@ module Yard
         # a method cannot be targeted by its full path.
         #
         # `ExcludedObjects` matches the **fully-qualified name** of any object -
-        # class, module, method, or constant - and supports exact names and regex
-        # patterns anchored to the full path:
+        # class, module, method, or constant - and supports exact names, arity
+        # notation (for methods), and regex patterns matched against the full path:
         #
         #     Documentation/UndocumentedObjects:
         #       ExcludedObjects:
         #         - 'MyApp::Config::DEFAULTS'   # exact fully-qualified constant
         #         - '/^MyApp::Keys::KEY_/'      # every KEY_* constant under MyApp::Keys
         #         - '/^MyApp::Internal#/'       # every method on MyApp::Internal
+        #         - 'MyApp::Api#call/1'         # only MyApp::Api#call with exactly 1 param
+        #
+        # Arity notation follows the same rules as `ExcludedMethods` (see below):
+        # the count is `required + optional` parameters, excluding splat (`*`) and
+        # block (`&`). Classes, modules, and constants have no arity and never match
+        # an arity pattern.
         #
         # Use `ExcludedObjects` when you need to skip constants (issue #299) or to
         # exclude one specific object without affecting same-named objects elsewhere.

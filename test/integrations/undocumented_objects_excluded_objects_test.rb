@@ -49,6 +49,8 @@ describe 'UndocumentedObjects ExcludedObjects' do
           KEY_0_9 = 2
 
           def undocumented_helper; end
+
+          def call(event); end
         end
       end
     RUBY
@@ -86,6 +88,23 @@ describe 'UndocumentedObjects ExcludedObjects' do
 
     refute(messages.any? { |m| m.include?('#undocumented_helper') })
     assert_includes(messages, 'Documentation required for `ATui::Input::KEY_A_Z`')
+  end
+
+  it 'excludes a method by full-path arity notation only at the matching arity' do
+    file = create_test_file('input.rb', source)
+    # call takes 1 param; helper takes 0. The /1 pattern must exclude only call.
+    messages = undocumented(file, build_config(['ATui::Input#call/1']))
+
+    refute(messages.any? { |m| m.include?('#call') })
+    assert_includes(messages, 'Documentation required for `ATui::Input#undocumented_helper`')
+  end
+
+  it 'does not exclude a method when the full-path arity does not match' do
+    file = create_test_file('input.rb', source)
+    # call takes 1 param, so an arity-0 pattern must not exclude it.
+    messages = undocumented(file, build_config(['ATui::Input#call/0']))
+
+    assert_includes(messages, 'Documentation required for `ATui::Input#call`')
   end
 
   it 'does not suppress a similarly-named class when the regex is scoped to a path' do

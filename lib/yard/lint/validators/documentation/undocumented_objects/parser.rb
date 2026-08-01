@@ -51,7 +51,7 @@ module Yard
                   # ExcludedObjects matches the whole element - so it can
                   # exclude constants (e.g. "Foo::KEY_A") and lets a regex be
                   # anchored to the full path.
-                  next if object_excluded?(element, excluded_objects)
+                  next if object_excluded?(element, arity, excluded_objects)
 
                   # Skip if method is in excluded list
                   next if method_excluded?(element, arity, excluded_methods)
@@ -103,18 +103,28 @@ module Yard
             # Checks if an object should be excluded based on ExcludedObjects config.
             # Matches against the fully-qualified object name (the whole element),
             # so it applies to every object type - classes, modules, methods, and
-            # constants alike. Supports exact names and regex patterns (arity
-            # notation is not meaningful for a full path and is not applied here).
+            # constants alike. Supports exact full names, arity notation (for
+            # methods), and regex patterns matched against the full path.
             # @param element [String] the fully-qualified object name
             #   (e.g. "Foo::Bar#baz", "Foo::Bar", "Foo::KEY_A")
+            # @param arity [Integer, nil] number of parameters for a method element
+            #   (required + optional, excluding splat and block); nil for
+            #   classes, modules, and constants
             # @param excluded_objects [Array<String>] list of exclusion patterns
             # @return [Boolean] true if the object should be excluded
-            def object_excluded?(element, excluded_objects)
+            def object_excluded?(element, arity, excluded_objects)
               excluded_objects.any? do |pattern|
                 case pattern
                 when %r{^/(.+)/$}
-                  # Regex pattern anchored to the full path: '/^Foo::KEY_/'
+                  # Regex pattern matched against the full path: '/^Foo::KEY_/'
                   match_regex_pattern(element, Regexp.last_match(1))
+                when %r{/\d+$}
+                  # Arity pattern on a full path: 'Foo::Bar#baz/1' matches the
+                  # method Foo::Bar#baz only when it takes exactly one parameter.
+                  # A full path contains a single '/' (the arity delimiter), so
+                  # match_arity_pattern splits it correctly. Constants and other
+                  # objects have a nil arity and never match an arity pattern.
+                  match_arity_pattern(element, arity, pattern)
                 else
                   # Exact full-name match: 'Foo::Bar::KEY_A'
                   element == pattern
