@@ -164,8 +164,11 @@ module Yard
 
             # Compiled `IgnoredCommentPatterns` from configuration. Each entry is
             # either a `/regex/` (compiled as a regular expression) or a plain
-            # string (matched as a whole word). Blank entries and invalid regexes
-            # are dropped. Memoized for the lifetime of the validator.
+            # string (matched as a whole word). Blank entries, the empty regex
+            # `//`, and invalid regexes are dropped (an empty regex would match
+            # every comment, making the option useless - consistent with the
+            # other pattern-list options). Memoized for the lifetime of the
+            # validator.
             # @return [Array<Regexp>] compiled patterns
             def ignored_comment_patterns
               @ignored_comment_patterns ||=
@@ -173,6 +176,7 @@ module Yard
                 .compact
                 .map { |pattern| pattern.to_s.strip }
                 .reject(&:empty?)
+                .reject { |pattern| pattern == '//' }
                 .filter_map { |pattern| compile_comment_pattern(pattern) }
             end
 
@@ -181,7 +185,8 @@ module Yard
             # matched at word boundaries, so a fragment like `api` does not match
             # inside `rapid` (which would silently suppress a real docstring); use
             # a `/regex/` entry for substring or case-insensitive matching. An
-            # invalid or empty regex is skipped (returns nil) rather than raising.
+            # invalid regex is skipped (returns nil) rather than raising; the empty
+            # regex `//` is filtered out before it reaches here.
             # @param pattern [String] one configured pattern
             # @return [Regexp, nil]
             def compile_comment_pattern(pattern)

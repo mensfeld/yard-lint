@@ -121,6 +121,24 @@ describe 'BlankLineBeforeDefinition issue #300' do
     assert(offenses.any? { |o| o[:message].include?('documented_but_detached') })
   end
 
+  it 'drops the empty regex // instead of matching every comment' do
+    # `//` is an empty regex that would otherwise match everything; it must be
+    # ignored so a genuine detached docstring is still reported.
+    file = create_test_file(<<~RUBY)
+      # A sample module
+      module Sample
+        # This is documentation for the method.
+
+        def documented_but_detached; end
+      end
+    RUBY
+
+    offenses = blank_line_offenses(file, config(['//']))
+
+    refute_empty(offenses)
+    assert(offenses.any? { |o| o[:message].include?('documented_but_detached') })
+  end
+
   it 'does not flag an undocumented method preceded by an ignored commented-out definition' do
     file = create_test_file(<<~RUBY)
       # A helper collection
