@@ -17,7 +17,8 @@ describe 'Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Conf
         'EnabledPatterns' => {
           'SingleBlankLine' => true,
           'OrphanedDocs' => true
-        }
+        },
+        'IgnoredCommentPatterns' => []
       },
       Yard::Lint::Validators::Documentation::BlankLineBeforeDefinition::Config.defaults
     )

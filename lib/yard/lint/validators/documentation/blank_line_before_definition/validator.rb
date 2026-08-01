@@ -136,8 +136,8 @@ module Yard
             end
 
             # Check if a comment line is not YARD documentation (magic comment,
-            # shebang, tool sigil/directive, a bare `#` separator, or a line of
-            # commented-out Ruby code).
+            # shebang, tool sigil/directive, a bare `#` separator, or a line the
+            # user has excluded via `IgnoredCommentPatterns`).
             # @param line [String] stripped comment line
             # @return [Boolean] true if the line should not count as documentation
             def non_documentation_comment?(line)
@@ -146,30 +146,50 @@ module Yard
                 line.match?(/\A#\s*(rubocop|standard):/i) ||       # linter directives
                 line.match?(/\A#\s*typed:/i) ||                    # Sorbet sigil
                 line.match?(/\A#+\s*\z/) ||                         # bare # separator
-                commented_out_code?(line)                          # e.g. "# KEY = 1"
+                ignored_comment?(line)                             # user-configured exclusions
             end
 
-            # Whether a comment line is commented-out Ruby code rather than prose
-            # documentation. A block of constants with some entries commented out
-            # (`# KEY_F12 = ...`) is a common pattern; treating such a line as a
-            # doc block produced a spurious blank-line offense for the next,
-            # deliberately undocumented, definition (see issue #300).
-            #
-            # The patterns are intentionally narrow so they never match real
-            # documentation: an assignment excludes the comparison operators
-            # (`==`, `=~`, `=>`), and `class`/`module`/`def` must be followed by a
-            # name the way a definition is, not by prose.
+            # Whether the comment line matches one of the user-configured
+            # `IgnoredCommentPatterns`. Such a line is not treated as
+            # documentation, so it never counts as a docstring detached from the
+            # definition below it. This lets a project silence the blank-line
+            # offense for comments that are not docs - commented-out code in a
+            # constant block, `# FIXME` notes, section separators - without the
+            # linter having to guess what is and is not code (see issue #300).
             # @param line [String] stripped comment line
-            # @return [Boolean] true if the line is commented-out code
-            def commented_out_code?(line)
-              # Assignment to a constant, local, ivar/cvar/gvar (e.g. "# KEY = 1",
-              # "# @x = 1"), but not a comparison or hash rocket.
-              line.match?(/\A#\s*[@$]{0,2}[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\s*=(?![=~>])/) ||
-                line.match?(/\A#\s*def\s+\w/) ||                          # method definition
-                line.match?(/\A#\s*(class|module)\s+[A-Z]/) ||           # class/module definition
-                line.match?(/\A#\s*(require|require_relative)\s+['"]/) || # require statement
-                line.match?(/\A#\s*(include|extend|prepend)\s+[A-Z]/) ||  # mixin statement
-                line.match?(/\A#\s*attr_(reader|writer|accessor)\s+:/)    # attribute macro
+            # @return [Boolean] true if the line matches an ignored pattern
+            def ignored_comment?(line)
+              ignored_comment_patterns.any? { |pattern| pattern.match?(line) }
+            end
+
+            # Compiled `IgnoredCommentPatterns` from configuration. Each entry is
+            # either a `/regex/` (compiled as a regular expression) or a plain
+            # string (matched as a literal substring). Blank entries and invalid
+            # regexes are dropped. Memoized for the lifetime of the validator.
+            # @return [Array<Regexp>] compiled patterns
+            def ignored_comment_patterns
+              @ignored_comment_patterns ||=
+                Array(config_or_default('IgnoredCommentPatterns'))
+                .compact
+                .map { |pattern| pattern.to_s.strip }
+                .reject(&:empty?)
+                .filter_map { |pattern| compile_comment_pattern(pattern) }
+            end
+
+            # Compile a single `IgnoredCommentPatterns` entry into a Regexp.
+            # A `/.../` entry is a regular expression; anything else is matched as
+            # a literal substring. An invalid or empty regex is skipped (returns
+            # nil) rather than raising.
+            # @param pattern [String] one configured pattern
+            # @return [Regexp, nil]
+            def compile_comment_pattern(pattern)
+              if (match = pattern.match(%r{\A/(.+)/\z}))
+                Regexp.new(match[1])
+              else
+                Regexp.new(Regexp.escape(pattern))
+              end
+            rescue RegexpError
+              nil
             end
 
             # Check if the given pattern is enabled in configuration

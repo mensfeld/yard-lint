@@ -10,9 +10,12 @@ require 'fileutils'
 # documentation is intentionally skipped):
 #
 #   1. A false "Blank line between documentation and definition" offense was
-#      raised even though the comment above is commented-out code (e.g.
-#      `# KEY_F12 = ...`), not documentation, and the object itself carries no
-#      docstring. The blank line is a visual separator, not a detached docstring.
+#      raised even though the comment above is not documentation (commented-out
+#      code such as `# KEY_F12 = ...`, a `# FIXME` note, a section separator).
+#      The validator cannot reliably guess which comments are docs, so a
+#      configurable `IgnoredCommentPatterns` option lets the project mark such
+#      comments as non-documentation; matching comment lines no longer count as
+#      a docstring detached from the definition below them.
 #
 #   2. The offense carried no validator name (`offense[:validator]` was nil), so
 #      it rendered as "    : Blank line ..." in the text output and the user
@@ -33,25 +36,30 @@ describe 'BlankLineBeforeDefinition issue #300' do
   end
 
   # UndocumentedObjects disabled (as in the report), only the blank-line
-  # validator active.
-  def config
+  # validator active. Optionally configures IgnoredCommentPatterns.
+  def config(ignored_patterns = nil)
     test_config do |c|
       c.set_validator_config('Documentation/UndocumentedObjects', 'Enabled', false)
       c.set_validator_config('Documentation/BlankLineBeforeDefinition', 'Enabled', true)
+      if ignored_patterns
+        c.set_validator_config(
+          'Documentation/BlankLineBeforeDefinition', 'IgnoredCommentPatterns', ignored_patterns
+        )
+      end
     end
   end
 
-  def blank_line_offenses(file)
+  def blank_line_offenses(file, cfg)
     Yard::Lint
-      .run(path: file, config: config, progress: false)
+      .run(path: file, config: cfg, progress: false)
       .offenses
       .select { |o| o[:name] == 'BlankLineBeforeDefinition' }
   end
 
-  it 'does not flag an undocumented constant preceded by a commented-out line and a blank line' do
-    # This is the exact shape from issue #300: a commented-out constant with a
-    # FIXME note, a blank separator line, then more undocumented constants.
-    file = create_test_file(<<~RUBY)
+  # The exact shape from issue #300: a commented-out constant with a FIXME note,
+  # a blank separator line, then more undocumented constants.
+  let(:constant_block) do
+    create_test_file(<<~RUBY)
       # Input handling
       module ATui
         # Input keys
@@ -64,8 +72,20 @@ describe 'BlankLineBeforeDefinition issue #300' do
         end
       end
     RUBY
+  end
 
-    offenses = blank_line_offenses(file)
+  it 'flags the constant block by default (no IgnoredCommentPatterns configured)' do
+    offenses = blank_line_offenses(constant_block, config)
+
+    # Documents the out-of-the-box behaviour the option exists to tune.
+    refute_empty(offenses)
+    assert(offenses.any? { |o| o[:message].include?('KEY_C_A') })
+  end
+
+  it 'does not flag the constant block when the commented-out line is ignored' do
+    # A pattern matching commented-out assignments (a `#` comment whose body is
+    # `NAME = ...`) marks that line as non-documentation.
+    offenses = blank_line_offenses(constant_block, config(['/\A#\s*\w[\w:]*\s*=/']))
 
     assert_empty(
       offenses,
@@ -73,10 +93,17 @@ describe 'BlankLineBeforeDefinition issue #300' do
     )
   end
 
-  it 'does not flag an undocumented method preceded by a commented-out definition' do
-    # A commented-out method sits directly below a real one (a common way to
-    # park dead code), then a blank line, then the next undocumented method.
-    # The commented-out line is code, not documentation for something_else.
+  it 'ignores a comment matched by a plain-substring pattern' do
+    # A literal substring (no /.../ delimiters) is matched anywhere in the line.
+    offenses = blank_line_offenses(constant_block, config(['FIXME']))
+
+    assert_empty(
+      offenses,
+      "Expected no blank-line offenses, got: #{offenses.map { |o| o[:message] }.inspect}"
+    )
+  end
+
+  it 'does not flag an undocumented method preceded by an ignored commented-out definition' do
     file = create_test_file(<<~RUBY)
       # A helper collection
       module Helpers
@@ -87,7 +114,7 @@ describe 'BlankLineBeforeDefinition issue #300' do
       end
     RUBY
 
-    offenses = blank_line_offenses(file)
+    offenses = blank_line_offenses(file, config(['/\A#\s*def\s/']))
 
     assert_empty(
       offenses,
@@ -95,11 +122,11 @@ describe 'BlankLineBeforeDefinition issue #300' do
     )
   end
 
-  it 'still reports the offense with a validator name so it can be disabled' do
-    # Even where an offense is legitimately produced, it must carry its
-    # validator name (issue #300 point 2: the message rendered as "    : ...").
+  it 'still flags a genuine detached docstring even when IgnoredCommentPatterns is set' do
+    # A real prose docstring separated from its definition by a blank line must
+    # still be reported; an unrelated ignore pattern must not suppress it.
     file = create_test_file(<<~RUBY)
-      # A documented class whose docstring is detached by a blank line.
+      # A sample module
       module Sample
         # This is documentation for the method.
 
@@ -107,7 +134,25 @@ describe 'BlankLineBeforeDefinition issue #300' do
       end
     RUBY
 
-    offense = blank_line_offenses(file).first
+    offenses = blank_line_offenses(file, config(['FIXME']))
+
+    refute_empty(offenses)
+    assert(offenses.any? { |o| o[:message].include?('documented_but_detached') })
+  end
+
+  it 'reports the offense with a validator name so it can be disabled' do
+    # Issue #300 point 2: the offense must carry its validator name instead of
+    # rendering as "    : Blank line ...".
+    file = create_test_file(<<~RUBY)
+      # A sample module
+      module Sample
+        # This is documentation for the method.
+
+        def documented_but_detached; end
+      end
+    RUBY
+
+    offense = blank_line_offenses(file, config).first
 
     refute_nil(offense, 'Expected a blank-line offense for the detached docstring')
     assert_equal(
