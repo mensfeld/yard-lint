@@ -59,7 +59,6 @@ module Yard
             # @param docstring [String] the raw docstring content
             #
             # @return [Array<Hash>] array of hashes with :from and :to tag names
-            #
             def offending_transitions(docstring)
               lines = docstring.split("\n")
               transitions = []
