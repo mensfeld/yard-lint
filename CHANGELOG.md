@@ -1,5 +1,5 @@
 ## 1.11.0 (2026-08-11)
-- [Maintenance] Re-release `1.10.3` as `1.11.0` due to new features being present.
+- [Maintenance] Re-release of `1.10.3` as `1.11.0` due to new features being present.
 
 ## 1.10.3 (2026-08-05)
 - **[Feature]** Added `Tags/TagSeparator` (opt-in, disabled by default, severity `convention`) - a stricter sibling of `Tags/TagGroupSeparator`. Where `TagGroupSeparator` only inserts a blank line between different tag *groups* (and therefore can never separate two tags of the same type, such as sibling `@param` tags), `TagSeparator` requires a blank line between *every* pair of consecutive tags. Tags listed under the `Exempt` option may immediately follow the previous tag without a blank line - useful for `@option` tags, which document keys of a preceding `@param` hash and read best when clustered directly beneath it. `RequireAfterDescription` additionally requires a blank line between the description and the first tag.
