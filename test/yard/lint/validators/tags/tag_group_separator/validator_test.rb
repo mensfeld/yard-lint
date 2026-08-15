@@ -23,6 +23,14 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
     assert_equal(true, Yard::Lint::Validators::Tags::TagGroupSeparator::Validator.in_process?)
   end
 
+  it 'in process visits private objects' do
+    # module_function_copy? skips the normalized half of a module_function pair
+    # on the understanding that its authored twin is linted instead. In two of
+    # the three forms that twin is the private instance method, so narrowing
+    # this to :public would leave those methods unlinted entirely.
+    assert_equal(:all, Yard::Lint::Validators::Tags::TagGroupSeparator::Validator.in_process_visibility)
+  end
+
   it 'with properly separated tag groups reports valid' do
     docstring = <<~DOC
       Description of method.
@@ -120,6 +128,54 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
     assert_includes(output, 'valid')
   end
 
+  it 'with the rebuilt half of a module_function pair skips the object' do
+    # What YARD's copy_to leaves behind: the same content, none of the layout
+    object = mock_module_function_object(
+      docstring: "Description of method.\n@param [String] id\n  the ID\n@return [Object] the result",
+      scope: :instance,
+      twin: mock_module_function_twin(scope: :class, line_range: 4..8)
+    )
+    validator.in_process_query(object, collector)
+
+    assert_empty(collector.to_stdout)
+  end
+
+  it 'with the authored half of a module_function pair reports its offenses' do
+    object = mock_module_function_object(
+      docstring: "Description of method.\n\n@param id [String] the ID\n@return [Object] the result",
+      scope: :class,
+      line_range: 4..8,
+      twin: mock_module_function_twin(scope: :instance, line_range: nil)
+    )
+    validator.in_process_query(object, collector)
+
+    assert_includes(collector.to_stdout, 'param->return')
+  end
+
+  it 'with module_function def skips the class method half' do
+    # `module_function def name` leaves neither half with a docstring line range;
+    # there the class method is the copy and the instance method is the original
+    object = mock_module_function_object(
+      docstring: "Description of method.\n@param [String] id\n  the ID\n@return [Object] the result",
+      scope: :class,
+      twin: mock_module_function_twin(scope: :instance, line_range: nil)
+    )
+    validator.in_process_query(object, collector)
+
+    assert_empty(collector.to_stdout)
+  end
+
+  it 'with module_function def reports the instance method half' do
+    object = mock_module_function_object(
+      docstring: "Description of method.\n\n@param id [String] the ID\n@return [Object] the result",
+      scope: :instance,
+      twin: mock_module_function_twin(scope: :class, line_range: nil)
+    )
+    validator.in_process_query(object, collector)
+
+    assert_includes(collector.to_stdout, 'param->return')
+  end
+
   private
 
   def mock_yard_object(docstring:, is_alias: false, type: :method)
@@ -133,8 +189,39 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
     object.stubs(:line).returns(10)
     object.stubs(:title).returns('Example#method')
     docstring_obj.stubs(:all).returns(docstring)
+    docstring_obj.stubs(:line_range).returns(nil)
 
     object
+  end
+
+  # One half of the pair YARD registers for a module_function definition. Both
+  # halves sit at the same file and line, and YARD flags only the class method
+  # as a module function.
+  def mock_module_function_object(docstring:, scope:, twin:, line_range: nil)
+    object = mock_yard_object(docstring: docstring)
+    namespace = stub('namespace')
+
+    object.stubs(:scope).returns(scope)
+    object.stubs(:name).returns(:method_name)
+    object.stubs(:module_function?).returns(scope == :class)
+    object.stubs(:namespace).returns(namespace)
+    object.docstring.stubs(:line_range).returns(line_range)
+    namespace.stubs(:child).returns(twin)
+
+    object
+  end
+
+  def mock_module_function_twin(scope:, line_range:)
+    twin = stub('twin')
+    twin_docstring = stub('twin_docstring')
+
+    twin.stubs(:file).returns('lib/example.rb')
+    twin.stubs(:line).returns(10)
+    twin.stubs(:module_function?).returns(scope == :class)
+    twin.stubs(:docstring).returns(twin_docstring)
+    twin_docstring.stubs(:line_range).returns(line_range)
+
+    twin
   end
 end
 

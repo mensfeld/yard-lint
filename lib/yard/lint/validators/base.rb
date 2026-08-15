@@ -110,6 +110,66 @@ module Yard
           !@scanned_docstrings.add?(key)
         end
 
+        # Whether the object is a synthesized copy whose docstring has been
+        # normalized and should not be linted.
+        #
+        # `module_function` makes YARD register one definition twice: as a public
+        # class method and as a private instance method.
+        #
+        # One of the two is built with `CodeObjects::Base#copy_to` which assigns a
+        # docstring which is a normalized copy of the original, authored docstring
+        # that preserves content but not layout.
+        #
+        # The normalized docstring drops the blank lines between tags, moves param
+        # types ahead of param names, and folds in tags inherited from the enclosing
+        # namespace (such as an api tag). Linting the normalized docstring reports
+        # layout offenses against text no one wrote.
+        #
+        # The authored docstring is the one YARD tracks back to a range of source
+        # lines.
+        #
+        # For `module_function def name` neither the original object nor its copy
+        # carries a line range. For this form, the instance method holds the original
+        # docstring (YARD::Handlers::Ruby::ModuleFunctionHandler copies it to the
+        # class method).
+        #
+        # @param object [YARD::CodeObjects::Base] the code object to check
+        # @return [Boolean] true if the object's docstring is a normalized copy
+        def module_function_copy?(object)
+          return false unless object.type == :method
+          # Checked before the twin lookup, which scans the namespace's children:
+          # an object YARD tracked back to source lines is authored, whatever it
+          # is paired with, and most objects are
+          return false if object.docstring.line_range
+
+          twin = module_function_twin(object)
+          return false unless twin
+          return true if twin.docstring.line_range
+
+          object.scope == :class
+        end
+
+        # Finds the other object registered for a module_function definition.
+        # @param object [YARD::CodeObjects::Base] one half of the pair
+        # @return [YARD::CodeObjects::MethodObject, nil] the other half, or nil
+        #   when the object does not come from module_function
+        def module_function_twin(object)
+          return nil unless object.respond_to?(:scope)
+
+          twin = object.namespace.child(
+            name: object.name,
+            scope: (object.scope == :class) ? :instance : :class
+          )
+
+          return nil unless twin
+          return nil unless twin.file == object.file && twin.line == object.line
+          # Both halves point at the same definition, but only the class method
+          # is flagged as a module function by YARD.
+          return nil unless [object, twin].any? { |o| o.respond_to?(:module_function?) && o.module_function? }
+
+          twin
+        end
+
         # Converts a zero-based line offset within a docstring's text into an
         # absolute line number in the source file, so offenses can point at
         # the offending documentation line instead of the definition line.
