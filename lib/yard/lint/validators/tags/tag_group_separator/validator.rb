@@ -25,8 +25,13 @@ module Yard
               # YARD's method_missing raises NameError, so guard by type first
               return if object.type == :method && object.is_alias?
               # The rebuilt half of a module_function pair carries no authored
-              # layout, only YARD's normalization of it
+              # layout, only YARD's normalization of it. Checked before
+              # duplicate_docstring? so the normalized half never claims the
+              # location its authored twin needs
               return if module_function_copy?(object)
+              # Objects sharing one comment block (an attr_accessor's reader and
+              # writer) would otherwise report the same offense once each
+              return if duplicate_docstring?(object)
 
               docstring = object.docstring.all
               return if docstring.nil? || docstring.empty?
