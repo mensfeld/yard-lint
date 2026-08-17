@@ -1,3 +1,7 @@
+## Unreleased
+- **[Bugfix]** `Tags/TagSeparator` and `Tags/TagGroupSeparator` no longer report false positives caused by `module_function`. `module_function` makes YARD register one definition twice: as a public class method and as a private instance method. One of the two is built with `CodeObjects::Base#copy_to`, which assigns it a normalized copy of the authored docstring that preserves content but not layout. The normalized copy drops the blank lines between tags and folds in tags inherited from the enclosing namespace, so a correctly separated docstring was reported as `description -> api, api -> param, param -> return`. Both validators now lint the half whose docstring YARD read from source and skip the normalized copy. A genuinely unseparated `module_function` method is still reported, exactly once.
+- **[Bugfix]** `Tags/TagSeparator` and `Tags/TagGroupSeparator` now report a docstring once however many objects YARD generates from it. An `attr_accessor` registers a reader and a writer sharing one comment block, so a layout offense in that comment was reported once for each of them. `Results::Aggregate` did not collapse the pair because each message names its own method. Both validators now report each docstring location once, using the `duplicate_docstring?` helper the base validator already provides.
+
 ## 1.11.0 (2026-08-11)
 - [Maintenance] Re-release of `1.10.3` as `1.11.0` due to new features being present.
 
