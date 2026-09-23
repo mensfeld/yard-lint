@@ -143,6 +143,14 @@ yard-lint lib/ --only Tags/Order,Documentation/UndocumentedObjects
 
 **Learn more:** [Advanced Usage Guide](https://github.com/mensfeld/yard-lint/wiki/Advanced-Usage)
 
+### Explain a Validator
+
+Print what a validator checks, its default severity, configuration options, and Bad/Good examples directly in the terminal - no need to open the wiki. The explanation is sourced from the validator's own YARD documentation.
+
+```bash
+yard-lint --explain Tags/TypeSyntax
+```
+
 ### Lint from stdin (LSP / Editor Integration)
 
 Pass source bytes directly without reading from disk. The `path` argument is still required - it governs config resolution, exclusion matching, and offense location reporting.
@@ -538,6 +546,7 @@ Diff Mode:
 
 Validators:
       --only VALIDATORS   Run only specified validators (comma-separated)
+      --explain VALIDATOR Explain what a validator checks and how to configure it
 
 Configuration Generation:
       --init              Generate .yard-lint.yml config file
