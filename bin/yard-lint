@@ -64,6 +64,10 @@ begin
     options[:only] = validators.split(',').map(&:strip)
   end
 
+  opts.on('--explain VALIDATOR', 'Explain what a validator checks and how to configure it') do |validator|
+    options[:explain] = validator
+  end
+
   opts.separator ''
   opts.separator 'Other options:'
 
@@ -112,6 +116,7 @@ begin
     puts '  yard-lint lib/                                 # Lint all files in lib/'
     puts '  yard-lint --only Tags/TypeSyntax lib/          # Run only one validator on lib/'
     puts '  yard-lint --only Tags/Order,Tags/TypeSyntax    # Run specific validators'
+    puts '  yard-lint --explain Tags/TypeSyntax            # Explain what a validator checks'
     puts '  yard-lint --diff main                          # Lint files changed since main branch'
     puts '  yard-lint --staged                             # Lint only staged files'
     puts '  yard-lint --changed                            # Lint only uncommitted files'
@@ -131,6 +136,33 @@ rescue OptionParser::ParseError => e
   warn "Error: #{e.message}"
   warn 'Run `yard-lint --help` for usage.'
   exit 1
+end
+
+# Report one or more unknown validator names with "did you mean" suggestions,
+# the full list of available validators, and a pointer to --explain. Shared by
+# --only and --explain so the two stay consistent.
+report_unknown_validators = lambda do |names|
+  checker = DidYouMean::SpellChecker.new(dictionary: Yard::Lint::ConfigLoader::ALL_VALIDATORS)
+  messages = names.map do |name|
+    suggestions = checker.correct(name)
+    suggestions.any? ? "  #{name} (did you mean: #{suggestions.first}?)" : "  #{name}"
+  end
+  puts 'Error: Unknown validator(s):'
+  puts messages.join("\n")
+  puts "\nAvailable validators:"
+  Yard::Lint::ConfigLoader::ALL_VALIDATORS.each { |v| puts "  #{v}" }
+  puts "\nRun `yard-lint --explain VALIDATOR` to see what a validator checks."
+end
+
+# Handle --explain flag (early exit; needs no config or path)
+if options[:explain]
+  name = options[:explain]
+  unless Yard::Lint::ConfigLoader::ALL_VALIDATORS.include?(name)
+    report_unknown_validators.call([name])
+    exit 1
+  end
+  puts Yard::Lint::Explainer.call(name)
+  exit 0
 end
 
 # Disambiguate `--diff PATH`. `--diff [REF]` takes an optional argument, so
@@ -260,15 +292,7 @@ config.min_coverage = options[:min_coverage] if options[:min_coverage]
 if options[:only]
   unknown = options[:only] - Yard::Lint::ConfigLoader::ALL_VALIDATORS
   if unknown.any?
-    checker = DidYouMean::SpellChecker.new(dictionary: Yard::Lint::ConfigLoader::ALL_VALIDATORS)
-    messages = unknown.map do |name|
-      suggestions = checker.correct(name)
-      suggestions.any? ? "  #{name} (did you mean: #{suggestions.first}?)" : "  #{name}"
-    end
-    puts "Error: Unknown validator(s):"
-    puts messages.join("\n")
-    puts "\nAvailable validators:"
-    Yard::Lint::ConfigLoader::ALL_VALIDATORS.each { |v| puts "  #{v}" }
+    report_unknown_validators.call(unknown)
     exit 1
   end
   config.only_validators = options[:only]
