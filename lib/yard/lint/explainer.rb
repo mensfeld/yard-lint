@@ -30,7 +30,12 @@ module Yard
       end
 
       # @return [String] formatted, terminal-ready explanation
+      # @raise [ArgumentError] if name is not a known validator
       def call
+        unless ConfigLoader::ALL_VALIDATORS.include?(@name)
+          raise ArgumentError, "Unknown validator: #{@name.inspect}"
+        end
+
         [header, body].compact.join("\n")
       end
 
@@ -38,36 +43,42 @@ module Yard
 
       # @return [String] the metadata header (name, defaults) for the validator
       def header
-        defaults = validator_defaults
         lines = [@name.to_s]
-        lines << "  Enabled by default: #{defaults.fetch('Enabled', true)}"
-        lines << "  Default severity:   #{defaults['Severity'] || '(department default)'}"
+        lines << "  Enabled by default: #{default_config.validator_enabled?(@name)}"
+        lines << "  Default severity:   #{default_config.validator_severity(@name)}"
 
-        config_keys = defaults.keys - META_KEYS
+        config_keys = validator_defaults.keys - META_KEYS
         lines << "  Configuration keys: #{config_keys.join(', ')}" if config_keys.any?
         lines.join("\n")
       end
 
       # @return [String] the documentation body (description, config, examples)
       def body
-        docstring = validator_docstring
-        return raw_comment_fallback if docstring.nil? || docstring.to_s.strip.empty?
+        doc = documentation
+        return raw_comment_fallback if doc.nil?
 
-        sections = ["\n#{docstring}"]
-
-        examples = docstring.tags(:example)
-        sections << render_examples(examples) if examples.any?
+        sections = ["\n#{doc[:description]}"]
+        sections << render_examples(doc[:examples]) if doc[:examples].any?
         sections.join("\n")
       end
 
-      # @param examples [Array<YARD::Tags::Tag>] example tags from the docstring
+      # @param examples [Array(String, String)] pairs of example label and code
       # @return [String] the rendered "Examples:" section
       def render_examples(examples)
-        rendered = examples.map do |example|
-          code = example.text.to_s.each_line.map { |line| "    #{line}" }.join
-          "  #{example.name}\n#{code}".rstrip
+        rendered = examples.map do |name, text|
+          code = text.each_line.map { |line| "    #{line}" }.join
+          "  #{name}\n#{code}".rstrip
         end
         "\nExamples:\n#{rendered.join("\n\n")}"
+      end
+
+      # A config carrying only built-in defaults (no user overrides), used as the
+      # authoritative source for the validator's default enabled state and
+      # severity so the header never drifts from how the linter actually resolves
+      # them (see Config#validator_enabled? / #validator_severity).
+      # @return [Config] the defaults-only config
+      def default_config
+        @default_config ||= Config.new
       end
 
       # @return [Hash] the validator's default configuration
@@ -76,16 +87,31 @@ module Yard
         config&.defaults || {}
       end
 
-      # Parse the validator's module file with YARD and return its docstring.
-      # @return [YARD::Docstring, nil] the module docstring, or nil if unavailable
-      def validator_docstring
+      # Parse the validator's module file with YARD and extract its description
+      # and examples. Runs in an isolated registry - any objects a caller parsed
+      # before us are saved and restored - so explaining a validator never
+      # clobbers the shared YARD::Registry.
+      # @return [Hash, nil] { description: String, examples: Array((String, String)) }
+      #   or nil if no docstring is available
+      def documentation
         path = source_path
         return nil unless path && File.exist?(path)
 
+        saved = YARD::Registry.all
         YARD::Registry.clear
-        YARD.parse_string(File.read(path))
-        object = YARD::Registry.at(object_path)
-        object&.docstring
+        begin
+          YARD.parse_string(File.read(path))
+          docstring = YARD::Registry.at(object_path)&.docstring
+          return nil if docstring.nil? || docstring.to_s.strip.empty?
+
+          {
+            description: docstring.to_s,
+            examples: docstring.tags(:example).map { |tag| [tag.name, tag.text.to_s] }
+          }
+        ensure
+          YARD::Registry.clear
+          saved.each { |object| YARD::Registry.register(object) }
+        end
       end
 
       # @return [String] the fully-qualified code object path (e.g.

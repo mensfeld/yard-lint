@@ -43,6 +43,23 @@ describe 'Yard::Lint::Explainer' do
     assert_includes(output, 'Examples:')
   end
 
+  it 'call raises ArgumentError for an unknown validator name' do
+    error = assert_raises(ArgumentError) { Yard::Lint::Explainer.call('Bogus') }
+
+    assert_includes(error.message, 'Bogus')
+  end
+
+  it 'call does not clobber a pre-existing YARD registry' do
+    YARD::Registry.clear
+    YARD.parse_string("# A documented class\nclass ExplainerProbe\nend\n")
+
+    Yard::Lint::Explainer.call('Tags/TypeSyntax')
+
+    probe = YARD::Registry.at('ExplainerProbe')
+    refute_nil(probe, 'explaining a validator wiped the caller\'s registry')
+    assert_equal('A documented class', probe.docstring.to_s)
+  end
+
   it 'call explains a validator in every category' do
     %w[
       Documentation/UndocumentedObjects
