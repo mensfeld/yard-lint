@@ -11,7 +11,7 @@ module Yard
     # blocks a standing reason to stay accurate.
     #
     # @example
-    #   puts Yard::Lint::Explainer.call('Tags/TypeSyntax')
+    #   puts Yard::Lint::Explainer.call("Tags/TypeSyntax")
     class Explainer
       # Keys in a validator's defaults that are surfaced in the header rather than
       # listed as tunable configuration options.
