@@ -129,6 +129,20 @@ describe 'CLI --format sarif' do
     assert_equal(first_prints, second_prints, 'fingerprints must be deterministic across runs')
   end
 
+  it 'gives element-less offenses in one file distinct fingerprints (Tags/TypeSyntax)' do
+    # Tags/TypeSyntax offenses carry no :element, so the fingerprint falls back
+    # to the (normalized) message; two malformed types in one file must not
+    # collapse into a single GitHub alert.
+    source = "# @param a [Array<]\n# @return [Hash{Symbol =>]\ndef foo(a); a; end\n"
+    output, = run_cli('--only Tags/TypeSyntax --format sarif --no-progress', source: source)
+    results = JSON.parse(output)['runs'][0]['results']
+
+    assert_operator(results.length, :>=, 2, "expected multiple offenses, got #{output}")
+    fingerprints = results.map { |r| r['partialFingerprints']['yardLintOffense/v1'] }
+    fingerprints.each { |fp| assert_match(/\A[0-9a-f]{64}\z/, fp) }
+    assert_equal(fingerprints.length, fingerprints.uniq.length, 'element-less offenses collided into one fingerprint')
+  end
+
   it 'fails the run (non-zero exit) when reportable offenses exist' do
     _, status = sarif
 
