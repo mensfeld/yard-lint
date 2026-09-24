@@ -1,5 +1,5 @@
 ## Unreleased
-- **[Feature]** Added `--format sarif`, which emits SARIF 2.1.0 for GitHub code scanning and other aggregators, so offenses can surface as PR annotations / Security-tab alerts. Rules carry each validator's description (from its YARD docs), severities map to error/warning/note, and paths are repository-relative. Output-only and additive - existing formats are unchanged.
+- **[Feature]** Added `--format sarif`, which emits SARIF 2.1.0 for GitHub code scanning and other aggregators.
 - **[Feature]** Category-level `Severity` is now honored: set `Severity` on a department (e.g. `Documentation`) to apply it to all its validators. A per-validator `Severity` still wins. Backwards compatible - it only affects configs that set a category `Severity`, which was previously ignored.
 
 ## 1.12.0 (2026-09-23)
