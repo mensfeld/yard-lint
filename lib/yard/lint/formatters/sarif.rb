@@ -146,14 +146,31 @@ module Yard
 
         # A line-independent fingerprint so GitHub correlates the same offense
         # across commits without churn (close/reopen) when unrelated lines shift.
-        # Keys on the validator, file, and offending object; the line number and
-        # message text are excluded so a re-worded message does not churn alerts.
+        # Keys on the validator, file, and offending object, excluding the line
+        # number and (when an object is identified) the message, so a re-worded
+        # message does not churn alerts. Validators that do not identify an object
+        # fall back to a normalized message, so distinct offenses in one file
+        # still get distinct fingerprints instead of collapsing into one alert.
         # @param offense [Hash] an offense hash
         # @param uri [String] the artifact URI (already made relative)
         # @return [String] a stable hex digest
         def fingerprint(offense, uri)
-          parts = [offense[:validator], uri, offense[:element]]
+          element = offense[:element].to_s
+          # Tag the identity with its source so an element that happens to equal
+          # another offense's normalized message cannot collide.
+          identity = element.empty? ? "m:#{normalized_message(offense[:message])}" : "e:#{element}"
+          parts = [offense[:validator], uri, identity]
           Digest::SHA256.hexdigest(parts.map(&:to_s).join("\x00"))
+        end
+
+        # Message reduced to a stable identity for offenses with no :element:
+        # whitespace is collapsed so trivial formatting differences do not churn
+        # alerts. Case is preserved - messages embed case-sensitive names (types,
+        # methods, constants), so downcasing could merge genuinely distinct offenses.
+        # @param message [String, nil] the offense message
+        # @return [String] the normalized message
+        def normalized_message(message)
+          message.to_s.gsub(/\s+/, ' ').strip
         end
 
         # @param severity [String, nil] a yard-lint severity
