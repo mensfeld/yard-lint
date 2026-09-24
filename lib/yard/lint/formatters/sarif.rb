@@ -156,18 +156,21 @@ module Yard
         # @return [String] a stable hex digest
         def fingerprint(offense, uri)
           element = offense[:element].to_s
-          identity = element.empty? ? normalized_message(offense[:message]) : element
+          # Tag the identity with its source so an element that happens to equal
+          # another offense's normalized message cannot collide.
+          identity = element.empty? ? "m:#{normalized_message(offense[:message])}" : "e:#{element}"
           parts = [offense[:validator], uri, identity]
           Digest::SHA256.hexdigest(parts.map(&:to_s).join("\x00"))
         end
 
         # Message reduced to a stable identity for offenses with no :element:
-        # downcased with collapsed whitespace, so trivial formatting differences
-        # do not churn alerts while genuinely different messages stay distinct.
+        # whitespace is collapsed so trivial formatting differences do not churn
+        # alerts. Case is preserved - messages embed case-sensitive names (types,
+        # methods, constants), so downcasing could merge genuinely distinct offenses.
         # @param message [String, nil] the offense message
         # @return [String] the normalized message
         def normalized_message(message)
-          message.to_s.downcase.gsub(/\s+/, ' ').strip
+          message.to_s.gsub(/\s+/, ' ').strip
         end
 
         # @param severity [String, nil] a yard-lint severity

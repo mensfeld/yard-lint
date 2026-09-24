@@ -160,11 +160,29 @@ describe 'Yard::Lint::Formatters::Sarif' do
       fp.call(base.merge(message: 'invalid type in @return', location_line: 2))
     )
 
-    # Still line-independent, and normalized for whitespace/case.
+    # Whitespace is collapsed and the line is ignored...
     assert_equal(
-      fp.call(base.merge(message: 'Invalid  Type', location_line: 1)),
-      fp.call(base.merge(message: 'invalid type', location_line: 40))
+      fp.call(base.merge(message: 'Invalid  type', location_line: 1)),
+      fp.call(base.merge(message: 'Invalid type', location_line: 40))
     )
+
+    # ...but case is preserved, so messages differing only in case (e.g.
+    # case-sensitive type names) do not collapse into one fingerprint.
+    refute_equal(
+      fp.call(base.merge(message: "invalid type 'Foo'")),
+      fp.call(base.merge(message: "invalid type 'foo'"))
+    )
+  end
+
+  it 'does not collide an element with an element-less message of the same text' do
+    key = 'yardLintOffense/v1'
+    base = { validator: 'Tags/TypeSyntax', severity: 'warning', location: 'lib/foo.rb' }
+    fp = ->(o) { document([o])['runs'][0]['results'][0]['partialFingerprints'][key] }
+
+    with_element = fp.call(base.merge(element: 'foo', message: 'ignored'))
+    with_message = fp.call(base.merge(message: 'foo')) # no element
+
+    refute_equal(with_element, with_message)
   end
 
   it 'ignores the message when the offense identifies an object (element present)' do
