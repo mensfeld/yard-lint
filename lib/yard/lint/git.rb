@@ -89,14 +89,16 @@ module Yard
           filter_ruby_files(files.uniq, path)
         end
 
-        private
-
-        # Absolute path to the repository root (git reports paths relative to it)
+        # Absolute path to the repository root (git reports paths relative to it).
+        # Used to make report paths repository-relative; falls back to the current
+        # directory outside a git repo.
         # @return [String] repo root, or the current directory if it can't be determined
         def repository_root
           stdout, _stderr, status = Open3.capture3('git', 'rev-parse', '--show-toplevel')
           status.success? ? stdout.strip : Dir.pwd
         end
+
+        private
 
         # Ensure we're in a git repository
         # @raise [Error] if not in a git repository

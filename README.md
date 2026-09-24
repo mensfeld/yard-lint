@@ -208,6 +208,26 @@ Then `:make` lints the current file and `:cnext` / `:cprev` jump between offense
 
 Then `M-x compile` and `M-g n` / `M-g p` navigate between offenses.
 
+### SARIF Output (GitHub Code Scanning)
+
+Use `--format sarif` to emit [SARIF 2.1.0](https://sarifweb.azurewebsites.net/), the format GitHub code scanning and most result aggregators ingest. Uploading it makes yard-lint offenses appear as annotations in the PR "Files changed" view and the repository Security tab, instead of being buried in CI logs:
+
+```bash
+yard-lint --format sarif lib/ > yard-lint.sarif
+```
+
+Each rule carries its description (from the validator's own YARD docs), and severities map to SARIF levels (`error` → error, `warning` → warning, `convention` → note). Artifact paths are emitted repository-relative so GitHub maps them onto your files. In GitHub Actions, upload the file with `github/codeql-action/upload-sarif`:
+
+```yaml
+- run: bundle exec yard-lint --format sarif lib/ > yard-lint.sarif
+  continue-on-error: true
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: yard-lint.sarif
+```
+
+(Run yard-lint from the repository root so paths resolve correctly; `continue-on-error` lets the upload step run even when offenses are found.)
+
 ## Configuration Basics
 
 Create a `.yard-lint.yml` file in your project root:
@@ -543,7 +563,7 @@ Configuration:
   -c, --config FILE       Path to config file (default: .yard-lint.yml)
 
 Output:
-  -f, --format FORMAT     Output format (text, json, quickfix)
+  -f, --format FORMAT     Output format (text, json, quickfix, sarif)
   -q, --quiet             Quiet mode (only show summary)
       --stats             Show documentation coverage statistics
       --[no-]progress     Show progress indicator (default: auto-detect TTY)
