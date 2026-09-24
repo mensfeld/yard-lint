@@ -237,6 +237,51 @@ describe 'Yard::Lint::Config' do
     assert_equal('convention', config.validator_severity('Tags/Order'))
   end
 
+  it 'category severity applies a category-level Severity to its validators' do
+    config = Yard::Lint::Config.new({ 'Tags' => { 'Severity' => 'error' } })
+
+    assert_equal('error', config.validator_severity('Tags/Order'))
+    assert_equal('error', config.validator_severity('Tags/TypeSyntax'))
+  end
+
+  it 'category severity beats a validator built-in default' do
+    # Tags/Order ships a built-in default of convention; the category overrides it.
+    config = Yard::Lint::Config.new({ 'Tags' => { 'Severity' => 'error' } })
+
+    assert_equal('error', config.validator_severity('Tags/Order'))
+  end
+
+  it 'category severity does not leak into other categories' do
+    config = Yard::Lint::Config.new({ 'Tags' => { 'Severity' => 'error' } })
+
+    assert_equal('warning', config.validator_severity('Documentation/UndocumentedObjects'))
+  end
+
+  it 'per-validator severity beats a category-level severity' do
+    config = Yard::Lint::Config.new(
+      'Tags' => { 'Severity' => 'error' },
+      'Tags/Order' => { 'Severity' => 'never' }
+    )
+
+    assert_equal('never', config.validator_severity('Tags/Order'))
+    assert_equal('error', config.validator_severity('Tags/TypeSyntax'))
+  end
+
+  it 'category severity leaves the built-in default intact when unset (backwards compatible)' do
+    config = Yard::Lint::Config.new({ 'Documentation/UndocumentedObjects' => { 'Severity' => 'error' } })
+
+    assert_equal('error', config.validator_severity('Documentation/UndocumentedObjects'))
+    assert_equal('convention', config.validator_severity('Tags/Order'))
+  end
+
+  it 'category severity rejects an invalid category-level Severity value' do
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::Config.new({ 'Documentation' => { 'Severity' => 'bogus' } })
+    end
+
+    assert_match(/Invalid Severity for category Documentation/, error.message)
+  end
+
   it 'edge cases returns validator exclude patterns' do
     config = Yard::Lint::Config.new({ 'Tags/Order' => { 'Exclude' => ['test/**/*'] } })
 

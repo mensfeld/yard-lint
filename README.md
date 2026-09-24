@@ -322,9 +322,22 @@ Documentation/UnderfilledLines:
 
 **Key features:**
 - Per-validator control (enable/disable, severity, exclusions)
+- Category-level defaults (enable/disable, severity) for a whole department
 - Configuration inheritance with `inherit_from` and `inherit_gem`
 - Automatic configuration validation with helpful error messages
 - Per-validator YARD options and file exclusions
+
+**Category-level defaults:** set `Enabled` or `Severity` on a category (`Documentation`, `Tags`, `Warnings`, `Semantic`) to apply it to every validator in that department. A per-validator setting always wins over the category, which in turn wins over the validator's built-in default:
+
+```yaml
+# Make every Tags/* offense an error...
+Tags:
+  Severity: error
+
+# ...except Tags/Order, which stays a convention
+Tags/Order:
+  Severity: convention
+```
 
 **Learn more:** [Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
 
