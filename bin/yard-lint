@@ -358,7 +358,10 @@ when 'quickfix'
   end
   exit result.exit_code
 when 'sarif'
-  puts Yard::Lint::Formatters::Sarif.new(result.offenses).generate
+  # Base paths on the repository root so GitHub can map offense URIs onto files
+  # even when yard-lint is run from a subdirectory.
+  sarif = Yard::Lint::Formatters::Sarif.new(result.offenses, base_dir: Yard::Lint::Git.repository_root)
+  puts sarif.generate
   exit result.exit_code
 when 'text', nil
   # Calculate coverage stats if requested or configured

@@ -108,13 +108,20 @@ module Yard
         # @param rule_index [Hash{String => Integer}] validator name to rule index
         # @return [Hash] a SARIF result
         def result(offense, rule_index)
-          {
-            'ruleId' => offense[:validator],
-            'ruleIndex' => rule_index[offense[:validator]],
-            'level' => level(offense[:severity]),
-            'message' => { 'text' => offense[:message].to_s },
-            'locations' => [location(offense)]
-          }
+          entry = {}
+
+          # ruleId/ruleIndex are optional in SARIF; omit them (rather than emit
+          # null, which is schema-invalid) for the rare offense with no validator.
+          validator = offense[:validator]
+          if validator
+            entry['ruleId'] = validator
+            entry['ruleIndex'] = rule_index[validator]
+          end
+
+          entry['level'] = level(offense[:severity])
+          entry['message'] = { 'text' => offense[:message].to_s }
+          entry['locations'] = [location(offense)]
+          entry
         end
 
         # @param offense [Hash] an offense hash
