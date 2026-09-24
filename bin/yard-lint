@@ -18,7 +18,7 @@ begin
     config_file = file
   end
 
-  opts.on('-f', '--format FORMAT', 'Output format (text, json, quickfix)') do |format|
+  opts.on('-f', '--format FORMAT', 'Output format (text, json, quickfix, sarif)') do |format|
     options[:format] = format
   end
 
@@ -122,6 +122,7 @@ begin
     puts '  yard-lint --changed                            # Lint only uncommitted files'
     puts '  yard-lint --format json lib/                   # Output in JSON format'
     puts '  yard-lint --format quickfix lib/               # Output in quickfix format (Vim/Emacs)'
+    puts '  yard-lint --format sarif lib/                  # Output SARIF 2.1.0 (GitHub code scanning)'
     puts '  yard-lint --init                               # Generate default config'
     puts '  yard-lint --init --strict                      # Generate strict config'
     puts '  yard-lint --update                             # Update config with new validators'
@@ -300,14 +301,14 @@ end
 
 # Validate the output format before doing any (potentially long) work, rather
 # than running the whole lint and only then rejecting an unknown format.
-valid_formats = %w[text json quickfix]
+valid_formats = %w[text json quickfix sarif]
 if options[:format] && !valid_formats.include?(options[:format])
   puts "Error: Unknown format '#{options[:format]}'. Valid formats: #{valid_formats.join(', ')}"
   exit 1
 end
 
-# Suppress progress for quickfix to avoid contaminating machine-readable output
-options[:progress] = false if options[:format] == 'quickfix' && options[:progress].nil?
+# Suppress progress for machine-readable formats to avoid contaminating output
+options[:progress] = false if %w[quickfix sarif].include?(options[:format]) && options[:progress].nil?
 
 # Run the linter
 begin
@@ -355,6 +356,9 @@ when 'quickfix'
     message = offense[:message].to_s.gsub(/\n/, ' ')
     puts "#{offense[:location]}:#{offense[:location_line]}: #{char}: #{offense[:validator]}: #{message}"
   end
+  exit result.exit_code
+when 'sarif'
+  puts Yard::Lint::Formatters::Sarif.new(result.offenses).generate
   exit result.exit_code
 when 'text', nil
   # Calculate coverage stats if requested or configured

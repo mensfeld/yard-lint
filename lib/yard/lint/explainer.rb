@@ -24,9 +24,32 @@ module Yard
         new(name).call
       end
 
+      # Structured description of a validator for programmatic consumers such as
+      # the SARIF formatter's rule metadata (as opposed to #call's terminal text).
+      # @param name [String] validator name (e.g. 'Tags/TypeSyntax')
+      # @return [Hash{Symbol => String}, nil] { short:, full: }, or nil when the
+      #   name is unknown or the validator has no docstring
+      def self.describe(name)
+        new(name).describe
+      end
+
       # @param name [String] validator name (e.g. 'Tags/TypeSyntax')
       def initialize(name)
         @name = name
+      end
+
+      # @return [Hash{Symbol => String}, nil] { short:, full: } description of the
+      #   validator, or nil when unknown or undocumented
+      def describe
+        return nil unless ConfigLoader::ALL_VALIDATORS.include?(@name)
+
+        doc = documentation
+        return nil unless doc
+
+        full = prose_only(doc[:description])
+        return nil if full.empty?
+
+        { short: first_sentence(full), full: full }
       end
 
       # @return [String] formatted, terminal-ready explanation
@@ -112,6 +135,25 @@ module Yard
           YARD::Registry.clear
           saved.each { |object| YARD::Registry.register(object) }
         end
+      end
+
+      # The human description of a validator: its docstring prose with the leading
+      # "<Name> validator" title line and any trailing "## ..." sections (e.g.
+      # Configuration) removed, leaving just the explanation.
+      # @param description [String] the raw docstring text
+      # @return [String] the trimmed prose (may be empty)
+      def prose_only(description)
+        lines = description.to_s.lines.take_while { |line| !line.start_with?('## ') }
+        text = lines.join
+        text = text.sub(/\A.*validator[ \t]*\n+/i, '') if text.match?(/\A.*validator[ \t]*\n/i)
+        text.strip
+      end
+
+      # @param text [String] prose text
+      # @return [String] the first sentence, for a concise one-line summary
+      def first_sentence(text)
+        flat = text.tr("\n", ' ').squeeze(' ').strip
+        flat[/.*?[.!?](?=\s|\z)/] || flat
       end
 
       # @return [String] the fully-qualified code object path (e.g.
