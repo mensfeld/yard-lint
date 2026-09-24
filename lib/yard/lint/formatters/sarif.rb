@@ -2,6 +2,7 @@
 
 require 'json'
 require 'pathname'
+require 'digest'
 
 module Yard
   module Lint
@@ -41,6 +42,11 @@ module Yard
         # Fallback SARIF level for any unrecognized severity.
         # @return [String]
         DEFAULT_LEVEL = 'warning'
+
+        # partialFingerprints key, versioned so the scheme can evolve without
+        # invalidating history. GitHub uses it to correlate results across runs.
+        # @return [String]
+        FINGERPRINT_KEY = 'yardLintOffense/v1'
 
         # @param offenses [Array<Hash>] offense hashes (from `result.offenses`)
         # @param base_dir [String] directory that offense paths are made relative
@@ -108,6 +114,7 @@ module Yard
         # @param rule_index [Hash{String => Integer}] validator name to rule index
         # @return [Hash] a SARIF result
         def result(offense, rule_index)
+          uri = relative_uri(offense[:location])
           entry = {}
 
           # ruleId/ruleIndex are optional in SARIF; omit them (rather than emit
@@ -120,19 +127,33 @@ module Yard
 
           entry['level'] = level(offense[:severity])
           entry['message'] = { 'text' => offense[:message].to_s }
-          entry['locations'] = [location(offense)]
+          entry['locations'] = [location(offense, uri)]
+          entry['partialFingerprints'] = { FINGERPRINT_KEY => fingerprint(offense, uri) }
           entry
         end
 
         # @param offense [Hash] an offense hash
+        # @param uri [String] the artifact URI (already made relative)
         # @return [Hash] a SARIF location
-        def location(offense)
+        def location(offense, uri)
           {
             'physicalLocation' => {
-              'artifactLocation' => { 'uri' => relative_uri(offense[:location]) },
+              'artifactLocation' => { 'uri' => uri },
               'region' => { 'startLine' => start_line(offense) }
             }
           }
+        end
+
+        # A line-independent fingerprint so GitHub correlates the same offense
+        # across commits without churn (close/reopen) when unrelated lines shift.
+        # Keys on the validator, file, and offending object; the line number and
+        # message text are excluded so a re-worded message does not churn alerts.
+        # @param offense [Hash] an offense hash
+        # @param uri [String] the artifact URI (already made relative)
+        # @return [String] a stable hex digest
+        def fingerprint(offense, uri)
+          parts = [offense[:validator], uri, offense[:element]]
+          Digest::SHA256.hexdigest(parts.map(&:to_s).join("\x00"))
         end
 
         # @param severity [String, nil] a yard-lint severity

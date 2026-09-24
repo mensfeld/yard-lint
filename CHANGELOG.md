@@ -1,4 +1,5 @@
 ## Unreleased
+- **[Enhancement]** SARIF output now includes a line-independent `partialFingerprints` per result, so GitHub tracks the same offense across commits instead of churning alerts when lines shift.
 - **[Feature]** Added `--format sarif`, which emits SARIF 2.1.0 for GitHub code scanning and other aggregators.
 - **[Feature]** Category-level `Severity` is now honored: set `Severity` on a department (e.g. `Documentation`) to apply it to all its validators. A per-validator `Severity` still wins. Backwards compatible - it only affects configs that set a category `Severity`, which was previously ignored.
 

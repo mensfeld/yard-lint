@@ -120,6 +120,33 @@ describe 'Yard::Lint::Formatters::Sarif' do
     assert_equal('lib/foo.rb', result['locations'][0]['physicalLocation']['artifactLocation']['uri'])
   end
 
+  it 'attaches a stable, line-independent partialFingerprint to each result' do
+    at_line_10 = document([offense(location_line: 10)])['runs'][0]['results'][0]
+    at_line_99 = document([offense(location_line: 99)])['runs'][0]['results'][0]
+
+    key = 'yardLintOffense/v1'
+    fingerprint = at_line_10['partialFingerprints'][key]
+    assert_match(/\A[0-9a-f]{64}\z/, fingerprint)
+    assert_equal(
+      fingerprint,
+      at_line_99['partialFingerprints'][key],
+      'fingerprint must not change when only the line number shifts'
+    )
+  end
+
+  it 'gives different offenses different fingerprints' do
+    key = 'yardLintOffense/v1'
+    base = document([offense])['runs'][0]['results'][0]['partialFingerprints'][key]
+
+    different_element = document([offense(element: 'Foo#other')])['runs'][0]['results'][0]['partialFingerprints'][key]
+    different_file = document([offense(location: 'lib/bar.rb')])['runs'][0]['results'][0]['partialFingerprints'][key]
+    different_validator = document([offense(validator: 'Tags/Order')])['runs'][0]['results'][0]['partialFingerprints'][key]
+
+    refute_equal(base, different_element)
+    refute_equal(base, different_file)
+    refute_equal(base, different_validator)
+  end
+
   it 'produces valid SARIF with empty results and rules when there are no offenses' do
     doc = document([])
 

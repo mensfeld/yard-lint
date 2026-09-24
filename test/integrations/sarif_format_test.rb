@@ -117,6 +117,18 @@ describe 'CLI --format sarif' do
     assert(levels.all? { |l| l == 'error' }, "expected all error, got #{levels}")
   end
 
+  it 'attaches a partialFingerprint to each result, identical across repeated runs' do
+    first, = sarif
+    second, = sarif
+
+    first_prints = first['runs'][0]['results'].map { |r| r['partialFingerprints']['yardLintOffense/v1'] }
+    second_prints = second['runs'][0]['results'].map { |r| r['partialFingerprints']['yardLintOffense/v1'] }
+
+    refute_empty(first_prints)
+    first_prints.each { |fp| assert_match(/\A[0-9a-f]{64}\z/, fp) }
+    assert_equal(first_prints, second_prints, 'fingerprints must be deterministic across runs')
+  end
+
   it 'fails the run (non-zero exit) when reportable offenses exist' do
     _, status = sarif
 
