@@ -38,6 +38,7 @@ module Yard
       def validate!
         validate_root_keys!
         validate_global_settings!
+        validate_category_configs!
         validate_validators!
 
         return if @errors.empty?
@@ -46,6 +47,23 @@ module Yard
       end
 
       private
+
+      # Validate category-level configuration (e.g. `Documentation: { Severity: ... }`).
+      # Only the value of a Severity key is checked; categories otherwise remain
+      # permissive, so existing configs are unaffected.
+      def validate_category_configs!
+        @raw_config.each do |key, value|
+          next unless VALID_CATEGORIES.include?(key)
+          next unless value.is_a?(Hash)
+
+          severity = value['Severity']
+          next unless severity && !Config::VALID_SEVERITIES.include?(severity.to_s)
+
+          @errors << "Invalid Severity for category #{key}: '#{severity}'"
+          @errors << "  Valid values: #{Config::VALID_SEVERITIES.join(', ')}"
+          suggest_similar_severity(severity.to_s)
+        end
+      end
 
       # Validate root-level keys in configuration
       def validate_root_keys!

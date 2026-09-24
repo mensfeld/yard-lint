@@ -173,9 +173,32 @@ module Yard
       end
 
       # Get validator severity
+      #
+      # Resolution order (highest priority first):
+      #   1. an explicit per-validator Severity in the user's config
+      #   2. a category-level Severity (e.g. `Documentation: { Severity: convention }`),
+      #      matching how category-level Enabled cascades in #validator_enabled?
+      #   3. the validator's built-in default Severity
+      #   4. the global 'warning' default
+      #
       # @param validator_name [String] full validator name
       # @return [String] severity level for this validator
       def validator_severity(validator_name)
+        # An explicit per-validator Severity in the user's config wins.
+        raw_validator = @raw_config[validator_name]
+        if raw_validator.is_a?(Hash) && raw_validator['Severity']
+          return raw_validator['Severity'].to_s
+        end
+
+        # Otherwise honor a category-level Severity, which previously validated
+        # but was ignored (the category-level Enabled key already cascades).
+        category = validator_name.split('/').first
+        raw_category = @raw_config[category]
+        if raw_category.is_a?(Hash) && raw_category['Severity']
+          return raw_category['Severity'].to_s
+        end
+
+        # Fall back to the validator's built-in default, then the global default.
         validator_config = validators[validator_name] || {}
         validator_config['Severity'] || 'warning'
       end
