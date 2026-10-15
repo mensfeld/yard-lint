@@ -25,7 +25,8 @@ module Yard
         #   # @overload fetch(key)
         #   #   @param name [String] the key
         #   #   @return [Object]
-        #   def fetch(*args); end
+        #   def fetch(*args)
+        #   end
         #
         # @example Good - each overload documents its own parameters
         #   # @overload fetch(key)
@@ -35,7 +36,8 @@ module Yard
         #   #   @param key [String] the key
         #   #   @param default [Object] value when the key is missing
         #   #   @return [Object]
-        #   def fetch(*args); end
+        #   def fetch(*args)
+        #   end
         #
         # ## Configuration
         #
