@@ -155,6 +155,9 @@ module Yard
         #   when the object does not come from module_function
         def module_function_twin(object)
           return nil unless object.respond_to?(:scope)
+          # `def CONST.name` leaves a Proxy or ConstantObject namespace with no
+          # children; Proxy#is_a? answers for the resolved object
+          return nil unless object.namespace.is_a?(YARD::CodeObjects::NamespaceObject)
 
           twin = object.namespace.child(
             name: object.name,

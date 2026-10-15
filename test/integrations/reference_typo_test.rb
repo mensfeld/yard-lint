@@ -310,6 +310,74 @@ describe 'Documentation/ReferenceTypo' do
     assert_empty(offenses)
   end
 
+  it 'does not crash on a singleton method defined on a constant' do
+    offenses = offenses_for(<<~RUBY)
+      # App
+      module ReferenceApp
+        # Extensions
+        module Ext
+          ANY = Object.new
+          def ANY.==(_)
+            true
+          end
+        end
+      end
+    RUBY
+
+    assert_empty(offenses)
+  end
+
+  it 'does not crash on bare constant references from a method defined on a constant' do
+    offenses = offenses_for(<<~RUBY)
+      # App
+      module ReferenceApp
+        # Worker
+        class Worker
+          # Runs
+          def run; end
+        end
+
+        # Extensions
+        module Ext
+          ANY = Object.new
+          # Compares with {Wroker}
+          # @see Wroker
+          # @return [Boolean] always true
+          def ANY.==(_)
+            true
+          end
+        end
+      end
+    RUBY
+
+    assert_empty(offenses)
+  end
+
+  it 'still reports typos inside a class of an unknown namespace' do
+    messages = messages_for(<<~RUBY)
+      # Thing
+      class UnknownReferenceParent::Thing
+        # Limit
+        LIMIT = 1
+
+        # Processes
+        def process; end
+
+        # Uses {LIMT} and {#proces}
+        # @see Wroker
+        def call; end
+      end
+    RUBY
+
+    assert_equal(
+      [
+        "Reference 'LIMT' does not resolve (did you mean 'LIMIT'?)",
+        "Reference '#proces' does not resolve (did you mean '#process'?)"
+      ].sort,
+      messages.sort
+    )
+  end
+
   it 'can be disabled' do
     path = File.join(dir, 'example.rb')
     File.write(path, <<~RUBY)
