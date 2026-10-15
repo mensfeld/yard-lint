@@ -500,7 +500,7 @@ To keep false positives low, it skips references into namespaces YARD does not k
 YARD checks `@param` names only against the method's own signature, never the tags inside an `@overload`. The `Tags/OverloadConsistency` validator (enabled by default, severity `warning`) checks each overload against its own signature and reports:
 
 - a `@param` that names no parameter of that overload
-- a parameter with no `@param`, when the overload documents at least one other parameter (splat and block parameters are not required)
+- a parameter with no `@param`, when the overload documents at least one other parameter (splat and block parameters are not required; a `@param` on the method docstring counts for every overload)
 - an overload with no `@return`, when another overload of the method has one and the method docstring has none
 
 ```ruby
