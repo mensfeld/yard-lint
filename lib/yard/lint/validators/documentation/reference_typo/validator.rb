@@ -92,6 +92,9 @@ module Yard
               return if external_method?(namespace, match[:name], scope)
 
               candidates = namespace.meths(scope: scope).map { |meth| meth.name.to_s }
+              # YARD does not resolve a method found more than one namespace up
+              return if candidates.include?(match[:name])
+
               suggestion = spell_check(match[:name], candidates)
 
               suggestion && "#{namespace_name}#{match[:separator]}#{suggestion}"

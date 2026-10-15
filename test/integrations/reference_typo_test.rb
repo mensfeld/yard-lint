@@ -141,6 +141,35 @@ describe 'Documentation/ReferenceTypo' do
     assert_empty(offenses)
   end
 
+  it 'does not flag methods that resolve two or more namespaces up' do
+    offenses = offenses_for(<<~RUBY)
+      # App
+      module ReferenceApp
+        # Client
+        class Client
+          # Runs
+          def run; end
+
+          # Runs many
+          def runs; end
+        end
+
+        # Sub
+        module Sub
+          # Uses {Client#run} and {ReferenceApp::Client#run}
+          # @see ReferenceApp::Client#run
+          class Worker
+            # Calls {Client#run}
+            # @see Client#run
+            def go; end
+          end
+        end
+      end
+    RUBY
+
+    assert_empty(offenses)
+  end
+
   it 'does not flag references into unknown or external namespaces' do
     offenses = offenses_for(<<~RUBY)
       # Parser
