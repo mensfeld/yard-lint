@@ -308,6 +308,11 @@ Tags/ForbiddenTags:
   Severity: convention
   ForbiddenPatterns: []
 
+Tags/OverloadConsistency:
+  Description: 'Checks the tags of each @overload against its own signature.'
+  Enabled: true
+  Severity: warning
+
 # Warnings validators - catches YARD parser errors
 Warnings/SyntaxError:
   Description: 'Detects Ruby files YARD cannot parse (syntax errors).'

@@ -495,6 +495,31 @@ def call; end
 
 To keep false positives low, it skips references into namespaces YARD does not know (stdlib, other gems), methods that a loaded Ruby ancestor may define (e.g. `{#to_s}`), names with no close match, and code spans and code blocks. A bare constant such as `{Kafka}` is only compared with constants of the enclosing namespaces, never with top-level ones, so a constant of a gem YARD did not parse is not reported as a typo of a similar project name.
 
+## Checking @overload Tags
+
+YARD checks `@param` names only against the method's own signature, never the tags inside an `@overload`. The `Tags/OverloadConsistency` validator (enabled by default, severity `warning`) checks each overload against its own signature and reports:
+
+- a `@param` that names no parameter of that overload
+- a parameter with no `@param`, when the overload documents at least one other parameter (splat and block parameters are not required)
+- an overload with no `@return`, when another overload of the method has one and the method docstring has none
+
+```ruby
+# Bad - reports: Overload 'fetch(key)' documents @param 'name', which is not in its signature
+#                Overload 'fetch(key)' has no @param for 'key'
+# @overload fetch(key)
+#   @param name [String] the key
+#   @return [Object]
+def fetch(*args); end
+
+# Good
+# @overload fetch(key)
+#   @param key [String] the key
+#   @return [Object]
+def fetch(*args); end
+```
+
+Overloads that forward arguments (`...`) or take anonymous `*`, `**` or `&` parameters are not checked for unknown names.
+
 ## Handling Non-Standard Types
 
 By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `Boolean`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes - project-specific aliases, LSP extensions, or informal conventions - you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.
