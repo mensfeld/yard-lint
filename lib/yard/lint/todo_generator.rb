@@ -132,7 +132,7 @@ module Yard
 
         todo_entries.each do |validator_name, patterns|
           next unless ConfigLoader::ALL_VALIDATORS.include?(validator_name)
-          next unless audit_config.validator_exclude(validator_name) == patterns
+          next unless audit_config.validator_config(validator_name, 'Exclude') == patterns
 
           audit_config.set_validator_config(validator_name, 'Exclude', [])
         end

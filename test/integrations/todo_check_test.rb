@@ -250,6 +250,22 @@ describe 'Todo Check' do
     refute_includes(result[:stdout], "- 'lib/b.rb'")
   end
 
+  it 'passes right after the todo file is generated with a category Exclude' do
+    write_undocumented('lib/a.rb', 'A')
+    write_undocumented('lib/b.rb', 'B')
+    File.write('.yard-lint.yml', <<~YAML)
+      Documentation:
+        Exclude:
+          - 'lib/gen/**/*'
+    YAML
+    run_yard_lint('--auto-gen-config', 'lib')
+
+    result = run_yard_lint('--check-todo', 'lib')
+
+    assert_equal(0, result[:exit_code], result[:stdout])
+    assert_includes(result[:stdout], 'No unused entries found')
+  end
+
   it 'does not judge entries of validators left out by --only' do
     write_undocumented('lib/a.rb', 'A')
     File.write('.yard-lint-todo.yml', <<~YAML)
