@@ -479,6 +479,22 @@ The validator reports one offense per wasteful paragraph and is deliberately con
 
 Unlike `LineLength` (which measures an objective property), "this line should have been longer" is a stylistic judgement. Projects that use **semantic line breaks** (one sentence or clause per line, see [sembr.org](https://sembr.org)) are never flagged - any paragraph whose non-final lines all end at a sentence boundary (`.?!:;`) is treated as intentional. Leave the validator off, or add `,` to `SentenceEndChars`, if that style is used heavily.
 
+## Catching Typos in References
+
+The `Documentation/ReferenceTypo` validator (enabled by default, severity `warning`) checks `{Foo#bar}` links in docstrings and tag text, and `@see` targets. When a reference does not resolve and a close match exists in its namespace, it reports the reference and suggests the closest name:
+
+```ruby
+# Bad - reports: Reference 'Parser#prase' does not resolve (did you mean 'Parser#parse'?)
+# Delegates to {Parser#prase}
+def call; end
+
+# Good
+# Delegates to {Parser#parse}
+def call; end
+```
+
+To keep false positives low, it skips references into namespaces YARD does not know (stdlib, other gems), methods that a loaded Ruby ancestor may define (e.g. `{#to_s}`), names with no close match, and code spans and code blocks. A bare constant such as `{Kafka}` is only compared with constants of the enclosing namespaces, never with top-level ones, so a constant of a gem YARD did not parse is not reported as a typo of a similar project name.
+
 ## Handling Non-Standard Types
 
 By default `Tags/InvalidTypes` accepts all built-in Ruby classes, constants, and a set of YARD pseudo-types (`nil`, `true`, `false`, `self`, `void`, `Boolean`, `undefined`, `unspecified`, `unknown`). If your project uses additional type names that are not real Ruby classes - project-specific aliases, LSP extensions, or informal conventions - you can declare them via `ExtraTypes` so yard-lint does not report them as `InvalidTagType` offenses.

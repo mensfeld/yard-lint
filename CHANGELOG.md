@@ -1,9 +1,10 @@
-## Unreleased
-- **[Bugfix]** Category-level `Exclude` (e.g. on `Documentation`) was ignored; it now skips those files for all validators in the category, combined with a per-validator `Exclude` rather than replaced by it.
+## 1.13.0 (Unreleased)
+- **[Feature]** Added `Documentation/ReferenceTypo` (enabled by default, severity `warning`), which flags probable typos in `{Foo#bar}` links and `@see` targets and suggests the closest name via `DidYouMean`.
 - **[Feature]** Added `--check-todo`, which re-lints without the `.yard-lint-todo.yml` exclusions and lists each `Exclude` entry that no longer matches any offense, exiting non-zero when there are any, so the baseline only shrinks. Combine with `--only` to check only some validators' entries.
-- **[Enhancement]** SARIF output now includes a line-independent `partialFingerprints` per result (keyed on the offending object, or the message when there is none), so GitHub tracks the same offense across commits instead of churning alerts when lines shift.
 - **[Feature]** Added `--format sarif`, which emits SARIF 2.1.0 for GitHub code scanning and other aggregators.
 - **[Feature]** Category-level `Severity` is now honored: set `Severity` on a department (e.g. `Documentation`) to apply it to all its validators. A per-validator `Severity` still wins. Backwards compatible - it only affects configs that set a category `Severity`, which was previously ignored.
+- **[Enhancement]** SARIF output now includes a line-independent `partialFingerprints` per result (keyed on the offending object, or the message when there is none), so GitHub tracks the same offense across commits instead of churning alerts when lines shift.
+- **[Bugfix]** Category-level `Exclude` (e.g. on `Documentation`) was ignored; it now skips those files for all validators in the category, combined with a per-validator `Exclude` rather than replaced by it.
 
 ## 1.12.0 (2026-09-23)
 - **[Feature]** Added `--explain VALIDATOR`, which prints a validator's description, default severity, configuration options, and examples in the terminal (sourced from its own YARD docs). Unknown names suggest close matches, like `--only`.
