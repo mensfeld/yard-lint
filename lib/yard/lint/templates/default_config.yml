@@ -156,6 +156,11 @@ Documentation/DuplicateNamespaceComment:
   Enabled: true
   Severity: warning
 
+Documentation/ReferenceTypo:
+  Description: 'Detects probable typos in method and constant references.'
+  Enabled: true
+  Severity: warning
+
 # Tags validators
 Tags/Order:
   Description: 'Enforces consistent ordering of YARD tags.'
