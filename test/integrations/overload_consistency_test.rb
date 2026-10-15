@@ -161,6 +161,44 @@ describe 'Tags/OverloadConsistency' do
     assert_equal([], messages)
   end
 
+  it 'accepts a parameter documented once on the method docstring' do
+    messages = messages_for(<<~RUBY)
+      # Store
+      class OverloadStore
+        # Fetches a value
+        # @param default_executor [Object] executor shared by all overloads
+        # @overload fetch(default_executor, key)
+        #   @param key [String] the key
+        #   @return [Object]
+        # @overload fetch(default_executor, key, default)
+        #   @param key [String] the key
+        #   @param default [Object] fallback
+        #   @return [Object]
+        def fetch(*args); end
+      end
+    RUBY
+
+    assert_equal([], messages)
+  end
+
+  it 'reports an aliased method once' do
+    messages = messages_for(<<~RUBY)
+      # Store
+      class OverloadStore
+        # Fetches a value
+        # @overload fetch(key)
+        #   @param name [String] the key
+        #   @param key [String] the key
+        def fetch(*args); end
+
+        alias get fetch
+        alias_method :read, :fetch
+      end
+    RUBY
+
+    assert_equal(["Overload 'fetch(key)' documents @param 'name', which is not in its signature"], messages)
+  end
+
   it 'flags an overload without @return when another overload has one' do
     messages = messages_for(<<~RUBY)
       # Store

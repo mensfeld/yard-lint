@@ -21,7 +21,8 @@ module Yard
               overloads = object.tags(:overload)
               return if overloads.empty?
 
-              offenses = overloads.flat_map { |overload| param_offenses(overload) }
+              shared = object.docstring.tags(:param).map { |tag| tag.name.to_s }
+              offenses = overloads.flat_map { |overload| param_offenses(overload, shared) }
               offenses.concat(return_offenses(object, overloads))
 
               offenses.each do |kind, param, overload|
@@ -33,15 +34,16 @@ module Yard
             private
 
             # @param overload [YARD::Tags::OverloadTag] overload to check
+            # @param shared [Array<String>] @param names on the method docstring, common to all overloads
             # @return [Array<Array>] [kind, param name, overload] offenses
-            def param_offenses(overload)
+            def param_offenses(overload, shared)
               documented = overload.docstring.tags(:param).map { |tag| tag.name.to_s }
               return [] if documented.empty?
 
               names = overload.parameters.map { |param| param[0].to_s }
               plain = names.reject { |name| name.start_with?('*', '&', '...') }.map { |name| name.sub(/:\z/, '') }
 
-              offenses = (plain - documented).map { |name| ['undocumented_param', name, overload] }
+              offenses = (plain - documented - shared).map { |name| ['undocumented_param', name, overload] }
 
               # `...`, `*`, `**` and `&` take arguments no @param can name
               return offenses if names.any? { |name| %w[... * ** &].include?(name) }
