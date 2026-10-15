@@ -49,12 +49,17 @@ module Yard
       private
 
       # Validate category-level configuration (e.g. `Documentation: { Severity: ... }`).
-      # Only the value of a Severity key is checked; categories otherwise remain
-      # permissive, so existing configs are unaffected.
+      # Only the values of the Severity and Exclude keys are checked; categories
+      # otherwise remain permissive, so existing configs are unaffected.
       def validate_category_configs!
         @raw_config.each do |key, value|
           next unless VALID_CATEGORIES.include?(key)
           next unless value.is_a?(Hash)
+
+          exclude = value['Exclude']
+          if exclude && !exclude.is_a?(Array)
+            @errors << "Invalid Exclude for category #{key}: must be an array, got #{exclude.class}"
+          end
 
           severity = value['Severity']
           next unless severity && !Config::VALID_SEVERITIES.include?(severity.to_s)
