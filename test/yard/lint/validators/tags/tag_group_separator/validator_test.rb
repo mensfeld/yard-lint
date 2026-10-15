@@ -200,6 +200,7 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
   def mock_module_function_object(docstring:, scope:, twin:, line_range: nil)
     object = mock_yard_object(docstring: docstring)
     namespace = stub('namespace')
+    namespace.stubs(:is_a?).with(YARD::CodeObjects::NamespaceObject).returns(true)
 
     object.stubs(:scope).returns(scope)
     object.stubs(:name).returns(:method_name)
