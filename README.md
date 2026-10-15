@@ -116,8 +116,8 @@ yard-lint lib/
 # Fix violations incrementally by removing exclusions from .yard-lint-todo.yml
 
 # Fail (exit 1) when .yard-lint-todo.yml has entries that no longer match any offense
-# (always lints the whole project; a PATH only limits which entries are reported)
-yard-lint --check-todo
+# (use the PATH of your normal run; a PATH only limits which entries are reported)
+yard-lint --check-todo lib/
 ```
 
 **Learn more:** [Incremental Adoption Guide](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)

@@ -74,9 +74,10 @@ module Yard
       end
 
       # Re-lint without the todo file exclusions and find entries that match no offense
-      # The whole project is linted whatever the path is, as offenses can depend on other files
-      # and on their order. The path only limits which entries are judged: those that cover
-      # a file under it, or no project file at all. The given config is not modified.
+      # Offenses can depend on the other linted files and on their order, so an entry counts as
+      # used when it matches an offense of a whole-project run or of a run on the path only.
+      # The path only limits which entries are judged: those that cover a file under it,
+      # or no project file at all. The given config is not modified.
       # @return [Hash] result with :message and :unused_entries (validator name => unused patterns)
       # @raise [Errors::TodoFileNotFoundError] if the todo file does not exist
       def check
@@ -85,7 +86,7 @@ module Yard
         path_files = Yard::Lint.send(:expand_path, @path, audit_config)
         files = Yard::Lint.send(:expand_path, '.', audit_config) | path_files
 
-        violations_by_validator = run_linting(files: files, config: audit_config)[:violations_by_validator]
+        violations_by_validator = audit_violations([files, path_files], audit_config)
         files = files.map { |file| make_relative_path(file) }
         path_files = path_files.map { |file| make_relative_path(file) }
 
@@ -137,6 +138,18 @@ module Yard
         end
 
         audit_config
+      end
+
+      # Lint each file set and merge the violating files per validator
+      # @param file_sets [Array<Array<String>>] file sets to lint separately
+      # @param config [Config] configuration for the audit run
+      # @return [Hash{String => Array<String>}] validator names to files with offenses in any run
+      def audit_violations(file_sets, config)
+        file_sets.uniq(&:sort).each_with_object({}) do |files, merged|
+          run_linting(files: files, config: config)[:violations_by_validator].each do |validator_name, paths|
+            merged[validator_name] = merged.fetch(validator_name, []) | paths
+          end
+        end
       end
 
       # Whether the audit can judge a validator's todo entries

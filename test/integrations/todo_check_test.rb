@@ -142,6 +142,36 @@ describe 'Todo Check' do
     end
   end
 
+  it 'keeps an entry whose offense only shows when the checked path is linted alone' do
+    write_undocumented('lib/a.rb', 'Foo')
+    FileUtils.mkdir_p('examples')
+    File.write('examples/demo.rb', "class Foo\n  def x; end\nend\n")
+    run_yard_lint('--auto-gen-config', 'lib')
+
+    result = run_yard_lint('--check-todo', 'lib')
+
+    assert_equal(0, result[:exit_code], result[:stdout])
+    assert_includes(result[:stdout], 'No unused entries found')
+  end
+
+  it 'reports only stale entries that cover a file under the checked path' do
+    write_undocumented('lib/a.rb', 'A')
+    write_undocumented('lib/b.rb', 'B')
+    run_yard_lint('--auto-gen-config', 'lib')
+    write_documented('lib/b.rb', 'B')
+
+    result = run_yard_lint('--check-todo', 'lib/a.rb')
+
+    assert_equal(0, result[:exit_code], result[:stdout])
+    assert_includes(result[:stdout], 'No unused entries found')
+
+    result = run_yard_lint('--check-todo', 'lib/b.rb')
+
+    assert_equal(1, result[:exit_code])
+    assert_includes(result[:stdout], "- 'lib/b.rb'")
+    refute_includes(result[:stdout], "- 'lib/a.rb'")
+  end
+
   it 'does not modify the todo file' do
     write_undocumented('lib/a.rb', 'A')
     run_yard_lint('--auto-gen-config', 'lib')
