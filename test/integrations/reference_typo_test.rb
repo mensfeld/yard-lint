@@ -310,6 +310,23 @@ describe 'Documentation/ReferenceTypo' do
     assert_empty(offenses)
   end
 
+  it 'does not crash on a singleton method defined on a constant' do
+    offenses = offenses_for(<<~RUBY)
+      # App
+      module ReferenceApp
+        # Extensions
+        module Ext
+          ANY = Object.new
+          def ANY.==(_)
+            true
+          end
+        end
+      end
+    RUBY
+
+    assert_empty(offenses)
+  end
+
   it 'can be disabled' do
     path = File.join(dir, 'example.rb')
     File.write(path, <<~RUBY)
