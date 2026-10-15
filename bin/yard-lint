@@ -160,6 +160,18 @@ report_unknown_validators = lambda do |names|
   puts "\nRun `yard-lint --explain VALIDATOR` to see what a validator checks."
 end
 
+# Apply --only filter if provided, exiting on unknown validator names
+apply_only = lambda do |config|
+  next unless options[:only]
+
+  unknown = options[:only] - Yard::Lint::ConfigLoader::ALL_VALIDATORS
+  if unknown.any?
+    report_unknown_validators.call(unknown)
+    exit 1
+  end
+  config.only_validators = options[:only]
+end
+
 # Handle --explain flag (early exit; needs no config or path)
 if options[:explain]
   name = options[:explain]
@@ -268,6 +280,7 @@ if options[:check_todo]
              else
                Yard::Lint::Config.load || Yard::Lint::Config.new
              end
+    apply_only.call(config)
 
     result = Yard::Lint::TodoGenerator.check(path: ARGV[0] || '.', config: config)
 
@@ -317,15 +330,7 @@ end
 # Apply CLI min_coverage override if provided
 config.min_coverage = options[:min_coverage] if options[:min_coverage]
 
-# Apply --only filter if provided
-if options[:only]
-  unknown = options[:only] - Yard::Lint::ConfigLoader::ALL_VALIDATORS
-  if unknown.any?
-    report_unknown_validators.call(unknown)
-    exit 1
-  end
-  config.only_validators = options[:only]
-end
+apply_only.call(config)
 
 # Validate the output format before doing any (potentially long) work, rather
 # than running the whole lint and only then rejecting an unknown format.

@@ -88,6 +88,8 @@ module Yard
         violations_by_validator = run_linting(files: files, config: audit_config)[:violations_by_validator]
 
         unused_entries = todo_entries.each_with_object({}) do |(validator_name, patterns), unused|
+          next unless judged?(validator_name, audit_config)
+
           violating_files = violations_by_validator.fetch(validator_name, [])
           stale = patterns.reject do |pattern|
             violating_files.any? { |file| File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
@@ -116,7 +118,9 @@ module Yard
         end
       end
 
-      # Build a copy of the config with the todo patterns removed from each validator's Exclude
+      # Build a copy of the config without the todo file's Exclude lists
+      # A per-validator Exclude replaces an inherited one, so a validator's todo list is in effect
+      # only when it is that validator's whole Exclude. Otherwise the user's Exclude stays as is.
       # @param todo_entries [Hash{String => Array<String>}] validator names to todo Exclude patterns
       # @return [Config] configuration for the audit run
       def build_audit_config(todo_entries)
@@ -125,12 +129,21 @@ module Yard
 
         todo_entries.each do |validator_name, patterns|
           next unless ConfigLoader::ALL_VALIDATORS.include?(validator_name)
+          next unless audit_config.validator_exclude(validator_name) == patterns
 
-          remaining = audit_config.validator_exclude(validator_name) - patterns
-          audit_config.set_validator_config(validator_name, 'Exclude', remaining)
+          audit_config.set_validator_config(validator_name, 'Exclude', [])
         end
 
         audit_config
+      end
+
+      # Whether the audit can judge a validator's todo entries
+      # Entries of validators left out by only_validators are not judged, as they were not run.
+      # @param validator_name [String] validator name from the todo file
+      # @param config [Config] configuration for the audit run
+      # @return [Boolean] true unless only_validators leaves the validator out
+      def judged?(validator_name, config)
+        config.only_validators.empty? || config.only_validators.include?(validator_name)
       end
 
       # Find project Ruby files matched by any of the given patterns

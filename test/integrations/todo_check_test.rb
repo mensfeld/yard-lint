@@ -162,4 +162,56 @@ describe 'Todo Check' do
     assert_equal(['lib/a.rb'], config.validator_exclude('Documentation/UndocumentedObjects'))
     assert_predicate(Yard::Lint.run(path: 'lib', config: config), :clean?)
   end
+
+  it 'keeps the user Exclude when it replaces the todo list' do
+    write_undocumented('lib/a.rb', 'A')
+    write_undocumented('lib/b.rb', 'B')
+    File.write('.yard-lint-todo.yml', <<~YAML)
+      Documentation/UndocumentedObjects:
+        Exclude:
+          - 'lib/a.rb'
+          - 'lib/b.rb'
+    YAML
+    File.write('.yard-lint.yml', <<~YAML)
+      inherit_from:
+        - .yard-lint-todo.yml
+      Documentation/UndocumentedObjects:
+        Exclude:
+          - 'lib/a.rb'
+    YAML
+
+    result = run_yard_lint('--check-todo', 'lib')
+
+    assert_equal(1, result[:exit_code])
+    assert_includes(result[:stdout], "- 'lib/a.rb'")
+    refute_includes(result[:stdout], "- 'lib/b.rb'")
+  end
+
+  it 'does not judge entries of validators left out by --only' do
+    write_undocumented('lib/a.rb', 'A')
+    File.write('.yard-lint-todo.yml', <<~YAML)
+      Documentation/UndocumentedObjects:
+        Exclude:
+          - 'lib/a.rb'
+      Tags/Order:
+        Exclude:
+          - 'lib/a.rb'
+    YAML
+    File.write('.yard-lint.yml', "inherit_from:\n  - .yard-lint-todo.yml\n")
+
+    result = run_yard_lint('--check-todo', '--only', 'Documentation/UndocumentedObjects', 'lib')
+
+    assert_equal(0, result[:exit_code], result[:stdout])
+    assert_includes(result[:stdout], 'No unused entries found')
+  end
+
+  it 'rejects unknown validators given to --only' do
+    write_undocumented('lib/a.rb', 'A')
+    run_yard_lint('--auto-gen-config', 'lib')
+
+    result = run_yard_lint('--check-todo', '--only', 'Tags/Nope', 'lib')
+
+    assert_equal(1, result[:exit_code])
+    assert_includes(result[:stdout], 'Unknown validator(s)')
+  end
 end
