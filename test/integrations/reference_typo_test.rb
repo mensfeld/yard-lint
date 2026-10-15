@@ -159,6 +159,22 @@ describe 'Documentation/ReferenceTypo' do
     assert_empty(offenses)
   end
 
+  it 'does not suggest a root-level name for a bare constant of an unloaded gem' do
+    offenses = offenses_for(<<~RUBY)
+      # Root namespace
+      module Karafka
+        # Producer
+        class Producer
+          # See {Kafka} and {Kafka::Client#call}
+          # @see Kafka
+          def call; end
+        end
+      end
+    RUBY
+
+    assert_empty(offenses)
+  end
+
   it 'does not flag methods a loaded Ruby ancestor defines' do
     offenses = offenses_for(<<~RUBY)
       # Parser
@@ -214,6 +230,40 @@ describe 'Documentation/ReferenceTypo' do
     RUBY
 
     assert_empty(offenses)
+  end
+
+  it 'ignores links inside indented code blocks' do
+    offenses = offenses_for(<<~RUBY)
+      # App
+      module ReferenceApp
+        # Worker
+        class Worker
+          # Example:
+          #
+          #     opts = {Wroker => 1}
+          def call; end
+        end
+      end
+    RUBY
+
+    assert_empty(offenses)
+  end
+
+  it 'checks links on continuation lines of a tag' do
+    messages = messages_for(<<~RUBY)
+      # Parser
+      class ReferenceParser
+        # Parses
+        def parse; end
+
+        # Calls
+        # @param input [String] passed on
+        #   to {#prase}
+        def call(input); end
+      end
+    RUBY
+
+    assert_equal(["Reference '#prase' does not resolve (did you mean '#parse'?)"], messages)
   end
 
   it 'does not flag a name with no close match' do

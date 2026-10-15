@@ -481,7 +481,7 @@ def call; end
 def call; end
 ```
 
-To keep false positives low, it skips references into namespaces YARD does not know (stdlib, other gems), methods that a loaded Ruby ancestor may define (e.g. `{#to_s}`), names with no close match, and text inside code spans.
+To keep false positives low, it skips references into namespaces YARD does not know (stdlib, other gems), methods that a loaded Ruby ancestor may define (e.g. `{#to_s}`), names with no close match, and code spans and code blocks. A bare constant such as `{Kafka}` is only compared with constants of the enclosing namespaces, never with top-level ones, so a constant of a gem YARD did not parse is not reported as a typo of a similar project name.
 
 ## Handling Non-Standard Types
 

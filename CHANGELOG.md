@@ -1,5 +1,5 @@
 ## Unreleased
-- **[Feature]** Added `Documentation/ReferenceTypo` (enabled by default, severity `warning`), which flags probable typos in `{Foo#bar}` links and `@see` targets and suggests the closest name via `DidYouMean`. A reference is reported only when its namespace resolves in the YARD registry and a close match exists there; references into unknown namespaces (stdlib, other gems) and methods a loaded Ruby ancestor may define are skipped.
+- **[Feature]** Added `Documentation/ReferenceTypo` (enabled by default, severity `warning`), which flags probable typos in `{Foo#bar}` links and `@see` targets and suggests the closest name via `DidYouMean`.
 - **[Enhancement]** SARIF output now includes a line-independent `partialFingerprints` per result (keyed on the offending object, or the message when there is none), so GitHub tracks the same offense across commits instead of churning alerts when lines shift.
 - **[Feature]** Added `--format sarif`, which emits SARIF 2.1.0 for GitHub code scanning and other aggregators.
 - **[Feature]** Category-level `Severity` is now honored: set `Severity` on a department (e.g. `Documentation`) to apply it to all its validators. A per-validator `Severity` still wins. Backwards compatible - it only affects configs that set a category `Severity`, which was previously ignored.

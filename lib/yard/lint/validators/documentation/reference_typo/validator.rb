@@ -12,8 +12,8 @@ module Yard
             # Same matching rules YARD uses for `{name}` / `{name title}` links
             LINK_PATTERN = /(?<![\\!])\{(?!\})(\S+?)(?:\s[^}]*)?\}/
 
-            # Code spans and fenced code blocks hold code, not links
-            CODE_PATTERN = /```.*?```|`[^`\n]*`/m
+            # Code spans, fenced and indented code blocks hold code, not links
+            CODE_PATTERN = /```.*?```|`[^`\n]*`|^(?: {4}|\t)[^\n]*/m
 
             # `Foo::Bar#baz`, `Foo.baz` or a namespace-relative `#baz`
             METHOD_REFERENCE = /\A(?<namespace>(?:::)?[A-Z]\w*(?:::[A-Z]\w*)*)?(?<separator>[#.])(?<name>[A-Za-z_]\w*[?!=]?)\z/
@@ -136,14 +136,16 @@ module Yard
               object.is_a?(YARD::CodeObjects::NamespaceObject) ? object : object.namespace
             end
 
+            # Root-level names are left out: a bare name near one of them is as
+            # likely a constant of a gem YARD did not parse as it is a typo
             # @param namespace [YARD::CodeObjects::NamespaceObject] innermost namespace
             # @return [Array<String>] constant names visible from it
             def visible_constants(namespace)
               names = []
 
-              while namespace
+              until namespace.root?
                 names.concat(constant_names(namespace))
-                namespace = namespace.root? ? nil : namespace.namespace
+                namespace = namespace.namespace
               end
 
               names.uniq
