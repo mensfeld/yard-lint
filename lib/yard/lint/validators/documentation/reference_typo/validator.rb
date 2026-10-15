@@ -45,16 +45,12 @@ module Yard
             # @param object [YARD::CodeObjects::Base] documented object
             # @return [Array<String>] link targets and `@see` names in its docs
             def references(object)
-              tags = object.tags.flat_map do |tag|
-                tag.is_a?(YARD::Tags::OverloadTag) ? [tag, *tag.tags] : [tag]
-              end
+              overloads = object.tags(:overload)
+              tags = object.tags + overloads.flat_map { |overload| overload.docstring.tags }
 
-              texts = [object.docstring.to_s]
+              texts = [object.docstring.to_s] + overloads.map { |overload| overload.docstring.to_s }
               tags.each do |tag|
-                next if tag.tag_name == 'example'
-
-                texts << tag.text.to_s
-                texts << tag.docstring.to_s if tag.is_a?(YARD::Tags::OverloadTag)
+                texts << tag.text.to_s unless tag.tag_name == 'example'
               end
 
               links = texts.flat_map do |text|
