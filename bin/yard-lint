@@ -99,6 +99,10 @@ begin
     options[:force] = true
   end
 
+  opts.on('--check-todo', 'Report .yard-lint-todo.yml entries that no longer match any offense') do
+    options[:check_todo] = true
+  end
+
   opts.on('--exclude-limit COUNT', Integer, 'Min files before grouping into pattern (default: 15)') do |count|
     options[:exclude_limit] = count
   end
@@ -129,6 +133,7 @@ begin
     puts '  yard-lint --auto-gen-config                    # Generate todo file for existing violations'
     puts '  yard-lint --regenerate-todo                    # Regenerate todo file'
     puts '  yard-lint --auto-gen-config --exclude-limit 10 # Custom grouping threshold'
+    puts '  yard-lint --check-todo                         # Fail if todo file has unused entries'
     puts '  cat lib/foo.rb | yard-lint --stdin lib/foo.rb  # Lint source piped from stdin'
     exit
   end
@@ -251,6 +256,29 @@ if options[:auto_gen_config]
     exit 1
   rescue Yard::Lint::Git::Error, Yard::Lint::Errors::FileNotFoundError => e
     puts "Error: #{e.message}"
+    exit 1
+  end
+end
+
+# Handle --check-todo flag
+if options[:check_todo]
+  begin
+    config = if config_file
+               Yard::Lint::Config.from_file(config_file)
+             else
+               Yard::Lint::Config.load || Yard::Lint::Config.new
+             end
+
+    result = Yard::Lint::TodoGenerator.check(path: ARGV[0] || '.', config: config)
+
+    puts result[:message]
+    exit result[:unused_entries].empty? ? 0 : 1
+  rescue Yard::Lint::Errors::ConfigFileNotFoundError, Yard::Lint::Errors::TodoFileNotFoundError,
+         Yard::Lint::Errors::FileNotFoundError, Yard::Lint::Git::Error => e
+    puts "Error: #{e.message}"
+    exit 1
+  rescue Yard::Lint::Errors::InvalidConfigError => e
+    puts "Configuration Error:\n#{e.message}"
     exit 1
   end
 end

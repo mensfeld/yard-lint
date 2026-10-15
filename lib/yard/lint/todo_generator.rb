@@ -20,6 +20,14 @@ module Yard
           new(path: path, config: config, force: force, exclude_limit: exclude_limit,
               config_path: config_path).generate
         end
+
+        # Report .yard-lint-todo.yml Exclude entries that no longer match any offense
+        # @param path [String] directory or file path containing Ruby files to analyze for violations
+        # @param config [Config] yard-lint configuration object with validator settings
+        # @return [Hash] result with :message and :unused_entries (validator name => unused patterns)
+        def check(path:, config:)
+          new(path: path, config: config, force: false, exclude_limit: DEFAULT_EXCLUDE_LIMIT).check
+        end
       end
 
       # Initialize a new TodoGenerator instance
@@ -65,7 +73,72 @@ module Yard
         build_success_result(violations_by_validator, lint_result[:total_offenses])
       end
 
+      # Re-lint without the todo file exclusions and find entries that match no offense
+      # @return [Hash] result with :message and :unused_entries (validator name => unused patterns)
+      # @raise [Errors::TodoFileNotFoundError] if the todo file does not exist
+      def check
+        todo_entries = load_todo_entries
+        strip_todo_excludes(todo_entries)
+
+        violations_by_validator = run_linting[:violations_by_validator]
+
+        unused_entries = todo_entries.each_with_object({}) do |(validator_name, patterns), unused|
+          files = violations_by_validator.fetch(validator_name, [])
+          stale = patterns.reject do |pattern|
+            files.any? { |file| File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
+          end
+          unused[validator_name] = stale if stale.any?
+        end
+
+        { message: build_check_message(unused_entries), unused_entries: unused_entries }
+      end
+
       private
+
+      # Load per-validator Exclude patterns from the todo file
+      # @return [Hash{String => Array<String>}] validator names to their todo Exclude patterns
+      # @raise [Errors::TodoFileNotFoundError] if the todo file does not exist
+      def load_todo_entries
+        unless File.exist?(@todo_path)
+          raise Errors::TodoFileNotFoundError,
+            '.yard-lint-todo.yml not found. Use --auto-gen-config to generate it.'
+        end
+
+        ConfigLoader.load_yaml_file(@todo_path).each_with_object({}) do |(validator_name, settings), entries|
+          next unless settings.is_a?(Hash) && settings['Exclude'].is_a?(Array)
+
+          entries[validator_name] = settings['Exclude'].map(&:to_s)
+        end
+      end
+
+      # Remove todo patterns from each validator's Exclude so their files are linted again
+      # @param todo_entries [Hash{String => Array<String>}] validator names to todo Exclude patterns
+      # @return [void]
+      def strip_todo_excludes(todo_entries)
+        todo_entries.each do |validator_name, patterns|
+          next unless ConfigLoader::ALL_VALIDATORS.include?(validator_name)
+
+          remaining = @config.validator_exclude(validator_name) - patterns
+          @config.set_validator_config(validator_name, 'Exclude', remaining)
+        end
+      end
+
+      # Build the summary message for a todo check
+      # @param unused_entries [Hash{String => Array<String>}] validator names to unused patterns
+      # @return [String] human-readable summary
+      def build_check_message(unused_entries)
+        return 'No unused entries found in .yard-lint-todo.yml' if unused_entries.empty?
+
+        count = unused_entries.values.sum(&:size)
+        lines = ["Found #{count} unused entr#{count == 1 ? 'y' : 'ies'} in .yard-lint-todo.yml:"]
+        unused_entries.each do |validator_name, patterns|
+          lines << "  #{validator_name}:"
+          patterns.each { |pattern| lines << "    - '#{pattern}'" }
+        end
+        lines << ''
+        lines << 'Remove these entries, or run yard-lint --regenerate-todo to rebuild the file.'
+        lines.join("\n")
+      end
 
       # Validate that the todo file doesn't already exist
       # @return [void]
