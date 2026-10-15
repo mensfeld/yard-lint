@@ -74,18 +74,23 @@ module Yard
       end
 
       # Re-lint without the todo file exclusions and find entries that match no offense
+      # Files covered by a todo pattern are linted even when outside the path, so an entry
+      # is never reported as unused only because its offenses lie elsewhere.
+      # The given config is not modified.
       # @return [Hash] result with :message and :unused_entries (validator name => unused patterns)
       # @raise [Errors::TodoFileNotFoundError] if the todo file does not exist
       def check
         todo_entries = load_todo_entries
-        strip_todo_excludes(todo_entries)
+        audit_config = build_audit_config(todo_entries)
+        files = Yard::Lint.send(:expand_path, @path, audit_config) |
+                files_covered_by(todo_entries.values.flatten, audit_config)
 
-        violations_by_validator = run_linting[:violations_by_validator]
+        violations_by_validator = run_linting(files: files, config: audit_config)[:violations_by_validator]
 
         unused_entries = todo_entries.each_with_object({}) do |(validator_name, patterns), unused|
-          files = violations_by_validator.fetch(validator_name, [])
+          violating_files = violations_by_validator.fetch(validator_name, [])
           stale = patterns.reject do |pattern|
-            files.any? { |file| File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
+            violating_files.any? { |file| File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
           end
           unused[validator_name] = stale if stale.any?
         end
@@ -111,15 +116,31 @@ module Yard
         end
       end
 
-      # Remove todo patterns from each validator's Exclude so their files are linted again
+      # Build a copy of the config with the todo patterns removed from each validator's Exclude
       # @param todo_entries [Hash{String => Array<String>}] validator names to todo Exclude patterns
-      # @return [void]
-      def strip_todo_excludes(todo_entries)
+      # @return [Config] configuration for the audit run
+      def build_audit_config(todo_entries)
+        audit_config = Config.new(Marshal.load(Marshal.dump(@config.raw_config)))
+        audit_config.only_validators = @config.only_validators.dup
+
         todo_entries.each do |validator_name, patterns|
           next unless ConfigLoader::ALL_VALIDATORS.include?(validator_name)
 
-          remaining = @config.validator_exclude(validator_name) - patterns
-          @config.set_validator_config(validator_name, 'Exclude', remaining)
+          remaining = audit_config.validator_exclude(validator_name) - patterns
+          audit_config.set_validator_config(validator_name, 'Exclude', remaining)
+        end
+
+        audit_config
+      end
+
+      # Find project Ruby files matched by any of the given patterns
+      # @param patterns [Array<String>] todo Exclude patterns
+      # @param config [Config] configuration whose global Exclude still applies
+      # @return [Array<String>] absolute paths of the matched files
+      def files_covered_by(patterns, config)
+        Yard::Lint.send(:expand_path, '.', config).select do |file|
+          relative_path = make_relative_path(file)
+          patterns.any? { |pattern| File.fnmatch(pattern, relative_path, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
         end
       end
 
@@ -151,23 +172,25 @@ module Yard
       end
 
       # Run linting and collect violations per validator
+      # @param files [Array<String>, nil] files to lint (defaults to the files under the path)
+      # @param config [Config] configuration to lint with
       # @return [Hash] hash with :violations_by_validator and :total_offenses keys
-      def run_linting
+      def run_linting(files: nil, config: @config)
         # Run each validator individually to track violations per validator
         # This is more reliable than trying to infer validator from offense name
-        files = Yard::Lint.send(:expand_path, @path, @config)
-        runner = Runner.new(files, @config)
+        files ||= Yard::Lint.send(:expand_path, @path, config)
+        runner = Runner.new(files, config)
 
         # Run validators and collect raw results
         raw_results = runner.send(:run_validators)
-        result_builder = ResultBuilder.new(@config)
+        result_builder = ResultBuilder.new(config)
 
         violations_by_validator = {}
         total_offenses = 0
 
         # Process each validator's results
         ConfigLoader::ALL_VALIDATORS.each do |validator_name|
-          next unless @config.validator_enabled?(validator_name)
+          next unless config.validator_enabled?(validator_name)
 
           validator_result = result_builder.build(validator_name, raw_results)
           next unless validator_result

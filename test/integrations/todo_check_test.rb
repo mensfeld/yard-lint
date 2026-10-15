@@ -90,6 +90,25 @@ describe 'Todo Check' do
     refute_includes(result[:stdout], "- 'lib/**/*'")
   end
 
+  it 'does not report entries whose offenses lie outside the checked path' do
+    write_undocumented('lib/a.rb', 'A')
+    write_undocumented('lib/b.rb', 'B')
+    write_undocumented('app/c.rb', 'C')
+    File.write('.yard-lint-todo.yml', <<~YAML)
+      Documentation/UndocumentedObjects:
+        Exclude:
+          - 'lib/a.rb'
+          - 'lib/b.rb'
+          - 'app/**/*'
+    YAML
+    File.write('.yard-lint.yml', "inherit_from:\n  - .yard-lint-todo.yml\n")
+
+    result = run_yard_lint('--check-todo', 'lib/a.rb')
+
+    assert_equal(0, result[:exit_code], result[:stdout])
+    assert_includes(result[:stdout], 'No unused entries found')
+  end
+
   it 'does not modify the todo file' do
     write_undocumented('lib/a.rb', 'A')
     run_yard_lint('--auto-gen-config', 'lib')
@@ -125,5 +144,22 @@ describe 'Todo Check' do
     result = Yard::Lint::TodoGenerator.check(path: 'lib', config: config)
 
     assert_equal({ 'Documentation/UndocumentedObjects' => ['lib/gone.rb'] }, result[:unused_entries])
+  end
+
+  it 'does not modify the given config' do
+    write_undocumented('lib/a.rb', 'A')
+    File.write('.yard-lint-todo.yml', <<~YAML)
+      Documentation/UndocumentedObjects:
+        Exclude:
+          - 'lib/a.rb'
+    YAML
+    config = Yard::Lint::Config.new(
+      'Documentation/UndocumentedObjects' => { 'Exclude' => ['lib/a.rb'] }
+    )
+
+    Yard::Lint::TodoGenerator.check(path: 'lib', config: config)
+
+    assert_equal(['lib/a.rb'], config.validator_exclude('Documentation/UndocumentedObjects'))
+    assert_predicate(Yard::Lint.run(path: 'lib', config: config), :clean?)
   end
 end
