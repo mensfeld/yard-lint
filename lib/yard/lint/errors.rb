@@ -22,6 +22,9 @@ module Yard
       # Raised when .yard-lint-todo.yml already exists without force flag
       class TodoFileExistsError < BaseError; end
 
+      # Raised when .yard-lint-todo.yml is required but does not exist
+      class TodoFileNotFoundError < BaseError; end
+
       # Raised when configuration is invalid
       class InvalidConfigError < BaseError; end
     end

@@ -114,6 +114,10 @@ yard-lint --auto-gen-config
 yard-lint lib/
 
 # Fix violations incrementally by removing exclusions from .yard-lint-todo.yml
+
+# Fail (exit 1) when .yard-lint-todo.yml has entries that no longer match any offense
+# (use the PATH of your normal run; a PATH only limits which entries are reported)
+yard-lint --check-todo lib/
 ```
 
 **Learn more:** [Incremental Adoption Guide](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)
@@ -588,6 +592,7 @@ Configuration Generation:
       --force             Force overwrite when using --init
       --auto-gen-config   Generate .yard-lint-todo.yml to silence existing violations
       --regenerate-todo   Regenerate .yard-lint-todo.yml (overwrites existing)
+      --check-todo        Report .yard-lint-todo.yml entries that no longer match any offense
       --exclude-limit N   Min files before grouping into pattern (default: 15)
 
 Information:
