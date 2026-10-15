@@ -74,25 +74,27 @@ module Yard
       end
 
       # Re-lint without the todo file exclusions and find entries that match no offense
-      # Files covered by a todo pattern are linted even when outside the path, so an entry
-      # is never reported as unused only because its offenses lie elsewhere.
-      # The given config is not modified.
+      # The whole project is linted whatever the path is, as offenses can depend on other files
+      # and on their order. The path only limits which entries are judged: those that cover
+      # a file under it, or no project file at all. The given config is not modified.
       # @return [Hash] result with :message and :unused_entries (validator name => unused patterns)
       # @raise [Errors::TodoFileNotFoundError] if the todo file does not exist
       def check
         todo_entries = load_todo_entries
         audit_config = build_audit_config(todo_entries)
-        files = Yard::Lint.send(:expand_path, @path, audit_config) |
-                files_covered_by(todo_entries.values.flatten, audit_config)
+        path_files = Yard::Lint.send(:expand_path, @path, audit_config)
+        files = Yard::Lint.send(:expand_path, '.', audit_config) | path_files
 
         violations_by_validator = run_linting(files: files, config: audit_config)[:violations_by_validator]
+        files = files.map { |file| make_relative_path(file) }
+        path_files = path_files.map { |file| make_relative_path(file) }
 
         unused_entries = todo_entries.each_with_object({}) do |(validator_name, patterns), unused|
           next unless judged?(validator_name, audit_config)
 
           violating_files = violations_by_validator.fetch(validator_name, [])
-          stale = patterns.reject do |pattern|
-            violating_files.any? { |file| File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
+          stale = patterns.select do |pattern|
+            in_scope?(pattern, files, path_files) && violating_files.none? { |file| todo_match?(pattern, file) }
           end
           unused[validator_name] = stale if stale.any?
         end
@@ -146,15 +148,22 @@ module Yard
         config.only_validators.empty? || config.only_validators.include?(validator_name)
       end
 
-      # Find project Ruby files matched by any of the given patterns
-      # @param patterns [Array<String>] todo Exclude patterns
-      # @param config [Config] configuration whose global Exclude still applies
-      # @return [Array<String>] absolute paths of the matched files
-      def files_covered_by(patterns, config)
-        Yard::Lint.send(:expand_path, '.', config).select do |file|
-          relative_path = make_relative_path(file)
-          patterns.any? { |pattern| File.fnmatch(pattern, relative_path, File::FNM_PATHNAME | File::FNM_EXTGLOB) }
-        end
+      # Whether a todo pattern belongs to the checked path
+      # @param pattern [String] todo Exclude pattern
+      # @param files [Array<String>] relative paths of all linted files
+      # @param path_files [Array<String>] relative paths of the files under the checked path
+      # @return [Boolean] true if the pattern covers a file under the path, or no linted file at all
+      def in_scope?(pattern, files, path_files)
+        path_files.any? { |file| todo_match?(pattern, file) } ||
+          files.none? { |file| todo_match?(pattern, file) }
+      end
+
+      # Whether a todo Exclude pattern matches a file
+      # @param pattern [String] todo Exclude pattern
+      # @param file [String] relative file path
+      # @return [Boolean] true if the pattern matches the file
+      def todo_match?(pattern, file)
+        File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
       end
 
       # Build the summary message for a todo check

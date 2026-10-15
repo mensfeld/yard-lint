@@ -109,6 +109,39 @@ describe 'Todo Check' do
     assert_includes(result[:stdout], 'No unused entries found')
   end
 
+  it 'keeps an entry whose offense moves to another file when only part of the project is checked' do
+    write_undocumented('lib/a.rb', 'Foo')
+    write_undocumented('lib/b.rb', 'Foo')
+    run_yard_lint('--auto-gen-config', 'lib')
+
+    %w[lib/a.rb lib/b.rb lib].each do |path|
+      result = run_yard_lint('--check-todo', path)
+
+      assert_equal(0, result[:exit_code], "#{path}: #{result[:stdout]}")
+      assert_includes(result[:stdout], 'No unused entries found')
+    end
+  end
+
+  it 'keeps a cross-file validator entry when only part of the project is checked' do
+    FileUtils.mkdir_p('lib')
+    File.write('lib/a.rb', "# Doc one\nmodule Foo\nend\n")
+    File.write('lib/b.rb', "# Doc two\nmodule Foo\nend\n")
+    write_documented('lib/c.rb', 'C')
+    File.write('.yard-lint-todo.yml', <<~YAML)
+      Documentation/DuplicateNamespaceComment:
+        Exclude:
+          - 'lib/a.rb'
+    YAML
+    File.write('.yard-lint.yml', "inherit_from:\n  - .yard-lint-todo.yml\n")
+
+    %w[lib/a.rb lib/b.rb lib/c.rb lib].each do |path|
+      result = run_yard_lint('--check-todo', path)
+
+      assert_equal(0, result[:exit_code], "#{path}: #{result[:stdout]}")
+      assert_includes(result[:stdout], 'No unused entries found')
+    end
+  end
+
   it 'does not modify the todo file' do
     write_undocumented('lib/a.rb', 'A')
     run_yard_lint('--auto-gen-config', 'lib')
@@ -203,6 +236,13 @@ describe 'Todo Check' do
 
     assert_equal(0, result[:exit_code], result[:stdout])
     assert_includes(result[:stdout], 'No unused entries found')
+
+    write_documented('lib/a.rb', 'A')
+    result = run_yard_lint('--check-todo', '--only', 'Documentation/UndocumentedObjects', 'lib')
+
+    assert_equal(1, result[:exit_code])
+    assert_includes(result[:stdout], 'Documentation/UndocumentedObjects:')
+    refute_includes(result[:stdout], 'Tags/Order:')
   end
 
   it 'rejects unknown validators given to --only' do

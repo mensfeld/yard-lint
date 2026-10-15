@@ -116,6 +116,7 @@ yard-lint lib/
 # Fix violations incrementally by removing exclusions from .yard-lint-todo.yml
 
 # Fail (exit 1) when .yard-lint-todo.yml has entries that no longer match any offense
+# (always lints the whole project; a PATH only limits which entries are reported)
 yard-lint --check-todo
 ```
 
