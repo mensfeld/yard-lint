@@ -342,7 +342,7 @@ Documentation/UnderfilledLines:
 
 **Key features:**
 - Per-validator control (enable/disable, severity, exclusions)
-- Category-level defaults (enable/disable, severity) for a whole department
+- Category-level defaults (enable/disable, severity, exclusions) for a whole department
 - Configuration inheritance with `inherit_from` and `inherit_gem`
 - Automatic configuration validation with helpful error messages
 - Per-validator YARD options and file exclusions
@@ -357,6 +357,14 @@ Tags:
 # ...except Tags/Order, which stays a convention
 Tags/Order:
   Severity: convention
+```
+
+A category-level `Exclude` is combined with each validator's own `Exclude` (it is not replaced by it), so these files are skipped by every `Documentation/*` validator, including one that sets its own `Exclude`:
+
+```yaml
+Documentation:
+  Exclude:
+    - 'lib/generated/**/*'
 ```
 
 **Learn more:** [Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)

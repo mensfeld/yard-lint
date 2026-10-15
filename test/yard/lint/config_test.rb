@@ -294,6 +294,36 @@ describe 'Yard::Lint::Config' do
     assert_equal([], config.validator_exclude('Tags/Order'))
   end
 
+  it 'category exclude applies a category-level Exclude to its validators' do
+    config = Yard::Lint::Config.new({ 'Tags' => { 'Exclude' => ['spec/**/*'] } })
+
+    assert_equal(['spec/**/*'], config.validator_exclude('Tags/Order'))
+    assert_includes(config.validator_all_excludes('Tags/TypeSyntax'), 'spec/**/*')
+  end
+
+  it 'category exclude is unioned with a per-validator Exclude' do
+    config = Yard::Lint::Config.new(
+      'Tags' => { 'Exclude' => ['spec/**/*', 'test/**/*'] },
+      'Tags/Order' => { 'Exclude' => ['test/**/*', 'lib/legacy/**/*'] }
+    )
+
+    assert_equal(['spec/**/*', 'test/**/*', 'lib/legacy/**/*'], config.validator_exclude('Tags/Order'))
+  end
+
+  it 'category exclude does not leak into other categories' do
+    config = Yard::Lint::Config.new({ 'Tags' => { 'Exclude' => ['spec/**/*'] } })
+
+    assert_equal([], config.validator_exclude('Documentation/UndocumentedObjects'))
+  end
+
+  it 'category exclude rejects a non-array category-level Exclude' do
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::Config.new({ 'Documentation' => { 'Exclude' => 'spec/**/*' } })
+    end
+
+    assert_match(/Invalid Exclude for category Documentation/, error.message)
+  end
+
   it 'edge cases returns validator config value' do
     config = Yard::Lint::Config.new({ 'Tags/Order' => { 'EnforcedOrder' => %w[param return] } })
 

@@ -204,17 +204,25 @@ module Yard
       end
 
       # Get validator-specific exclude patterns
+      #
+      # A category-level Exclude (e.g. `Documentation: { Exclude: [...] }`) is
+      # unioned with the per-validator one rather than replaced by it, so a
+      # validator that sets its own Exclude still skips its category's files.
+      #
       # @param validator_name [String] full validator name
-      # @return [Array<String>] exclusion patterns for this validator
+      # @return [Array<String>] exclusion patterns for this validator (category + per-validator)
       def validator_exclude(validator_name)
         validator_config = validators[validator_name] || {}
-        validator_config['Exclude'] || []
+        raw_category = @raw_config[validator_name.split('/').first]
+        category_exclude = raw_category.is_a?(Hash) ? Array(raw_category['Exclude']) : []
+
+        (category_exclude + (validator_config['Exclude'] || [])).uniq
       end
 
-      # Combined global and per-validator exclusions
+      # Combined global, category and per-validator exclusions
       # Returns all exclusion patterns that apply to this validator
       # @param validator_name [String] full validator name
-      # @return [Array<String>] combined exclusion patterns (global + per-validator)
+      # @return [Array<String>] combined exclusion patterns (global + category + per-validator)
       def validator_all_excludes(validator_name)
         exclude + validator_exclude(validator_name)
       end
