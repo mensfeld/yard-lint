@@ -353,7 +353,7 @@ describe 'Documentation/ReferenceTypo' do
     assert_empty(offenses)
   end
 
-  it 'does not crash on bare constant references inside a class of an unknown namespace' do
+  it 'still reports typos inside a class of an unknown namespace' do
     messages = messages_for(<<~RUBY)
       # Thing
       class UnknownReferenceParent::Thing
