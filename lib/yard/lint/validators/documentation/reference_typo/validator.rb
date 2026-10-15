@@ -141,12 +141,14 @@ module Yard
 
             # Root-level names are left out: a bare name near one of them is as
             # likely a constant of a gem YARD did not parse as it is a typo
-            # @param namespace [YARD::CodeObjects::NamespaceObject] innermost namespace
+            # @param namespace [YARD::CodeObjects::Base] innermost namespace
             # @return [Array<String>] constant names visible from it
             def visible_constants(namespace)
               names = []
 
-              until namespace.root?
+              # `def CONST.name` and `class Unknown::Name` leave unresolved
+              # namespaces, which have no children to list
+              while namespace.is_a?(YARD::CodeObjects::NamespaceObject) && !namespace.root?
                 names.concat(constant_names(namespace))
                 namespace = namespace.namespace
               end
