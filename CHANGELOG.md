@@ -1,4 +1,5 @@
 ## 1.13.0 (Unreleased)
+- **[Feature]** Added `Tags/OverloadConsistency` (enabled by default, severity `warning`), which checks the tags of each `@overload` against that overload's own signature: a `@param` not in the signature, a parameter without `@param` in an overload that documents others (a method-level `@param` counts for every overload), and an overload without `@return` when other overloads have one.
 - **[Feature]** Added `Documentation/ReferenceTypo` (enabled by default, severity `warning`), which flags probable typos in `{Foo#bar}` links and `@see` targets and suggests the closest name via `DidYouMean`.
 - **[Feature]** Added `--check-todo`, which re-lints without the `.yard-lint-todo.yml` exclusions and lists each `Exclude` entry that no longer matches any offense, exiting non-zero when there are any, so the baseline only shrinks. Combine with `--only` to check only some validators' entries.
 - **[Feature]** Added `--format sarif`, which emits SARIF 2.1.0 for GitHub code scanning and other aggregators.
