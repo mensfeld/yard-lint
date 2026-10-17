@@ -37,8 +37,9 @@ module Yard
               # does not need option tags.
               return if options_param_documented_as_non_hash?(object)
 
-              # Check if @option tags are missing
-              option_tags = object.tags(:option)
+              # Check if @option tags are missing; tags nested inside overload
+              # blocks live on the overload's own docstring, so check those too
+              option_tags = all_typed_tags(object.docstring, %w[option])
               return unless option_tags.empty?
 
               # Output method location and parameter info
