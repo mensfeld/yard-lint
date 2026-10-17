@@ -58,12 +58,12 @@ module Yard
 
             private
 
-            # Escapes '|' (the field separator) and '%' (the escape character)
-            # so they survive the parser's split
+            # Escapes '|' (the field separator), newlines (YARD keeps them in
+            # multi-line types) and '%' (the escape character)
             # @param text [String] raw field text
             # @return [String] escaped field text
             def escape_field(text)
-              text.gsub(/[%|]/, '%' => '%25', '|' => '%7C')
+              text.gsub(/[%|\n]/, '%' => '%25', '|' => '%7C', "\n" => '%0A')
             end
           end
         end

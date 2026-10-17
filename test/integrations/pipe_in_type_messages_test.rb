@@ -23,8 +23,18 @@ describe 'Pipe in type messages' do
     result.offenses.find { |o| o[:name] == name && o[:line] == line }&.fetch(:message)
   end
 
-  it 'InvalidTypes reports the pipe token for a spaced union' do
-    assert_equal('The `find` has invalid type(s): @return: `|`', message_for('InvalidTagType', 'find'))
+  it 'InvalidTypes reports the pipe token and the full type for a spaced union' do
+    assert_equal(
+      'The `find` has invalid type(s): @return: `|` in `String | nil`',
+      message_for('InvalidTagType', 'find')
+    )
+  end
+
+  it 'InvalidTypes reports the full type of a multi-line union' do
+    assert_equal(
+      "The `join` has invalid type(s): @param part: `|` in `String |\nnil`",
+      message_for('InvalidTagType', 'join')
+    )
   end
 
   it 'InvalidTypes reports the whole type for an unspaced union' do
@@ -43,6 +53,17 @@ describe 'Pipe in type messages' do
       "Invalid type syntax in @return tag: 'String | nil' (invalid character at |)",
       message_for('InvalidTypeSyntax', 'find')
     )
+  end
+
+  it 'TypeSyntax reports a multi-line union' do
+    assert_equal(
+      "Invalid type syntax in @param tag: 'String |\nnil' (invalid character at |)",
+      message_for('InvalidTypeSyntax', 'join')
+    )
+  end
+
+  it 'TypeSyntax reports a multi-line type without a pipe' do
+    assert_includes(message_for('InvalidTypeSyntax', 'split'), "'Array<String,\nInteger]")
   end
 
   it 'TypeSyntax keeps a percent sign next to a pipe' do

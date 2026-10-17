@@ -8,8 +8,9 @@ module Yard
           # Parser for invalid tag types output.
           # The validator emits two lines per offense:
           #   /path/to/file.rb:10: ClassName#method_name
-          #   @tagname param_name:BadType1,BadType2|@tagname2:BadType3
-          # '|' and '%' inside type names are escaped as %7C and %25
+          #   @tagname param_name:BadType1,BadType2:Type|@tagname2:BadType3:Type2
+          # One entry per type with invalid names. '%', '|', ',', ':' and newlines
+          # inside names and types are escaped as %25, %7C, %2C, %3A and %0A
           class Parser < Parsers::Base
             # @return [Regexp] matches "file:line: ObjectTitle"
             LOCATION_REGEX = /^(.+):(\d+):\s+(.+)$/
@@ -72,26 +73,28 @@ module Yard
               match ? [match[1], match[2]] : [title, title]
             end
 
-            # Parse "tagname param:Type1,Type2|tagname2:Type3" into structured data
+            # Parse "tagname param:Bad1,Bad2:Type|tagname2:Bad3:Type2" into structured data
             # @param line [String] the violations line
             # @return [Array<Hash>] each entry has :tag, :param (may be nil), :types
+            #   (the invalid names) and :type (the full type, may be nil)
             def parse_tag_violations(line)
               line.split('|').map do |entry|
-                label, types_str = entry.split(':', 2)
+                label, types_str, type = entry.split(':', 3)
                 parts = label.split(' ', 2)
                 {
                   tag: parts[0],
                   param: parts[1],
-                  types: (types_str || '').split(',').reject(&:empty?).map { |type| unescape_field(type) }
+                  types: (types_str || '').split(',').reject(&:empty?).map { |name| unescape_field(name) },
+                  type: type && unescape_field(type)
                 }
               end
             end
 
-            # Reverts the validator's escaping of '|' and '%'
+            # Reverts the validator's escaping
             # @param text [String] escaped field text
             # @return [String] raw field text
             def unescape_field(text)
-              text.gsub(/%(?:25|7C)/, '%25' => '%', '%7C' => '|')
+              text.gsub(/%(?:25|7C|2C|3A|0A)/, '%25' => '%', '%7C' => '|', '%2C' => ',', '%3A' => ':', '%0A' => "\n")
             end
           end
         end

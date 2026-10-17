@@ -14,4 +14,16 @@ class PipeInType
   # Formats a rate
   # @return [Rate%|nil] the rate
   def rate = nil
+
+  # Joins two parts
+  # @param part [String |
+  #   nil] the part
+  # @return [void]
+  def join(part) = part
+
+  # Splits a list
+  # @param list [Array<String,
+  #   Integer] the list
+  # @return [void]
+  def split(list) = list
 end
