@@ -12,7 +12,8 @@ module Yard
             # Expected format (two lines per violation):
             #   file.rb:LINE: ClassName#method_name
             #   tag_name|type_string|error_message
-            # '|' and '%' inside type_string and error_message are escaped as %7C and %25
+            # '|', '%' and newlines inside type_string and error_message are escaped
+            # as %7C, %25 and %0A
             # @param yard_output [String] raw YARD query results
             # @option _kwargs [Object] :unused this parameter accepts no options (reserved for future use)
             # @return [Array<Hash>] array with violation details
@@ -55,11 +56,11 @@ module Yard
 
             private
 
-            # Reverts the validator's escaping of '|' and '%'
+            # Reverts the validator's escaping of '|', '%' and newlines
             # @param text [String] escaped field text
             # @return [String] raw field text
             def unescape_field(text)
-              text.gsub(/%(?:25|7C)/, '%25' => '%', '%7C' => '|')
+              text.gsub(/%(?:25|7C|0A)/, '%25' => '%', '%7C' => '|', '%0A' => "\n")
             end
           end
         end
