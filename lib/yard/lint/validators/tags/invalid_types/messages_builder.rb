@@ -28,14 +28,14 @@ module Yard
 
               private
 
-              # @param violation [Hash] entry with :types (invalid names) and :type (full type, may be nil)
+              # @param violation [Hash] entry with :types (invalid names) and :type_string (full type, may be nil)
               # @return [String] the invalid names, plus the full type when it differs from them
               def describe_types(violation)
                 names = violation[:types].map { |t| "`#{t}`" }.join(', ')
-                type = violation[:type]
-                return names if type.nil? || violation[:types] == [type]
+                type_string = violation[:type_string]
+                return names if type_string.nil? || violation[:types] == [type_string]
 
-                "#{names} in `#{type}`"
+                "#{names} in `#{type_string}`"
               end
             end
           end

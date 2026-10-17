@@ -88,7 +88,7 @@ describe 'Yard::Lint::Validators::Tags::InvalidTypes::Parser' do
     assert_equal(2, violations.size)
     assert_equal(['|', 'Rate%|nil'], violations[0][:types])
     assert_equal(['Wrong'], violations[1][:types])
-    assert_nil(violations[0][:type])
+    assert_nil(violations[0][:type_string])
   end
 
   it 'call parses and unescapes the full type' do
@@ -99,7 +99,7 @@ describe 'Yard::Lint::Validators::Tags::InvalidTypes::Parser' do
     violation = result.first[:tag_violations].first
     assert_equal('x', violation[:param])
     assert_equal(['|', 'Foo::Bar'], violation[:types])
-    assert_equal("Hash{Foo::Bar => String |\nnil, Baz%}", violation[:type])
+    assert_equal("Hash{Foo::Bar => String |\nnil, Baz%}", violation[:type_string])
   end
 
   it 'call unescapes the tag and param name' do

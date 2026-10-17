@@ -67,9 +67,9 @@ describe 'Yard::Lint::Validators::Tags::InvalidTypes::MessagesBuilder' do
     offense = {
       method_name: 'call',
       tag_violations: [
-        { tag: '@param', param: 'x', types: ['Foo|Bar'], type: 'Foo|Bar' },
-        { tag: '@param', param: 'x', types: ['|'], type: 'Baz | Qux' },
-        { tag: '@return', param: nil, types: ['Strng'], type: 'Array<Strng>' }
+        { tag: '@param', param: 'x', types: ['Foo|Bar'], type_string: 'Foo|Bar' },
+        { tag: '@param', param: 'x', types: ['|'], type_string: 'Baz | Qux' },
+        { tag: '@return', param: nil, types: ['Strng'], type_string: 'Array<Strng>' }
       ]
     }
 

@@ -76,16 +76,16 @@ module Yard
             # Parse "tagname param:Bad1,Bad2:Type|tagname2:Bad3:Type2" into structured data
             # @param line [String] the violations line
             # @return [Array<Hash>] each entry has :tag, :param (may be nil), :types
-            #   (the invalid names) and :type (the full type, may be nil)
+            #   (the invalid names) and :type_string (the full type, may be nil)
             def parse_tag_violations(line)
               line.split('|').map do |entry|
-                label, types_str, type = entry.split(':', 3)
+                label, types_str, type_string = entry.split(':', 3)
                 tag, param = label.split(' ', 2)
                 {
                   tag: unescape_field(tag),
                   param: param && unescape_field(param),
                   types: (types_str || '').split(',').reject(&:empty?).map { |name| unescape_field(name) },
-                  type: type && unescape_field(type)
+                  type_string: type_string && unescape_field(type_string)
                 }
               end
             end
