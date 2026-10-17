@@ -9,6 +9,7 @@ module Yard
           # The validator emits two lines per offense:
           #   /path/to/file.rb:10: ClassName#method_name
           #   @tagname param_name:BadType1,BadType2|@tagname2:BadType3
+          # '|' and '%' inside type names are escaped as %7C and %25
           class Parser < Parsers::Base
             # @return [Regexp] matches "file:line: ObjectTitle"
             LOCATION_REGEX = /^(.+):(\d+):\s+(.+)$/
@@ -81,9 +82,16 @@ module Yard
                 {
                   tag: parts[0],
                   param: parts[1],
-                  types: (types_str || '').split(',').reject(&:empty?)
+                  types: (types_str || '').split(',').reject(&:empty?).map { |type| unescape_field(type) }
                 }
               end
+            end
+
+            # Reverts the validator's escaping of '|' and '%'
+            # @param text [String] escaped field text
+            # @return [String] raw field text
+            def unescape_field(text)
+              text.gsub(/%(?:25|7C)/, '%25' => '%', '%7C' => '|')
             end
           end
         end

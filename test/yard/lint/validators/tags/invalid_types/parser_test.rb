@@ -78,4 +78,15 @@ describe 'Yard::Lint::Validators::Tags::InvalidTypes::Parser' do
     assert_equal('foo', result[0][:method_name])
     assert_equal('bar', result[1][:method_name])
   end
+
+  it 'call unescapes pipe and percent in type names' do
+    input = "/a.rb:1: A#foo\n@return:%7C,Rate%25%7Cnil|@param x:Wrong"
+
+    result = parser.call(input)
+
+    violations = result.first[:tag_violations]
+    assert_equal(2, violations.size)
+    assert_equal(['|', 'Rate%|nil'], violations[0][:types])
+    assert_equal(['Wrong'], violations[1][:types])
+  end
 end
