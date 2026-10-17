@@ -38,20 +38,22 @@ module Yard
               strict = config_or_default('StrictConstantNames')
               allowed_types = ALLOWED_DEFAULTS + extra_types
 
-              # Collect per-tag violations to surface in the offense message.
-              # Each entry is "tagname param_name:Type1,Type2" (param_name omitted when nil).
-              tag_violations = all_typed_tags(object.docstring, checked_tags).filter_map do |tag|
-                bad = (tag_data(tag).types || [])
-                        .compact
-                        .flat_map { |type| extract_type_names(type) }
-                        .uniq
-                        .reject { |type| allowed_types.include?(type) }
-                        .reject { |type| type_defined?(type, strict: strict) }
-                        .reject { |type| type.include?('#') }
-                next if bad.empty?
+              # Collect per-type violations to surface in the offense message.
+              # Each entry is "tagname param_name:Bad1,Bad2:Type" (param_name omitted when nil).
+              tag_violations = all_typed_tags(object.docstring, checked_tags).flat_map do |tag|
+                label = escape_field("@#{tag.tag_name}")
+                label = "#{label} #{escape_field(tag.name)}" if tag.name
 
-                label = tag.name ? "@#{tag.tag_name} #{tag.name}" : "@#{tag.tag_name}"
-                "#{label}:#{bad.join(',')}"
+                (tag_data(tag).types || []).compact.uniq.filter_map do |type|
+                  bad = extract_type_names(type)
+                        .uniq
+                        .reject { |name| allowed_types.include?(name) }
+                        .reject { |name| type_defined?(name, strict: strict) }
+                        .reject { |name| name.include?('#') }
+                  next if bad.empty?
+
+                  "#{label}:#{bad.map { |name| escape_field(name) }.join(',')}:#{escape_field(type)}"
+                end
               end
 
               return if tag_violations.empty?
@@ -61,6 +63,14 @@ module Yard
             end
 
             private
+
+            # Escapes the separators of the output format, newlines (YARD keeps
+            # them in multi-line types) and '%' (the escape character)
+            # @param text [String] raw field text
+            # @return [String] escaped field text
+            def escape_field(text)
+              text.gsub(/[%|,:\n]/, '%' => '%25', '|' => '%7C', ',' => '%2C', ':' => '%3A', "\n" => '%0A')
+            end
 
             # Extract individual type names from a compound type string.
             # Instead of stripping all syntax characters and concatenating (which
