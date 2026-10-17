@@ -51,7 +51,7 @@ module Yard
                 next if bad.empty?
 
                 label = tag.name ? "@#{tag.tag_name} #{tag.name}" : "@#{tag.tag_name}"
-                "#{label}:#{bad.join(',')}"
+                "#{label}:#{bad.map { |type| escape_field(type) }.join(',')}"
               end
 
               return if tag_violations.empty?
@@ -61,6 +61,14 @@ module Yard
             end
 
             private
+
+            # Escapes '|' (the entry separator) and '%' (the escape character)
+            # so they survive the parser's split
+            # @param text [String] raw field text
+            # @return [String] escaped field text
+            def escape_field(text)
+              text.gsub(/[%|]/, '%' => '%25', '|' => '%7C')
+            end
 
             # Extract individual type names from a compound type string.
             # Instead of stripping all syntax characters and concatenating (which
