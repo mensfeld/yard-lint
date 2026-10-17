@@ -48,6 +48,14 @@ describe 'Pipe in type messages' do
     assert_equal('The `rate` has invalid type(s): @return: `Rate%|nil`', message_for('InvalidTagType', 'rate'))
   end
 
+  it 'InvalidTypes keeps a colon in the param name' do
+    assert_equal('The `kw` has invalid type(s): @param foo:: `strng`', message_for('InvalidTagType', 'kw'))
+  end
+
+  it 'InvalidTypes keeps a pipe in the param name' do
+    assert_equal('The `pick` has invalid type(s): @param a|b: `strng`', message_for('InvalidTagType', 'pick'))
+  end
+
   it 'TypeSyntax reports the full type and the error' do
     assert_equal(
       "Invalid type syntax in @return tag: 'String | nil' (invalid character at |)",

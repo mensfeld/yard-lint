@@ -101,4 +101,18 @@ describe 'Yard::Lint::Validators::Tags::InvalidTypes::Parser' do
     assert_equal(['|', 'Foo::Bar'], violation[:types])
     assert_equal("Hash{Foo::Bar => String |\nnil, Baz%}", violation[:type])
   end
+
+  it 'call unescapes the tag and param name' do
+    input = "/a.rb:1: A#foo\n@param foo%3A:strng|@param a%7Cb:strng"
+
+    result = parser.call(input)
+
+    violations = result.first[:tag_violations]
+    assert_equal(2, violations.size)
+    assert_equal('@param', violations[0][:tag])
+    assert_equal('foo:', violations[0][:param])
+    assert_equal(['strng'], violations[0][:types])
+    assert_equal('a|b', violations[1][:param])
+    assert_equal(['strng'], violations[1][:types])
+  end
 end
