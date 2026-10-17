@@ -10,7 +10,7 @@ module Yard
           #   /path/to/file.rb:10: ClassName#method_name
           #   @tagname param_name:BadType1,BadType2:Type|@tagname2:BadType3:Type2
           # One entry per type with invalid names. '%', '|', ',', ':' and newlines
-          # inside names and types are escaped as %25, %7C, %2C, %3A and %0A
+          # inside tags, params, names and types are escaped as %25, %7C, %2C, %3A and %0A
           class Parser < Parsers::Base
             # @return [Regexp] matches "file:line: ObjectTitle"
             LOCATION_REGEX = /^(.+):(\d+):\s+(.+)$/
@@ -80,10 +80,10 @@ module Yard
             def parse_tag_violations(line)
               line.split('|').map do |entry|
                 label, types_str, type = entry.split(':', 3)
-                parts = label.split(' ', 2)
+                tag, param = label.split(' ', 2)
                 {
-                  tag: parts[0],
-                  param: parts[1],
+                  tag: unescape_field(tag),
+                  param: param && unescape_field(param),
                   types: (types_str || '').split(',').reject(&:empty?).map { |name| unescape_field(name) },
                   type: type && unescape_field(type)
                 }

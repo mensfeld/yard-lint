@@ -26,4 +26,14 @@ class PipeInType
   #   Integer] the list
   # @return [void]
   def split(list) = list
+
+  # Builds a keyword
+  # @param foo: [strng] the foo
+  # @return [void]
+  def kw(foo:) = foo
+
+  # Picks a part
+  # @param a|b [strng] the part
+  # @return [void]
+  def pick(part) = part
 end
