@@ -16,10 +16,12 @@ module Yard
             # @param collector [Executor::ResultCollector] collector for output
             # @return [void]
             def in_process_query(object, collector)
-              return unless object.has_tag?(:example)
+              # Tags nested inside overload blocks live on the overload's own
+              # docstring, so check those too
+              example_tags = all_typed_tags(object.docstring, %w[example])
+              return if example_tags.empty?
 
               skip_non_ruby = config_or_default('SkipNonRuby')
-              example_tags = object.tags(:example)
 
               example_tags.each_with_index do |example, index|
                 code = example.text
