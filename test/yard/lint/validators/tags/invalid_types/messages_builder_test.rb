@@ -62,4 +62,22 @@ describe 'Yard::Lint::Validators::Tags::InvalidTypes::MessagesBuilder' do
     assert_includes(message, '@return')
     assert_match(/TypeA.*TypeB|TypeB.*TypeA/, message)
   end
+
+  it 'call adds the full type when it differs from the invalid names' do
+    offense = {
+      method_name: 'call',
+      tag_violations: [
+        { tag: '@param', param: 'x', types: ['Foo|Bar'], type_string: 'Foo|Bar' },
+        { tag: '@param', param: 'x', types: ['|'], type_string: 'Baz | Qux' },
+        { tag: '@return', param: nil, types: ['Strng'], type_string: 'Array<Strng>' }
+      ]
+    }
+
+    message = Yard::Lint::Validators::Tags::InvalidTypes::MessagesBuilder.call(offense)
+
+    assert_equal(
+      'The `call` has invalid type(s): @param x: `Foo|Bar`, `|` in `Baz | Qux`; @return: `Strng` in `Array<Strng>`',
+      message
+    )
+  end
 end
