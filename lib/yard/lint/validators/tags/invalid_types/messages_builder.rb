@@ -15,16 +15,27 @@ module Yard
                 violations = offense[:tag_violations]
 
                 if violations&.any?
-                  details = violations.map do |v|
-                    label = v[:param] ? "#{v[:tag]} #{v[:param]}" : v[:tag]
-                    types = v[:types].map { |t| "`#{t}`" }.join(', ')
-                    "#{label}: #{types}"
+                  details = violations.group_by { |v| v[:param] ? "#{v[:tag]} #{v[:param]}" : v[:tag] }
+                                      .map do |label, entries|
+                    "#{label}: #{entries.map { |v| describe_types(v) }.join(', ')}"
                   end.join('; ')
 
                   "The `#{offense[:method_name]}` has invalid type(s): #{details}"
                 else
                   "The `#{offense[:method_name]}` has at least one tag with an invalid type definition."
                 end
+              end
+
+              private
+
+              # @param violation [Hash] entry with :types (invalid names) and :type_string (full type, may be nil)
+              # @return [String] the invalid names, plus the full type when it differs from them
+              def describe_types(violation)
+                names = violation[:types].map { |t| "`#{t}`" }.join(', ')
+                type_string = violation[:type_string]
+                return names if type_string.nil? || violation[:types] == [type_string]
+
+                "#{names} in `#{type_string}`"
               end
             end
           end

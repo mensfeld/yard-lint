@@ -49,11 +49,21 @@ module Yard
                     # YARD's parser may generate malformed error messages for non-ASCII input
                     error_msg = e.message.encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
                     collector.puts "#{object.file}:#{object.line}: #{object.title}"
-                    collector.puts "#{tag.tag_name}|#{type_str}|#{error_msg}"
+                    collector.puts "#{tag.tag_name}|#{escape_field(type_str)}|#{escape_field(error_msg)}"
                     break
                   end
                 end
               end
+            end
+
+            private
+
+            # Escapes '|' (the field separator), newlines (YARD keeps them in
+            # multi-line types) and '%' (the escape character)
+            # @param text [String] raw field text
+            # @return [String] escaped field text
+            def escape_field(text)
+              text.gsub(/[%|\n]/, '%' => '%25', '|' => '%7C', "\n" => '%0A')
             end
           end
         end

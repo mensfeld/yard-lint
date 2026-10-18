@@ -75,5 +75,27 @@ describe 'Yard::Lint::Validators::Tags::TypeSyntax::Parser' do
   it 'inheritance inherits from parsers base' do
     assert_equal(Yard::Lint::Parsers::Base, Yard::Lint::Validators::Tags::TypeSyntax::Parser.superclass)
   end
-end
 
+  it 'call unescapes pipe and percent in type string and error message' do
+    yard_output = <<~OUTPUT
+      lib/example.rb:10: Example#method
+      return|String %7C nil%25|invalid character at %7C
+    OUTPUT
+
+    result = parser.call(yard_output)
+
+    assert_equal(1, result.size)
+    assert_equal('return', result[0][:tag_name])
+    assert_equal('String | nil%', result[0][:type_string])
+    assert_equal('invalid character at |', result[0][:error_message])
+  end
+
+  it 'call unescapes newlines in type string' do
+    yard_output = "lib/example.rb:10: Example#method\nparam|String %7C%0Anil|invalid character at %7C\n"
+
+    result = parser.call(yard_output)
+
+    assert_equal(1, result.size)
+    assert_equal("String |\nnil", result[0][:type_string])
+  end
+end
