@@ -27,9 +27,9 @@ module Yard
               tags_to_check = config_checked_tags
               patterns = config_enabled_patterns
 
-              object.docstring.tags.each do |tag|
-                next unless tags_to_check.include?(tag.tag_name)
-
+              # Tags nested inside overload blocks live on the overload's own
+              # docstring, so check those too
+              all_typed_tags(object.docstring, tags_to_check).each do |tag|
                 # Option tags carry their description on the nested pair tag;
                 # the documented name is the option key (e.g. ":mode"), not the
                 # hash parameter name
