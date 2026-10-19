@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# Proves that Tags/RedundantParamDescription checks @param tags written inside
-# @overload blocks. YARD stores them on the overload's own docstring, so
-# reading object.docstring.tags missed them and a redundant description was
-# never reported.
+# Proves that Tags/RedundantParamDescription checks @param and @option tags
+# written inside @overload blocks. YARD stores them on the overload's own
+# docstring, so reading object.docstring.tags missed them and a redundant
+# description was never reported.
 describe 'RedundantParamDescription with @overload' do
   attr_reader :result
 
@@ -21,6 +21,10 @@ describe 'RedundantParamDescription with @overload' do
 
   it 'flags a redundant @param description inside an @overload block' do
     assert(flagged?('the name'), '@param inside an @overload block was not checked')
+  end
+
+  it 'flags a redundant @option description inside an @overload block' do
+    assert(flagged?('the port'), '@option inside an @overload block was not checked')
   end
 
   it 'flags a redundant @param description at top level' do

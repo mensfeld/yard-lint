@@ -18,6 +18,15 @@ class RedundantParamDescriptionOverload
     title
   end
 
+  # Connects with a redundant @option description inside an overload.
+  # @overload connect(opts = {})
+  #   @param opts [Hash] settings passed to the socket
+  #   @option opts [Integer] :port the port
+  #   @return [void]
+  def connect(opts = {})
+    opts
+  end
+
   # Parses with a meaningful description inside an overload.
   # @overload parse(source)
   #   @param source [String] raw input read from the config file
