@@ -46,6 +46,15 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedBooleanMethods::Par
     )
   end
 
+  it 'call parses a root level class method' do
+    result = parser.call('lib/user.rb:9: ::enabled?')
+
+    assert_equal(
+      [{ location: 'lib/user.rb', line: 9, element: '::enabled?', method_name: 'enabled?' }],
+      result
+    )
+  end
+
   it 'call skips lines without a location' do
     assert_equal([], parser.call('App::User#active?'))
   end

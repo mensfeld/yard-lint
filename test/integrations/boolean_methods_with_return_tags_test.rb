@@ -206,6 +206,23 @@ describe 'Boolean Methods With Return Tags' do
     assert_includes(offenses.first[:message], '`#enabled?`')
   end
 
+  it 'root level class method without return tag reports with its title' do
+    file = create_test_file('root_class_method.rb', <<~RUBY)
+      # Checks if enabled
+      def self.enabled?
+        true
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('enabled?') }
+    assert_equal(1, offenses.size)
+    assert_equal(file, offenses.first[:location])
+    assert_equal(2, offenses.first[:location_line])
+    assert_includes(offenses.first[:message], '`::enabled?`')
+  end
+
   it 'return tag inside overload does not report' do
     file = create_test_file('overload.rb', <<~RUBY)
       # Example class
