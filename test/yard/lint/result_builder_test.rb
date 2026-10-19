@@ -76,6 +76,23 @@ describe 'Yard::Lint::ResultBuilder' do
     assert_nil(result)
   end
 
+  it 'build with composite child validator reports on its own when its parent is disabled' do
+    @config.only_validators = ['Documentation/UndocumentedBooleanMethods']
+    raw_results = {
+      undocumented_boolean_methods: {
+        stdout: 'file.rb:30: MyClass#valid?',
+        stderr: '',
+        exit_code: 0
+      }
+    }
+
+    result = @builder.build('Documentation/UndocumentedBooleanMethods', raw_results)
+
+    refute_nil(result)
+    assert_equal(1, result.offenses.size)
+    assert_equal('Documentation/UndocumentedBooleanMethods', result.offenses.first[:validator])
+  end
+
   it 'build with warnings unknowntag discovers and uses parser' do
     validator_name = 'Warnings/UnknownTag'
     raw_results = {
