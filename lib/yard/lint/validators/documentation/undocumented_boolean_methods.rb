@@ -6,9 +6,13 @@ module Yard
       module Documentation
         # UndocumentedBooleanMethods validator
         #
-        # Ensures that boolean methods (methods ending with `?`) have an explicit
-        # `@return [Boolean]` tag. Boolean methods should clearly document that they
-        # return true or false values. This validator is enabled by default.
+        # Ensures that documented boolean methods (methods ending with `?`) have an
+        # explicit `@return` tag, at the top level or inside an `@overload`. Boolean
+        # methods should clearly document that they return true or false values.
+        # YARD adds `@return [Boolean]` to such methods on its own, so this validator
+        # reads the tags written in the comment. Methods without any documentation
+        # are reported by `Documentation/UndocumentedObjects`. This validator is
+        # enabled by default.
         #
         # @example Bad - Missing @return tag on boolean method
         #   # Checks if the user is active
@@ -20,6 +24,15 @@ module Yard
         #   # Checks if the user is active
         #   # @return [Boolean] true if the user is active
         #   def active?
+        #     @active
+        #   end
+        #
+        # @example Good - Boolean return documented inside @overload
+        #   # Checks if the user is active
+        #   # @overload active?(strict)
+        #   #   @param strict [Boolean] whether to require a confirmed account
+        #   #   @return [Boolean] true if the user is active
+        #   def active?(strict)
         #     @active
         #   end
         #
