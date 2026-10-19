@@ -15,8 +15,7 @@ describe 'Only Composite Child' do
     File.write(@file, <<~RUBY)
       # Checker
       class Checker
-        # @overload enabled?
-        #   @return [Boolean]
+        # Whether the checker is enabled
         def enabled?
           true
         end
