@@ -24,7 +24,7 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorNoTags' do
   end
 
   it 'does not output anything when object has no example tags' do
-    object = stub('object', has_tag?: false)
+    object = stub('object', docstring: YARD::Docstring.new('No examples'))
 
     collector.expects(:puts).never
     validator.in_process_query(object, collector)
@@ -41,7 +41,7 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorNoLinter' do
   end
 
   it 'returns early without processing when no linter is available' do
-    object = stub('object', has_tag?: true, tags: [])
+    object = stub('object', docstring: YARD::Docstring.new("@example\n  user = User.new"))
 
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:detect).returns(:none)
 
@@ -57,16 +57,25 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorWithLinter' do
     @config = Yard::Lint::Config.new
     @validator = Yard::Lint::Validators::Tags::ExampleStyle::Validator.new(config, [])
     @collector = stub('collector', puts: nil)
-    @example_tag = stub('example', text: 'user = User.new', name: 'Basic usage')
+    @example_tag = stub('example', tag_name: 'example', text: 'user = User.new', name: 'Basic usage')
     @object = stub(
       'object',
-      has_tag?: true,
-      tags: [example_tag],
+      docstring: docstring_with([example_tag]),
       file: 'lib/user.rb',
       line: 10,
       title: 'User#initialize'
     )
     Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:detect).returns(:rubocop)
+  end
+
+  # Stubs a docstring holding the given tags and no @overload tags
+  # @param tags [Array] example tag stubs
+  # @return [Mocha::Mock] docstring stub
+  def docstring_with(tags)
+    docstring = stub('docstring')
+    docstring.stubs(:tags).returns(tags)
+    docstring.stubs(:tags).with(:overload).returns([])
+    docstring
   end
 
   it 'processes examples and outputs offenses' do
@@ -94,11 +103,10 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorWithLinter' do
   end
 
   it 'uses default example name when name is nil' do
-    unnamed_example = stub('example', text: 'user = User.new', name: nil)
+    unnamed_example = stub('example', tag_name: 'example', text: 'user = User.new', name: nil)
     obj = stub(
       'object',
-      has_tag?: true,
-      tags: [unnamed_example],
+      docstring: docstring_with([unnamed_example]),
       file: 'lib/user.rb',
       line: 10,
       title: 'User#initialize'
@@ -112,12 +120,11 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorWithLinter' do
   end
 
   it 'skips examples with nil or empty code' do
-    nil_example = stub('example', text: nil, name: 'Nil example')
-    empty_example = stub('example', text: '', name: 'Empty example')
+    nil_example = stub('example', tag_name: 'example', text: nil, name: 'Nil example')
+    empty_example = stub('example', tag_name: 'example', text: '', name: 'Empty example')
     obj = stub(
       'object',
-      has_tag?: true,
-      tags: [nil_example, empty_example],
+      docstring: docstring_with([nil_example, empty_example]),
       file: 'lib/user.rb',
       line: 10,
       title: 'User#initialize'
