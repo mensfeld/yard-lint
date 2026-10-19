@@ -6,6 +6,8 @@
 - **[Feature]** Category-level `Severity` is now honored: set `Severity` on a department (e.g. `Documentation`) to apply it to all its validators. A per-validator `Severity` still wins. Backwards compatible - it only affects configs that set a category `Severity`, which was previously ignored.
 - **[Enhancement]** SARIF output now includes a line-independent `partialFingerprints` per result (keyed on the offending object, or the message when there is none), so GitHub tracks the same offense across commits instead of churning alerts when lines shift.
 - **[Bugfix]** `Tags/RedundantParamDescription` now checks `@param` and `@option` tags written inside `@overload` blocks instead of skipping them.
+- **[Bugfix]** `Tags/ExampleStyle` now checks `@example` tags written inside `@overload` blocks instead of skipping them.
+- **[Bugfix]** `Documentation/UndocumentedBooleanMethods` now reports a documented `?` method whose comment has no `@return` (YARD adds `@return [Boolean]` on its own, so it never fired), no longer reports one whose `@return` is inside `@overload`, and gives the real file and line instead of line 0.
 - **[Bugfix]** `Tags/ExampleSyntax` now checks `@example` tags written inside `@overload` blocks instead of skipping them.
 - **[Bugfix]** `Tags/InvalidTypes` and `Tags/TypeSyntax` no longer cut the type text in their messages when it contains `|` (e.g. `@return [String | nil]`), and `Tags/TypeSyntax` no longer drops offenses on types that span several lines. `Tags/InvalidTypes` also shows the full type when it differs from the invalid name.
 - **[Bugfix]** `Documentation/UndocumentedOptions` now counts `@option` tags written inside `@overload` blocks instead of reporting the method as having none.
