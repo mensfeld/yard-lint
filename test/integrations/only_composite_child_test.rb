@@ -33,9 +33,10 @@ describe 'Only Composite Child' do
   end
 
   # @param only [Array<String>] validators to run, all enabled ones when empty
+  # @param raw_config [Hash] user configuration
   # @return [Array<Hash>] offenses found in the test file
-  def offenses_for(only)
-    config = Yard::Lint::Config.new
+  def offenses_for(only, raw_config = {})
+    config = Yard::Lint::Config.new(raw_config)
     config.only_validators = only
     Yard::Lint.run(path: @file, config: config, progress: false).offenses
   end
@@ -69,5 +70,11 @@ describe 'Only Composite Child' do
 
     assert_equal(2, offenses.size)
     assert_equal(['Documentation/UndocumentedObjects'], offenses.map { |o| o[:validator] }.uniq)
+  end
+
+  it 'reports no child offenses in a normal run when the parent is disabled in config' do
+    offenses = offenses_for([], 'Documentation/UndocumentedObjects' => { 'Enabled' => false })
+
+    assert_empty(offenses.select { |o| o[:message].include?('enabled?') })
   end
 end
