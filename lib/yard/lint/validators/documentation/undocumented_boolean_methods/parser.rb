@@ -8,10 +8,15 @@ module Yard
         module UndocumentedBooleanMethods
           # Class used to extract details about undocumented boolean methods
           # @example Output format (skip-lint)
-          #   Platform::Analysis::Authors#valid?
+          #   lib/platform/analysis/authors.rb:12: Platform::Analysis::Authors#valid?
           class Parser < Parsers::Base
-            # Regex to extract location and method name from yard list output
-            LOCATION_REGEX = /^(.+)#(.+)$|^(.+)\.(.+)$/
+            # Regex to extract file, line and method title from the validator output
+            # Format: file.rb:LINE: Namespace#method?, Namespace.method?, or #method? and
+            # ::method? at the root
+            LINE_REGEX = /^(.+):(\d+): (.+)$/
+
+            # Method name: the last segment of the title
+            METHOD_NAME_REGEX = /[^#.:]+\z/
 
             # @param yard_list [String] raw yard list results string
             # @return [Array<Hash>] Array with undocumented boolean methods details
@@ -20,18 +25,14 @@ module Yard
                 .split("\n")
                 .reject(&:empty?)
                 .filter_map do |line|
-                  match_data = line.match(LOCATION_REGEX)
+                  match_data = line.match(LINE_REGEX)
                   next unless match_data
 
-                  # Handle both instance (#) and class (.) methods
-                  location = match_data[1] || match_data[3]
-                  method_name = match_data[2] || match_data[4]
-
                   {
-                    location: location,
-                    element: "#{location}##{method_name}",
-                    method_name: method_name,
-                    line: 0 # YARD list doesn't provide line numbers
+                    location: match_data[1],
+                    line: match_data[2].to_i,
+                    element: match_data[3],
+                    method_name: match_data[3][METHOD_NAME_REGEX]
                   }
                 end
             end

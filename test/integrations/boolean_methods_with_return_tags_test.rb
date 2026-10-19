@@ -132,7 +132,7 @@ describe 'Boolean Methods With Return Tags' do
       'Expected valid? method to be flagged as undocumented')
   end
 
-  it 'comment but no explicit return tag does not report' do
+  it 'comment but no explicit return tag reports with the file and line' do
     file = create_test_file('no_return.rb', <<~RUBY)
       # Example class
       class Example
@@ -145,13 +145,167 @@ describe 'Boolean Methods With Return Tags' do
 
     result = Yard::Lint.run(path: file, config: config)
 
-    # With a comment, the method should NOT be flagged as undocumented
-    # (it has docstring text, even without explicit @return tag)
-    undocumented = result.offenses.select do |o|
+    offenses = result.offenses.select do |o|
       o[:name].to_s == 'UndocumentedObject' && o[:message].include?('valid?')
     end
-    assert_empty(undocumented,
-      'Method with comment should not be flagged as undocumented')
+    assert_equal(1, offenses.size)
+    assert_equal(file, offenses.first[:location])
+    assert_equal(4, offenses.first[:location_line])
+    assert_includes(offenses.first[:message], '`Example#valid?`')
+  end
+
+  it 'no documentation at all reports once' do
+    file = create_test_file('bare.rb', <<~RUBY)
+      # Example class
+      class Example
+        def valid?
+          @valid
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('valid?') }
+    assert_equal(1, offenses.size)
+  end
+
+  it 'class method without return tag reports with its title' do
+    file = create_test_file('class_method.rb', <<~RUBY)
+      # Example class
+      class Example
+        # Checks if enabled
+        def self.enabled?
+          true
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('enabled?') }
+    assert_equal(1, offenses.size)
+    assert_equal(4, offenses.first[:location_line])
+    assert_includes(offenses.first[:message], '`Example.enabled?`')
+  end
+
+  it 'root level method without return tag reports with its title' do
+    file = create_test_file('root_method.rb', <<~RUBY)
+      # Checks if enabled
+      def enabled?
+        true
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('enabled?') }
+    assert_equal(1, offenses.size)
+    assert_equal(file, offenses.first[:location])
+    assert_equal(2, offenses.first[:location_line])
+    assert_includes(offenses.first[:message], '`#enabled?`')
+  end
+
+  it 'root level class method without return tag reports with its title' do
+    file = create_test_file('root_class_method.rb', <<~RUBY)
+      # Checks if enabled
+      def self.enabled?
+        true
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('enabled?') }
+    assert_equal(1, offenses.size)
+    assert_equal(file, offenses.first[:location])
+    assert_equal(2, offenses.first[:location_line])
+    assert_includes(offenses.first[:message], '`::enabled?`')
+  end
+
+  it 'return tag inside overload does not report' do
+    file = create_test_file('overload.rb', <<~RUBY)
+      # Example class
+      class Example
+        # Checks readiness
+        # @overload ready?(strict)
+        #   @param strict [Boolean] strict mode
+        #   @return [Boolean] true when ready
+        def ready?(strict)
+          strict
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('ready?') }
+    assert_empty(offenses, "Expected no offenses, got: #{offenses.inspect}")
+  end
+
+  it 'return tag without types does not report' do
+    file = create_test_file('untyped.rb', <<~RUBY)
+      # Example class
+      class Example
+        # Checks state
+        # @return true when ok
+        def ok?
+          true
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('ok?') }
+    assert_empty(offenses, "Expected no offenses, got: #{offenses.inspect}")
+  end
+
+  it 'return tag from a macro does not report' do
+    file = create_test_file('macro.rb', <<~RUBY)
+      # Example class
+      class Example
+        # @!macro [new] predicate
+        #   @return [Boolean] whether it is set
+        # Checks if set
+        def set?
+          true
+        end
+
+        # Checks if other
+        # @macro predicate
+        def other?
+          true
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select do |o|
+      o[:message].include?('set?') || o[:message].include?('other?')
+    end
+    assert_empty(offenses, "Expected no offenses, got: #{offenses.inspect}")
+  end
+
+  it 'macro generated boolean method does not report' do
+    file = create_test_file('generated.rb', <<~RUBY)
+      # Example class
+      class Example
+        # @!macro [attach] flag
+        #   Checks the $1 flag
+        # @param name [Symbol] flag name
+        # @return [void]
+        def self.flag(name); end
+
+        flag :visible?
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('visible?') }
+    assert_empty(offenses, "Expected no offenses, got: #{offenses.inspect}")
   end
 
   it 'karafka examples handles all correctly' do

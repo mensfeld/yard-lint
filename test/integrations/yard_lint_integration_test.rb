@@ -96,17 +96,16 @@ describe 'Yard Lint Integration' do
 
     result = Yard::Lint.run(path: file, config: @config)
 
-    # Boolean methods with comments but without explicit @return tags
-    # are NOT flagged because:
-    # 1. YARD auto-infers @return [Boolean] for methods ending with '?'
-    # 2. Having ANY docstring content (even just a comment) satisfies UndocumentedObjects
-    # This is the correct behavior - boolean methods don't need explicit @return tags
+    # YARD adds @return [Boolean] to every '?' method on its own; the validator
+    # must still flag the ones whose comment has no @return
     undocumented_booleans = result.offenses
                                   .select { |o| o[:name] == 'UndocumentedObject' }
-                                  .select do |o|
-      o[:element].to_s.include?('active?') || o[:element].to_s.include?('ready?')
-      end
-    assert_empty(undocumented_booleans)
+                                  .select { |o| o[:element].to_s.end_with?('?') }
+
+    assert_equal(
+      [['BooleanMethods#active?', 6], ['BooleanMethods#ready?', 17]],
+      undocumented_booleans.map { |o| [o[:element], o[:location_line]] }.sort
+    )
   end
 
   it 'invalid tag types validates that tags use valid type definitions' do
