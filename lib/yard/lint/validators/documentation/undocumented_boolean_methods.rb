@@ -7,7 +7,7 @@ module Yard
         # UndocumentedBooleanMethods validator
         #
         # Ensures that documented boolean methods (methods ending with `?`) have an
-        # explicit `@return` tag, at the top level or inside each `@overload`. Boolean
+        # explicit `@return` tag, at the top level or inside an `@overload`. Boolean
         # methods should clearly document that they return true or false values.
         # YARD adds `@return [Boolean]` to such methods on its own, so this validator
         # reads the tags written in the comment. Methods without any documentation

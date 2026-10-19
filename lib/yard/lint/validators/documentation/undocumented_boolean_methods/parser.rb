@@ -11,8 +11,8 @@ module Yard
           #   lib/platform/analysis/authors.rb:12: Platform::Analysis::Authors#valid?
           class Parser < Parsers::Base
             # Regex to extract file, line and method title from the validator output
-            # Format: file.rb:LINE: Namespace#method? or Namespace.method?
-            LINE_REGEX = /^(.+):(\d+): (.+[#.](.+))$/
+            # Format: file.rb:LINE: Namespace#method?, Namespace.method? or #method? (root)
+            LINE_REGEX = /^(.+):(\d+): (.*[#.](.+))$/
 
             # @param yard_list [String] raw yard list results string
             # @return [Array<Hash>] Array with undocumented boolean methods details
