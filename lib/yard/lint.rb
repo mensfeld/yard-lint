@@ -5,6 +5,7 @@ require 'shellwords'
 require 'open3'
 require 'tempfile'
 require 'tmpdir'
+require 'pathname'
 require 'digest'
 require 'did_you_mean'
 require 'yard'
@@ -73,9 +74,6 @@ module Yard
       # @param config [Yard::Lint::Config] configuration object
       # @return [Array<String>] array of absolute file paths
       def get_diff_files(diff, path, config)
-        # Determine the base directory for relative path calculations
-        base_dir = determine_base_dir(path)
-
         # Get changed files from git based on mode
         git_files = case diff[:mode]
                     when :ref
@@ -92,7 +90,7 @@ module Yard
                     end
 
         # Apply exclusion patterns
-        git_files.reject { |file| excluded_file?(file, config.exclude, base_dir) }
+        git_files.reject { |file| config.excluded_path?(file, config.exclude) }
       end
 
       # Expand path/glob patterns into an array of files
@@ -100,16 +98,13 @@ module Yard
       # @param config [Yard::Lint::Config] configuration object
       # @return [Array<String>] array of absolute file paths
       def expand_path(path, config)
-        # Determine the base directory for relative path calculations
-        base_dir = determine_base_dir(path)
-
         files = discover_ruby_files(path)
 
         # Convert to absolute paths for YARD
         files = files.map { |file| File.expand_path(file) }
 
         # Filter out excluded files
-        files.reject { |file| excluded_file?(file, config.exclude, base_dir) }
+        files.reject { |file| config.excluded_path?(file, config.exclude) }
       end
 
       # Discover Ruby files from path/glob patterns
@@ -138,55 +133,6 @@ module Yard
         return if File.exist?(path)
 
         raise Errors::FileNotFoundError, "No such file or directory: #{path}"
-      end
-
-      # Determine base directory for relative path calculations
-      # @param path [String, Array<String>] path or array of paths
-      # @return [String] absolute base directory path
-      def determine_base_dir(path)
-        first_path = Array(path).first
-        return Dir.pwd unless first_path
-
-        absolute_path = File.expand_path(first_path)
-        File.directory?(absolute_path) ? absolute_path : File.dirname(absolute_path)
-      end
-
-      # Check if a file matches any exclusion pattern
-      # Patterns are matched against both absolute and relative paths
-      # @param file [String] absolute file path
-      # @param patterns [Array<String>] exclusion patterns
-      # @param base_dir [String] base directory for relative path calculation
-      # @return [Boolean] true if file should be excluded
-      def excluded_file?(file, patterns, base_dir)
-        relative_path = relative_path_from(file, base_dir)
-
-        patterns.any? do |pattern|
-          match_path?(pattern, file, relative_path)
-        end
-      end
-
-      # Calculate relative path from base directory
-      # @param file [String] absolute file path
-      # @param base_dir [String] base directory
-      # @return [String] relative path
-      def relative_path_from(file, base_dir)
-        if file.start_with?("#{base_dir}/")
-          file.sub("#{base_dir}/", '')
-        else
-          file
-        end
-      end
-
-      # Check if a pattern matches a file path
-      # Tries matching against both relative and absolute paths
-      # @param pattern [String] glob pattern
-      # @param absolute_path [String] absolute file path
-      # @param relative_path [String] relative file path
-      # @return [Boolean] true if pattern matches
-      def match_path?(pattern, absolute_path, relative_path)
-        flags = File::FNM_PATHNAME | File::FNM_EXTGLOB
-
-        File.fnmatch(pattern, relative_path, flags) || File.fnmatch(pattern, absolute_path, flags)
       end
     end
   end

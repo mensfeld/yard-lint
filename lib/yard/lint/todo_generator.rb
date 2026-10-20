@@ -14,7 +14,7 @@ module Yard
         # @param force [Boolean] whether to overwrite existing todo file if present
         # @param exclude_limit [Integer] minimum files in directory before grouping into wildcard patterns
         # @param config_path [String, nil] config file to link the todo into
-        #   (defaults to .yard-lint.yml in the current directory)
+        #   (defaults to .yard-lint.yml in the config directory)
         # @return [Hash] result with :message, :offense_count, :validator_count
         def generate(path:, config:, force: false, exclude_limit: DEFAULT_EXCLUDE_LIMIT, config_path: nil)
           new(path: path, config: config, force: force, exclude_limit: exclude_limit,
@@ -41,8 +41,8 @@ module Yard
         @config = config
         @force = force
         @exclude_limit = exclude_limit
-        @todo_path = File.join(Dir.pwd, '.yard-lint-todo.yml')
-        @config_path = config_path || File.join(Dir.pwd, Config::DEFAULT_CONFIG_FILE)
+        @todo_path = File.join(config.base_dir, '.yard-lint-todo.yml')
+        @config_path = config_path || File.join(config.base_dir, Config::DEFAULT_CONFIG_FILE)
       end
 
       # Generate the .yard-lint-todo.yml file with exclusions for current violations
@@ -128,6 +128,7 @@ module Yard
       # @return [Config] configuration for the audit run
       def build_audit_config(todo_entries)
         audit_config = Config.new(Marshal.load(Marshal.dump(@config.raw_config)))
+        audit_config.base_dir = @config.base_dir
         audit_config.only_validators = @config.only_validators.dup
 
         todo_entries.each do |validator_name, patterns|
@@ -176,7 +177,7 @@ module Yard
       # @param file [String] relative file path
       # @return [Boolean] true if the pattern matches the file
       def todo_match?(pattern, file)
-        File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
+        File.fnmatch(pattern, file, Config::EXCLUDE_FLAGS)
       end
 
       # Build the summary message for a todo check
@@ -268,14 +269,13 @@ module Yard
         end
       end
 
-      # Convert absolute path to relative path from current directory
+      # Convert a path to the form Exclude patterns match (relative to the config directory)
       # @param path [String, nil] absolute or relative file path
-      # @return [String, nil] relative path from current directory, or nil if path is nil
+      # @return [String, nil] path relative to the config directory, or nil if path is nil
       def make_relative_path(path)
         return path if path.nil?
 
-        pwd = Dir.pwd
-        path.start_with?(pwd) ? path.sub("#{pwd}/", '') : path
+        @config.relative_path(path)
       end
 
       # Build YAML content for the todo file

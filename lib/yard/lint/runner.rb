@@ -102,11 +102,7 @@ module Yard
         validator_excludes = config.validator_exclude(validator_name)
         return files if validator_excludes.empty?
 
-        files.reject do |file|
-          validator_excludes.any? do |pattern|
-            File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
-          end
-        end
+        files.reject { |file| config.excluded_path?(file, validator_excludes) }
       end
 
       # Filter result offenses based on per-validator exclusions
@@ -124,23 +120,8 @@ module Yard
         return nil if result.offenses.empty?
         return result if validator_excludes.empty?
 
-        working_dir = Dir.pwd
-
         filtered_offenses = result.offenses.reject do |offense|
-          file_path = offense[:location] || offense[:file]
-          next true unless file_path
-
-          # Convert to relative path for pattern matching
-          relative_path = if file_path.start_with?(working_dir)
-                            file_path.sub(%r{^#{Regexp.escape(working_dir)}/}, '')
-                          else
-                            file_path
-                          end
-
-          # Check if file matches any exclusion pattern
-          validator_excludes.any? do |pattern|
-            File.fnmatch(pattern, relative_path, File::FNM_PATHNAME | File::FNM_EXTGLOB)
-          end
+          config.excluded_path?(offense[:location] || offense[:file], validator_excludes)
         end
 
         # Return nil if no offenses remain after filtering
