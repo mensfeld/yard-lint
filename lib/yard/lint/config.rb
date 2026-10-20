@@ -254,16 +254,21 @@ module Yard
       # Path of a file relative to {#base_dir}
       # Symlinks are resolved when the plain paths do not nest (/var is /private/var on macOS)
       # @param file [String] absolute file path, or one relative to the current directory
-      # @return [String] relative path, or the absolute path for a file outside {#base_dir}
+      # @return [String] relative path (with ../ for a file outside {#base_dir}), or the absolute
+      #   path when there is no relative one (another drive)
       def relative_path(file)
         absolute = File.expand_path(file)
         base = File.expand_path(base_dir)
         return absolute.delete_prefix("#{base}/") if absolute.start_with?("#{base}/")
 
-        real_base = File.realpath(base)
-        real_file = File.realpath(absolute)
-        real_file.start_with?("#{real_base}/") ? real_file.delete_prefix("#{real_base}/") : absolute
-      rescue SystemCallError
+        from, to = begin
+          [File.realpath(absolute), File.realpath(base)]
+        rescue SystemCallError
+          [absolute, base]
+        end
+
+        Pathname.new(from).relative_path_from(Pathname.new(to)).to_s
+      rescue ArgumentError
         absolute
       end
 

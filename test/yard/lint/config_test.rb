@@ -158,7 +158,8 @@ describe 'Yard::Lint::Config' do
     config = Yard::Lint::Config.new { |c| c.base_dir = '/project' }
 
     assert_equal('lib/foo.rb', config.relative_path('/project/lib/foo.rb'))
-    assert_equal('/other/lib/foo.rb', config.relative_path('/other/lib/foo.rb'))
+    assert_equal('../other/lib/foo.rb', config.relative_path('/other/lib/foo.rb'))
+    assert_equal('../lib/foo.rb', config.relative_path('/project/../lib/foo.rb'))
   end
 
   it 'excluded path matches patterns relative to the base dir or absolute' do
@@ -168,6 +169,8 @@ describe 'Yard::Lint::Config' do
     assert(config.excluded_path?('/project/lib/gen/a.rb', ['/project/lib/gen/**/*']))
     refute(config.excluded_path?('/project/lib/gen/a.rb', ['gen/**/*']))
     refute(config.excluded_path?('/project/lib/a.rb', ['lib/gen/**/*']))
+    assert(config.excluded_path?('/lib/gen/a.rb', ['../lib/gen/**/*']))
+    assert(config.excluded_path?('/lib/gen/a.rb', ['**/gen/**/*']))
   end
 
   it 'load returns nil if no config file is found' do

@@ -156,6 +156,40 @@ describe 'Exclude patterns relative to the config file directory' do
     end
   end
 
+  describe 'with --config in a subdirectory' do
+    let(:config_dir) { File.join(project_dir, 'config') }
+    let(:config_file) { File.join(config_dir, 'yard-lint.yml') }
+
+    before do
+      FileUtils.mkdir_p(config_dir)
+    end
+
+    it 'matches a ../ pattern for a file outside the config directory' do
+      File.write(config_file, "AllValidators:\n  Exclude:\n    - '../lib/gen/**/*'\n")
+      result = run_yard_lint('--config', config_file, '.')
+
+      assert_equal(0, result[:exit_code], result[:output])
+      refute_includes(result[:output], 'bad.rb')
+    end
+
+    it 'writes portable ../ entries with --auto-gen-config and applies them' do
+      File.write(config_file, "Tags/Order:\n  Enabled: true\n")
+      generate_result = run_yard_lint('--config', config_file, '--auto-gen-config', '.')
+
+      assert_equal(0, generate_result[:exit_code], generate_result[:output])
+
+      todo = File.read(File.join(config_dir, '.yard-lint-todo.yml'))
+
+      assert_includes(todo, "'../lib/gen/bad.rb'")
+      refute_includes(todo, project_dir)
+
+      result = run_yard_lint('--config', config_file, '.')
+
+      assert_equal(0, result[:exit_code], result[:output])
+      refute_includes(result[:output], 'bad.rb')
+    end
+  end
+
   describe 'in diff mode' do
     before do
       write_config("AllValidators:\n  Exclude:\n    - 'lib/gen/**/*'\n")
