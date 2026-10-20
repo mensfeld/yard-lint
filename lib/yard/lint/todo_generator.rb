@@ -128,6 +128,7 @@ module Yard
       # @return [Config] configuration for the audit run
       def build_audit_config(todo_entries)
         audit_config = Config.new(Marshal.load(Marshal.dump(@config.raw_config)))
+        audit_config.base_dir = @config.base_dir
         audit_config.only_validators = @config.only_validators.dup
 
         todo_entries.each do |validator_name, patterns|
@@ -268,14 +269,13 @@ module Yard
         end
       end
 
-      # Convert absolute path to relative path from current directory
+      # Convert a path to the form Exclude patterns match (relative to the config directory)
       # @param path [String, nil] absolute or relative file path
-      # @return [String, nil] relative path from current directory, or nil if path is nil
+      # @return [String, nil] path relative to the config directory, or nil if path is nil
       def make_relative_path(path)
         return path if path.nil?
 
-        pwd = Dir.pwd
-        path.start_with?(pwd) ? path.sub("#{pwd}/", '') : path
+        @config.relative_path(path)
       end
 
       # Build YAML content for the todo file

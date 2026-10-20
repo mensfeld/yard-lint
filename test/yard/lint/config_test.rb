@@ -141,6 +141,35 @@ describe 'Yard::Lint::Config' do
     FileUtils.rm_f(config_file)
   end
 
+  it 'from file uses the config file directory as base dir' do
+    Dir.mktmpdir do |dir|
+      config_file = File.join(dir, '.yard-lint.yml')
+      File.write(config_file, "AllValidators:\n  Exclude: []\n")
+
+      assert_equal(dir, Yard::Lint::Config.from_file(config_file).base_dir)
+    end
+  end
+
+  it 'base dir defaults to the current directory' do
+    assert_equal(Dir.pwd, Yard::Lint::Config.new.base_dir)
+  end
+
+  it 'relative path is relative to the base dir' do
+    config = Yard::Lint::Config.new { |c| c.base_dir = '/project' }
+
+    assert_equal('lib/foo.rb', config.relative_path('/project/lib/foo.rb'))
+    assert_equal('/other/lib/foo.rb', config.relative_path('/other/lib/foo.rb'))
+  end
+
+  it 'excluded path matches patterns relative to the base dir or absolute' do
+    config = Yard::Lint::Config.new { |c| c.base_dir = '/project' }
+
+    assert(config.excluded_path?('/project/lib/gen/a.rb', ['lib/gen/**/*']))
+    assert(config.excluded_path?('/project/lib/gen/a.rb', ['/project/lib/gen/**/*']))
+    refute(config.excluded_path?('/project/lib/gen/a.rb', ['gen/**/*']))
+    refute(config.excluded_path?('/project/lib/a.rb', ['lib/gen/**/*']))
+  end
+
   it 'load returns nil if no config file is found' do
     Yard::Lint::Config.stubs(:find_config_file).returns(nil)
 

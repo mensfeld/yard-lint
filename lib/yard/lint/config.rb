@@ -6,6 +6,7 @@ module Yard
     class Config
       attr_reader :raw_config, :validators
       attr_accessor :only_validators
+      attr_writer :base_dir
 
       # Default YAML config file name
       DEFAULT_CONFIG_FILE = '.yard-lint.yml'
@@ -15,6 +16,9 @@ module Yard
 
       # Metadata keys to skip when merging validator configs
       METADATA_KEYS = %w[Description StyleGuide VersionAdded VersionChanged].freeze
+
+      # File.fnmatch flags used for Exclude patterns
+      EXCLUDE_FLAGS = File::FNM_PATHNAME | File::FNM_EXTGLOB
 
       # @param raw_config [Hash] raw configuration hash (new hierarchical format)
       def initialize(raw_config = {})
@@ -42,7 +46,7 @@ module Yard
           # Load with inheritance support
           merged_yaml = ConfigLoader.load(path)
 
-          new(merged_yaml)
+          new(merged_yaml) { |config| config.base_dir = File.dirname(File.expand_path(path)) }
         end
 
         # Search for and load config file from current directory upwards
@@ -225,6 +229,42 @@ module Yard
       # @return [Array<String>] combined exclusion patterns (global + category + per-validator)
       def validator_all_excludes(validator_name)
         exclude + validator_exclude(validator_name)
+      end
+
+      # Directory that Exclude patterns are relative to
+      # @return [String] directory of the loaded config file, or the current directory without one
+      def base_dir
+        @base_dir || Dir.pwd
+      end
+
+      # Whether a file matches any of the given Exclude patterns
+      # A pattern matches the path relative to {#base_dir} or the absolute path
+      # @param file [String] absolute file path, or one relative to the current directory
+      # @param patterns [Array<String>] glob patterns
+      # @return [Boolean] true if any pattern matches
+      def excluded_path?(file, patterns)
+        absolute = File.expand_path(file)
+        relative = relative_path(absolute)
+
+        patterns.any? do |pattern|
+          File.fnmatch(pattern, relative, EXCLUDE_FLAGS) || File.fnmatch(pattern, absolute, EXCLUDE_FLAGS)
+        end
+      end
+
+      # Path of a file relative to {#base_dir}
+      # Symlinks are resolved when the plain paths do not nest (/var is /private/var on macOS)
+      # @param file [String] absolute file path, or one relative to the current directory
+      # @return [String] relative path, or the absolute path for a file outside {#base_dir}
+      def relative_path(file)
+        absolute = File.expand_path(file)
+        base = File.expand_path(base_dir)
+        return absolute.delete_prefix("#{base}/") if absolute.start_with?("#{base}/")
+
+        real_base = File.realpath(base)
+        real_file = File.realpath(absolute)
+        real_file.start_with?("#{real_base}/") ? real_file.delete_prefix("#{real_base}/") : absolute
+      rescue SystemCallError
+        absolute
       end
 
       # Get validator-specific configuration value

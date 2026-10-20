@@ -41,6 +41,7 @@ describe 'Global Exclusions' do
   it 'excludes vendor when scanning a directory with absolute path' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['vendor/**/*']
+      c.base_dir = test_dir
     end
 
     result = Yard::Lint.run(path: test_dir, config:)
@@ -53,6 +54,7 @@ describe 'Global Exclusions' do
   it 'excludes vendor when scanning with dot from the target directory' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['vendor/**/*']
+      c.base_dir = test_dir
     end
 
     Dir.chdir(test_dir) do
@@ -85,6 +87,7 @@ describe 'Global Exclusions' do
 
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['vendor/**/*']
+      c.base_dir = test_dir
     end
 
     result = Yard::Lint.run(path: test_dir, config:)
@@ -96,6 +99,7 @@ describe 'Global Exclusions' do
   it 'absolute exclusion patterns work' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ["#{test_dir}/vendor/**/*"]
+      c.base_dir = test_dir
     end
 
     result = Yard::Lint.run(path: test_dir, config:)
@@ -121,6 +125,7 @@ describe 'Global Exclusions' do
 
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['vendor/**/*', 'spec/**/*']
+      c.base_dir = test_dir
     end
 
     result = Yard::Lint.run(path: test_dir, config:)
@@ -134,6 +139,7 @@ describe 'Global Exclusions' do
   it 'handles patterns with curly braces extglob' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['{vendor,spec}/**/*']
+      c.base_dir = test_dir
     end
 
     result = Yard::Lint.run(path: test_dir, config:)
@@ -146,6 +152,7 @@ describe 'Global Exclusions' do
   it 'handles single file exclusion by relative path' do
     config = Yard::Lint::Config.new do |c|
       c.exclude = ['lib/my_code.rb']
+      c.base_dir = test_dir
     end
 
     result = Yard::Lint.run(path: test_dir, config:)
