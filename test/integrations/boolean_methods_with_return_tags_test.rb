@@ -404,6 +404,40 @@ describe 'Boolean Methods With Return Tags' do
     assert_equal(%w[Gate#locked? Gate#open? Gate#shut?], reported)
   end
 
+  it 'macro defined in a file that is not linted does not report' do
+    create_test_file('macro_def.rb', <<~RUBY)
+      # Example class
+      class Source
+        # @!macro [new] xret
+        #   @return [Boolean] whether it is so
+        def defs?
+          true
+        end
+      end
+    RUBY
+    file = create_test_file('macro_use.rb', <<~RUBY)
+      # Example class
+      class User
+        # Tells if ready
+        # @!macro xret
+        def ready?
+          true
+        end
+
+        # Tells if going
+        # @macro xret
+        def go?
+          true
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('User#') }
+    assert_empty(offenses, "Expected no offenses, got: #{offenses.inspect}")
+  end
+
   it 'return tag inside overload example reports' do
     file = create_test_file('overload_example.rb', <<~RUBY)
       # Example class

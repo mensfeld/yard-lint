@@ -70,13 +70,16 @@ module Yard
             # Tells if the macro named in the line carries a `@return`
             # @param line [String] the `@macro` or `@!macro` line
             # @param depth [Integer] macro nesting depth
-            # @return [Boolean] true when the macro text has a `@return`
+            # @return [Boolean] true when the macro text has a `@return` or the macro
+            #   is not in the registry
             def macro_return?(line, depth)
               return false if depth >= MAX_MACRO_DEPTH
 
               name = line[MACRO_REGEX, 1]
               macro = name && YARD::CodeObjects::MacroObject.find(name)
-              return false unless macro
+              # Only the selected files are parsed, so a macro from another file is
+              # unknown here; count it as written to report the same in every run
+              return true unless macro
 
               user_return?(macro.macro_data.to_s, depth + 1)
             end
