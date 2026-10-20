@@ -120,6 +120,8 @@ yard-lint lib/
 yard-lint --check-todo lib/
 ```
 
+`.yard-lint-todo.yml` is written and read next to the loaded `.yard-lint.yml` (or in the current directory without one), and its entries are relative to that directory, so the baseline works from any directory you run yard-lint in.
+
 **Learn more:** [Incremental Adoption Guide](https://github.com/mensfeld/yard-lint/wiki/Incremental-Adoption)
 
 ### Check Documentation Coverage
@@ -370,6 +372,8 @@ Documentation:
   Exclude:
     - 'lib/generated/**/*'
 ```
+
+`Exclude` patterns at every level are relative to the directory of the loaded `.yard-lint.yml` (or the current directory without one), whatever PATH or directory you run yard-lint from. A file outside that directory is matched as `../...` (with `--config config/yard-lint.yml`, write `../lib/generated/**/*`); absolute patterns also work.
 
 **Learn more:** [Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
 

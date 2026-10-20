@@ -177,7 +177,7 @@ module Yard
       # @param file [String] relative file path
       # @return [Boolean] true if the pattern matches the file
       def todo_match?(pattern, file)
-        File.fnmatch(pattern, file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
+        File.fnmatch(pattern, file, Config::EXCLUDE_FLAGS)
       end
 
       # Build the summary message for a todo check

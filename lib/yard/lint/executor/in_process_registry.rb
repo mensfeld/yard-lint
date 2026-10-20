@@ -112,7 +112,7 @@ module Yard
               next false unless obj.file
 
               file_excludes.any? do |pattern|
-                File.fnmatch(pattern, obj.file, File::FNM_PATHNAME | File::FNM_EXTGLOB)
+                File.fnmatch(pattern, obj.file, Config::EXCLUDE_FLAGS)
               end
             end
           end
