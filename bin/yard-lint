@@ -172,7 +172,7 @@ apply_only = lambda do |config|
   config.only_validators = options[:only]
 end
 
-# Load the config (-c file or auto-discovered), exiting with a one-line error
+# Load the config (-c file or auto-discovered), exiting with a configuration error
 # instead of a backtrace when it is missing, invalid or inherits in a cycle.
 # Shared by the normal run, --auto-gen-config and --check-todo.
 load_config = lambda do

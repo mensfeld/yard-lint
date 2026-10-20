@@ -39,9 +39,7 @@ describe 'CLI error handling' do
         refute_path_exists(File.join(dir, '.yard-lint-todo.yml'))
       end
     end
-  end
 
-  [[], %w[--check-todo], %w[--auto-gen-config]].each do |flags|
     it "reports a circular inherit_from without a backtrace (#{flags.first || 'normal run'})" do
       Dir.mktmpdir do |dir|
         File.write(File.join(dir, 'a.yml'), "inherit_from: b.yml\n")
