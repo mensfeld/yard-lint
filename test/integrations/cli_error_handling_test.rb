@@ -28,22 +28,16 @@ describe 'CLI error handling' do
     assert_match(/invalid option|unknown|--definitely-not-a-flag/i, output)
   end
 
-  it 'reports a missing -c config file without a backtrace' do
-    output = `#{bin_path} -c /no/such/yard-lint.yml . 2>&1`
+  [[], %w[--check-todo], %w[--auto-gen-config]].each do |flags|
+    it "reports a missing -c config file without a backtrace (#{flags.first || 'normal run'})" do
+      Dir.mktmpdir do |dir|
+        output = `#{bin_path} #{flags.join(' ')} -c #{dir}/missing.yml #{dir} 2>&1`
 
-    assert_equal(1, $CHILD_STATUS.exitstatus)
-    refute(backtrace?(output), "missing config dumped a backtrace:\n#{output}")
-    assert_match(%r{/no/such/yard-lint\.yml}, output)
-  end
-
-  it 'reports a missing -c config file under --auto-gen-config without a backtrace' do
-    Dir.mktmpdir do |dir|
-      output = `#{bin_path} --auto-gen-config -c #{dir}/missing.yml #{dir} 2>&1`
-
-      assert_equal(1, $CHILD_STATUS.exitstatus)
-      refute(backtrace?(output), "missing config dumped a backtrace:\n#{output}")
-      assert_includes(output, "Configuration Error: Config file not found: #{dir}/missing.yml")
-      refute_path_exists(File.join(dir, '.yard-lint-todo.yml'))
+        assert_equal(1, $CHILD_STATUS.exitstatus)
+        refute(backtrace?(output), "missing config dumped a backtrace:\n#{output}")
+        assert_match(%r{\AConfiguration Error: Config file not found: #{Regexp.escape(dir)}/missing\.yml\Z}, output)
+        refute_path_exists(File.join(dir, '.yard-lint-todo.yml'))
+      end
     end
   end
 
