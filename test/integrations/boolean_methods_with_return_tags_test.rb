@@ -308,6 +308,125 @@ describe 'Boolean Methods With Return Tags' do
     assert_empty(offenses, "Expected no offenses, got: #{offenses.inspect}")
   end
 
+  it 'return tag line inside example reports' do
+    file = create_test_file('example_return.rb', <<~RUBY)
+      # Example class
+      class Example
+        # Tells if the flag is on
+        # @example Check the flag
+        #   flag.on? #=> true
+        #   @return [Boolean] written inside an example
+        def on?
+          true
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select do |o|
+      o[:name] == 'UndocumentedObject' && o[:message].include?('on?')
+    end
+    assert_equal(1, offenses.size)
+    assert_equal(7, offenses.first[:location_line])
+  end
+
+  it 'return assignment inside example reports' do
+    file = create_test_file('example_assign.rb', <<~RUBY)
+      # Example class
+      class Example
+        # Tells if the flag is set
+        # @example
+        #   @return = true
+        def set?
+          true
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('set?') }
+    assert_equal(1, offenses.size)
+  end
+
+  it 'macro line inside example reports' do
+    file = create_test_file('example_macro.rb', <<~RUBY)
+      # Example class
+      class Example
+        # Tells if the flag is off
+        # @example
+        #   @macro = value
+        def off?
+          false
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('off?') }
+    assert_equal(1, offenses.size)
+  end
+
+  it 'macro without return tag reports where it is defined and used' do
+    file = create_test_file('macro_without_return.rb', <<~RUBY)
+      # Example class
+      class Gate
+        # @!macro [new] gate_flag
+        #   Says something about the gate
+        def open?
+          true
+        end
+
+        # @!macro gate_flag
+        def shut?
+          true
+        end
+
+        # @macro gate_flag
+        def locked?
+          true
+        end
+
+        # @!macro [new] gate_ret
+        #   @return [Boolean] whether ajar
+        def ajar?
+          true
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select { |o| o[:message].include?('Gate#') }
+    reported = offenses.map { |o| o[:message][/Gate#\w+\?/] }.sort
+    assert_equal(%w[Gate#locked? Gate#open? Gate#shut?], reported)
+  end
+
+  it 'return tag inside overload example reports' do
+    file = create_test_file('overload_example.rb', <<~RUBY)
+      # Example class
+      class Example
+        # Checks readiness
+        # @overload ready?(strict)
+        #   @param strict [Boolean] strict mode
+        #   @example
+        #     @return [Boolean] written inside an example
+        def ready?(strict)
+          strict
+        end
+      end
+    RUBY
+
+    result = Yard::Lint.run(path: file, config: config)
+
+    offenses = result.offenses.select do |o|
+      o[:name] == 'UndocumentedObject' && o[:message].include?('ready?')
+    end
+    assert_equal(1, offenses.size)
+  end
+
   it 'karafka examples handles all correctly' do
     file = create_test_file('karafka_examples.rb', <<~RUBY)
       # Karafka module
