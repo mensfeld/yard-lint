@@ -119,6 +119,43 @@ describe 'Exclude patterns relative to the config file directory' do
     refute_includes(result[:output], 'bad.rb')
   end
 
+  describe 'with --auto-gen-config run from a subdirectory' do
+    before do
+      write_config("Tags/Order:\n  Enabled: true\n")
+      FileUtils.mkdir_p(File.join(lib_dir, 'sub'))
+      File.write(File.join(lib_dir, 'sub', 'bad2.rb'), "module Sub\n  def self.y(b)\n    b\n  end\nend\n")
+      @generate_result = run_yard_lint('--auto-gen-config', '.', dir: lib_dir)
+    end
+
+    it 'writes the todo file next to the loaded config and links it there' do
+      assert_equal(0, @generate_result[:exit_code], @generate_result[:output])
+      refute_path_exists(File.join(lib_dir, '.yard-lint-todo.yml'))
+      refute_path_exists(File.join(lib_dir, '.yard-lint.yml'))
+
+      todo = File.read(File.join(project_dir, '.yard-lint-todo.yml'))
+
+      assert_includes(todo, "'lib/gen/bad.rb'")
+      assert_includes(todo, "'lib/sub/bad2.rb'")
+      assert_includes(File.read(File.join(project_dir, '.yard-lint.yml')), '.yard-lint-todo.yml')
+    end
+
+    it 'applies the baseline from the subdirectory and from the project root' do
+      [lib_dir, project_dir].each do |dir|
+        result = run_yard_lint('.', dir: dir)
+
+        assert_equal(0, result[:exit_code], result[:output])
+        refute_includes(result[:output], 'bad')
+      end
+    end
+
+    it 'finds the todo file with --check-todo from the subdirectory' do
+      result = run_yard_lint('--check-todo', '.', dir: lib_dir)
+
+      assert_equal(0, result[:exit_code], result[:output])
+      assert_includes(result[:output], 'No unused entries found')
+    end
+  end
+
   describe 'in diff mode' do
     before do
       write_config("AllValidators:\n  Exclude:\n    - 'lib/gen/**/*'\n")
