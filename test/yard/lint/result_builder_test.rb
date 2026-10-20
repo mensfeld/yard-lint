@@ -76,6 +76,41 @@ describe 'Yard::Lint::ResultBuilder' do
     assert_nil(result)
   end
 
+  it 'build with composite child validator returns nil when its parent is disabled in config' do
+    config = Yard::Lint::Config.new(
+      'Documentation/UndocumentedObjects' => { 'Enabled' => false }
+    )
+    raw_results = {
+      undocumented_boolean_methods: {
+        stdout: 'file.rb:30: MyClass#valid?',
+        stderr: '',
+        exit_code: 0
+      }
+    }
+
+    result = Yard::Lint::ResultBuilder.new(config)
+                                      .build('Documentation/UndocumentedBooleanMethods', raw_results)
+
+    assert_nil(result)
+  end
+
+  it 'build with composite child validator reports on its own when only it is selected' do
+    @config.only_validators = ['Documentation/UndocumentedBooleanMethods']
+    raw_results = {
+      undocumented_boolean_methods: {
+        stdout: 'file.rb:30: MyClass#valid?',
+        stderr: '',
+        exit_code: 0
+      }
+    }
+
+    result = @builder.build('Documentation/UndocumentedBooleanMethods', raw_results)
+
+    refute_nil(result)
+    assert_equal(1, result.offenses.size)
+    assert_equal('Documentation/UndocumentedBooleanMethods', result.offenses.first[:validator])
+  end
+
   it 'build with warnings unknowntag discovers and uses parser' do
     validator_name = 'Warnings/UnknownTag'
     raw_results = {

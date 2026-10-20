@@ -22,8 +22,7 @@ module Yard
         validator_cfg = ConfigLoader.validator_config(validator_name)
         return nil unless validator_module && validator_cfg
 
-        # Skip if this validator is a child of a composite
-        return nil if composite_child?(validator_name)
+        return nil if reported_by_composite?(validator_name)
 
         # Handle composite validators (those that combine multiple validators)
         unless validator_cfg.combines_with.empty?
@@ -36,15 +35,17 @@ module Yard
 
       private
 
-      # Check if a validator is a child of a composite validator
+      # Check if a composite parent reports this validator's offenses
+      # A child reports on its own only when --only selects it without its parent
       # @param validator_name [String] validator name to check
-      # @return [Boolean] true if this is a composite child
-      def composite_child?(validator_name)
+      # @return [Boolean] true if a composite parent reports it
+      def reported_by_composite?(validator_name)
         ConfigLoader::ALL_VALIDATORS.any? do |parent_name|
           parent_cfg = ConfigLoader.validator_config(parent_name)
           next unless parent_cfg
+          next unless parent_cfg.combines_with.include?(validator_name)
 
-          parent_cfg.combines_with.include?(validator_name)
+          config.only_validators.empty? || config.only_validators.include?(parent_name)
         end
       end
 
