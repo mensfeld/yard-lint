@@ -14,6 +14,9 @@ module Yard
         inherit_gem
       ].freeze
 
+      # Keys that are valid in a category-level configuration
+      CATEGORY_KEYS = %w[Enabled Exclude Severity].freeze
+
       # Valid boolean values
       BOOLEAN_VALUES = [true, false].freeze
 
@@ -49,12 +52,17 @@ module Yard
       private
 
       # Validate category-level configuration (e.g. `Documentation: { Severity: ... }`).
-      # Only the values of the Severity and Exclude keys are checked; categories
-      # otherwise remain permissive, so existing configs are unaffected.
+      # Checks the values of Enabled, Severity and Exclude and rejects any other key.
       def validate_category_configs!
         @raw_config.each do |key, value|
           next unless VALID_CATEGORIES.include?(key)
           next unless value.is_a?(Hash)
+
+          enabled = value['Enabled']
+          if enabled && !BOOLEAN_VALUES.include?(enabled)
+            @errors << "Invalid Enabled value for category #{key}: '#{enabled}'"
+            @errors << '  Must be true or false'
+          end
 
           exclude = value['Exclude']
           if exclude && !exclude.is_a?(Array)
@@ -62,11 +70,29 @@ module Yard
           end
 
           severity = value['Severity']
-          next unless severity && !Config::VALID_SEVERITIES.include?(severity.to_s)
+          if severity && !Config::VALID_SEVERITIES.include?(severity.to_s)
+            @errors << "Invalid Severity for category #{key}: '#{severity}'"
+            @errors << "  Valid values: #{Config::VALID_SEVERITIES.join(', ')}"
+            suggest_similar_severity(severity.to_s)
+          end
 
-          @errors << "Invalid Severity for category #{key}: '#{severity}'"
-          @errors << "  Valid values: #{Config::VALID_SEVERITIES.join(', ')}"
-          suggest_similar_severity(severity.to_s)
+          validate_category_keys!(key, value)
+        end
+      end
+
+      # Reject unknown keys in a category configuration
+      # @param category [String] category name
+      # @param config [Hash] category configuration hash
+      # @return [void]
+      def validate_category_keys!(category, config)
+        config.each_key do |key|
+          next if CATEGORY_KEYS.include?(key)
+
+          @errors << "Unknown configuration key for category #{category}: '#{key}'"
+          @errors << "  Valid keys: #{CATEGORY_KEYS.join(', ')}"
+
+          suggestions = DidYouMean::SpellChecker.new(dictionary: CATEGORY_KEYS).correct(key.to_s)
+          @errors << "  Did you mean: #{suggestions.first}?" if suggestions.any?
         end
       end
 

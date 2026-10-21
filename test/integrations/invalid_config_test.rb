@@ -116,6 +116,40 @@ describe 'Invalid Config' do
     end
   end
 
+  it 'with a non boolean category enabled value fails with clear error message' do
+    run_in_tmpdir do
+      bin_path = File.expand_path('../../bin/yard-lint', __dir__)
+      File.write('.yard-lint.yml', <<~YAML)
+        Documentation:
+          Enabled: "false"
+      YAML
+
+      output, status = Open3.capture2e(bin_path, 'test.rb')
+
+      assert_equal(1, status.exitstatus)
+      assert_includes(output, 'Configuration Error')
+      assert_includes(output, "Invalid Enabled value for category Documentation: 'false'")
+      assert_includes(output, 'Must be true or false')
+    end
+  end
+
+  it 'with an unknown category key fails with did you mean suggestion' do
+    run_in_tmpdir do
+      bin_path = File.expand_path('../../bin/yard-lint', __dir__)
+      File.write('.yard-lint.yml', <<~YAML)
+        Documentation:
+          Enabeld: false
+      YAML
+
+      output, status = Open3.capture2e(bin_path, 'test.rb')
+
+      assert_equal(1, status.exitstatus)
+      assert_includes(output, 'Configuration Error')
+      assert_includes(output, "Unknown configuration key for category Documentation: 'Enabeld'")
+      assert_includes(output, 'Did you mean: Enabled?')
+    end
+  end
+
   it 'with valid configuration runs successfully' do
     run_in_tmpdir do
       bin_path = File.expand_path('../../bin/yard-lint', __dir__)
