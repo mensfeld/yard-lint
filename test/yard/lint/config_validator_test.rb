@@ -281,6 +281,16 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_includes(error.message, 'Must be true or false')
   end
 
+  it 'validate with category config raises error for an empty category Enabled value' do
+    config = { 'Documentation' => { 'Enabled' => nil } }
+
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::ConfigValidator.validate!(config)
+    end
+    assert_includes(error.message, "Invalid Enabled value for category Documentation: ''")
+    assert_includes(error.message, 'Must be true or false')
+  end
+
   it 'validate with category config raises error for an unknown category key with a suggestion' do
     config = { 'Documentation' => { 'Enabeld' => false } }
 

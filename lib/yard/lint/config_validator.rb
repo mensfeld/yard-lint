@@ -59,7 +59,7 @@ module Yard
           next unless value.is_a?(Hash)
 
           enabled = value['Enabled']
-          if enabled && !BOOLEAN_VALUES.include?(enabled)
+          if value.key?('Enabled') && !BOOLEAN_VALUES.include?(enabled)
             @errors << "Invalid Enabled value for category #{key}: '#{enabled}'"
             @errors << '  Must be true or false'
           end
