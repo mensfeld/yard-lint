@@ -261,7 +261,7 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_includes(error.message, 'Invalid YardOptions for Documentation/UndocumentedObjects: must be an array')
   end
 
-  it 'validate with category config raises error for a string category Enabled value' do
+  it 'validate with category config raises error for string category enabled value' do
     config = { 'Documentation' => { 'Enabled' => 'false' } }
 
     error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
@@ -271,7 +271,7 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_includes(error.message, 'Must be true or false')
   end
 
-  it 'validate with category config raises error for a numeric category Enabled value' do
+  it 'validate with category config raises error for numeric category enabled value' do
     config = { 'Tags' => { 'Enabled' => 1 } }
 
     error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
@@ -281,7 +281,7 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_includes(error.message, 'Must be true or false')
   end
 
-  it 'validate with category config raises error for an empty category Enabled value' do
+  it 'validate with category config raises error for empty category enabled value' do
     config = { 'Documentation' => { 'Enabled' => nil } }
 
     error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
@@ -291,7 +291,7 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_includes(error.message, 'Must be true or false')
   end
 
-  it 'validate with category config raises error for an unknown category key with a suggestion' do
+  it 'validate with category config raises error for unknown category key with suggestion' do
     config = { 'Documentation' => { 'Enabeld' => false } }
 
     error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
@@ -302,7 +302,7 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_includes(error.message, 'Did you mean: Enabled?')
   end
 
-  it 'validate with category config accepts Enabled, Severity and Exclude' do
+  it 'validate with category config accepts enabled severity and exclude' do
     config = {
       'Documentation' => { 'Enabled' => false, 'Severity' => 'warning', 'Exclude' => ['lib/gen/**/*'] },
       'Tags' => { 'Enabled' => true }

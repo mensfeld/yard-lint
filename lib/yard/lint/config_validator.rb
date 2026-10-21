@@ -90,9 +90,7 @@ module Yard
 
           @errors << "Unknown configuration key for category #{category}: '#{key}'"
           @errors << "  Valid keys: #{CATEGORY_KEYS.join(', ')}"
-
-          suggestions = DidYouMean::SpellChecker.new(dictionary: CATEGORY_KEYS).correct(key.to_s)
-          @errors << "  Did you mean: #{suggestions.first}?" if suggestions.any?
+          suggest_category_key(key.to_s)
         end
       end
 
@@ -260,6 +258,18 @@ module Yard
       def suggest_similar_severity(invalid_severity)
         checker = DidYouMean::SpellChecker.new(dictionary: Config::VALID_SEVERITIES)
         suggestions = checker.correct(invalid_severity)
+
+        if suggestions.any?
+          @errors << "  Did you mean: #{suggestions.first}?"
+        end
+      end
+
+      # Suggest similar category configuration keys
+      # @param invalid_key [String] invalid category key
+      # @return [void]
+      def suggest_category_key(invalid_key)
+        checker = DidYouMean::SpellChecker.new(dictionary: CATEGORY_KEYS)
+        suggestions = checker.correct(invalid_key)
 
         if suggestions.any?
           @errors << "  Did you mean: #{suggestions.first}?"
