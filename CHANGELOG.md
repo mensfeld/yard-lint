@@ -19,6 +19,7 @@
 - **[Bugfix]** `Documentation/UndocumentedOptions` now counts `@option` tags written inside `@overload` blocks instead of reporting the method as having none.
 - **[Bugfix]** `Tags/TagSeparator` and `Tags/TagGroupSeparator` no longer crash (`ProxyMethodError` or `NoMethodError`) on a singleton method defined on a constant (`def CONST.name`).
 - **[Bugfix]** Category-level `Exclude` (e.g. on `Documentation`) was ignored; it now skips those files for all validators in the category, combined with a per-validator `Exclude` rather than replaced by it.
+- **[Maintenance]** Configuration validation now runs on contracts (`Yard::Lint::Contracts`) built on a copy of karafka-core's `Contractable`. Error messages are unchanged.
 
 ## 1.12.0 (2026-09-23)
 - **[Feature]** Added `--explain VALIDATOR`, which prints a validator's description, default severity, configuration options, and examples in the terminal (sourced from its own YARD docs). Unknown names suggest close matches, like `--only`.
