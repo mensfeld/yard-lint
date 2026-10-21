@@ -11,6 +11,20 @@ module Yard
         # @return [String] category name
         attr_reader :name
 
+        class << self
+          private
+
+          # Suggest similar category configuration keys
+          # @param invalid_key [String] invalid category key
+          # @return [String, nil] suggestion line or nil when there is no similar key
+          def suggest_category_key(invalid_key)
+            checker = DidYouMean::SpellChecker.new(dictionary: KEYS)
+            suggestions = checker.correct(invalid_key)
+
+            "  Did you mean: #{suggestions.first}?" if suggestions.any?
+          end
+        end
+
         # @param name [String] category name used in error messages
         def initialize(name)
           super()
@@ -31,10 +45,10 @@ module Yard
         end
 
         optional('Severity') do |severity, _data, _errors, contract|
-          !severity || Config::VALID_SEVERITIES.include?(severity.to_s) ||
+          !severity || Lint::Config::VALID_SEVERITIES.include?(severity.to_s) ||
             message(
               "Invalid Severity for category #{contract.name}: '#{severity}'",
-              "  Valid values: #{Config::VALID_SEVERITIES.join(', ')}",
+              "  Valid values: #{Lint::Config::VALID_SEVERITIES.join(', ')}",
               suggest_similar_severity(severity.to_s)
             )
         end

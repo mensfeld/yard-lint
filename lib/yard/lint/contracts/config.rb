@@ -4,7 +4,7 @@ module Yard
   module Lint
     module Contracts
       # Validates the whole configuration: root keys, AllValidators, categories and validators
-      class Root < Base
+      class Config < Base
         # Valid category names (from ConfigUpdater::CATEGORY_ORDER)
         VALID_CATEGORIES = %w[Documentation Tags Warnings Semantic].freeze
 
@@ -35,8 +35,8 @@ module Yard
         # This allows users to put custom data in AllValidators
         nested('AllValidators') do
           optional('FailOnSeverity') do |fail_on|
-            !fail_on || Config::VALID_SEVERITIES.include?(fail_on.to_s) ||
-              message("Invalid FailOnSeverity: '#{fail_on}'", "  Valid values: #{Config::VALID_SEVERITIES.join(', ')}")
+            !fail_on || Lint::Config::VALID_SEVERITIES.include?(fail_on.to_s) ||
+              message("Invalid FailOnSeverity: '#{fail_on}'", "  Valid values: #{Lint::Config::VALID_SEVERITIES.join(', ')}")
           end
 
           optional('MinCoverage') do |min_cov|

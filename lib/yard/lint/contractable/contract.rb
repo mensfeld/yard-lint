@@ -28,8 +28,6 @@ module Yard
           # @return [Array<Rule>] all the validation rules defined for a given contract
           attr_reader :rules
 
-          # @return [Hash{String => String}] error messages for error keys that rules return
-          #   instead of custom message Strings
           attr_writer :error_messages
 
           # @return [Hash{String => String}] error messages for error keys that rules return

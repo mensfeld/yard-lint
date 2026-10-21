@@ -45,18 +45,8 @@ module Yard
           # @param invalid_severity [String] invalid severity value
           # @return [String, nil] suggestion line or nil when there is no similar value
           def suggest_similar_severity(invalid_severity)
-            checker = DidYouMean::SpellChecker.new(dictionary: Config::VALID_SEVERITIES)
+            checker = DidYouMean::SpellChecker.new(dictionary: Lint::Config::VALID_SEVERITIES)
             suggestions = checker.correct(invalid_severity)
-
-            "  Did you mean: #{suggestions.first}?" if suggestions.any?
-          end
-
-          # Suggest similar category configuration keys
-          # @param invalid_key [String] invalid category key
-          # @return [String, nil] suggestion line or nil when there is no similar key
-          def suggest_category_key(invalid_key)
-            checker = DidYouMean::SpellChecker.new(dictionary: Category::KEYS)
-            suggestions = checker.correct(invalid_key)
 
             "  Did you mean: #{suggestions.first}?" if suggestions.any?
           end

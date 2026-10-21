@@ -29,10 +29,10 @@ module Yard
         end
 
         optional('Severity') do |severity, _data, _errors, contract|
-          !severity || Config::VALID_SEVERITIES.include?(severity.to_s) ||
+          !severity || Lint::Config::VALID_SEVERITIES.include?(severity.to_s) ||
             message(
               "Invalid Severity for #{contract.name}: '#{severity}'",
-              "  Valid values: #{Config::VALID_SEVERITIES.join(', ')}",
+              "  Valid values: #{Lint::Config::VALID_SEVERITIES.join(', ')}",
               suggest_similar_severity(severity.to_s)
             )
         end
@@ -54,7 +54,7 @@ module Yard
           validator_config_class = ConfigLoader.validator_config(contract.name)
           next unless validator_config_class
 
-          valid_keys = (validator_config_class.defaults.keys + Config::METADATA_KEYS + BASE_KEYS).uniq.sort
+          valid_keys = (validator_config_class.defaults.keys + Lint::Config::METADATA_KEYS + BASE_KEYS).uniq.sort
 
           (data.keys - valid_keys).map do |key|
             [

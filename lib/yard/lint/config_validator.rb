@@ -22,7 +22,7 @@ module Yard
       # @return [void]
       # @raise [Errors::InvalidConfigError] if configuration is invalid
       def validate!
-        result = Contracts::Root.new.call(@raw_config)
+        result = Contracts::Config.new.call(@raw_config)
 
         return if result.success?
 
