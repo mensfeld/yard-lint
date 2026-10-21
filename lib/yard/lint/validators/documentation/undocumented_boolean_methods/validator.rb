@@ -35,11 +35,18 @@ module Yard
               # Only check boolean methods (ending with ?)
               return unless object.name.to_s.end_with?('?')
 
+              # A module_function pair is reported once, on its public class method
+              twin = module_function_twin(object)
+              return if twin && object.scope == :instance
+
+              # The copied half's raw text includes YARD's inferred `@return`
+              docstring = module_function_copy?(object) ? twin.docstring : object.docstring
+
               # Undocumented methods are reported by UndocumentedObjects
-              return if object.docstring.all.empty?
+              return if docstring.all.empty?
               # YARD adds `@return [Boolean]` to every `?` method without one, so the
               # tags cannot tell; read the raw docstring instead
-              return if user_return?(object.docstring.all)
+              return if user_return?(docstring.all)
 
               collector.puts "#{object.file}:#{object.line}: #{object.title}"
             end

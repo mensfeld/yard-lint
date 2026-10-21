@@ -461,6 +461,81 @@ describe 'Boolean Methods With Return Tags' do
     assert_equal(1, offenses.size)
   end
 
+  [[], ['--private']].each do |yard_options|
+    describe "module_function methods with YardOptions #{yard_options.inspect}" do
+      before do
+        config.options = yard_options
+      end
+
+      it 'reports each form once on the module function at its line' do
+        file = create_test_file('health.rb', <<~RUBY)
+          # Module with module functions
+          module Health
+            # Tells if ready
+            def ready?
+              true
+            end
+            module_function :ready?
+
+            # Tells if alive
+            module_function def alive?
+              true
+            end
+
+            module_function
+
+            # Tells if healthy
+            def healthy?
+              true
+            end
+          end
+        RUBY
+
+        result = Yard::Lint.run(path: file, config: config)
+
+        offenses = result.offenses
+          .select { |o| o[:name].to_s == 'UndocumentedObject' }
+          .map { |o| [o[:location_line], o[:message][/`([^`]+)`/, 1]] }
+        assert_equal(
+          [[4, 'Health.ready?'], [10, 'Health.alive?'], [17, 'Health.healthy?']],
+          offenses.sort
+        )
+      end
+
+      it 'does not report forms with a return tag' do
+        file = create_test_file('health_documented.rb', <<~RUBY)
+          # Module with module functions
+          module Health
+            # Tells if ready
+            # @return [Boolean]
+            def ready?
+              true
+            end
+            module_function :ready?
+
+            # Tells if alive
+            # @return [Boolean]
+            module_function def alive?
+              true
+            end
+
+            module_function
+
+            # Tells if healthy
+            # @return [Boolean]
+            def healthy?
+              true
+            end
+          end
+        RUBY
+
+        result = Yard::Lint.run(path: file, config: config)
+
+        assert_empty(result.offenses.select { |o| o[:name].to_s == 'UndocumentedObject' })
+      end
+    end
+  end
+
   it 'karafka examples handles all correctly' do
     file = create_test_file('karafka_examples.rb', <<~RUBY)
       # Karafka module
