@@ -260,5 +260,54 @@ describe 'Yard::Lint::ConfigValidator' do
     end
     assert_includes(error.message, 'Invalid YardOptions for Documentation/UndocumentedObjects: must be an array')
   end
-end
 
+  it 'validate with category config raises error for string category enabled value' do
+    config = { 'Documentation' => { 'Enabled' => 'false' } }
+
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::ConfigValidator.validate!(config)
+    end
+    assert_includes(error.message, "Invalid Enabled value for category Documentation: 'false'")
+    assert_includes(error.message, 'Must be true or false')
+  end
+
+  it 'validate with category config raises error for numeric category enabled value' do
+    config = { 'Tags' => { 'Enabled' => 1 } }
+
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::ConfigValidator.validate!(config)
+    end
+    assert_includes(error.message, "Invalid Enabled value for category Tags: '1'")
+    assert_includes(error.message, 'Must be true or false')
+  end
+
+  it 'validate with category config raises error for empty category enabled value' do
+    config = { 'Documentation' => { 'Enabled' => nil } }
+
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::ConfigValidator.validate!(config)
+    end
+    assert_includes(error.message, "Invalid Enabled value for category Documentation: ''")
+    assert_includes(error.message, 'Must be true or false')
+  end
+
+  it 'validate with category config raises error for unknown category key with suggestion' do
+    config = { 'Documentation' => { 'Enabeld' => false } }
+
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::ConfigValidator.validate!(config)
+    end
+    assert_includes(error.message, "Unknown configuration key for category Documentation: 'Enabeld'")
+    assert_includes(error.message, 'Valid keys: Enabled, Exclude, Severity')
+    assert_includes(error.message, 'Did you mean: Enabled?')
+  end
+
+  it 'validate with category config accepts enabled severity and exclude' do
+    config = {
+      'Documentation' => { 'Enabled' => false, 'Severity' => 'warning', 'Exclude' => ['lib/gen/**/*'] },
+      'Tags' => { 'Enabled' => true }
+    }
+
+    Yard::Lint::ConfigValidator.validate!(config)
+  end
+end

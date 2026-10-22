@@ -373,6 +373,8 @@ Documentation:
     - 'lib/generated/**/*'
 ```
 
+A category accepts only the keys `Enabled` (`true` or `false`), `Severity` and `Exclude`; an unknown key or a non-boolean `Enabled` fails configuration validation.
+
 `Exclude` patterns at every level are relative to the directory of the loaded `.yard-lint.yml` (or the current directory without one), whatever PATH or directory you run yard-lint from. A file outside that directory is matched as `../...` (with `--config config/yard-lint.yml`, write `../lib/generated/**/*`); absolute patterns also work.
 
 **Learn more:** [Complete Configuration Guide](https://github.com/mensfeld/yard-lint/wiki/Configuration)
