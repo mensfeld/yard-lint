@@ -25,10 +25,9 @@ describe 'Yard::Lint::Validators::Tags::ForbiddenTags::Result' do
       .with(offense)
       .returns('formatted message')
 
-    result = Yard::Lint::Validators::Tags::ForbiddenTags::Result.new([])
-    message = result.send(:build_message, offense)
+    result = Yard::Lint::Validators::Tags::ForbiddenTags::Result.new([offense])
 
-    assert_equal('formatted message', message)
+    assert_equal('formatted message', result.offenses.first[:message])
   end
 
   it 'inheritance inherits from results base' do

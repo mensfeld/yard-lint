@@ -14,7 +14,7 @@ describe 'Yard::Lint::Validators::Documentation::MissingReturn::Result' do
   end
 
   it 'initialize stores config' do
-    assert_equal(config, result.instance_variable_get(:@config))
+    assert_equal(config, result.config)
   end
 
   it 'offenses returns an array' do

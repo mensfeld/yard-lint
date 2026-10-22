@@ -153,7 +153,7 @@ describe 'Yard::Lint::Results::Base' do
     end
 
     result = named_class.new([{}], nil)
-    assert_equal('MyCustom', result.send(:computed_offense_name))
+    assert_equal('MyCustom', result.offenses.first[:name])
   end
 
   it 'validator name extracts validator name from class path' do
