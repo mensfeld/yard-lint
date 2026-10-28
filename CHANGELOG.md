@@ -1,3 +1,6 @@
+## Unreleased
+- **[Bugfix]** `Documentation/UndocumentedBooleanMethods` no longer slows down with the square of the number of methods in a class or module (a module with 4200 methods: about 3 s to 40 ms). The `module_function` twin lookup it shares with the separator, `Tags/OverloadConsistency` and `Documentation/ReferenceTypo` validators now reads the registry by path instead of scanning the namespace's children.
+
 ## 1.13.0 (2026-10-25)
 - **[Feature]** Added `Tags/OverloadConsistency` (enabled by default, severity `warning`), which checks the tags of each `@overload` against that overload's own signature: a `@param` not in the signature, a parameter without `@param` in an overload that documents others (a method-level `@param` counts for every overload), and an overload without `@return` when other overloads have one.
 - **[Feature]** Added `Documentation/ReferenceTypo` (enabled by default, severity `warning`), which flags probable typos in `{Foo#bar}` links and `@see` targets and suggests the closest name via `DidYouMean`.

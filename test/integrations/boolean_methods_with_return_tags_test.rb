@@ -533,6 +533,59 @@ describe 'Boolean Methods With Return Tags' do
 
         assert_empty(result.offenses.select { |o| o[:name].to_s == 'UndocumentedObject' })
       end
+
+      it 'pairs only the halves module_function made, nested or at the root' do
+        file = create_test_file('pairs.rb', <<~RUBY)
+          # Outer module
+          module Outer
+            # Inner module
+            module Inner
+              # Tells if ready
+              def ready?
+                true
+              end
+              module_function :ready?
+
+              # Tells if alive
+              def alive?
+                true
+              end
+
+              # Tells if alive
+              def self.alive?
+                true
+              end
+
+              # Tells if solo
+              def solo?
+                true
+              end
+            end
+          end
+
+          # Tells if top
+          def top?
+            true
+          end
+          module_function :top?
+        RUBY
+
+        result = Yard::Lint.run(path: file, config: config)
+
+        offenses = result.offenses
+          .select { |o| o[:name].to_s == 'UndocumentedObject' }
+          .map { |o| [o[:location_line], o[:message][/`([^`]+)`/, 1]] }
+        assert_equal(
+          [
+            [6, 'Outer::Inner.ready?'],
+            [12, 'Outer::Inner#alive?'],
+            [17, 'Outer::Inner.alive?'],
+            [22, 'Outer::Inner#solo?'],
+            [29, '::top?']
+          ],
+          offenses.sort
+        )
+      end
     end
   end
 

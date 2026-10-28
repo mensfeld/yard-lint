@@ -137,9 +137,8 @@ module Yard
         # @return [Boolean] true if the object's docstring is a normalized copy
         def module_function_copy?(object)
           return false unless object.type == :method
-          # Checked before the twin lookup, which scans the namespace's children:
-          # an object YARD tracked back to source lines is authored, whatever it
-          # is paired with, and most objects are
+          # Checked before the twin lookup: an object YARD tracked back to source
+          # lines is authored, whatever it is paired with, and most objects are
           return false if object.docstring.line_range
 
           twin = module_function_twin(object)
@@ -155,22 +154,38 @@ module Yard
         #   when the object does not come from module_function
         def module_function_twin(object)
           return nil unless object.respond_to?(:scope)
-          # `def CONST.name` leaves a Proxy or ConstantObject namespace with no
-          # children; Proxy#is_a? answers for the resolved object
+          # Only a module defines module functions; `def CONST.name` leaves a Proxy
+          # or ConstantObject namespace. Proxy#is_a? answers for the resolved object
           return nil unless object.namespace.is_a?(YARD::CodeObjects::NamespaceObject)
 
-          twin = object.namespace.child(
-            name: object.name,
-            scope: (object.scope == :class) ? :instance : :class
-          )
+          # Looked up by path: a children scan per object is quadratic in the
+          # number of methods of a namespace
+          twin = YARD::Registry.at(module_function_twin_path(object))
 
-          return nil unless twin
+          return nil unless twin.is_a?(YARD::CodeObjects::MethodObject)
           return nil unless twin.file == object.file && twin.line == object.line
           # Both halves point at the same definition, but only the class method
           # is flagged as a module function by YARD.
           return nil unless [object, twin].any? { |o| o.respond_to?(:module_function?) && o.module_function? }
 
           twin
+        end
+
+        # Builds the registry path of the method with the same name and the other
+        # scope, the way YARD::CodeObjects::MethodObject#path does
+        # @param object [YARD::CodeObjects::MethodObject] one half of the pair
+        # @return [String] the registry path of the other half
+        def module_function_twin_path(object)
+          namespace = object.namespace
+
+          separator =
+            if object.scope == :instance
+              namespace.root? ? YARD::CodeObjects::NSEP : YARD::CodeObjects::CSEP
+            else
+              YARD::CodeObjects::ISEP
+            end
+
+          "#{namespace.path}#{separator}#{object.name}"
         end
 
         # Converts a zero-based line offset within a docstring's text into an
