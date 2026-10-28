@@ -154,8 +154,8 @@ module Yard
         #   when the object does not come from module_function
         def module_function_twin(object)
           return nil unless object.respond_to?(:scope)
-          # `def CONST.name` leaves a Proxy or ConstantObject namespace with no
-          # children; Proxy#is_a? answers for the resolved object
+          # Only a module defines module functions; `def CONST.name` leaves a Proxy
+          # or ConstantObject namespace. Proxy#is_a? answers for the resolved object
           return nil unless object.namespace.is_a?(YARD::CodeObjects::NamespaceObject)
 
           # Looked up by path: a children scan per object is quadratic in the
@@ -185,7 +185,7 @@ module Yard
               YARD::CodeObjects::ISEP
             end
 
-          namespace.root? ? "#{separator}#{object.name}" : "#{namespace.path}#{separator}#{object.name}"
+          "#{namespace.path}#{separator}#{object.name}"
         end
 
         # Converts a zero-based line offset within a docstring's text into an
