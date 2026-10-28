@@ -207,13 +207,17 @@ describe 'Yard::Lint::Validators::Tags::TagGroupSeparator::Validator' do
     object.stubs(:module_function?).returns(scope == :class)
     object.stubs(:namespace).returns(namespace)
     object.docstring.stubs(:line_range).returns(line_range)
-    namespace.stubs(:child).returns(twin)
+    namespace.stubs(:root?).returns(false)
+    namespace.stubs(:path).returns('Example')
+    twin_path = (scope == :class) ? 'Example#method_name' : 'Example.method_name'
+    YARD::Registry.stubs(:at).with(twin_path).returns(twin)
 
     object
   end
 
   def mock_module_function_twin(scope:, line_range:)
     twin = stub('twin')
+    twin.stubs(:is_a?).with(YARD::CodeObjects::MethodObject).returns(true)
     twin_docstring = stub('twin_docstring')
 
     twin.stubs(:file).returns('lib/example.rb')

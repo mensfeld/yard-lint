@@ -198,3 +198,55 @@ describe 'YardLintValidatorsBaseCachedLines' do
   end
 end
 
+
+describe 'YardLintValidatorsBaseModuleFunctionTwin' do
+  attr_reader :validator
+
+  before do
+    @validator = Yard::Lint::Validators::Base.new(Yard::Lint::Config.new, ['lib/example.rb'])
+
+    YARD::Registry.clear
+    YARD.parse_string(<<~RUBY)
+      module Outer
+        module Inner
+          def ready?; true; end
+          module_function :ready?
+
+          def alive?; true; end
+
+          def self.alive?; true; end
+        end
+      end
+
+      def top?; true; end
+      module_function :top?
+    RUBY
+  end
+
+  after { YARD::Registry.clear }
+
+  def twin_of(path)
+    validator.send(:module_function_twin, YARD::Registry.at(path))
+  end
+
+  it 'finds each half of a nested module_function pair from the other' do
+    assert_same(YARD::Registry.at('Outer::Inner.ready?'), twin_of('Outer::Inner#ready?'))
+    assert_same(YARD::Registry.at('Outer::Inner#ready?'), twin_of('Outer::Inner.ready?'))
+  end
+
+  it 'finds each half of a root-level module_function pair from the other' do
+    assert_same(YARD::Registry.at('::top?'), twin_of('#top?'))
+    assert_same(YARD::Registry.at('#top?'), twin_of('::top?'))
+  end
+
+  it 'returns nil for a class and an instance method of the same name defined apart' do
+    assert_nil(twin_of('Outer::Inner#alive?'))
+    assert_nil(twin_of('Outer::Inner.alive?'))
+  end
+
+  it 'returns nil for a method that has no twin' do
+    YARD.parse_string("module Lone\n  def solo?; true; end\nend\n")
+
+    assert_nil(twin_of('Lone#solo?'))
+  end
+end
