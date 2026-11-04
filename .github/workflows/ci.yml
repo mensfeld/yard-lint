@@ -24,20 +24,28 @@ jobs:
           - '3.3'
           - '3.4'
           - '4.0'
+          - '4.1.0-preview1'
         exclude:
           # Only test Ruby 3.4 on macOS to limit CI usage
           - os: macos-latest
             ruby: '3.3'
           - os: macos-latest
             ruby: '4.0'
+          - os: macos-latest
+            ruby: '4.1.0-preview1'
 
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ contains(matrix.ruby, 'preview') || contains(matrix.ruby, 'rc') }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - name: Remove Gemfile.lock for Ruby preview versions
+        if: contains(matrix.ruby, 'preview') || contains(matrix.ruby, 'rc')
+        run: rm -f Gemfile.lock
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
