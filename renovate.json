@@ -8,6 +8,11 @@
     "enabled": true,
     "pinDigests": true
   },
+  "bundler": {
+    "managerFilePatterns": [
+      "/(^|/)Gemfile\\.lint$/"
+    ]
+  },
   "includePaths": [
     ".ruby-version",
     "Gemfile",
