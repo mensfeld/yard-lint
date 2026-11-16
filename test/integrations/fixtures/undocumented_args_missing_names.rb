@@ -19,6 +19,10 @@ class UndocumentedArgsMissingNames
   def destructured_multiline((a,
                               b)); end
 
+  def nested_first(((a, b), c), d); end
+
+  def nested_last((a, (b, c)), d); end
+
   def repeated(_, _, x); end
 
   # Combines two values

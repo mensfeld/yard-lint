@@ -76,12 +76,26 @@ module Yard
             end
 
             # YARD names a destructured parameter `(a, b)` as `a, b`, keeping the
-            # source whitespace; put the parentheses back and collapse whitespace
-            # so the message shows it as one parameter.
+            # source whitespace, and drops only the outermost pair, so a nested one
+            # can come back unbalanced (`((a, b), c)` as `a, b), c`). Rebalance,
+            # put the outer pair back and collapse whitespace so the message
+            # shows it as one parameter.
             # @param name [String] normalized parameter name
             # @return [String] name as shown in the message
             def display_name(name)
-              name.include?(',') ? "(#{name.gsub(/\s+/, ' ')})" : name
+              return name unless name.include?(',')
+
+              depth = 0
+              unopened = 0
+              name.each_char do |char|
+                if char == '('
+                  depth += 1
+                elsif char == ')'
+                  depth.zero? ? unopened += 1 : depth -= 1
+                end
+              end
+
+              "(#{'(' * unopened}#{name.gsub(/\s+/, ' ')}#{')' * depth})"
             end
 
             # Escapes ',' (the name separator), tabs and newlines (the line and
