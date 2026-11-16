@@ -23,6 +23,8 @@ class UndocumentedArgsMissingNames
 
   def nested_last((a, (b, c)), d); end
 
+  def nested_inner((a, ((b, c), d)), e); end
+
   def repeated(_, _, x); end
 
   # Combines two values

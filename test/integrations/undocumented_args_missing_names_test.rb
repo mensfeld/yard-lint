@@ -49,6 +49,7 @@ describe 'Documentation/UndocumentedMethodArguments missing argument names' do
   it 'names a nested destructured argument with balanced parentheses' do
     assert_equal('The `nested_first` method has no @param for: ((a, b), c), d', offenses['nested_first'][:message])
     assert_equal('The `nested_last` method has no @param for: (a, (b, c)), d', offenses['nested_last'][:message])
+    assert_equal('The `nested_inner` method has no @param for: (a, ((b, c), d)), e', offenses['nested_inner'][:message])
   end
 
   it 'names a repeated argument once' do
