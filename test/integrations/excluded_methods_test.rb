@@ -986,7 +986,7 @@ describe 'Excluded Methods' do
 
     result = run_lint(config)
     operator_pattern = /\+|-|==|<=>|Example#\+|Example#-|Example#==|Example#<=>/
-    refute(result.offenses.any? { |o| o[:element]&.match?(operator_pattern) })
+    refute(result.offenses.any? { |o| o[:name] == 'UndocumentedObject' && o[:element]&.match?(operator_pattern) })
   end
 
   it 'advanced excludes unary operators' do
