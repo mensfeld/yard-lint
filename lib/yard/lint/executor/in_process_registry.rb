@@ -86,7 +86,8 @@ module Yard
         # Get objects filtered for a specific validator
         # @param visibility [Symbol] visibility filter, either :all or :public
         # @param file_excludes [Array<String>] glob patterns for files to exclude
-        # @param file_selection [Array<String>, nil] specific files to include (nil = all files)
+        # @param file_selection [Array<String>, nil] specific files to include (nil = all files,
+        #   empty = no files)
         # @return [Array<YARD::CodeObjects::Base>]
         def objects_for_validator(visibility:, file_excludes: [], file_selection: nil)
           objects = all_objects
@@ -99,7 +100,7 @@ module Yard
           end
 
           # Filter by file selection (if provided)
-          if file_selection && !file_selection.empty?
+          if file_selection
             expanded_selection = file_selection.to_set { |f| File.expand_path(f) }
             objects = objects.select do |obj|
               obj.file && expanded_selection.include?(File.expand_path(obj.file))
