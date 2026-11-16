@@ -1,3 +1,6 @@
+## 1.14.0 (Unreleased)
+- **[Enhancement]** `Documentation/UndocumentedMethodArguments` now names the arguments that have no `@param` tag (e.g. ``The `undocumented` method has no @param for: a, b``) instead of saying that some arguments are missing. Count-only mode (`CheckParameterNames: false`) keeps the old message. Its offenses now carry the method as their object, so SARIF fingerprints no longer change with the message.
+
 ## 1.13.1 (2026-11-02)
 - **[Bugfix]** `Documentation/UndocumentedBooleanMethods` no longer slows down with the square of the number of methods in a class or module (a module with 4200 methods: about 3 s to 40 ms). The `module_function` twin lookup it shares with the separator, `Tags/OverloadConsistency` and `Documentation/ReferenceTypo` validators now reads the registry by path instead of scanning the namespace's children.
 

@@ -37,27 +37,33 @@ module Yard
               # Documentation/UndocumentedObjects instead of reporting them here too.
               return if config_or_default('SkipFullyUndocumented') && object.docstring.blank?
 
-              return unless arguments_missing_docs?(object, params)
+              missing = missing_param_names(object, params)
+              return unless missing
 
-              collector.puts "#{object.file}:#{object.line}: #{object.title}"
+              # Parameter names never contain `|` or `,`; the title can (`def |`),
+              # so the parser splits on the last `|`.
+              collector.puts "#{object.file}:#{object.line}: #{object.title}|#{missing.join(',')}"
             end
 
             private
 
-            # Decide whether a method's parameters are under-documented.
+            # Find the parameters of a method that have no @param tag.
             # @param object [YARD::CodeObjects::MethodObject] the method to check
             # @param params [Array<Array>] non-splat/block parameters
-            # @return [Boolean] true if documentation is missing
-            def arguments_missing_docs?(object, params)
+            # @return [Array<String>, nil] names of the undocumented parameters
+            #   (empty in count-only mode, which does not know them), or nil when
+            #   documentation is complete
+            def missing_param_names(object, params)
               # Tags nested inside @overload blocks live on the overload's own
               # docstring, so all_typed_tags collects those @param tags too.
               param_tags = all_typed_tags(object.docstring, %w[param])
 
               if config_or_default('CheckParameterNames')
                 documented = param_tags.map { |tag| normalize_param_name(tag.name) }
-                params.any? { |param| !documented.include?(normalize_param_name(param[0])) }
-              else
-                params.size > param_tags.size
+                missing = params.map { |param| normalize_param_name(param[0]) }.uniq - documented
+                missing unless missing.empty?
+              elsif params.size > param_tags.size
+                []
               end
             end
 
