@@ -40,9 +40,7 @@ module Yard
               missing = missing_param_names(object, params)
               return unless missing
 
-              # Parameter names never contain `|` or `,`; the title can (`def |`),
-              # so the parser splits on the last `|`.
-              collector.puts "#{object.file}:#{object.line}: #{object.title}|#{missing.join(',')}"
+              collector.puts "#{object.file}:#{object.line}: #{object.title}\t#{missing.join(',')}"
             end
 
             private

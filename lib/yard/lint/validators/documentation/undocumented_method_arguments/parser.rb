@@ -6,11 +6,13 @@ module Yard
       module Documentation
         module UndocumentedMethodArguments
           # Class used to extract details about methods with undocumented arguments
+          # Tags/Order and the separator validators reuse it for plain location
+          # lines, which carry no tab-separated list of missing parameter names.
           # @example Output format (skip-lint)
-          #   /path/to/file.rb:10: Platform::Analysis::Authors#initialize|name,options
+          #   /path/to/file.rb:10: Platform::Analysis::Authors#initialize\tname,options
           class Parser < Parsers::Base
             # Regex to extract file, line, and object title from yard list output
-            # Format: /path/to/file.rb:10: ClassName#method_name|param1,param2
+            # Format: /path/to/file.rb:10: ClassName#method_name
             LOCATION_REGEX = /^(.+):(\d+):\s+(.+)$/
             # Splits an object title into namespace and method name on the last
             # # or . separator. Top-level methods (#foo) have an empty namespace;
@@ -30,17 +32,18 @@ module Yard
                   # Extract: file path, line number, class name, method name
                   file_path = match_data[1]
                   line_number = match_data[2].to_i
-                  title, _, missing = match_data[3].rpartition('|')
+                  title, separator, missing = match_data[3].partition("\t")
                   class_name, method_name = split_title(title)
 
-                  {
+                  offense = {
                     location: file_path,
                     method_name: method_name,
                     line: line_number,
-                    class_name: class_name,
-                    element: title,
-                    missing_params: missing.split(',')
+                    class_name: class_name
                   }
+                  next offense if separator.empty?
+
+                  offense.merge(element: title, missing_params: missing.split(','))
                 end
             end
 
