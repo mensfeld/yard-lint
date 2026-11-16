@@ -41,37 +41,44 @@ describe 'Composite child Exclude matching every linted file' do
   end
 
   def run_yard_lint(*args, stdin_data: '')
-    stdout, stderr, = Open3.capture3(
+    stdout, stderr, status = Open3.capture3(
       bin_path, '--no-progress', '--min-coverage', '0', *args,
       chdir: project_dir, stdin_data: stdin_data
     )
-    stdout + stderr
+    { output: stdout + stderr, exit_code: status.exitstatus }
   end
 
   it 'reports only the not excluded file on a directory run' do
     write_exclude('lib/q.rb')
-    output = run_yard_lint('lib/')
+    result = run_yard_lint('lib/')
 
-    refute_includes(output, 'Q#supervised?')
-    assert_includes(output, 'R#supervised?')
+    refute_equal(0, result[:exit_code])
+    refute_includes(result[:output], 'Q#supervised?')
+    assert_includes(result[:output], 'R#supervised?')
   end
 
   it 'reports nothing when the only linted file is excluded' do
     write_exclude('lib/q.rb')
+    result = run_yard_lint('lib/q.rb')
 
-    refute_includes(run_yard_lint('lib/q.rb'), 'supervised?')
+    assert_equal(0, result[:exit_code])
+    refute_includes(result[:output], 'supervised?')
   end
 
   it 'reports nothing for an excluded file linted from stdin' do
     write_exclude('lib/q.rb')
     source = File.read(File.join(project_dir, 'lib', 'q.rb'))
+    result = run_yard_lint('--stdin', 'lib/q.rb', stdin_data: source)
 
-    refute_includes(run_yard_lint('--stdin', 'lib/q.rb', stdin_data: source), 'supervised?')
+    assert_equal(0, result[:exit_code])
+    refute_includes(result[:output], 'supervised?')
   end
 
   it 'reports nothing when the pattern excludes every file of a directory run' do
     write_exclude('lib/*.rb')
+    result = run_yard_lint('lib/')
 
-    refute_includes(run_yard_lint('lib/'), 'supervised?')
+    assert_equal(0, result[:exit_code])
+    refute_includes(result[:output], 'supervised?')
   end
 end
