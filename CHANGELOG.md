@@ -1,3 +1,6 @@
+## Unreleased
+- **[Bugfix]** A per-validator `Exclude` that matches every linted file is no longer ignored. The empty file selection was read as "all files", so `Documentation/UndocumentedBooleanMethods` reported excluded files on single-file and `--stdin` runs (editors, `--staged`, `--diff` with one changed file), and on any run whose files its `Exclude` covers fully.
+
 ## 1.13.1 (2026-11-02)
 - **[Bugfix]** `Documentation/UndocumentedBooleanMethods` no longer slows down with the square of the number of methods in a class or module (a module with 4200 methods: about 3 s to 40 ms). The `module_function` twin lookup it shares with the separator, `Tags/OverloadConsistency` and `Documentation/ReferenceTypo` validators now reads the registry by path instead of scanning the namespace's children.
 

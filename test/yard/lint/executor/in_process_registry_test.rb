@@ -140,6 +140,12 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
     assert_includes(paths, 'VirtualFiltered')
   end
 
+  it 'objects for validator returns no objects for an empty file selection' do
+    registry.parse(['/virtual/file.rb'], source: "# Documented\nclass EmptySelection; end\n")
+
+    assert_empty(registry.objects_for_validator(visibility: :public, file_selection: []))
+  end
+
   it 'clear resets parsed state' do
     registry.parse(['/virtual/file.rb'], source: '# Doc\nclass Foo; end')
     assert(registry.parsed?)
