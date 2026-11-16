@@ -144,6 +144,12 @@ rescue OptionParser::ParseError => e
   exit 1
 end
 
+if options[:min_coverage] && !options[:min_coverage].between?(0, 100)
+  warn "Error: Invalid --min-coverage: '#{options[:min_coverage]}'"
+  warn '  Must be a number between 0 and 100'
+  exit 1
+end
+
 # Report one or more unknown validator names with "did you mean" suggestions,
 # the full list of available validators, and a pointer to --explain. Shared by
 # --only and --explain so the two stay consistent.

@@ -1,4 +1,5 @@
 ## Unreleased
+- **[Bugfix]** `--min-coverage` outside 0-100 now stops the run with `Error: Invalid --min-coverage` and exit 1, like `MinCoverage` in `.yard-lint.yml`. Before, a value above 100 always failed and a negative value always passed.
 - **[Bugfix]** A per-validator `Exclude` that matches every linted file is no longer ignored. The empty file selection was read as "all files", so `Documentation/UndocumentedBooleanMethods` reported excluded files on single-file and `--stdin` runs (editors, `--staged`, `--diff` with one changed file), and on any run whose files its `Exclude` covers fully.
 
 ## 1.13.1 (2026-11-02)
