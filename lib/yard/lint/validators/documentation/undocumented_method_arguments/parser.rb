@@ -32,7 +32,8 @@ module Yard
                   # Extract: file path, line number, class name, method name
                   file_path = match_data[1]
                   line_number = match_data[2].to_i
-                  title, separator, missing = match_data[3].partition("\t")
+                  title = match_data[3]
+                  title, _, missing = title.partition("\t") if title.include?("\t")
                   class_name, method_name = split_title(title)
 
                   offense = {
@@ -41,9 +42,11 @@ module Yard
                     line: line_number,
                     class_name: class_name
                   }
-                  next offense if separator.empty?
+                  next offense unless missing
 
-                  offense.merge(element: title, missing_params: missing.split(','))
+                  offense[:element] = title
+                  offense[:missing_params] = missing.split(',')
+                  offense
                 end
             end
 
