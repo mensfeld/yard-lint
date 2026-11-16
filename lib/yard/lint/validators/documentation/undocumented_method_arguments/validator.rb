@@ -40,7 +40,8 @@ module Yard
               missing = missing_param_names(object, params)
               return unless missing
 
-              collector.puts "#{object.file}:#{object.line}: #{object.title}\t#{missing.join(',')}"
+              names = missing.map! { |name| escape_field(display_name(name)) }.join(',')
+              collector.puts "#{object.file}:#{object.line}: #{object.title}\t#{names}"
             end
 
             private
@@ -72,6 +73,25 @@ module Yard
             # @return [String] the normalized name
             def normalize_param_name(name)
               name.to_s.sub(/:\z/, '')
+            end
+
+            # YARD names a destructured parameter `(a, b)` as `a, b`, keeping the
+            # source whitespace; put the parentheses back and collapse whitespace
+            # so the message shows it as one parameter.
+            # @param name [String] normalized parameter name
+            # @return [String] name as shown in the message
+            def display_name(name)
+              name.include?(',') ? "(#{name.gsub(/\s+/, ' ')})" : name
+            end
+
+            # Escapes ',' (the name separator), tabs and newlines (the line and
+            # field separators) and '%' (the escape character)
+            # @param text [String] raw field text
+            # @return [String] escaped field text
+            def escape_field(text)
+              return text unless text.match?(/[%,\t\n]/)
+
+              text.gsub(/[%,\t\n]/, '%' => '%25', ',' => '%2C', "\t" => '%09', "\n" => '%0A')
             end
           end
         end

@@ -8,6 +8,7 @@ module Yard
           # Class used to extract details about methods with undocumented arguments
           # Tags/Order and the separator validators reuse it for plain location
           # lines, which carry no tab-separated list of missing parameter names.
+          # Names in that list are escaped as %25, %2C, %09 and %0A.
           # @example Output format (skip-lint)
           #   /path/to/file.rb:10: Platform::Analysis::Authors#initialize\tname,options
           class Parser < Parsers::Base
@@ -45,12 +46,21 @@ module Yard
                   next offense unless missing
 
                   offense[:element] = title
-                  offense[:missing_params] = missing.split(',')
+                  offense[:missing_params] = missing.split(',').map! { |name| unescape_field(name) }
                   offense
                 end
             end
 
             private
+
+            # Reverses the validator's escaping of '%', ',', tabs and newlines
+            # @param text [String] escaped field text
+            # @return [String] original text
+            def unescape_field(text)
+              return text unless text.include?('%')
+
+              text.gsub(/%(?:25|2C|09|0A)/, '%25' => '%', '%2C' => ',', '%09' => "\t", '%0A' => "\n")
+            end
 
             # Splits a YARD object title into namespace and method name parts
             # @param title [String] object title (e.g. "Foo#bar", "#bar", "CONST")

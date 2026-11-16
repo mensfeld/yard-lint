@@ -61,6 +61,12 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedMethodArguments::Pa
     assert_equal(%w[other], result.first[:missing_params])
   end
 
+  it 'call unescapes the missing argument names' do
+    result = parser.call("lib/foo.rb:3: Foo#bar\t(a%2C b),c%25%09%0A\n")
+
+    assert_equal(['(a, b)', "c%\t\n"], result.first[:missing_params])
+  end
+
   it 'call parses a plain location line as other validators send it' do
     result = parser.call("lib/foo.rb:10: Foo#process\n")
 

@@ -35,6 +35,21 @@ describe 'Documentation/UndocumentedMethodArguments missing argument names' do
     assert_equal('The `|` method has no @param for: other', offenses['|'][:message])
   end
 
+  it 'names a destructured argument as one argument' do
+    assert_equal('The `destructured` method has no @param for: (a, b), c', offenses['destructured'][:message])
+  end
+
+  it 'names a destructured argument that spans lines on one line' do
+    assert_equal(
+      'The `destructured_multiline` method has no @param for: (a, b)',
+      offenses['destructured_multiline'][:message]
+    )
+  end
+
+  it 'names a repeated argument once' do
+    assert_equal('The `repeated` method has no @param for: _, x', offenses['repeated'][:message])
+  end
+
   it 'identifies the offending method so SARIF fingerprints do not depend on the message' do
     assert_equal('UndocumentedArgsMissingNames#greet', offenses['greet'][:element])
   end

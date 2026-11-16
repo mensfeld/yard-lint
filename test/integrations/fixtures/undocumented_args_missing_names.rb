@@ -14,6 +14,13 @@ class UndocumentedArgsMissingNames
   # @param item [String] the item
   def keyword_missing(item, limit:); end
 
+  def destructured((a, b), c); end
+
+  def destructured_multiline((a,
+                              b)); end
+
+  def repeated(_, _, x); end
+
   # Combines two values
   # @return [UndocumentedArgsMissingNames]
   def |(other); end
