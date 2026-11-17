@@ -159,7 +159,6 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorWithLinter' do
   end
 end
 
-
 describe 'YardLintValidatorsTagsExampleStyleValidatorMissingLinterWarning' do
   attr_reader :config, :collector, :object
 
