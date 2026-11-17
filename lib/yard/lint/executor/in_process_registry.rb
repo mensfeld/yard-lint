@@ -9,10 +9,13 @@ module Yard
       # Manages shared YARD::Registry for in-process execution.
       # Ensures files are parsed once and shared across all validators.
       class InProcessRegistry
-        # Source of an alias registered before the method it aliases
-        ALIAS_SOURCE = /\Aalias(?:_method)?\b/
+        # Statements YARD registers an alias for
+        ALIAS_KEYWORDS = %w[alias alias_method].freeze
 
-        private_constant :ALIAS_SOURCE
+        # A keyword or method name in an alias statement
+        ALIAS_TOKEN = /[^\s,():"']+/
+
+        private_constant :ALIAS_KEYWORDS, :ALIAS_TOKEN
 
         # @return [Array<String>] warnings captured during parsing
         attr_reader :warnings
@@ -187,11 +190,22 @@ module Yard
         # and a bare `def <alias>` signature. YARD never resolves a module scope alias,
         # so a reparse would not change it.
         # @param method [YARD::CodeObjects::MethodObject]
-        # @return [Boolean] true when the method may be an alias of a method parsed later
+        # @return [Boolean] true when the method is an alias of a method parsed later
         def stale_alias?(method)
           return false if method.module_function?
+          return false unless method.signature == "def #{method.name}"
 
-          method.signature == "def #{method.name}" && ALIAS_SOURCE.match?(method.source.to_s)
+          source = method.source.to_s
+          return false unless source.start_with?('alias')
+
+          # `alias new old`, `alias_method :new, :old`
+          keyword, _new_name, old_name = source.scan(ALIAS_TOKEN)
+          return false unless ALIAS_KEYWORDS.include?(keyword) && old_name
+
+          # Looked up by path: a children scan per alias is quadratic in the
+          # number of methods of a namespace
+          target = YARD::Registry.at(method.path.delete_suffix(method.name.to_s) + old_name)
+          target.is_a?(YARD::CodeObjects::MethodObject)
         end
 
         # @param method [YARD::CodeObjects::MethodObject]
