@@ -383,7 +383,8 @@ when 'quickfix'
   result.offenses.each do |offense|
     char = severity_char.call(offense[:severity])
     message = offense[:message].to_s.gsub(/\n/, ' ')
-    puts "#{offense[:location]}:#{offense[:location_line]}: #{char}: #{offense[:validator]}: #{message}"
+    location = Yard::Lint::Formatters::RelativePath.call(offense[:location])
+    puts "#{location}:#{offense[:location_line]}: #{char}: #{offense[:validator]}: #{message}"
   end
   exit result.exit_code
 when 'sarif'
@@ -438,7 +439,8 @@ when 'text', nil
       puts "Found #{result.count} offense(s):\n\n"
 
       result.offenses.each do |offense|
-        puts "[#{severity_char.call(offense[:severity])}] #{offense[:location]}:#{offense[:location_line]}"
+        location = Yard::Lint::Formatters::RelativePath.call(offense[:location])
+        puts "[#{severity_char.call(offense[:severity])}] #{location}:#{offense[:location_line]}"
         puts "    #{offense[:validator]}: #{offense[:message]}"
         puts
       end
