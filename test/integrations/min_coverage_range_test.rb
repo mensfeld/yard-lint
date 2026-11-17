@@ -33,9 +33,25 @@ describe 'Min coverage range' do
       output = `#{bin_path} --min-coverage #{value} #{@dir} 2>&1`
 
       assert_equal(1, $CHILD_STATUS.exitstatus)
-      assert_match(/Invalid --min-coverage: '#{Regexp.escape(Float(value).to_s)}'/, output)
-      assert_match(/Must be a number between 0 and 100/, output)
+      assert_equal(
+        ["Error: Invalid --min-coverage: '#{Float(value)}'", '  Must be a number between 0 and 100'],
+        output.lines.map(&:chomp)
+      )
     end
+  end
+
+  it 'reports an invalid --format and --min-coverage together' do
+    output = `#{bin_path} --format xml --min-coverage 150 #{@dir} 2>&1`
+
+    assert_equal(1, $CHILD_STATUS.exitstatus)
+    assert_equal(
+      [
+        "Error: Unknown format 'xml'. Valid formats: text, json, quickfix, sarif",
+        "Error: Invalid --min-coverage: '150.0'",
+        '  Must be a number between 0 and 100'
+      ],
+      output.lines.map(&:chomp)
+    )
   end
 
   %w[0 100].each do |value|
