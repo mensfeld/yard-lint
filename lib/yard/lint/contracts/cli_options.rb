@@ -16,11 +16,9 @@ module Yard
           # @param names [Array<String>] unknown validator names
           # @return [String] multi-line error message
           def unknown_validators(names)
-            checker = DidYouMean::SpellChecker.new(dictionary: ConfigLoader::ALL_VALIDATORS)
-
             names_lines = names.map do |name|
-              suggestions = checker.correct(name)
-              suggestions.any? ? "  #{name} (did you mean: #{suggestions.first}?)" : "  #{name}"
+              suggestion = closest_validator_name(name)
+              suggestion ? "  #{name} (did you mean: #{suggestion}?)" : "  #{name}"
             end
 
             message(
