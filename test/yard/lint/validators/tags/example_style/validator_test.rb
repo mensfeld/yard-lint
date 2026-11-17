@@ -159,3 +159,29 @@ describe 'YardLintValidatorsTagsExampleStyleValidatorWithLinter' do
   end
 end
 
+describe 'YardLintValidatorsTagsExampleStyleValidatorMissingLinterWarning' do
+  attr_reader :config, :collector, :object
+
+  before do
+    @debug = ENV.fetch('DEBUG', nil)
+    ENV['DEBUG'] = '1'
+    Yard::Lint::Validators::Tags::ExampleStyle::Validator.warned_about_linter = nil
+    @config = Yard::Lint::Config.new
+    @collector = stub('collector')
+    @object = stub('object', docstring: YARD::Docstring.new("@example\n  user = User.new"))
+    Yard::Lint::Validators::Tags::ExampleStyle::LinterDetector.stubs(:detect).returns(:none)
+  end
+
+  after do
+    ENV['DEBUG'] = @debug
+    Yard::Lint::Validators::Tags::ExampleStyle::Validator.warned_about_linter = nil
+  end
+
+  it 'warns about the missing linter only once across validator instances' do
+    Warning.expects(:warn).with(regexp_matches(/no linter/), anything).once
+
+    2.times do
+      Yard::Lint::Validators::Tags::ExampleStyle::Validator.new(config, []).in_process_query(object, collector)
+    end
+  end
+end

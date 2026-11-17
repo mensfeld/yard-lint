@@ -10,6 +10,11 @@ module Yard
             # Enable in-process execution with all visibility
             in_process visibility: :all
 
+            class << self
+              # @return [Boolean, nil] whether the missing linter warning was already printed
+              attr_accessor :warned_about_linter
+            end
+
             # Execute query for a single object during in-process execution.
             # Checks code style in @example tags using RuboCop or StandardRB.
             # @param object [YARD::CodeObjects::Base] the code object to query
@@ -74,10 +79,10 @@ module Yard
 
             # Warn once about missing linter (class-level tracking)
             def warn_once_about_missing_linter
-              return if self.class.instance_variable_get(:@warned_about_linter)
+              return if self.class.warned_about_linter
 
               warn '[YARD::Lint] ExampleStyle validator enabled but no linter (RuboCop/StandardRB) found. Skipping.'
-              self.class.instance_variable_set(:@warned_about_linter, true)
+              self.class.warned_about_linter = true
             end
           end
         end

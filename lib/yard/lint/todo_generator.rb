@@ -83,8 +83,8 @@ module Yard
       def check
         todo_entries = load_todo_entries
         audit_config = build_audit_config(todo_entries)
-        path_files = Yard::Lint.send(:expand_path, @path, audit_config)
-        files = Yard::Lint.send(:expand_path, '.', audit_config) | path_files
+        path_files = Yard::Lint.expand_path(@path, audit_config)
+        files = Yard::Lint.expand_path('.', audit_config) | path_files
 
         violations_by_validator = audit_violations([files, path_files], audit_config)
         files = files.map { |file| make_relative_path(file) }
@@ -214,11 +214,11 @@ module Yard
       def run_linting(files: nil, config: @config)
         # Run each validator individually to track violations per validator
         # This is more reliable than trying to infer validator from offense name
-        files ||= Yard::Lint.send(:expand_path, @path, config)
+        files ||= Yard::Lint.expand_path(@path, config)
         runner = Runner.new(files, config)
 
         # Run validators and collect raw results
-        raw_results = runner.send(:run_validators)
+        raw_results = runner.run_validators
         result_builder = ResultBuilder.new(config)
 
         violations_by_validator = {}
@@ -234,7 +234,7 @@ module Yard
           # Apply per-validator Exclude patterns (and drop no-location offenses)
           # exactly as a normal run does, so the baseline does not silence files
           # that are already excluded.
-          validator_result = runner.send(:filter_result_offenses, validator_name, validator_result)
+          validator_result = runner.filter_result_offenses(validator_name, validator_result)
           next unless validator_result && validator_result.offenses.any?
 
           # Extract file paths from offenses, skipping those without a location
