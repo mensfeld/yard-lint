@@ -32,10 +32,9 @@ module Yard
         build_result(parsed_results, @selection)
       end
 
-      private
-
       # Run all validators using in-process YARD execution.
       # Parses files once and shares the registry across all validators.
+      # @api private
       # @return [Hash] hash with raw results from all validators
       def run_validators
         results = {}
@@ -94,21 +93,11 @@ module Yard
         results
       end
 
-      # Filter files for a specific validator based on per-validator exclusions
-      # @param validator_name [String] full validator name
-      # @param files [Array<String>] array of file paths
-      # @return [Array<String>] filtered array of file paths
-      def filter_files_for_validator(validator_name, files)
-        validator_excludes = config.validator_exclude(validator_name)
-        return files if validator_excludes.empty?
-
-        files.reject { |file| config.excluded_path?(file, validator_excludes) }
-      end
-
       # Filter result offenses based on per-validator exclusions
       # Also always removes offenses with no file location (e.g. YARD warnings
       # emitted without file context such as from macro expansion with nil object)
       # since they carry no actionable information and would display as `:0`.
+      # @api private
       # @param validator_name [String] full validator name
       # @param result [Results::Base] result object with offenses
       # @return [Results::Base, nil] result with filtered offenses, or nil if no offenses remain
@@ -132,6 +121,19 @@ module Yard
         # This preserves all the processed offense data including enhanced messages
         result.offenses = filtered_offenses
         result
+      end
+
+      private
+
+      # Filter files for a specific validator based on per-validator exclusions
+      # @param validator_name [String] full validator name
+      # @param files [Array<String>] array of file paths
+      # @return [Array<String>] filtered array of file paths
+      def filter_files_for_validator(validator_name, files)
+        validator_excludes = config.validator_exclude(validator_name)
+        return files if validator_excludes.empty?
+
+        files.reject { |file| config.excluded_path?(file, validator_excludes) }
       end
 
       # Parse raw results from validators and create Result objects

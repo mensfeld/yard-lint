@@ -55,6 +55,21 @@ module Yard
         runner.run
       end
 
+      # Expand path/glob patterns into an array of files
+      # @api private
+      # @param path [String, Array<String>] path or array of paths
+      # @param config [Yard::Lint::Config] configuration object
+      # @return [Array<String>] array of absolute file paths
+      def expand_path(path, config)
+        files = discover_ruby_files(path)
+
+        # Convert to absolute paths for YARD
+        files = files.map { |file| File.expand_path(file) }
+
+        # Filter out excluded files
+        files.reject { |file| config.excluded_path?(file, config.exclude) }
+      end
+
       private
 
       # Load configuration from file or auto-detect
@@ -91,20 +106,6 @@ module Yard
 
         # Apply exclusion patterns
         git_files.reject { |file| config.excluded_path?(file, config.exclude) }
-      end
-
-      # Expand path/glob patterns into an array of files
-      # @param path [String, Array<String>] path or array of paths
-      # @param config [Yard::Lint::Config] configuration object
-      # @return [Array<String>] array of absolute file paths
-      def expand_path(path, config)
-        files = discover_ruby_files(path)
-
-        # Convert to absolute paths for YARD
-        files = files.map { |file| File.expand_path(file) }
-
-        # Filter out excluded files
-        files.reject { |file| config.excluded_path?(file, config.exclude) }
       end
 
       # Discover Ruby files from path/glob patterns
