@@ -37,27 +37,32 @@ module Yard
               # Documentation/UndocumentedObjects instead of reporting them here too.
               return if config_or_default('SkipFullyUndocumented') && object.docstring.blank?
 
-              return unless arguments_missing_docs?(object, params)
+              missing = missing_param_names(object, params)
+              return unless missing
 
-              collector.puts "#{object.file}:#{object.line}: #{object.title}"
+              names = missing.map! { |name| escape_field(display_name(name)) }.join(',')
+              collector.puts "#{object.file}:#{object.line}: #{object.title}\t#{names}"
             end
 
             private
 
-            # Decide whether a method's parameters are under-documented.
+            # Find the parameters of a method that have no @param tag.
             # @param object [YARD::CodeObjects::MethodObject] the method to check
             # @param params [Array<Array>] non-splat/block parameters
-            # @return [Boolean] true if documentation is missing
-            def arguments_missing_docs?(object, params)
+            # @return [Array<String>, nil] names of the undocumented parameters
+            #   (empty in count-only mode, which does not know them), or nil when
+            #   documentation is complete
+            def missing_param_names(object, params)
               # Tags nested inside @overload blocks live on the overload's own
               # docstring, so all_typed_tags collects those @param tags too.
               param_tags = all_typed_tags(object.docstring, %w[param])
 
               if config_or_default('CheckParameterNames')
                 documented = param_tags.map { |tag| normalize_param_name(tag.name) }
-                params.any? { |param| !documented.include?(normalize_param_name(param[0])) }
-              else
-                params.size > param_tags.size
+                missing = params.map { |param| normalize_param_name(param[0]) }.uniq - documented
+                missing unless missing.empty?
+              elsif params.size > param_tags.size
+                []
               end
             end
 
@@ -68,6 +73,39 @@ module Yard
             # @return [String] the normalized name
             def normalize_param_name(name)
               name.to_s.sub(/:\z/, '')
+            end
+
+            # YARD names a destructured parameter `(a, b)` as `a, b`, keeping the
+            # source whitespace, and drops only the outermost pair, so a nested one
+            # can come back unbalanced (`((a, b), c)` as `a, b), c`). Rebalance,
+            # put the outer pair back and collapse whitespace so the message
+            # shows it as one parameter.
+            # @param name [String] normalized parameter name
+            # @return [String] name as shown in the message
+            def display_name(name)
+              return name unless name.include?(',')
+
+              depth = 0
+              unopened = 0
+              name.each_char do |char|
+                if char == '('
+                  depth += 1
+                elsif char == ')'
+                  depth.zero? ? unopened += 1 : depth -= 1
+                end
+              end
+
+              "(#{'(' * unopened}#{name.gsub(/\s+/, ' ')}#{')' * depth})"
+            end
+
+            # Escapes ',' (the name separator), tabs and newlines (the line and
+            # field separators) and '%' (the escape character)
+            # @param text [String] raw field text
+            # @return [String] escaped field text
+            def escape_field(text)
+              return text unless text.match?(/[%,\t\n]/)
+
+              text.gsub(/[%,\t\n]/, '%' => '%25', ',' => '%2C', "\t" => '%09', "\n" => '%0A')
             end
           end
         end
