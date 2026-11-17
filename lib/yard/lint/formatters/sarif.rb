@@ -187,21 +187,11 @@ module Yard
           line.positive? ? line : 1
         end
 
-        # Make a path repository-relative so GitHub maps it onto a file. Paths
-        # already relative are kept; a path outside base_dir keeps its original
-        # value rather than emitting a `../` or absolute URI.
+        # Make a path repository-relative so GitHub maps it onto a file.
         # @param location [String, nil] the offense location path
         # @return [String] a relative URI where possible
         def relative_uri(location)
-          path = location.to_s
-          return path if path.empty?
-
-          absolute = File.absolute_path(path, @base_dir)
-          relative = Pathname.new(absolute).relative_path_from(Pathname.new(@base_dir)).to_s
-          relative.start_with?('..') ? path : relative
-        rescue ArgumentError
-          # relative_path_from raises across platforms/mixed roots; fall back.
-          path
+          RelativePath.call(location, @base_dir)
         end
 
         # The validator's default severity, from a defaults-only config, for the

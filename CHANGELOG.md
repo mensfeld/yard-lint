@@ -1,5 +1,7 @@
 ## 1.14.0 (Unreleased)
+- **[Enhancement]** Text and quickfix output now print offense paths relative to the current directory (`lib/foo.rb:10` instead of `/home/me/myproj/lib/foo.rb:10`), like RuboCop. Files outside the current directory keep their absolute path. JSON output and `Yard::Lint.run` results keep absolute paths.
 - **[Enhancement]** `Documentation/UndocumentedMethodArguments` now names the arguments that have no `@param` tag (e.g. ``The `undocumented` method has no @param for: a, b``) instead of saying that some arguments are missing. Count-only mode (`CheckParameterNames: false`) keeps the old message. Its offenses now carry the method as their object, so SARIF fingerprints no longer change with the message.
+- **[Bugfix]** SARIF output now gives a repository-relative URI for a file under a directory whose name starts with `..` (e.g. `..cache/foo.rb`) instead of keeping its absolute path.
 - **[Bugfix]** A per-validator `Exclude` that matches every linted file is no longer ignored. The empty file selection was read as "all files", so `Documentation/UndocumentedBooleanMethods` reported excluded files on single-file and `--stdin` runs (editors, `--staged`, `--diff` with one changed file), and on any run whose files its `Exclude` covers fully.
 
 ## 1.13.1 (2026-11-02)
