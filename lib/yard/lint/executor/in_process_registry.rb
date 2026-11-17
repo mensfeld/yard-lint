@@ -51,15 +51,19 @@ module Yard
                 @warnings = capture_warnings { parse_source_string(source, virtual_path) }
               else
                 # First pass: parse all files to process directive definitions
-                YARD.parse(files)
-
-                # Clear checksums to force reparsing without clearing the registry.
-                # This allows macro definitions from the first pass to be available
-                # during the second pass, enabling proper directive expansion regardless of parse order.
-                YARD::Registry.checksums.clear
-
-                # Second pass: reparse files now that all directive definitions are available
                 @warnings = capture_warnings { YARD.parse(files) }
+
+                # Only a macro defined in one file and used in a file parsed before it
+                # needs a second pass, so skip it when the first pass found no macro.
+                unless YARD::Registry.all(:macro).empty?
+                  # Clear checksums to force reparsing without clearing the registry.
+                  # This allows macro definitions from the first pass to be available
+                  # during the second pass, enabling proper directive expansion regardless of parse order.
+                  YARD::Registry.checksums.clear
+
+                  # Second pass: reparse files now that all directive definitions are available
+                  @warnings = capture_warnings { YARD.parse(files) }
+                end
               end
 
               @parsed = true

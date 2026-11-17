@@ -122,6 +122,82 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
     assert_kind_of(Array, registry.warnings)
   end
 
+  describe 'parse with files' do
+    attr_reader :files, :passes
+
+    before do
+      @files = []
+      @passes = 0
+      @callback = proc { @passes += 1 }
+      YARD::Parser::SourceParser.after_parse_list_callbacks << @callback
+    end
+
+    after do
+      YARD::Parser::SourceParser.after_parse_list_callbacks.delete(@callback)
+      files.each(&:unlink)
+    end
+
+    def write_file(content)
+      file = Tempfile.new(['test', '.rb'])
+      file.write(content)
+      file.close
+      files << file
+      file.path
+    end
+
+    it 'parses once when no macro is defined' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class NoMacro
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+      assert_includes(registry.all_objects.map(&:path), 'NoMacro#name')
+    end
+
+    it 'parses twice when a macro is defined' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class WithMacro
+          # @!macro named
+          #   @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'keeps warnings when it parses once' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class UnknownTag
+          # @unknowntag value
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+      assert(registry.warnings.any? { |w| w.include?('@unknowntag') }, registry.warnings.inspect)
+    end
+  end
+
   it 'objects for validator filters by file selection matching the virtual path' do
     source = <<~RUBY
       # Documented
