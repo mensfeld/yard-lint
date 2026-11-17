@@ -15,8 +15,11 @@ module Yard
             path = location.to_s
             return path if path.empty?
 
-            absolute = File.absolute_path(path, base_dir)
-            relative = Pathname.new(absolute).relative_path_from(Pathname.new(base_dir)).to_s
+            base = File.absolute_path(base_dir)
+            absolute = File.absolute_path(path, base)
+            return absolute.delete_prefix("#{base}/") if absolute.start_with?("#{base}/")
+
+            relative = Pathname.new(absolute).relative_path_from(Pathname.new(base)).to_s
             relative.start_with?('..') ? path : relative
           rescue ArgumentError
             # relative_path_from raises across platforms/mixed roots; fall back.

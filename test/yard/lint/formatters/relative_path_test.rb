@@ -21,6 +21,14 @@ describe 'Yard::Lint::Formatters::RelativePath' do
     assert_equal('lib/foo.rb', relative('lib/foo.rb'))
   end
 
+  it 'normalizes a path that leaves and re-enters base_dir' do
+    assert_equal('lib/foo.rb', relative('/repo/x/../lib/foo.rb'))
+  end
+
+  it 'makes a path relative to the filesystem root' do
+    assert_equal('repo/lib/foo.rb', relative('/repo/lib/foo.rb', '/'))
+  end
+
   it 'returns an empty string for a nil location' do
     assert_equal('', relative(nil))
   end
