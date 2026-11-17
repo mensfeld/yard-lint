@@ -235,6 +235,42 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
       assert_equal(2, passes)
     end
 
+    it 'parses once when an alias names a method that is not parsed' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class ExternalAlias
+          alias_method :old_inspect, :inspect
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+    end
+
+    it 'parses twice when module_function precedes a method documented with text only' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module EarlyTextModuleFunction
+          module_function :run
+
+          # Runs the thing
+          def run
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
     it 'parses twice for an undocumented module function predicate' do
       path = write_file(<<~RUBY)
         # Documented
