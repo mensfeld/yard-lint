@@ -63,11 +63,11 @@ module Yard
 
                 if second_pass_needed?
                   # Clear checksums to force reparsing without clearing the registry.
-                  # This allows macro definitions from the first pass to be available
-                  # during the second pass, enabling proper directive expansion regardless of parse order.
+                  # This keeps the objects of the first pass available to the second,
+                  # so macros and copied methods resolve regardless of parse order.
                   YARD::Registry.checksums.clear
 
-                  # Second pass: reparse files now that all directive definitions are available
+                  # Second pass: reparse files now that all definitions are available
                   @warnings = capture_warnings { YARD.parse(files) }
                 end
               end
