@@ -122,6 +122,191 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
     assert_kind_of(Array, registry.warnings)
   end
 
+  describe 'parse with files' do
+    attr_reader :files, :passes
+
+    before do
+      @files = []
+      @passes = 0
+      @callback = proc { @passes += 1 }
+      YARD::Parser::SourceParser.after_parse_list_callbacks << @callback
+    end
+
+    after do
+      YARD::Parser::SourceParser.after_parse_list_callbacks.delete(@callback)
+      files.each(&:unlink)
+    end
+
+    def write_file(content)
+      file = Tempfile.new(['test', '.rb'])
+      file.write(content)
+      file.close
+      files << file
+      file.path
+    end
+
+    it 'parses once when no macro is defined' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class NoMacro
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+      assert_includes(registry.all_objects.map(&:path), 'NoMacro#name')
+    end
+
+    it 'parses twice when a macro is defined' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class WithMacro
+          # @!macro named
+          #   @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'parses once when aliases and module functions follow their methods' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module InOrder
+          module_function
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+
+          alias label name
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+    end
+
+    it 'parses twice when an alias precedes its method' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class EarlyAlias
+          alias label name
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'parses twice when module_function precedes its method' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module EarlyModuleFunction
+          module_function :name
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'parses once when an alias names a method that is not parsed' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class ExternalAlias
+          alias_method :old_inspect, :inspect
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+    end
+
+    it 'parses twice when module_function precedes a method documented with text only' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module EarlyTextModuleFunction
+          module_function :run
+
+          # Runs the thing
+          def run
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'parses twice for an undocumented module function predicate' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module PredicateModuleFunction
+          module_function
+
+          def ready?
+            true
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'keeps warnings when it parses once' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class UnknownTag
+          # @unknowntag value
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+      assert(registry.warnings.any? { |w| w.include?('@unknowntag') }, registry.warnings.inspect)
+    end
+  end
+
   it 'objects for validator filters by file selection matching the virtual path' do
     source = <<~RUBY
       # Documented
