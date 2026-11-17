@@ -9,6 +9,11 @@ module Yard
       # Manages shared YARD::Registry for in-process execution.
       # Ensures files are parsed once and shared across all validators.
       class InProcessRegistry
+        # Source of an alias registered before the method it aliases
+        ALIAS_SOURCE = /\Aalias(?:_method)?\b/
+
+        private_constant :ALIAS_SOURCE
+
         # @return [Array<String>] warnings captured during parsing
         attr_reader :warnings
 
@@ -53,9 +58,7 @@ module Yard
                 # First pass: parse all files to process directive definitions
                 @warnings = capture_warnings { YARD.parse(files) }
 
-                # Only a macro defined in one file and used in a file parsed before it
-                # needs a second pass, so skip it when the first pass found no macro.
-                unless YARD::Registry.all(:macro).empty?
+                if second_pass_needed?
                   # Clear checksums to force reparsing without clearing the registry.
                   # This allows macro definitions from the first pass to be available
                   # during the second pass, enabling proper directive expansion regardless of parse order.
@@ -162,6 +165,45 @@ module Yard
           end
         rescue StandardError => e
           warn "[YARD::Lint] Failed to load .yardopts tags: #{e.message}" if ENV['DEBUG']
+        end
+
+        # Tells whether the first pass left objects that depend on parse order.
+        # A macro may be used before its definition; an alias or `module_function :name`
+        # copies a method that may be defined later, and YARD gives a module function
+        # copy of a `?` method an inferred `@return` that its instance twin gets only on
+        # a reparse. Skipping the second pass in these cases would change the offenses.
+        # @return [Boolean]
+        def second_pass_needed?
+          return true unless YARD::Registry.all(:macro).empty?
+
+          YARD::Registry.all(:method).any? do |method|
+            stale_alias?(method) || stale_module_function_copy?(method)
+          end
+        end
+
+        # YARD drops the alias entry once the aliased method is defined, so an alias
+        # registered before its method is known only by what the alias handler leaves:
+        # the alias statement as source (a resolved alias copies the method's source)
+        # and a bare `def <alias>` signature. YARD never resolves a module scope alias,
+        # so a reparse would not change it.
+        # @param method [YARD::CodeObjects::MethodObject]
+        # @return [Boolean] true when the method may be an alias of a method parsed later
+        def stale_alias?(method)
+          return false if method.module_function?
+
+          method.signature == "def #{method.name}" && ALIAS_SOURCE.match?(method.source.to_s)
+        end
+
+        # @param method [YARD::CodeObjects::MethodObject]
+        # @return [Boolean] true when a module function copy differs from its instance method
+        def stale_module_function_copy?(method)
+          return false unless method.module_function?
+
+          twin = YARD::Registry.at("#{method.namespace.path}#{YARD::CodeObjects::ISEP}#{method.name}")
+          return false unless twin.is_a?(YARD::CodeObjects::MethodObject)
+
+          twin.docstring.all != method.docstring.all ||
+            twin.tags.map(&:tag_name) != method.tags.map(&:tag_name)
         end
 
         # Parse Ruby source from a string and register objects under a virtual path.

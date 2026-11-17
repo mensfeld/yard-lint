@@ -179,6 +179,79 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
       assert_equal(2, passes)
     end
 
+    it 'parses once when aliases and module functions follow their methods' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module InOrder
+          module_function
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+
+          alias label name
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(1, passes)
+    end
+
+    it 'parses twice when an alias precedes its method' do
+      path = write_file(<<~RUBY)
+        # Documented
+        class EarlyAlias
+          alias label name
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'parses twice when module_function precedes its method' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module EarlyModuleFunction
+          module_function :name
+
+          # @return [String] the name
+          def name
+            'test'
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
+    it 'parses twice for an undocumented module function predicate' do
+      path = write_file(<<~RUBY)
+        # Documented
+        module PredicateModuleFunction
+          module_function
+
+          def ready?
+            true
+          end
+        end
+      RUBY
+
+      registry.parse([path])
+
+      assert_equal(2, passes)
+    end
+
     it 'keeps warnings when it parses once' do
       path = write_file(<<~RUBY)
         # Documented
