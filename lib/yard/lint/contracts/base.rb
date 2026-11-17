@@ -2,9 +2,10 @@
 
 module Yard
   module Lint
-    # Contracts that validate the configuration structure and values
+    # Contracts that validate the configuration and the command line options
     module Contracts
-      # Base for the configuration contracts with the helpers that build their error messages
+      # Base for the configuration and command line options contracts with the helpers that
+      # build their error messages
       class Base < Contractable::Contract
         # Valid boolean values
         BOOLEAN_VALUES = [true, false].freeze
@@ -26,15 +27,21 @@ module Yard
             result.errors.map { |scope, error| [[scope], error] }
           end
 
+          # Finds the validator name closest to an invalid one using did_you_mean
+          # @param invalid_name [String] invalid validator name
+          # @return [String, nil] closest validator name or nil when there is no similar one
+          def closest_validator_name(invalid_name)
+            DidYouMean::SpellChecker.new(dictionary: ConfigLoader::ALL_VALIDATORS).correct(invalid_name).first
+          end
+
           # Suggest similar validator names using did_you_mean
           # @param invalid_name [String] invalid validator name
           # @return [String] suggestion line
           def suggest_validator_name(invalid_name)
-            checker = DidYouMean::SpellChecker.new(dictionary: ConfigLoader::ALL_VALIDATORS)
-            suggestions = checker.correct(invalid_name)
+            suggestion = closest_validator_name(invalid_name)
 
-            if suggestions.any?
-              "  Did you mean: #{suggestions.first}?"
+            if suggestion
+              "  Did you mean: #{suggestion}?"
             else
               '  See https://github.com/mensfeld/yard-lint/wiki/Validators ' \
                 'for all available validators'
