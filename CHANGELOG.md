@@ -1,6 +1,9 @@
 ## 1.14.0 (Unreleased)
 - **[Enhancement]** Files are now parsed with YARD once instead of twice when nothing in them depends on parse order (simplecov 1.3.2 `lib/`: about 5.9 s to 4.5 s). The second pass still runs, and the offenses stay the same, when the files define a `@!macro`, have an `alias`/`alias_method` or `module_function :name` written before its method, or a `module_function` copy that differs from its instance method (e.g. an undocumented `?` method).
+- **[Enhancement]** Text and quickfix output now print offense paths relative to the current directory (`lib/foo.rb:10` instead of `/home/me/myproj/lib/foo.rb:10`), like RuboCop. Files outside the current directory keep their absolute path. JSON output and `Yard::Lint.run` results keep absolute paths.
 - **[Enhancement]** `Documentation/UndocumentedMethodArguments` now names the arguments that have no `@param` tag (e.g. ``The `undocumented` method has no @param for: a, b``) instead of saying that some arguments are missing. Count-only mode (`CheckParameterNames: false`) keeps the old message. Its offenses now carry the method as their object, so SARIF fingerprints no longer change with the message.
+- **[Bugfix]** `--min-coverage` outside 0-100 now stops the run with `Error: Invalid --min-coverage` and exit 1, like `MinCoverage` in `.yard-lint.yml`. Before, a value above 100 always failed and a negative value always passed.
+- **[Bugfix]** SARIF output now gives a repository-relative URI for a file under a directory whose name starts with `..` (e.g. `..cache/foo.rb`) instead of keeping its absolute path.
 - **[Bugfix]** A per-validator `Exclude` that matches every linted file is no longer ignored. The empty file selection was read as "all files", so `Documentation/UndocumentedBooleanMethods` reported excluded files on single-file and `--stdin` runs (editors, `--staged`, `--diff` with one changed file), and on any run whose files its `Exclude` covers fully.
 
 ## 1.13.1 (2026-11-02)
