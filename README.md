@@ -667,12 +667,19 @@ Every offense (in text, JSON, and quickfix output) includes a `validator` field 
   "validator": "Documentation/OrphanedDocComment",
   "severity": "warning",
   "message": "Documentation comment with @param, @return is orphaned - YARD will ignore it",
-  "location": "lib/my_class.rb",
+  "location": "/home/me/myproj/lib/my_class.rb",
   "location_line": 42
 }
 ```
 
-The text formatter also shows the validator path (e.g., `[Documentation/OrphanedDocComment]`) instead of just the short offense name.
+The text formatter also shows the validator path instead of just the short offense name:
+
+```
+[W] lib/my_class.rb:42
+    Documentation/OrphanedDocComment: Documentation comment with @param, @return is orphaned - YARD will ignore it
+```
+
+JSON output keeps the absolute `location`. Text and quickfix output print the path relative to the current directory when the file is inside it, and the absolute path otherwise.
 
 ## Documentation
 
