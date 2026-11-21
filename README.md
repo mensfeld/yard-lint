@@ -192,9 +192,9 @@ yard-lint --format quickfix lib/
 Example output:
 
 ```
-lib/foo.rb:42: E: Documentation/UndocumentedObjects: Class Foo is not documented
-lib/foo.rb:57: W: Tags/InvalidTypes: has invalid type(s): @return: `Sting`
-lib/bar.rb:12: C: Tags/Order: Tags are not in the correct order
+lib/foo.rb:42: E: Documentation/UndocumentedObjects: Documentation required for `Foo`
+lib/foo.rb:57: W: Tags/InvalidTypes: The `bar` has invalid type(s): @return: `string`
+lib/bar.rb:12: C: Tags/Order: The `baz` has yard tags in an invalid order. Following tags need to be in the presented order: `param`, `return`.
 ```
 
 **Vim** — set `makeprg` and use `:make` to populate the quickfix list:
