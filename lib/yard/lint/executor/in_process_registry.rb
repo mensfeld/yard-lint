@@ -62,6 +62,13 @@ module Yard
                 @warnings = capture_warnings { YARD.parse(files) }
 
                 if second_pass_needed?
+                  # The first pass parses a constant defined in a later file before
+                  # applying `private_constant`. The second pass applies it first and
+                  # then the constant definition makes it public again.
+                  private_constants = YARD::Registry.all(:constant).select do |constant|
+                    constant.visibility == :private
+                  end
+
                   # Clear checksums to force reparsing without clearing the registry.
                   # This keeps the objects of the first pass available to the second,
                   # so macros and copied methods resolve regardless of parse order.
@@ -69,6 +76,8 @@ module Yard
 
                   # Second pass: reparse files now that all definitions are available
                   @warnings = capture_warnings { YARD.parse(files) }
+
+                  private_constants.each { |constant| constant.visibility = :private }
                 end
               end
 

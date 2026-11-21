@@ -288,6 +288,31 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
       assert_equal(2, passes)
     end
 
+    it 'keeps a constant private when its definition is parsed after private_constant' do
+      hiding = write_file(<<~RUBY)
+        # Documented
+        module HiddenConstant
+          # @!macro named
+          #   @return [String] the name
+          def self.name
+            'test'
+          end
+
+          private_constant :SECRET
+        end
+      RUBY
+      defining = write_file(<<~RUBY)
+        module HiddenConstant
+          SECRET = 1
+        end
+      RUBY
+
+      registry.parse([hiding, defining])
+
+      assert_equal(2, passes)
+      assert_equal(:private, YARD::Registry.at('HiddenConstant::SECRET').visibility)
+    end
+
     it 'keeps warnings when it parses once' do
       path = write_file(<<~RUBY)
         # Documented
