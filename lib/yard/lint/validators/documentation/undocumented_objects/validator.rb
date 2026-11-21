@@ -40,12 +40,12 @@ module Yard
             def undocumented_method?(object)
               if object.docstring.all.empty?
                 # A class cannot define module functions; skipping it saves the twin lookup.
-                # The copy is public when `module_function :name` is parsed before the def
+                # Visibility cannot skip it: the copy is public when `module_function :name`
+                # is parsed before the def
                 object.scope == :class ||
                   object.namespace.is_a?(YARD::CodeObjects::ClassObject) ||
                   module_function_twin(object).nil?
               else
-                # Only a `?` pair can differ, by the inferred `@return`
                 object.module_function? &&
                   object.name.end_with?('?') &&
                   module_function_twin(object)&.docstring&.all&.empty? == true
