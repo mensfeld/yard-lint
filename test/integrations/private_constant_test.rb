@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # Proves that a constant made private in a file parsed before its definition
-# stays private in both parse orders, with one parse pass and with two
+# stays private in both parse orders, with one parse pass and with two, while
+# a public constant next to it stays public
 describe 'Private Constant' do
   attr_reader :fixtures_path, :macro_path
 
@@ -15,15 +16,18 @@ describe 'Private Constant' do
 
   [false, true].each do |reversed|
     [false, true].each do |macro|
-      it "reports no offenses with #{reversed ? 'reversed' : 'normal'} parse order " \
+      it "reports only the public constant with #{reversed ? 'reversed' : 'normal'} parse order " \
          "#{macro ? 'with' : 'without'} a macro" do
         files = reversed ? fixtures_path.reverse : fixtures_path
         files += [macro_path] if macro
         result = Yard::Lint.run(path: files, config: test_config, progress: false)
 
-        assert_equal(0, result.count, result.offenses.inspect)
+        messages = result.offenses.map { |o| o[:message] }
+
+        assert_equal(['Documentation required for `PrivateConstantHolder::VISIBLE`'], messages)
         assert_equal(macro, !YARD::Registry.all(:macro).empty?)
         assert_equal(:private, YARD::Registry.at('PrivateConstantHolder::SECRET').visibility)
+        assert_equal(:public, YARD::Registry.at('PrivateConstantHolder::VISIBLE').visibility)
       end
     end
   end

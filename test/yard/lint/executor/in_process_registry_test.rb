@@ -288,7 +288,7 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
       assert_equal(2, passes)
     end
 
-    it 'keeps a constant private when its definition is parsed after private_constant' do
+    it 'keeps only a constant hidden before its definition private after two passes' do
       hiding = write_file(<<~RUBY)
         # Documented
         module HiddenConstant
@@ -304,6 +304,7 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
       defining = write_file(<<~RUBY)
         module HiddenConstant
           SECRET = 1
+          VISIBLE = 2
         end
       RUBY
 
@@ -311,6 +312,7 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
 
       assert_equal(2, passes)
       assert_equal(:private, YARD::Registry.at('HiddenConstant::SECRET').visibility)
+      assert_equal(:public, YARD::Registry.at('HiddenConstant::VISIBLE').visibility)
     end
 
     it 'keeps warnings when it parses once' do

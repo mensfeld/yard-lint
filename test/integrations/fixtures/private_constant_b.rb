@@ -2,4 +2,5 @@
 
 module PrivateConstantHolder
   SECRET = 1
+  VISIBLE = 2
 end
