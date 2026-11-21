@@ -294,7 +294,7 @@ describe 'Yard::Lint::Executor::InProcessRegistry' do
         module HiddenConstant
           # @!macro named
           #   @return [String] the name
-          def self.name
+          def name
             'test'
           end
 
