@@ -17,15 +17,38 @@ module Yard
             # @return [void]
             def in_process_query(object, collector)
               return if parent_class_allowed?(object)
-              # Check if docstring is empty
-              return unless object.docstring.all.empty?
 
               if object.is_a?(YARD::CodeObjects::MethodObject)
+                return unless undocumented_method?(object)
+
                 # For methods, include arity (excluding splat and block params)
                 arity = object.parameters.reject { |p| p[0].to_s.start_with?('*', '&') }.size
                 collector.puts "#{object.file}:#{object.line}: #{object.title}|#{arity}"
               else
+                return unless object.docstring.all.empty?
+
                 collector.puts "#{object.file}:#{object.line}: #{object.title}"
+              end
+            end
+
+            private
+
+            # A module_function pair is reported once, on its public module method.
+            # YARD gives one half of an undocumented `?` pair an inferred `@return`.
+            # @param object [YARD::CodeObjects::MethodObject] the method to check
+            # @return [Boolean] true when the method should be reported
+            def undocumented_method?(object)
+              if object.docstring.all.empty?
+                # A class cannot define module functions; skipping it saves the twin lookup.
+                # Visibility cannot skip it: the copy is public when `module_function :name`
+                # is parsed before the def
+                object.scope == :class ||
+                  object.namespace.is_a?(YARD::CodeObjects::ClassObject) ||
+                  module_function_twin(object).nil?
+              else
+                object.module_function? &&
+                  object.name.end_with?('?') &&
+                  module_function_twin(object)&.docstring&.all&.empty? == true
               end
             end
           end
