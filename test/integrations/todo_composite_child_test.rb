@@ -59,6 +59,19 @@ describe 'Todo file with a composite child validator' do
     assert_equal(0, run_yard_lint('lib')[:exit_code])
   end
 
+  it 'leaves out a child offense the parent Exclude filters with --auto-gen-config' do
+    File.write(
+      File.join(project_dir, '.yard-lint.yml'),
+      "Documentation/UndocumentedObjects:\n  Exclude:\n    - 'lib/q.rb'\n"
+    )
+
+    result = run_yard_lint('--auto-gen-config', 'lib')
+
+    assert_equal(0, result[:exit_code], result[:output])
+    assert_includes(result[:output], 'No offenses found')
+    refute(File.exist?(File.join(project_dir, '.yard-lint-todo.yml')))
+  end
+
   it 'counts a child entry that silences an offense as used' do
     write_todo('Documentation/UndocumentedBooleanMethods')
 
