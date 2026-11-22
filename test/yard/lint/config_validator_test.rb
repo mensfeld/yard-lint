@@ -140,6 +140,19 @@ describe 'Yard::Lint::ConfigValidator' do
     assert_match(/Invalid MinCoverage/, error.message)
   end
 
+  it 'validate with invalid global settings raises error for nan mincoverage' do
+    config = {
+      'AllValidators' => {
+        'MinCoverage' => Float::NAN
+      }
+    }
+
+    error = assert_raises(Yard::Lint::Errors::InvalidConfigError) do
+      Yard::Lint::ConfigValidator.validate!(config)
+    end
+    assert_includes(error.message, "Invalid MinCoverage: 'NaN'")
+  end
+
   it 'validate with invalid global settings raises error for non array exclude' do
     config = {
       'AllValidators' => {

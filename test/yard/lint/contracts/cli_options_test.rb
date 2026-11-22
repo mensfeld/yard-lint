@@ -43,6 +43,19 @@ describe 'Yard::Lint::Contracts::CliOptions' do
     end
   end
 
+  [%w[--staged], %w[--diff --diff]].each do |flags|
+    it "accepts diff_flags #{flags.join(' ')}" do
+      assert_empty(errors_for({ diff_flags: flags }))
+    end
+  end
+
+  it 'rejects two diff_flags naming both' do
+    assert_equal(
+      { diff_flags: 'Diff mode options are mutually exclusive: --diff, --staged' },
+      errors_for({ diff_flags: %w[--diff --staged --diff] })
+    )
+  end
+
   it 'rejects unknown validators in only with suggestions and the validator list' do
     message = errors_for({ only: ['Tags/Ordr', 'Tags/Order', 'Nope'] })[:only]
     lines = message.split("\n")

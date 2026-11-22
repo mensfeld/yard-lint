@@ -20,6 +20,13 @@ module Yard
             lines.compact.join("\n")
           end
 
+          # Checks a minimum documentation coverage, shared by MinCoverage and --min-coverage
+          # @param value [Object] coverage value to check
+          # @return [Boolean] true when the value is a number between 0 and 100
+          def valid_coverage?(value)
+            value.is_a?(Numeric) && value >= 0 && value <= 100
+          end
+
           # Converts errors of a nested contract into virtual rule errors of the parent contract
           # @param result [Contractable::Result] nested contract validation result
           # @return [Array<Array>] error pairs with the nested error scope as their path

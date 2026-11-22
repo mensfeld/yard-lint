@@ -40,7 +40,7 @@ module Yard
           end
 
           optional('MinCoverage') do |min_cov|
-            !min_cov || (min_cov.is_a?(Numeric) && !(min_cov < 0 || min_cov > 100)) ||
+            !min_cov || valid_coverage?(min_cov) ||
               message("Invalid MinCoverage: '#{min_cov}'", '  Must be a number between 0 and 100')
           end
 
