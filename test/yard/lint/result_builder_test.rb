@@ -111,7 +111,7 @@ describe 'Yard::Lint::ResultBuilder' do
     assert_equal('Documentation/UndocumentedBooleanMethods', result.offenses.first[:validator])
   end
 
-  it 'build_by_source keys composite offenses by the validator that found them' do
+  it 'build_by_validator keys composite offenses by the validator that found them' do
     raw_results = {
       undocumented_objects: { stdout: 'file.rb:10: MyClass', stderr: '', exit_code: 0 },
       undocumented_boolean_methods: {
@@ -121,7 +121,7 @@ describe 'Yard::Lint::ResultBuilder' do
       }
     }
 
-    results = @builder.build_by_source('Documentation/UndocumentedObjects', raw_results)
+    results = @builder.build_by_validator('Documentation/UndocumentedObjects', raw_results)
 
     assert_equal(
       { 'Documentation/UndocumentedObjects' => 1, 'Documentation/UndocumentedBooleanMethods' => 2 },
@@ -129,32 +129,32 @@ describe 'Yard::Lint::ResultBuilder' do
     )
   end
 
-  it 'build_by_source leaves out composite members without offenses' do
+  it 'build_by_validator leaves out composite members without offenses' do
     raw_results = {
       undocumented_objects: { stdout: '', stderr: '', exit_code: 0 },
       undocumented_boolean_methods: { stdout: 'file.rb:30: MyClass#valid?', stderr: '', exit_code: 0 }
     }
 
-    results = @builder.build_by_source('Documentation/UndocumentedObjects', raw_results)
+    results = @builder.build_by_validator('Documentation/UndocumentedObjects', raw_results)
 
     assert_equal(['Documentation/UndocumentedBooleanMethods'], results.keys)
   end
 
-  it 'build_by_source returns nothing for a composite child its parent reports' do
+  it 'build_by_validator returns nothing for a composite child its parent reports' do
     raw_results = {
       undocumented_boolean_methods: { stdout: 'file.rb:30: MyClass#valid?', stderr: '', exit_code: 0 }
     }
 
-    assert_empty(@builder.build_by_source('Documentation/UndocumentedBooleanMethods', raw_results))
+    assert_empty(@builder.build_by_validator('Documentation/UndocumentedBooleanMethods', raw_results))
   end
 
-  it 'build_by_source keys a composite child selected alone by its own name' do
+  it 'build_by_validator keys a composite child selected alone by its own name' do
     @config.only_validators = ['Documentation/UndocumentedBooleanMethods']
     raw_results = {
       undocumented_boolean_methods: { stdout: 'file.rb:30: MyClass#valid?', stderr: '', exit_code: 0 }
     }
 
-    results = @builder.build_by_source('Documentation/UndocumentedBooleanMethods', raw_results)
+    results = @builder.build_by_validator('Documentation/UndocumentedBooleanMethods', raw_results)
 
     assert_equal(['Documentation/UndocumentedBooleanMethods'], results.keys)
     assert_equal(1, results.values.first.count)

@@ -241,7 +241,7 @@ module Yard
           next unless config.validator_enabled?(validator_name)
 
           # A composite child's offenses are keyed by the child, whose todo entry silences them
-          result_builder.build_by_source(validator_name, raw_results).each do |source_name, validator_result|
+          result_builder.build_by_validator(validator_name, raw_results).each do |name, validator_result|
             # Apply per-validator Exclude patterns (and drop no-location offenses)
             # exactly as a normal run does, so the baseline does not silence files
             # that are already excluded.
@@ -253,7 +253,7 @@ module Yard
               make_relative_path(offense[:location])
             end.uniq.sort
 
-            violations_by_validator[source_name] = file_paths
+            violations_by_validator[name] = file_paths
             total_offenses += validator_result.count
           end
         end

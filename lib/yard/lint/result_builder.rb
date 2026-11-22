@@ -40,7 +40,7 @@ module Yard
       # @param validator_name [String] validator name (e.g., 'Tags/Order')
       # @param raw [Hash] raw results from all validators
       # @return [Hash{String => Results::Base}] validator names to their results
-      def build_by_source(validator_name, raw)
+      def build_by_validator(validator_name, raw)
         validator_cfg = ConfigLoader.validator_config(validator_name)
         if validator_cfg.nil? || validator_cfg.combines_with.empty?
           result = build(validator_name, raw)
@@ -81,7 +81,6 @@ module Yard
       # @param raw [Hash] raw results
       # @return [Results::Base, nil] composite result or nil
       def build_composite_result(validator_name, validator_module, validator_cfg, raw)
-        # Parse output from all validators (parent + children)
         combined = composite_members(validator_name, validator_module, validator_cfg)
                    .flat_map { |_name, mod, cfg| parse_validator_output(mod, cfg, raw) }
 
