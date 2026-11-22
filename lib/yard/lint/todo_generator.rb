@@ -93,7 +93,7 @@ module Yard
         unused_entries = todo_entries.each_with_object({}) do |(validator_name, patterns), unused|
           next unless judged?(validator_name, audit_config)
 
-          violating_files = violations_by_validator.fetch(validator_name, [])
+          violating_files = violating_files(validator_name, violations_by_validator)
           stale = patterns.select do |pattern|
             in_scope?(pattern, files, path_files) && violating_files.none? { |file| todo_match?(pattern, file) }
           end
@@ -151,6 +151,18 @@ module Yard
             merged[validator_name] = merged.fetch(validator_name, []) | paths
           end
         end
+      end
+
+      # Files whose offenses a validator's todo entries can silence
+      # A composite parent's Exclude also filters the offenses of its children.
+      # @param validator_name [String] validator name from the todo file
+      # @param violations_by_validator [Hash{String => Array<String>}] validator names to files with offenses
+      # @return [Array<String>] files with offenses of the validator or of its composite children
+      def violating_files(validator_name, violations_by_validator)
+        validator_cfg = ConfigLoader.validator_config(validator_name)
+        children = validator_cfg ? validator_cfg.combines_with : []
+
+        ([validator_name] + children).flat_map { |name| violations_by_validator.fetch(name, []) }.uniq
       end
 
       # Whether the audit can judge a validator's todo entries
@@ -228,22 +240,22 @@ module Yard
         ConfigLoader::ALL_VALIDATORS.each do |validator_name|
           next unless config.validator_enabled?(validator_name)
 
-          validator_result = result_builder.build(validator_name, raw_results)
-          next unless validator_result
+          # A composite child's offenses are keyed by the child, whose todo entry silences them
+          result_builder.build_by_validator(validator_name, raw_results).each do |name, validator_result|
+            # Apply per-validator Exclude patterns (and drop no-location offenses)
+            # exactly as a normal run does, so the baseline does not silence files
+            # that are already excluded.
+            validator_result = runner.filter_result_offenses(validator_name, validator_result)
+            next unless validator_result && validator_result.offenses.any?
 
-          # Apply per-validator Exclude patterns (and drop no-location offenses)
-          # exactly as a normal run does, so the baseline does not silence files
-          # that are already excluded.
-          validator_result = runner.filter_result_offenses(validator_name, validator_result)
-          next unless validator_result && validator_result.offenses.any?
+            # Extract file paths from offenses, skipping those without a location
+            file_paths = validator_result.offenses.filter_map do |offense|
+              make_relative_path(offense[:location])
+            end.uniq.sort
 
-          # Extract file paths from offenses, skipping those without a location
-          file_paths = validator_result.offenses.filter_map do |offense|
-            make_relative_path(offense[:location])
-          end.uniq.sort
-
-          violations_by_validator[validator_name] = file_paths
-          total_offenses += validator_result.count
+            violations_by_validator[name] = file_paths
+            total_offenses += validator_result.count
+          end
         end
 
         { violations_by_validator: violations_by_validator, total_offenses: total_offenses }

@@ -26,11 +26,36 @@ module Yard
 
         # Handle composite validators (those that combine multiple validators)
         unless validator_cfg.combines_with.empty?
-          return build_composite_result(validator_module, validator_cfg, raw)
+          return build_composite_result(validator_name, validator_module, validator_cfg, raw)
         end
 
         # Handle standard validators (single or multi-parser)
         build_standard_result(validator_module, validator_cfg, raw)
+      end
+
+      # Build results keyed by the validator that found the offenses
+      # A composite result is split into one result per member (the parent and each child),
+      # so a child's offenses are keyed by the child's name.
+      # @api private
+      # @param validator_name [String] validator name (e.g., 'Tags/Order')
+      # @param raw [Hash] raw results from all validators
+      # @return [Hash{String => Results::Base}] validator names to their results
+      def build_by_validator(validator_name, raw)
+        validator_cfg = ConfigLoader.validator_config(validator_name)
+        if validator_cfg.nil? || validator_cfg.combines_with.empty?
+          result = build(validator_name, raw)
+          return result ? { validator_name => result } : {}
+        end
+
+        validator_module = ConfigLoader.validator_module(validator_name)
+        return {} unless validator_module
+        return {} if reported_by_composite?(validator_name)
+
+        composite_members(validator_name, validator_module, validator_cfg)
+          .each_with_object({}) do |(name, mod, cfg), results|
+            parsed = parse_validator_output(mod, cfg, raw)
+            results[name] = validator_module::Result.new(parsed, config) unless parsed.empty?
+          end
       end
 
       private
@@ -50,29 +75,33 @@ module Yard
       end
 
       # Build result for a composite validator (combines multiple validators)
+      # @param validator_name [String] composite validator name
       # @param validator_module [Module] validator namespace module
       # @param validator_cfg [Class] validator config class
       # @param raw [Hash] raw results
       # @return [Results::Base, nil] composite result or nil
-      def build_composite_result(validator_module, validator_cfg, raw)
-        # Collect all child validators (modules + configs)
-        children = validator_cfg.combines_with.filter_map do |child_name|
-          child_mod = ConfigLoader.validator_module(child_name)
-          child_cfg = ConfigLoader.validator_config(child_name)
-          [child_mod, child_cfg] if child_mod && child_cfg
-        end
-
-        # All validators (parent + children)
-        all_validators = [[validator_module, validator_cfg]] + children
-
-        # Parse output from all validators
-        combined = all_validators.flat_map do |mod, cfg|
-          parse_validator_output(mod, cfg, raw)
-        end
+      def build_composite_result(validator_name, validator_module, validator_cfg, raw)
+        combined = composite_members(validator_name, validator_module, validator_cfg)
+                   .flat_map { |_name, mod, cfg| parse_validator_output(mod, cfg, raw) }
 
         return nil if combined.empty?
 
         validator_module::Result.new(combined, config)
+      end
+
+      # Collect the members of a composite validator: the parent and each known child
+      # @param validator_name [String] composite validator name
+      # @param validator_module [Module] validator namespace module
+      # @param validator_cfg [Class] validator config class
+      # @return [Array<Array(String, Module, Class)>] name, module and config of each member
+      def composite_members(validator_name, validator_module, validator_cfg)
+        children = validator_cfg.combines_with.filter_map do |child_name|
+          child_mod = ConfigLoader.validator_module(child_name)
+          child_cfg = ConfigLoader.validator_config(child_name)
+          [child_name, child_mod, child_cfg] if child_mod && child_cfg
+        end
+
+        [[validator_name, validator_module, validator_cfg]] + children
       end
 
       # Build result for a standard validator (single or multi-parser)
