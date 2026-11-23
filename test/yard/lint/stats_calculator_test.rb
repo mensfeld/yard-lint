@@ -206,12 +206,11 @@ describe 'Yard::Lint::StatsCalculator' do
     assert_includes(query, 'object.title')
   end
 
-  it 'parse stats output reads a method title that contains | and :' do
+  it 'calculate reads a method title that contains | and :' do
     calculator = calculator_excluding('|')
-    output = "method:undoc:Foo::Bar#||1\nmethod:undoc:Foo::Bar#baz|0\n"
+    calculator.stubs(:run_yard_stats_query).returns("method:undoc:Foo::Bar#||1\nmethod:undoc:Foo::Bar#baz|0\n")
 
-    result = calculator.send(:parse_stats_output, output)
-    assert_equal({ documented: 0, undocumented: 1 }, result['method'])
+    assert_equal({ total: 1, documented: 0, coverage: 0.0 }, calculator.calculate)
   end
 end
 

@@ -71,6 +71,7 @@ module Yard
             #   excluding splat and block)
             # @param excluded_methods [Array<String>] list of exclusion patterns
             # @return [Boolean] true if method should be excluded
+            # @api private
             def method_excluded?(element, arity, excluded_methods)
               # ExcludedMethods only applies to methods. A class, module, or
               # constant element has no #/. separator, so never derive a
@@ -101,6 +102,7 @@ module Yard
             # Sanitize exclusion patterns
             # @param patterns [Array] raw patterns from config
             # @return [Array<String>] cleaned and validated patterns
+            # @api private
             def sanitize_patterns(patterns)
               patterns
                 .compact # Remove nil values
