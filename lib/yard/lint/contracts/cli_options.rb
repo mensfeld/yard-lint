@@ -39,8 +39,13 @@ module Yard
         end
 
         optional(:min_coverage) do |min_cov|
-          min_cov.between?(0, 100) ||
+          valid_coverage?(min_cov) ||
             message("Invalid --min-coverage: '#{min_cov}'", '  Must be a number between 0 and 100')
+        end
+
+        optional(:diff_flags) do |flags|
+          flags.uniq.size < 2 ||
+            "Diff mode options are mutually exclusive: #{flags.uniq.join(', ')}"
         end
 
         optional(:only) do |names|
