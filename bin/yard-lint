@@ -47,14 +47,17 @@ begin
 
   opts.on('--diff [REF]', 'Lint only files changed since REF (default: main/master auto-detected)') do |ref|
     diff_mode = { mode: :ref, base_ref: ref }
+    (options[:diff_flags] ||= []) << '--diff'
   end
 
   opts.on('--staged', 'Lint only staged files (git index)') do
     diff_mode = { mode: :staged }
+    (options[:diff_flags] ||= []) << '--staged'
   end
 
   opts.on('--changed', 'Lint only uncommitted files') do
     diff_mode = { mode: :changed }
+    (options[:diff_flags] ||= []) << '--changed'
   end
 
   opts.separator ''
@@ -185,6 +188,9 @@ if options[:explain]
   puts Yard::Lint::Explainer.call(options[:explain])
   exit 0
 end
+
+# Reject two diff mode flags instead of silently running the last one
+validate_options.call(:diff_flags)
 
 # Disambiguate `--diff PATH`. `--diff [REF]` takes an optional argument, so
 # `yard-lint --diff lib/` makes OptionParser consume `lib/` as the REF, leaving
