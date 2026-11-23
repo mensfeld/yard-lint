@@ -6,7 +6,6 @@ module Yard
       module Documentation
         module UndocumentedBooleanMethods
           # Result object for undocumented boolean methods validation
-          # Reuses UndocumentedObjects::MessagesBuilder
           class Result < Results::Base
             self.default_severity = 'warning'
             self.offense_type = 'line'
@@ -16,7 +15,7 @@ module Yard
             # @param offense [Hash] offense data
             # @return [String] formatted message
             def build_message(offense)
-              UndocumentedObjects::MessagesBuilder.call(offense)
+              MessagesBuilder.call(offense)
             end
           end
         end

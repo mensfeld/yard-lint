@@ -36,5 +36,20 @@ describe 'Yard::Lint::Validators::Documentation::UndocumentedObjects::Result' do
   it 'class methods defines offense name' do
     assert_respond_to(Yard::Lint::Validators::Documentation::UndocumentedObjects::Result, :offense_name)
   end
-end
 
+  it 'offenses use the documentation required message for an undocumented object' do
+    result = Yard::Lint::Validators::Documentation::UndocumentedObjects::Result.new(
+      [{ location: 'a.rb', line: 3, element: 'Checker#ready?' }], config
+    )
+
+    assert_equal('Documentation required for `Checker#ready?`', result.offenses.first[:message])
+  end
+
+  it 'offenses name the missing return tag for a combined boolean method offense' do
+    result = Yard::Lint::Validators::Documentation::UndocumentedObjects::Result.new(
+      [{ location: 'a.rb', line: 3, element: 'Checker#enabled?', method_name: 'enabled?' }], config
+    )
+
+    assert_equal('The `Checker#enabled?` method has no @return tag', result.offenses.first[:message])
+  end
+end

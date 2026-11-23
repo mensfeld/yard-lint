@@ -15,7 +15,12 @@ module Yard
             # @param offense [Hash] offense data
             # @return [String] formatted message
             def build_message(offense)
-              MessagesBuilder.call(offense)
+              # Offenses of the combined UndocumentedBooleanMethods carry :method_name
+              if offense.key?(:method_name)
+                UndocumentedBooleanMethods::MessagesBuilder.call(offense)
+              else
+                MessagesBuilder.call(offense)
+              end
             end
           end
         end
