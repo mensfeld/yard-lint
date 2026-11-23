@@ -19,10 +19,12 @@ module Yard
         # @param results [Array<Results::Base>] array of validator result objects
         # @param config [Config, nil] configuration object
         # @param files [Array<String>, nil] array of files that were analyzed
-        def initialize(results, config = nil, files = nil)
+        # @param source [String, nil] in-memory source of the single file (--stdin)
+        def initialize(results, config = nil, files = nil, source: nil)
           @results = Array(results)
           @config = config
           @files = Array(files)
+          @source = source
         end
 
         # Get all offenses from all validators
@@ -74,7 +76,7 @@ module Yard
 
           return nil unless @config && !@files.empty?
 
-          calculator = StatsCalculator.new(@config, @files)
+          calculator = StatsCalculator.new(@config, @files, source: @source)
           @documentation_coverage = calculator.calculate
         end
 

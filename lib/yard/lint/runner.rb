@@ -163,7 +163,7 @@ module Yard
       # @param files [Array<String>] array of files that were analyzed
       # @return [Results::Aggregate] aggregate result object
       def build_result(results, files)
-        Results::Aggregate.new(results, config, files)
+        Results::Aggregate.new(results, config, files, source: @source)
       end
     end
   end

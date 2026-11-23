@@ -9,6 +9,13 @@ describe 'Yard::Lint::StatsCalculator' do
     @calculator = Yard::Lint::StatsCalculator.new(config, files)
   end
 
+  def calculator_excluding(*patterns)
+    excluding = Yard::Lint::Config.new(
+      'Documentation/UndocumentedObjects' => { 'ExcludedMethods' => patterns }
+    )
+    Yard::Lint::StatsCalculator.new(excluding, files)
+  end
+
   # #initialize
 
   it 'initialize stores config and files' do
@@ -23,10 +30,10 @@ describe 'Yard::Lint::StatsCalculator' do
 
   # #calculate
 
-  it 'calculate with empty file list returns 100 coverage' do
+  it 'calculate with empty file list returns 0 coverage' do
     empty_calculator = Yard::Lint::StatsCalculator.new(config, [])
     result = empty_calculator.calculate
-    assert_equal({ total: 0, documented: 0, coverage: 100.0 }, result)
+    assert_equal({ total: 0, documented: 0, coverage: 0.0 }, result)
   end
 
   it 'calculate with valid yard output calculates correct coverage' do
@@ -74,11 +81,38 @@ describe 'Yard::Lint::StatsCalculator' do
     assert_equal(0.0, result[:coverage])
   end
 
-  it 'calculate when yard command fails returns default stats' do
+  it 'calculate with no documentable objects returns 0 coverage' do
     calculator.stubs(:run_yard_stats_query).returns('')
 
     result = calculator.calculate
-    assert_equal({ total: 0, documented: 0, coverage: 100.0 }, result)
+    assert_equal({ total: 0, documented: 0, coverage: 0.0 }, result)
+  end
+
+  it 'calculate does not count methods matching ExcludedMethods' do
+    calculator = calculator_excluding('initialize/0', '/^test_/', 'call')
+    yard_output = <<~OUTPUT
+      class:doc
+      method:undoc:Foo#initialize|0
+      method:undoc:Foo#initialize|1
+      method:undoc:Foo#test_one|0
+      method:undoc:Foo.call|2
+      method:doc:Foo#bar|0
+    OUTPUT
+    calculator.stubs(:run_yard_stats_query).returns(yard_output)
+
+    result = calculator.calculate
+    # Foo, Foo#initialize/1 and Foo#bar remain; 2 of 3 documented
+    assert_equal(3, result[:total])
+    assert_equal(2, result[:documented])
+    assert_in_delta(66.67, result[:coverage], 0.01)
+  end
+
+  it 'calculate returns 0 coverage when all objects are excluded' do
+    calculator = calculator_excluding('/./')
+    calculator.stubs(:run_yard_stats_query).returns("method:doc:Foo#bar|0\nmethod:undoc:#baz|1\n")
+
+    result = calculator.calculate
+    assert_equal({ total: 0, documented: 0, coverage: 0.0 }, result)
   end
 
   # #parse_stats_output
@@ -117,10 +151,10 @@ describe 'Yard::Lint::StatsCalculator' do
     assert_equal(2, result.keys.size)
   end
 
-  it 'parse stats output ignores lines with extra colons' do
+  it 'parse stats output ignores a method part without arity' do
     output = "method:doc:extra\n"
     result = calculator.send(:parse_stats_output, output)
-    # Line is malformed (extra colon), should be ignored
+    # Line is malformed (no |arity), should be ignored
     # Hash.new returns default value for non-existent keys
     assert_equal({ documented: 0, undocumented: 0 }, result['method'])
   end
@@ -140,13 +174,13 @@ describe 'Yard::Lint::StatsCalculator' do
     assert_in_delta(86.67, result[:coverage], 0.01)
   end
 
-  it 'calculate coverage percentage returns 100 for empty stats' do
+  it 'calculate coverage percentage returns 0 for empty stats' do
     stats = {}
     result = calculator.send(:calculate_coverage_percentage, stats)
 
     assert_equal(0, result[:total])
     assert_equal(0, result[:documented])
-    assert_equal(100.0, result[:coverage])
+    assert_equal(0.0, result[:coverage])
   end
 
   it 'calculate coverage percentage handles zero documented objects' do
@@ -169,6 +203,15 @@ describe 'Yard::Lint::StatsCalculator' do
     assert_includes(query, 'object.docstring.all.empty?')
     assert_includes(query, 'doc')
     assert_includes(query, 'undoc')
+    assert_includes(query, 'object.title')
+  end
+
+  it 'parse stats output reads a method title that contains | and :' do
+    calculator = calculator_excluding('|')
+    output = "method:undoc:Foo::Bar#||1\nmethod:undoc:Foo::Bar#baz|0\n"
+
+    result = calculator.send(:parse_stats_output, output)
+    assert_equal({ documented: 0, undocumented: 1 }, result['method'])
   end
 end
 
