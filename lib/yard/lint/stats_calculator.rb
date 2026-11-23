@@ -26,8 +26,8 @@ module Yard
 
         raw_stats = run_yard_stats_query
         # nil means the YARD subprocess failed - return nil (coverage unknown)
-        # rather than default_stats, which would falsely report 100% coverage
-        # and let a MinCoverage gate pass.
+        # rather than default_stats, which would report the files as having
+        # nothing to document.
         return nil if raw_stats.nil?
         return default_stats if raw_stats.empty?
 
@@ -59,7 +59,7 @@ module Yard
 
             # Return nil if the YARD command fails (non-zero exit, or killed by
             # a signal so exitstatus is nil) - distinct from genuinely empty
-            # output, so coverage is reported as unknown rather than 100%.
+            # output, so coverage is reported as unknown rather than 0%.
             return nil unless status.exitstatus&.zero?
 
             stdout

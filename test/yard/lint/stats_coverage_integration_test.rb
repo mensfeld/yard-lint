@@ -303,6 +303,33 @@ describe 'Yard::Lint::StatsCoverageIntegration' do
     assert_equal(0.0, coverage[:coverage])
   end
 
+  it 'excluded methods arity ignores splat and block params' do
+    File.write(@config_file, <<~YAML)
+      Documentation/UndocumentedObjects:
+        ExcludedMethods:
+          - 'initialize/0'
+          - 'call/1'
+    YAML
+
+    file = create_test_file('arity.rb', <<~RUBY)
+      # frozen_string_literal: true
+
+      # Documented class
+      class Arity
+        def initialize(*args, &blk); end
+
+        def call(value, *rest, **opts, &blk); end
+
+        def other(value, &blk); end
+      end
+    RUBY
+
+    coverage = run_yard_lint(file, config_file: @config_file).documentation_coverage
+
+    # initialize (arity 0) and call (arity 1) are excluded: class (doc) + #other (undoc)
+    assert_equal({ total: 2, documented: 1, coverage: 50.0 }, coverage)
+  end
+
   it 'all methods excluded with no other objects gives 0 coverage' do
     file = create_test_file('only_methods.rb', <<~RUBY)
       # frozen_string_literal: true
