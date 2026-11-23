@@ -31,7 +31,7 @@ YARD-Lint validates your YARD documentation for:
 - **Performance** - In-process YARD execution with shared registry (~10x faster than shell-based execution)
 - **Incremental Adoption** - `--auto-gen-config` generates a baseline todo file to adopt on legacy codebases without fixing everything first
 
-**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [37 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
+**See the complete list:** [All Features](https://github.com/mensfeld/yard-lint/wiki/Features) | [40 Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)
 
 ## Installation
 
@@ -688,7 +688,7 @@ JSON output keeps the absolute `location`. Text and quickfix output print the pa
 - **[Wiki Home](https://github.com/mensfeld/yard-lint/wiki)** - Full documentation
 - **[Installation](https://github.com/mensfeld/yard-lint/wiki/Installation)** - Installation guide
 - **[Configuration](https://github.com/mensfeld/yard-lint/wiki/Configuration)** - Complete configuration reference
-- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 37 validators documented
+- **[Validators](https://github.com/mensfeld/yard-lint/wiki/Validators)** - All 40 validators documented
 - **[Features](https://github.com/mensfeld/yard-lint/wiki/Features)** - All features explained
 
 ### Workflows
