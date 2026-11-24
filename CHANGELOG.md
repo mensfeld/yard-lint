@@ -1,3 +1,6 @@
+## 1.15.0 (2026-11-24)
+- **[Maintenance]** Release with a Sigstore attestation. 1.14.0 was pushed to RubyGems.org without one: the release job's `sigstore-cli 0.2.3` failed with json 3.1.0, and the push went ahead unsigned. The release job now installs its gems into `vendor/bundle`, so they do not reach the signer, and uses `rubygems/release-gem` v1.4.2, which fixes the release wait that failed the job under Ruby 4.0. No code changes since 1.14.0.
+
 ## 1.14.0 (2026-11-24)
 - **[Enhancement]** Files are now parsed with YARD once instead of twice when nothing in them depends on parse order (simplecov 1.3.2 `lib/`: about 5.9 s to 4.5 s). The second pass still runs, and the offenses stay the same, when the files define a `@!macro`, have an `alias`/`alias_method` or `module_function :name` written before its method, or a `module_function` copy that differs from its instance method (e.g. an undocumented `?` method).
 - **[Enhancement]** Text and quickfix output now print offense paths relative to the current directory (`lib/foo.rb:10` instead of `/home/me/myproj/lib/foo.rb:10`), like RuboCop. Files outside the current directory keep their absolute path. JSON output and `Yard::Lint.run` results keep absolute paths.

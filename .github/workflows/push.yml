@@ -31,8 +31,13 @@ jobs:
           ruby-version: '4.0.10'
           bundler-cache: false
 
+      # Install into vendor/bundle, not the Ruby install. release-gem signs the gem with
+      # `gem exec sigstore-cli` outside the bundle, so gems in the Ruby install leak into the
+      # signer. json 3.x from Gemfile.lock broke sigstore-cli 0.2.3 and v1.14.0 went out
+      # without an attestation.
       - name: Bundle install
         run: |
+          bundle config set --local path vendor/bundle
           bundle install --jobs 4 --retry 3
 
-      - uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1
+      - uses: rubygems/release-gem@5c53f5308233b7c0f47411f0471b3faae6fa57b2 # v1.4.2
