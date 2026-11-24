@@ -18,6 +18,7 @@ describe 'Quickfix output format' do
       output = IO.popen(
         "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         '--format quickfix --no-progress 2>&1',
+        chdir: dir,
         &:read
       )
 
@@ -40,11 +41,15 @@ describe 'Quickfix output format' do
 
     Dir.mktmpdir do |dir|
       virtual = File.join(dir, 'myfile.rb')
-      output = IO.popen(
-        "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
-        '--format quickfix --no-progress 2>&1',
-        &:read
-      )
+      # Run from another directory: paths outside it stay absolute
+      output = Dir.mktmpdir do |cwd|
+        IO.popen(
+          "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
+          '--format quickfix --no-progress 2>&1',
+          chdir: cwd,
+          &:read
+        )
+      end
 
       lines = output.lines.map(&:chomp).reject(&:empty?)
       refute_empty(lines)
@@ -99,6 +104,7 @@ describe 'Quickfix output format' do
       IO.popen(
         "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         '--format quickfix --no-progress 2>&1',
+        chdir: dir,
         &:read
       )
       refute_equal(0, $CHILD_STATUS.exitstatus)
@@ -203,6 +209,7 @@ describe 'Quickfix output format' do
       output = IO.popen(
         "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         '--format quickfix --no-progress 2>&1',
+        chdir: dir,
         &:read
       )
 
@@ -246,6 +253,7 @@ describe 'Quickfix output format' do
       output = IO.popen(
         "printf '%s' #{Shellwords.escape(source)} | #{@bin_path} --stdin #{Shellwords.escape(virtual)} " \
         '--format quickfix 2>&1',
+        chdir: dir,
         &:read
       )
 

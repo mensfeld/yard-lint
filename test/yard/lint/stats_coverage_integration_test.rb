@@ -148,14 +148,11 @@ describe 'Yard::Lint::StatsCoverageIntegration' do
     result = run_yard_lint(file, config_file: @config_file)
     coverage = result.documentation_coverage
 
-    # Should exclude initialize/1 and private_method from stats
-    # Total: 4 (class + 3 methods) - but initialize/1 and private_method excluded
-    # But YARD query doesn't filter by ExcludedMethods, it reports all objects
-    # The exclusion only affects validators, not stats calculation
-    # So we expect: class (1 doc) + initialize (0 doc) + private_method (0 doc) + public_method (0 doc)
+    # initialize/1 and private_method are excluded: class (doc) + public_method (undoc)
     refute_nil(coverage)
-    assert_equal(4, coverage[:total])
-    assert_equal(1, coverage[:documented]) # Just the class
+    assert_equal(2, coverage[:total])
+    assert_equal(1, coverage[:documented])
+    assert_equal(50.0, coverage[:coverage])
   end
 
   it 'min coverage passes when meets minimum threshold' do
@@ -290,7 +287,7 @@ describe 'Yard::Lint::StatsCoverageIntegration' do
     assert_nil(coverage) # No files means no coverage to calculate
   end
 
-  it 'empty file handling handles files with no documentable objects' do
+  it 'empty file handling returns 0 for files with no documentable objects' do
     file = create_test_file('empty.rb', <<~RUBY)
       # frozen_string_literal: true
 
@@ -303,7 +300,61 @@ describe 'Yard::Lint::StatsCoverageIntegration' do
     refute_nil(coverage)
     assert_equal(0, coverage[:total])
     assert_equal(0, coverage[:documented])
-    assert_equal(100.0, coverage[:coverage]) # Empty = 100% by convention
+    assert_equal(0.0, coverage[:coverage])
+  end
+
+  it 'excluded methods arity ignores splat and block params' do
+    File.write(@config_file, <<~YAML)
+      Documentation/UndocumentedObjects:
+        ExcludedMethods:
+          - 'initialize/0'
+          - 'call/1'
+    YAML
+
+    file = create_test_file('arity.rb', <<~RUBY)
+      # frozen_string_literal: true
+
+      # Documented class
+      class Arity
+        def initialize(*args, &blk); end
+
+        def call(value, *rest, **opts, &blk); end
+
+        def other(value, &blk); end
+      end
+    RUBY
+
+    coverage = run_yard_lint(file, config_file: @config_file).documentation_coverage
+
+    # initialize (arity 0) and call (arity 1) are excluded: class (doc) + #other (undoc)
+    assert_equal({ total: 2, documented: 1, coverage: 50.0 }, coverage)
+  end
+
+  it 'all methods excluded with no other objects gives 0 coverage' do
+    file = create_test_file('only_methods.rb', <<~RUBY)
+      # frozen_string_literal: true
+
+      def helper; end
+    RUBY
+    File.write(@config_file, <<~YAML)
+      Documentation/UndocumentedObjects:
+        ExcludedMethods:
+          - 'helper'
+    YAML
+
+    result = run_yard_lint(file, config_file: @config_file, min_coverage: 50.0)
+
+    assert_equal({ total: 0, documented: 0, coverage: 0.0 }, result.documentation_coverage)
+    assert_equal(1, result.exit_code)
+  end
+
+  it 'stdin source is counted instead of the file on disk' do
+    file = create_test_file('stdin.rb', "class OnDisk; end\n")
+    source = "# Documented\nclass FromStdin\n  def undocumented; end\nend\n"
+
+    result = Yard::Lint.run(path: file, config: Yard::Lint::Config.new, progress: false, source: source)
+
+    assert_equal({ total: 2, documented: 1, coverage: 50.0 }, result.documentation_coverage)
   end
 
   it 'multiple files calculates aggregate coverage' do

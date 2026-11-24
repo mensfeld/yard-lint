@@ -64,8 +64,6 @@ module Yard
                 end
             end
 
-            private
-
             # Checks if a method should be excluded based on ExcludedMethods config
             # Supports: simple names, arity notation, and regex patterns
             # @param element [String] the element name (e.g., "Class#method")
@@ -73,6 +71,7 @@ module Yard
             #   excluding splat and block)
             # @param excluded_methods [Array<String>] list of exclusion patterns
             # @return [Boolean] true if method should be excluded
+            # @api private
             def method_excluded?(element, arity, excluded_methods)
               # ExcludedMethods only applies to methods. A class, module, or
               # constant element has no #/. separator, so never derive a
@@ -99,6 +98,20 @@ module Yard
                 end
               end
             end
+
+            # Sanitize exclusion patterns
+            # @param patterns [Array] raw patterns from config
+            # @return [Array<String>] cleaned and validated patterns
+            # @api private
+            def sanitize_patterns(patterns)
+              patterns
+                .compact # Remove nil values
+                .map { |p| p.to_s.strip } # Convert to strings and trim whitespace
+                .reject(&:empty?) # Remove empty strings
+                .reject { |p| p == '//' } # Reject empty regex (matches everything)
+            end
+
+            private
 
             # Checks if an object should be excluded based on ExcludedObjects config.
             # Matches against the fully-qualified object name (the whole element),
@@ -130,17 +143,6 @@ module Yard
                   element == pattern
                 end
               end
-            end
-
-            # Sanitize exclusion patterns
-            # @param patterns [Array] raw patterns from config
-            # @return [Array<String>] cleaned and validated patterns
-            def sanitize_patterns(patterns)
-              patterns
-                .compact # Remove nil values
-                .map { |p| p.to_s.strip } # Convert to strings and trim whitespace
-                .reject(&:empty?) # Remove empty strings
-                .reject { |p| p == '//' } # Reject empty regex (matches everything)
             end
 
             # Match a regex pattern against method name with error handling
